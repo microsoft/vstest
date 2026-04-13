@@ -173,6 +173,61 @@ public class ExecutionTests : AcceptanceTestBase
         ExitCodeEquals(0);
     }
 
+    /// <summary>
+    /// Verifies that vstest.console does not hang when testhost starts a child process
+    /// that inherits the stderr pipe handle and outlives testhost. This simulates the
+    /// Selenium WebDriver scenario where Edge Driver (child) keeps the pipe handle open
+    /// after testhost exits.
+    ///
+    /// The protection is the 500ms timeout in ProcessHelper.cs's Exited handler.
+    /// Without it, the parameterless WaitForExit() would block forever waiting for pipe EOF.
+    /// </summary>
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    public void VsTestShouldNotHangWhenChildProcessHoldsPipeOpen(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = GetAssetFullPath("zombie-child-process.dll");
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        InvokeVsTest(arguments);
+        stopwatch.Stop();
+
+        // The test should pass (the test method itself passes immediately).
+        ValidateSummaryStatus(1, 0, 0);
+        ExitCodeEquals(0);
+
+        // vstest.console should complete well within 60 seconds.
+        // The child process sleeps for 30s, so if vstest.console waits for the pipe EOF
+        // it would take at least 30s. A healthy run completes in a few seconds.
+        stopwatch.Elapsed.Should().BeLessThan(TimeSpan.FromSeconds(60),
+            "vstest.console should not hang waiting for pipe EOF from the child process");
+
+        // Clean up the sleeping-child process if it's still running.
+        var stderrOutput = StdErr;
+        var pidMatch = System.Text.RegularExpressions.Regex.Match(stderrOutput, @"ZOMBIE_CHILD_PID=(\d+)");
+        if (pidMatch.Success && int.TryParse(pidMatch.Groups[1].Value, out int childPid))
+        {
+            try
+            {
+                var childProcess = System.Diagnostics.Process.GetProcessById(childPid);
+                childProcess.Kill();
+                childProcess.WaitForExit(5000);
+            }
+            catch (ArgumentException)
+            {
+                // Process already exited
+            }
+            catch (InvalidOperationException)
+            {
+                // Process already exited
+            }
+        }
+    }
+
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
