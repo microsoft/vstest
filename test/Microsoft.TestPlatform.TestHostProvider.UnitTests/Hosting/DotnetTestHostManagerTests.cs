@@ -22,6 +22,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -1110,8 +1111,199 @@ public class DotnetTestHostManagerTests
         return startInfo;
     }
 
-    internal class TestableDotnetTestHostManager : DotnetTestHostManager
+    // -------------------------------------------------------------------------
+    // Tests for PR #15266 — "Set dotnet_root_<arch> always"
+    // The PR changed DOTNET_ROOT_<ARCH> to be set early (before testhost.exe is found)
+    // so that child processes launched by xunit v3 can also find dotnet.
+    // It also added VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS feature flag to revert.
+    // -------------------------------------------------------------------------
+
+    [TestCleanup]
+    public void Cleanup()
     {
+        // Remove the feature flag env var so it doesn't bleed into subsequent tests.
+        Environment.SetEnvironmentVariable(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS, null);
+#pragma warning disable CS0618
+        FeatureFlag.Reset();
+#pragma warning restore CS0618
+    }
+
+    [TestMethod]
+    [TestCategory("PR15266")]
+    public void GetTestHostProcessStartInfoShouldSetDotnetRootArchEarlyOnNonWindows()
+    {
+        // When the feature flag is NOT set, DOTNET_ROOT_<ARCH> must be added
+        // even when running on non-Windows — this enables xunit v3 child processes.
+        var path = "/usr/local/dotnet";
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(path);
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE")).Returns("x64");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsNotNull(startInfo.EnvironmentVariables);
+        Assert.IsTrue(startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT_X64"),
+            "Expected DOTNET_ROOT_X64 to be set early even on non-Windows when flag is off.");
+        Assert.AreEqual(path, startInfo.EnvironmentVariables["DOTNET_ROOT_X64"]);
+    }
+
+    [TestMethod]
+    [TestCategory("PR15266")]
+    public void GetTestHostProcessStartInfoShouldNotSetDotnetRootEarlyWhenFeatureFlagIsSet()
+    {
+        // When VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS=1, the early-set block is
+        // skipped and only the testhost.exe branch (not exercised here) may set it.
+        var path = @"C:\dotnet";
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(path);
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE")).Returns("x64");
+
+        Environment.SetEnvironmentVariable(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS, "1");
+#pragma warning disable CS0618
+        FeatureFlag.Reset();
+#pragma warning restore CS0618
+
+        // testhost.exe is NOT mocked as found, so the testHostExeFound branch is skipped too.
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsTrue(
+            startInfo.EnvironmentVariables == null || !startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT_X64"),
+            "DOTNET_ROOT_X64 should not be set by the early block when the feature flag is enabled.");
+    }
+
+    [TestMethod]
+    [TestCategory("PR15266")]
+    public void GetTestHostProcessStartInfoShouldNotOverrideExistingDotnetRootArchInEnvironment()
+    {
+        // SetDotnetRootForArchitecture should respect an already-set DOTNET_ROOT_<ARCH>
+        // so that a user's explicit environment takes priority over the SDK-supplied path.
+        var sdkPath = @"C:\sdk-dotnet";
+        var userPath = @"C:\user-dotnet";
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(sdkPath);
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE")).Returns("x64");
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64")).Returns(userPath);
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        // DOTNET_ROOT_X64 should NOT appear in startInfo because it is already in the environment.
+        Assert.IsTrue(
+            startInfo.EnvironmentVariables == null || !startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT_X64"),
+            "DOTNET_ROOT_X64 already present in the surrounding environment must not be overridden.");
+    }
+
+    [TestMethod]
+    [TestCategory("PR15266")]
+    public void GetTestHostProcessStartInfoShouldThrowWhenDotnetRootPathSetButArchitectureMissing()
+    {
+        // If the SDK sets VSTEST_DOTNET_ROOT_PATH but forgets VSTEST_DOTNET_ROOT_ARCHITECTURE,
+        // we throw a descriptive InvalidOperationException instead of silently doing the wrong thing.
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(@"C:\dotnet");
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE"))
+            .Returns((string?)null);
+
+        Assert.ThrowsExactly<InvalidOperationException>(
+            () => _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo));
+    }
+
+    // -------------------------------------------------------------------------
+    // Tests for PR #15184 — "Handle dotnet_root in testhost version-aware way"
+    // Old testhosts (< 17.14) use legacy DOTNET_ROOT / DOTNET_ROOT(x86) env vars.
+    // New testhosts (≥ 17.14) use the architecture-specific DOTNET_ROOT_<ARCH>.
+    // The old-testhost path is exercised here (dll missing → null version info).
+    // -------------------------------------------------------------------------
+
+    [TestMethod]
+    [TestCategory("PR15184")]
+    public void GetTestHostProcessStartInfoShouldSetLegacyDotnetRootForOldTesthostX64WhenFeatureFlagIsSet()
+    {
+        // Old testhost running x64 — DOTNET_ROOT must be set (not DOTNET_ROOT_X64).
+        // Triggered when: feature flag set + testhost.exe found + testhost.dll absent (null version).
+        var path = @"C:\dotnet";
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(path);
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE")).Returns("x64");
+
+        Environment.SetEnvironmentVariable(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS, "1");
+#pragma warning disable CS0618
+        FeatureFlag.Reset();
+#pragma warning restore CS0618
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsNotNull(startInfo.EnvironmentVariables);
+        Assert.IsTrue(startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT"),
+            "Old x64 testhost: expected legacy DOTNET_ROOT env var.");
+        Assert.AreEqual(path, startInfo.EnvironmentVariables["DOTNET_ROOT"]);
+        Assert.IsFalse(startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT_X64"),
+            "Old x64 testhost must use DOTNET_ROOT, not the arch-specific variant.");
+    }
+
+    [TestMethod]
+    [TestCategory("PR15184")]
+    public void GetTestHostProcessStartInfoShouldSetLegacyDotnetRootX86ForOldTesthostX86WhenFeatureFlagIsSet()
+    {
+        // Old testhost running x86 — DOTNET_ROOT(x86) must be set, not DOTNET_ROOT.
+        const string x86Settings = @"<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>";
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, x86Settings);
+
+        var path = @"C:\dotnet-x86";
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.dll")).Returns(false);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(path);
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE")).Returns("x86");
+
+        Environment.SetEnvironmentVariable(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS, "1");
+#pragma warning disable CS0618
+        FeatureFlag.Reset();
+#pragma warning restore CS0618
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsNotNull(startInfo.EnvironmentVariables);
+        Assert.IsTrue(startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT(x86)"),
+            "Old x86 testhost: expected DOTNET_ROOT(x86) env var.");
+        Assert.AreEqual(path, startInfo.EnvironmentVariables["DOTNET_ROOT(x86)"]);
+    }
+
+    [TestMethod]
+    [TestCategory("PR15184")]
+    public void GetTestHostProcessStartInfoShouldNotSetDotnetRootWhenArchitectureMismatchForOldTesthost()
+    {
+        // Old testhost path: when the SDK-provided architecture does not match the target
+        // architecture, no DOTNET_ROOT variable should be forwarded (avoids x64→x86 confusion).
+        var path = @"C:\dotnet";
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.exe")).Returns(true);
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.dll")).Returns(false);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH")).Returns(path);
+        // SDK says the dotnet binary is x86, but this host manager targets x64 → mismatch.
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE")).Returns("x86");
+
+        Environment.SetEnvironmentVariable(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS, "1");
+#pragma warning disable CS0618
+        FeatureFlag.Reset();
+#pragma warning restore CS0618
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsTrue(
+            startInfo.EnvironmentVariables == null
+            || (!startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT")
+                && !startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT(x86)")
+                && !startInfo.EnvironmentVariables.ContainsKey("DOTNET_ROOT_X64")),
+            "Architecture mismatch must not forward any DOTNET_ROOT variant.");
+    }
+
+    internal class TestableDotnetTestHostManager : DotnetTestHostManager    {
         public TestableDotnetTestHostManager(
             IProcessHelper processHelper,
             IFileHelper fileHelper,
