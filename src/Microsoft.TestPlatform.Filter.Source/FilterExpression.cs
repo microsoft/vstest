@@ -1,6 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+#nullable enable
+
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -9,10 +11,16 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 
+#if !IS_VSTEST_REPO
+using Microsoft.CodeAnalysis;
+#endif
+
+#if IS_VSTEST_REPO
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
-using CommonResources = Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+using static Microsoft.VisualStudio.TestPlatform.Common.Resources.Resources;
+#endif
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 
@@ -23,8 +31,25 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 ///     Equality Operators: =, !=
 ///     Parenthesis (, ) for grouping.
 /// </summary>
+#if !IS_VSTEST_REPO
+[Embedded]
+#endif
 internal sealed class FilterExpression
 {
+#if !IS_VSTEST_REPO
+    private const string TestCaseFilterFormatException = "Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.";
+
+    private const string MissingOperand = "Error: Missing operand";
+
+    private const string MissingCloseParenthesis = "Error: Missing ')'";
+
+    private const string EmptyParenthesis = "Error: Empty parenthesis ( )";
+
+    private const string MissingOpenParenthesis = "Error: Missing '('";
+
+    private const string MissingOperator = "Missing Operator '|' or '&'";
+#endif
+
     /// <summary>
     /// Condition, if expression is conditional expression.
     /// </summary>
@@ -78,7 +103,7 @@ internal sealed class FilterExpression
         {
             if (filterStack.Count < 2)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperand));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingOperand));
             }
 
             var filterRight = filterStack.Pop();
@@ -90,7 +115,7 @@ internal sealed class FilterExpression
         {
             if (filterStack.Count < 2)
             {
-                throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperand));
+                throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingOperand));
             }
 
             var filterRight = filterStack.Pop();
@@ -100,12 +125,12 @@ internal sealed class FilterExpression
         }
         else if (op == Operator.OpenBrace)
         {
-            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingCloseParenthesis));
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingCloseParenthesis));
         }
         else
         {
             Debug.Fail("ProcessOperator called for Unexpected operator.");
-            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, string.Empty));
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, string.Empty));
         }
     }
 
@@ -113,7 +138,11 @@ internal sealed class FilterExpression
     /// True, if filter is valid for given set of properties.
     /// When False, invalidProperties would contain properties making filter invalid.
     /// </summary>
+#if IS_VSTEST_REPO
     internal string[]? ValidForProperties(IEnumerable<string>? properties, Func<string, TestProperty?>? propertyProvider)
+#else
+    internal string[]? ValidForProperties(IEnumerable<string>? properties)
+#endif
     {
         properties ??= [];
 
@@ -122,7 +151,11 @@ internal sealed class FilterExpression
             // Only the leaves have a condition value.
             if (current._condition != null)
             {
+#if IS_VSTEST_REPO
                 var valid = current._condition.ValidForProperties(properties, propertyProvider);
+#else
+                var valid = current._condition.ValidForProperties(properties);
+#endif
                 // If it's not valid will add it to the function's return array.
                 return !valid ? [current._condition.Name] : null;
             }
@@ -150,13 +183,15 @@ internal sealed class FilterExpression
     /// </summary>
     internal static FilterExpression Parse(string filterString, out FastFilter? fastFilter)
     {
+#if IS_VSTEST_REPO
         ValidateArg.NotNull(filterString, nameof(filterString));
+#endif
 
         // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parenthesis).
         var invalidInput = Regex.Match(filterString, @"\(\s*\)");
         if (invalidInput.Success)
         {
-            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.EmptyParenthesis));
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, EmptyParenthesis));
         }
 
         var tokens = TokenizeFilterExpressionString(filterString);
@@ -170,7 +205,11 @@ internal sealed class FilterExpression
         foreach (var inputToken in tokens)
         {
             var token = inputToken.Trim();
+#if IS_VSTEST_REPO
             if (token.IsNullOrEmpty())
+#else
+            if (string.IsNullOrEmpty(token))
+#endif
             {
                 // ignore empty tokens
                 continue;
@@ -218,7 +257,7 @@ internal sealed class FilterExpression
                     // If stack is empty at any time, than matching OpenBrace is missing from the expression.
                     if (operatorStack.Count == 0)
                     {
-                        throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOpenParenthesis));
+                        throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingOpenParenthesis));
                     }
 
                     Operator temp = operatorStack.Pop();
@@ -227,7 +266,7 @@ internal sealed class FilterExpression
                         ProcessOperator(filterStack, temp);
                         if (operatorStack.Count == 0)
                         {
-                            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOpenParenthesis));
+                            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingOpenParenthesis));
                         }
                         temp = operatorStack.Pop();
                     }
@@ -253,7 +292,7 @@ internal sealed class FilterExpression
 
         if (filterStack.Count != 1)
         {
-            throw new FormatException(string.Format(CultureInfo.CurrentCulture, CommonResources.TestCaseFilterFormatException, CommonResources.MissingOperator));
+            throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, MissingOperator));
         }
 
         fastFilter = fastFilterBuilder.ToFastFilter();
@@ -300,7 +339,7 @@ internal sealed class FilterExpression
         }
         while (filterStack.Count > 0);
 
-        TPDebug.Assert(result.Count == 1, "Result stack should have one element at the end.");
+        Debug.Assert(result.Count == 1, "Result stack should have one element at the end.");
         return result.Peek();
     }
     /// <summary>
@@ -310,7 +349,9 @@ internal sealed class FilterExpression
     /// <returns> True if evaluation is successful. </returns>
     internal bool Evaluate(Func<string, object?> propertyValueProvider)
     {
+#if IS_VSTEST_REPO
         ValidateArg.NotNull(propertyValueProvider, nameof(propertyValueProvider));
+#endif
 
         return IterateFilterExpression<bool>((current, result) =>
         {
@@ -332,7 +373,9 @@ internal sealed class FilterExpression
 
     internal static IEnumerable<string> TokenizeFilterExpressionString(string str)
     {
+#if IS_VSTEST_REPO
         ValidateArg.NotNull(str, nameof(str));
+#endif
         return TokenizeFilterExpressionStringHelper(str);
 
         static IEnumerable<string> TokenizeFilterExpressionStringHelper(string s)
