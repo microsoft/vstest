@@ -165,4 +165,102 @@ public sealed class ArtifactNameTemplateTests
 
         Assert.AreEqual("TestResults/20260415T105100.123", result);
     }
+
+    [TestMethod]
+    public void ExpandTemplate_EmptyToken_KeptLiterally()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string>();
+
+        string result = provider.ExpandTemplate("{}", context);
+
+        Assert.AreEqual("{}", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_LoneBrace_KeptLiterally()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string>();
+
+        string result = provider.ExpandTemplate("a}b", context);
+
+        Assert.AreEqual("a}b", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_WhitespaceToken_KeptLiterally()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string>();
+
+        string result = provider.ExpandTemplate("{ Token }", context);
+
+        Assert.AreEqual("{ Token }", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_UnknownTokenWithFormat_KeptLiterally()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string>();
+
+        string result = provider.ExpandTemplate("{Missing:yyyy}", context);
+
+        Assert.AreEqual("{Missing:yyyy}", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_MultipleColons_FirstColonIsFormatSeparator()
+    {
+        var provider = CreateProvider();
+        string isoTimestamp = FixedTime.ToString("o", System.Globalization.CultureInfo.InvariantCulture);
+        var context = new Dictionary<string, string> { ["Timestamp"] = isoTimestamp };
+
+        // Format "HH:mm:ss" contains colons — only the first colon separates token from format.
+        string result = provider.ExpandTemplate("{Timestamp:HH:mm:ss}", context);
+
+        Assert.AreEqual("10:51:00", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_FormatOnNonDateTimeValue_FormatIgnored()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string> { ["BuildId"] = "12345" };
+
+        // "12345" is not a DateTime — format is silently ignored, raw value returned.
+        string result = provider.ExpandTemplate("{BuildId:D4}", context);
+
+        Assert.AreEqual("12345", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_TripleBraces_EscapedBracePlusToken()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string> { ["X"] = "val" };
+
+        // {{{ → escaped { + start of token, but there's no inner token name that matches.
+        // Actually: {{ → literal {, then {X} → "val"
+        string result = provider.ExpandTemplate("{{{X}}}", context);
+
+        // {{ → {, {X} → val, }} → }
+        Assert.AreEqual("{val}", result);
+    }
+
+    [TestMethod]
+    public void ExpandTemplate_CaseInsensitiveTokenLookup()
+    {
+        var provider = CreateProvider();
+        var context = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["assemblyname"] = "MyTests",
+        };
+
+        // Template uses PascalCase, context has lowercase — should still match.
+        string result = provider.ExpandTemplate("{AssemblyName}", context);
+
+        Assert.AreEqual("MyTests", result);
+    }
 }

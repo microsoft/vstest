@@ -249,7 +249,7 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
             result.Append(InvalidFileNameChars.Contains(c) ? '_' : c);
         }
 
-        string sanitized = result.ToString().TrimEnd();
+        string sanitized = result.ToString().TrimEnd(' ', '.');
         if (sanitized.Length == 0)
         {
             return "_";
