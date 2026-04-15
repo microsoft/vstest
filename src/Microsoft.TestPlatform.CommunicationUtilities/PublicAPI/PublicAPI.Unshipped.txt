@@ -1,5 +1,19 @@
 #nullable enable
 const Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.MessageType.TelemetryEventMessage = "TestPlatform.TelemetryEvent" -> string!
+const Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.MessageType.TestCaseFinished = "TestExecution.TestCaseFinished" -> string!
+const Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.MessageType.TestCaseStarting = "TestExecution.TestCaseStarting" -> string!
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ITestRequestHandler.SendTestCaseFinished(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase! testCase) -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.ITestRequestHandler.SendTestCaseStarting(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase! testCase) -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseFinishedPayload
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseFinishedPayload.Id.get -> System.Guid
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseFinishedPayload.Id.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseFinishedPayload.TestCaseFinishedPayload() -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseStartingPayload
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseStartingPayload.DisplayName.get -> string?
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseStartingPayload.DisplayName.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseStartingPayload.Id.get -> System.Guid
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseStartingPayload.Id.set -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel.TestCaseStartingPayload.TestCaseStartingPayload() -> void
 ~static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.ConnectionTimeoutProcessDidNotStartErrorMessage.get -> string
 ~static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.ConnectionTimeoutProcessExitedErrorMessage.get -> string
 ~static Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources.Resources.ConnectionTimeoutWithDetailsErrorMessage.get -> string

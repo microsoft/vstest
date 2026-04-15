@@ -20,6 +20,11 @@ public class TestRunEventsHandler : IInternalTestRunEventsHandler
     private readonly ITestRequestHandler _requestHandler;
 
     /// <summary>
+    /// Gets the underlying request handler for direct message sending.
+    /// </summary>
+    internal ITestRequestHandler RequestHandler => _requestHandler;
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="TestRunEventsHandler"/> class.
     /// </summary>
     /// <param name="requestHandler">test request handler</param>

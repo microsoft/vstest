@@ -50,6 +50,7 @@ public class TestRequestSender : ITestRequestSender
     // that implies host is using version 1.
     private int _protocolVersion = 1;
     private bool _isDiscoveryAborted;
+    private readonly InFlightTestTracker _inFlightTests = new();
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestRequestSender"/> class.
@@ -593,6 +594,24 @@ public class TestRequestSender : ITestRequestSender
                     _channel.Send(resultMessage);
 
                     break;
+
+                case MessageType.TestCaseStarting:
+                    var testCaseStarting = _dataSerializer.DeserializePayload<TestCaseStartingPayload>(message);
+                    if (testCaseStarting is not null)
+                    {
+                        EqtTrace.Info("TestRequestSender.OnExecutionMessageReceived: TestCaseStarting received for: {0}", testCaseStarting.DisplayName);
+                        _inFlightTests.TestStarting(testCaseStarting, DateTimeOffset.UtcNow);
+                    }
+                    break;
+
+                case MessageType.TestCaseFinished:
+                    var testCaseFinished = _dataSerializer.DeserializePayload<TestCaseFinishedPayload>(message);
+                    if (testCaseFinished is not null)
+                    {
+                        EqtTrace.Info("TestRequestSender.OnExecutionMessageReceived: TestCaseFinished received for: {0}", testCaseFinished.Id);
+                        _inFlightTests.TestFinished(testCaseFinished.Id);
+                    }
+                    break;
             }
         }
         catch (Exception exception)
@@ -748,6 +767,14 @@ public class TestRequestSender : ITestRequestSender
         // TODO: this timeout is 10 seconds, make it also configurable like the other famous timeout that is 100ms
         if (_clientExited.Wait(_clientExitedWaitTime))
         {
+            // Give a brief moment for any in-flight protocol messages (like TestCaseStarting)
+            // to be processed before we build the error. The message receive loop runs on a
+            // separate thread and may still be draining buffered messages.
+            if (!_inFlightTests.HasInFlightTests)
+            {
+                Thread.Sleep(50);
+            }
+
             // Set a default message of test host process exited and additionally specify the error if we were able to get it
             // from error output of the process
             EqtTrace.Info("TestRequestSender.GetAbortErrorMessage: Received test host error message.");
@@ -757,14 +784,46 @@ public class TestRequestSender : ITestRequestSender
                 reason = $"{reason} : {_clientExitErrorMessage}";
             }
 
+            reason = AppendInFlightTestsInfo(reason);
+
             return reason;
         }
         else
         {
             EqtTrace.Info("TestRequestSender.GetAbortErrorMessage: Timed out waiting for test host error message.");
-            return CommonResources.UnableToCommunicateToTestHost;
+            return AppendInFlightTestsInfo(CommonResources.UnableToCommunicateToTestHost);
         }
     }
+
+    private string AppendInFlightTestsInfo(string reason)
+    {
+        var sb = new System.Text.StringBuilder(reason);
+
+        if (_inFlightTests.HasInFlightTests)
+        {
+            var inFlight = _inFlightTests.GetInFlightTests();
+            var now = DateTimeOffset.UtcNow;
+            sb.AppendLine();
+            sb.AppendLine("Tests that were executing when the crash occurred:");
+            foreach (var (displayName, startTime) in inFlight)
+            {
+                var elapsed = now - startTime;
+                sb.AppendLine($"  {displayName ?? "<unknown>"} (running for {FormatElapsed(elapsed)})");
+            }
+        }
+
+        sb.AppendLine();
+        sb.Append("Consider using --blame-crash to collect a crash dump for further diagnosis.");
+
+        return sb.ToString();
+    }
+
+    private static string FormatElapsed(TimeSpan elapsed) => elapsed.TotalSeconds switch
+    {
+        < 1 => $"{elapsed.Milliseconds}ms",
+        < 60 => $"{elapsed.TotalSeconds:F0}s",
+        _ => $"{elapsed.TotalMinutes:F0}m {elapsed.Seconds}s",
+    };
 
     private void LogErrorMessage(string message)
     {

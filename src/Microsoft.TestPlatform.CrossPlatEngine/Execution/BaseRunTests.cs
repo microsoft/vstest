@@ -18,6 +18,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandlers;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
@@ -156,11 +157,14 @@ internal abstract class BaseRunTests
         RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
         _runConfiguration = runConfig;
 
+        var requestHandler = (testRunEventsHandler as TestRunEventsHandler)?.RequestHandler;
         FrameworkHandle = new FrameworkHandle(
             _testCaseEventsHandler,
             TestRunCache,
             TestExecutionContext,
-            TestRunEventsHandler);
+            TestRunEventsHandler,
+            onTestCaseStarting: requestHandler is not null ? tc => requestHandler.SendTestCaseStarting(tc) : null,
+            onTestCaseFinished: requestHandler is not null ? tc => requestHandler.SendTestCaseFinished(tc) : null);
         FrameworkHandle.TestRunMessage += OnTestRunMessage;
 
         ExecutorUrisThatRanTests = new List<string>();
