@@ -1033,7 +1033,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
 
@@ -1073,7 +1073,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(3, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(5, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.IsFalse(ValidLoggerWithParameters.Parameters!.TryGetValue("Key1", out var key1Value));
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
 
@@ -1114,7 +1114,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value3", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
 
@@ -1185,7 +1185,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
         mockMetricsCollection.Verify(
@@ -1223,7 +1223,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
         mockMetricsCollection.Verify(
@@ -1261,7 +1261,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
         mockMetricsCollection.Verify(
@@ -1299,7 +1299,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
         mockMetricsCollection.Verify(
@@ -1343,7 +1343,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual("DummyTestResultsFolder", ValidLoggerWithParameters.Parameters!["testRunDirectory"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
@@ -1387,7 +1387,7 @@ public class TestLoggerManagerTests
         testLoggerManager.Initialize(settingsXml);
 
         Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
-        Assert.HasCount(4, ValidLoggerWithParameters.Parameters!); // Two additional because of testRunDirectory and targetFramework
+        Assert.HasCount(6, ValidLoggerWithParameters.Parameters!); // Four additional because of testRunDirectory, targetFramework, targetArchitecture and testRunTimestamp
         Assert.AreEqual("Value1", ValidLoggerWithParameters.Parameters!["Key1"]);
         Assert.AreEqual(Constants.DefaultResultsDirectory, ValidLoggerWithParameters.Parameters!["testRunDirectory"]);
         Assert.AreEqual("Value2", ValidLoggerWithParameters.Parameters!["Key2"]);
@@ -1662,4 +1662,195 @@ public class TestLoggerManagerTests
 
         }
     }
+
+    #region GetTargetArchitecture Tests
+
+    [TestMethod]
+    public void GetTargetArchitectureShouldReturnNullForNullRunSettings()
+    {
+        Assert.IsNull(TestLoggerManager.GetTargetArchitecture(null));
+    }
+
+    [TestMethod]
+    public void GetTargetArchitectureShouldReturnNullForDefaultArchitecture()
+    {
+        string settingsXml = @"
+            <RunSettings>
+              <RunConfiguration>
+              </RunConfiguration>
+            </RunSettings>";
+
+        // Default architecture is Architecture.Default which should return null.
+        Assert.IsNull(TestLoggerManager.GetTargetArchitecture(settingsXml));
+    }
+
+    [TestMethod]
+    public void GetTargetArchitectureShouldReturnX64WhenSet()
+    {
+        string settingsXml = @"
+            <RunSettings>
+              <RunConfiguration>
+                <TargetPlatform>x64</TargetPlatform>
+              </RunConfiguration>
+            </RunSettings>";
+
+        Assert.AreEqual("x64", TestLoggerManager.GetTargetArchitecture(settingsXml));
+    }
+
+    [TestMethod]
+    public void GetTargetArchitectureShouldReturnX86WhenSet()
+    {
+        string settingsXml = @"
+            <RunSettings>
+              <RunConfiguration>
+                <TargetPlatform>x86</TargetPlatform>
+              </RunConfiguration>
+            </RunSettings>";
+
+        Assert.AreEqual("x86", TestLoggerManager.GetTargetArchitecture(settingsXml));
+    }
+
+    [TestMethod]
+    public void GetTargetArchitectureShouldReturnArm64WhenSet()
+    {
+        string settingsXml = @"
+            <RunSettings>
+              <RunConfiguration>
+                <TargetPlatform>ARM64</TargetPlatform>
+              </RunConfiguration>
+            </RunSettings>";
+
+        Assert.AreEqual("arm64", TestLoggerManager.GetTargetArchitecture(settingsXml));
+    }
+
+    #endregion
+
+    #region GetOrGenerateTestRunTimestamp Tests
+
+    [TestMethod]
+    public void GetOrGenerateTestRunTimestampShouldUseExistingTimestampFromRunSettings()
+    {
+        string settingsXml = @"
+            <RunSettings>
+              <RunConfiguration>
+                <ArtifactRunTimestamp>20260415T105100.123</ArtifactRunTimestamp>
+              </RunConfiguration>
+            </RunSettings>";
+
+        var manager = new DummyTestLoggerManager();
+        string timestamp = manager.GetOrGenerateTestRunTimestamp(settingsXml);
+
+        Assert.AreEqual("20260415T105100.123", timestamp);
+    }
+
+    [TestMethod]
+    public void GetOrGenerateTestRunTimestampShouldGenerateNewTimestampWhenNotInRunSettings()
+    {
+        string settingsXml = @"
+            <RunSettings>
+              <RunConfiguration>
+              </RunConfiguration>
+            </RunSettings>";
+
+        var manager = new DummyTestLoggerManager();
+        string timestamp = manager.GetOrGenerateTestRunTimestamp(settingsXml);
+
+        // Verify it matches the ISO 8601 compact format: yyyyMMddTHHmmss.fff
+        Assert.IsNotNull(timestamp);
+        Assert.AreEqual(19, timestamp.Length, $"Timestamp '{timestamp}' should be in yyyyMMddTHHmmss.fff format (19 chars)");
+        Assert.Contains("T", timestamp, $"Timestamp '{timestamp}' should contain 'T' separator");
+        Assert.Contains(".", timestamp, $"Timestamp '{timestamp}' should contain '.' for milliseconds");
+    }
+
+    [TestMethod]
+    public void GetOrGenerateTestRunTimestampShouldGenerateTimestampForNullRunSettings()
+    {
+        var manager = new DummyTestLoggerManager();
+        string timestamp = manager.GetOrGenerateTestRunTimestamp(null);
+
+        Assert.IsNotNull(timestamp);
+        Assert.AreEqual(19, timestamp.Length, $"Timestamp '{timestamp}' should be 19 chars");
+    }
+
+    #endregion
+
+    #region Context Propagation Integration Tests
+
+    [TestMethod]
+    public void InitializeShouldPassArchitectureAndTimestampToLoggers()
+    {
+        ValidLoggerWithParameters.Reset();
+        var mockRequestData = new Mock<IRequestData>();
+        var mockMetricsCollection = new Mock<IMetricsCollection>();
+        mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+        string codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
+
+        string settingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <RunConfiguration>
+                    <TargetPlatform>x64</TargetPlatform>
+                    <TargetFrameworkVersion>Framework45</TargetFrameworkVersion>
+                  </RunConfiguration>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerWithParameterExtension"" uri=""invalid://invalid"" assemblyQualifiedName=""invalidAssembly"" codeBase=""" + codeBase + @""">
+                        <Configuration>
+                          <Key1>Value1</Key1>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+        var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+        testLoggerManager.Initialize(settingsXml);
+
+        Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
+        Assert.IsNotNull(ValidLoggerWithParameters.Parameters);
+
+        // Verify new parameters are present
+        Assert.IsTrue(ValidLoggerWithParameters.Parameters!.ContainsKey(DefaultLoggerParameterNames.TargetArchitecture));
+        Assert.AreEqual("x64", ValidLoggerWithParameters.Parameters![DefaultLoggerParameterNames.TargetArchitecture]);
+
+        Assert.IsTrue(ValidLoggerWithParameters.Parameters!.ContainsKey(DefaultLoggerParameterNames.TestRunTimestamp));
+        string? timestamp = ValidLoggerWithParameters.Parameters![DefaultLoggerParameterNames.TestRunTimestamp];
+        Assert.IsNotNull(timestamp);
+        Assert.Contains("T", timestamp!, $"Timestamp should be in ISO 8601 compact format, got: {timestamp}");
+    }
+
+    [TestMethod]
+    public void InitializeShouldUseArtifactRunTimestampFromRunSettingsIfPresent()
+    {
+        ValidLoggerWithParameters.Reset();
+        var mockRequestData = new Mock<IRequestData>();
+        var mockMetricsCollection = new Mock<IMetricsCollection>();
+        mockRequestData.Setup(rd => rd.MetricsCollection).Returns(mockMetricsCollection.Object);
+
+        string codeBase = typeof(TestLoggerManagerTests).Assembly.Location;
+
+        string settingsXml = @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <RunConfiguration>
+                    <ArtifactRunTimestamp>20260415T105100.123</ArtifactRunTimestamp>
+                  </RunConfiguration>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""TestLoggerWithParameterExtension"" uri=""invalid://invalid"" assemblyQualifiedName=""invalidAssembly"" codeBase=""" + codeBase + @""">
+                        <Configuration>
+                          <Key1>Value1</Key1>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+        var testLoggerManager = new DummyTestLoggerManager(mockRequestData.Object);
+        testLoggerManager.Initialize(settingsXml);
+
+        Assert.AreEqual(1, ValidLoggerWithParameters.Counter);
+        Assert.AreEqual("20260415T105100.123", ValidLoggerWithParameters.Parameters![DefaultLoggerParameterNames.TestRunTimestamp]);
+    }
+
+    #endregion
 }

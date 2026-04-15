@@ -62,3 +62,6 @@ override Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.Artifact
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.ExpandTemplate(string! template, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! context) -> string!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.Resolve(Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest! request) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultLoggerParameterNames.TargetArchitecture = "TargetArchitecture" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultLoggerParameterNames.TestRunTimestamp = "TestRunTimestamp" -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.ArtifactRunTimestamp.get -> string?
