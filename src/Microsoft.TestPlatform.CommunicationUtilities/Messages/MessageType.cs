@@ -112,6 +112,18 @@ public static class MessageType
     public const string TestRunStatsChange = "TestExecution.StatsChange";
 
     /// <summary>
+    /// Lightweight notification that a test case has started executing.
+    /// Sent unbatched from testhost to console for real-time in-flight test tracking.
+    /// </summary>
+    public const string TestCaseStarting = "TestExecution.TestCaseStarting";
+
+    /// <summary>
+    /// Lightweight notification that a test case has finished executing.
+    /// Sent unbatched from testhost to console for real-time in-flight test tracking.
+    /// </summary>
+    public const string TestCaseFinished = "TestExecution.TestCaseFinished";
+
+    /// <summary>
     /// The execution complete.
     /// </summary>
     public const string ExecutionComplete = "TestExecution.Completed";

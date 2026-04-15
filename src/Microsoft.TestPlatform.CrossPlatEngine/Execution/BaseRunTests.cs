@@ -156,11 +156,14 @@ internal abstract class BaseRunTests
         RunContext.SolutionDirectory = RunSettingsUtilities.GetSolutionDirectory(runConfig);
         _runConfiguration = runConfig;
 
+        var notifier = testRunEventsHandler as ITestCaseLifecycleNotifier;
         FrameworkHandle = new FrameworkHandle(
             _testCaseEventsHandler,
             TestRunCache,
             TestExecutionContext,
-            TestRunEventsHandler);
+            TestRunEventsHandler,
+            onTestCaseStarting: notifier is not null ? tc => notifier.SendTestCaseStarting(tc) : null,
+            onTestCaseFinished: notifier is not null ? tc => notifier.SendTestCaseFinished(tc) : null);
         FrameworkHandle.TestRunMessage += OnTestRunMessage;
 
         ExecutorUrisThatRanTests = new List<string>();

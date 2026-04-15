@@ -613,4 +613,21 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         EqtTrace.Verbose("TestRequestHandler.SendData: sending data from testhost: {0}", data);
         _channel?.Send(data);
     }
+
+    /// <inheritdoc />
+    public void SendTestCaseStarting(TestCase testCase)
+    {
+        EqtTrace.Info("TestRequestHandler.SendTestCaseStarting: Sending test case starting for: {0}", testCase.DisplayName);
+        var payload = new TestCaseStartingPayload { Id = testCase.Id, DisplayName = testCase.DisplayName };
+        var data = _dataSerializer.SerializePayload(MessageType.TestCaseStarting, payload, _protocolVersion);
+        SendData(data);
+    }
+
+    /// <inheritdoc />
+    public void SendTestCaseFinished(TestCase testCase)
+    {
+        var payload = new TestCaseFinishedPayload { Id = testCase.Id };
+        var data = _dataSerializer.SerializePayload(MessageType.TestCaseFinished, payload, _protocolVersion);
+        SendData(data);
+    }
 }

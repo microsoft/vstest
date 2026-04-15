@@ -1,1 +1,3 @@
 #nullable enable
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.SendTestCaseFinished(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase! testCase) -> void
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.TestRequestHandler.SendTestCaseStarting(Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCase! testCase) -> void

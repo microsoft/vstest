@@ -229,6 +229,59 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [NetCoreTargetFrameworkDataSource]
+    public void WhenTestHostCrashesTheErrorSuggestsUsingBlameCrash(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
+
+        InvokeVsTest(arguments);
+
+        ExitCodeEquals(1);
+        // The error message should suggest using --blame-crash for further diagnosis.
+        StdErrorContains("--blame-crash");
+    }
+
+    [TestMethod]
+    [NetCoreTargetFrameworkDataSource]
+    public void WhenTestHostCrashesWithUnhandledExceptionTheErrorShowsInFlightTest(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /testcasefilter:ExitwithUnhandleException");
+
+        InvokeVsTest(arguments);
+
+        ExitCodeEquals(1);
+        StdErrorContains("Tests that were executing when the crash occurred:");
+        StdErrorContains("ExitwithUnhandleException");
+    }
+
+    [TestMethod]
+    [NetCoreTargetFrameworkDataSource]
+    public void WhenTestHostCrashesWithStackOverflowTheErrorShowsInFlightTest(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = GetAssetFullPath("SimpleTestProject3.dll");
+        var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /testcasefilter:ExitWithStackoverFlow");
+
+        InvokeVsTest(arguments);
+
+        ExitCodeEquals(1);
+        // Even for stack overflow, the error should suggest --blame-crash.
+        StdErrorContains("--blame-crash");
+        // The test name should appear if the message was sent before the crash.
+        // Stack overflow may kill the process before the message arrives, so we only check blame-crash suggestion.
+    }
+
+    [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenIncompatibleX86andX64Dll(RunnerInfo runnerInfo)

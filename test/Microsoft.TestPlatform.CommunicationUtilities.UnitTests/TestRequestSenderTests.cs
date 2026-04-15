@@ -212,7 +212,7 @@ public class TestRequestSenderTests
 
         var expectedErrorMessage = "Reason: Test host process crashed";
         RaiseClientDisconnectedEvent();
-        _mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.EndsWith(expectedErrorMessage))), Times.Once);
+        _mockDiscoveryEventsHandler.Verify(eh => eh.HandleLogMessage(TestMessageLevel.Error, It.Is<string>(s => s.Contains(expectedErrorMessage))), Times.Once);
     }
 
     [TestMethod]
