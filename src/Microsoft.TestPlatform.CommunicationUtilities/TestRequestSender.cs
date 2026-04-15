@@ -772,7 +772,7 @@ public class TestRequestSender : ITestRequestSender
             // separate thread and may still be draining buffered messages.
             if (!_inFlightTests.HasInFlightTests)
             {
-                Thread.Sleep(50);
+                SpinWait.SpinUntil(() => _inFlightTests.HasInFlightTests, millisecondsTimeout: 50);
             }
 
             // Set a default message of test host process exited and additionally specify the error if we were able to get it
@@ -822,7 +822,7 @@ public class TestRequestSender : ITestRequestSender
     {
         < 1 => $"{elapsed.Milliseconds}ms",
         < 60 => $"{elapsed.TotalSeconds:F0}s",
-        _ => $"{elapsed.TotalMinutes:F0}m {elapsed.Seconds}s",
+        _ => $"{(int)elapsed.TotalMinutes}m {elapsed.Seconds}s",
     };
 
     private void LogErrorMessage(string message)

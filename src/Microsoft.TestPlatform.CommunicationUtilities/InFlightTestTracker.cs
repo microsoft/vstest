@@ -12,9 +12,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// <summary>
 /// Tracks a set of in-flight test executions that share the same <see cref="Guid"/>.
 /// Uses inline slots to avoid queue allocation in the common case (unique Guid per test).
+/// All mutation and enumeration is guarded by a lock because the message-receive thread
+/// updates slots while the abort thread may read them concurrently via <see cref="GetAll"/>.
 /// </summary>
 internal sealed class InFlightTest
 {
+    private readonly object _lock = new();
     public TestCaseStartingPayload Slot0;
     public DateTimeOffset StartTime0;
     public TestCaseStartingPayload? Slot1;
@@ -32,29 +35,32 @@ internal sealed class InFlightTest
     }
 
     /// <summary>
-    /// Adds another in-flight execution for the same Guid. Returns false if this should not happen (defensive).
+    /// Adds another in-flight execution for the same Guid.
     /// </summary>
     public void Add(TestCaseStartingPayload payload, DateTimeOffset startTime)
     {
-        if (Slot1 is null)
+        lock (_lock)
         {
-            Slot1 = payload;
-            StartTime1 = startTime;
-        }
-        else if (Slot2 is null)
-        {
-            Slot2 = payload;
-            StartTime2 = startTime;
-        }
-        else if (Slot3 is null)
-        {
-            Slot3 = payload;
-            StartTime3 = startTime;
-        }
-        else
-        {
-            Overflow ??= new Queue<(TestCaseStartingPayload, DateTimeOffset)>();
-            Overflow.Enqueue((payload, startTime));
+            if (Slot1 is null)
+            {
+                Slot1 = payload;
+                StartTime1 = startTime;
+            }
+            else if (Slot2 is null)
+            {
+                Slot2 = payload;
+                StartTime2 = startTime;
+            }
+            else if (Slot3 is null)
+            {
+                Slot3 = payload;
+                StartTime3 = startTime;
+            }
+            else
+            {
+                Overflow ??= new Queue<(TestCaseStartingPayload, DateTimeOffset)>();
+                Overflow.Enqueue((payload, startTime));
+            }
         }
     }
 
@@ -63,61 +69,70 @@ internal sealed class InFlightTest
     /// </summary>
     public bool RemoveOldest()
     {
-        // Shift slots down
-        if (Slot1 is not null)
+        lock (_lock)
         {
-            Slot0 = Slot1;
-            StartTime0 = StartTime1;
-            Slot1 = Slot2;
-            StartTime1 = StartTime2;
-            Slot2 = Slot3;
-            StartTime2 = StartTime3;
-            Slot3 = null;
-            StartTime3 = default;
-
-            // Refill Slot3 from overflow if available
-            if (Overflow is { Count: > 0 })
+            // Shift slots down
+            if (Slot1 is not null)
             {
-                var (payload, startTime) = Overflow.Dequeue();
-                Slot3 = payload;
-                StartTime3 = startTime;
+                Slot0 = Slot1;
+                StartTime0 = StartTime1;
+                Slot1 = Slot2;
+                StartTime1 = StartTime2;
+                Slot2 = Slot3;
+                StartTime2 = StartTime3;
+                Slot3 = null;
+                StartTime3 = default;
+
+                // Refill Slot3 from overflow if available
+                if (Overflow is { Count: > 0 })
+                {
+                    var (payload, startTime) = Overflow.Dequeue();
+                    Slot3 = payload;
+                    StartTime3 = startTime;
+                }
+
+                return true;
             }
 
-            return true;
+            // Slot0 was the only entry
+            return false;
         }
-
-        // Slot0 was the only entry
-        return false;
     }
 
     /// <summary>
-    /// Enumerates all in-flight entries with their display name and start time.
+    /// Returns a snapshot of all in-flight entries with their display name and start time.
     /// </summary>
-    public IEnumerable<(string? DisplayName, DateTimeOffset StartTime)> GetAll()
+    public IReadOnlyList<(string? DisplayName, DateTimeOffset StartTime)> GetAll()
     {
-        yield return (Slot0.DisplayName, StartTime0);
-
-        if (Slot1 is not null)
+        lock (_lock)
         {
-            yield return (Slot1.DisplayName, StartTime1);
-        }
+            var result = new List<(string?, DateTimeOffset)>();
+            result.Add((Slot0.DisplayName, StartTime0));
 
-        if (Slot2 is not null)
-        {
-            yield return (Slot2.DisplayName, StartTime2);
-        }
-
-        if (Slot3 is not null)
-        {
-            yield return (Slot3.DisplayName, StartTime3);
-        }
-
-        if (Overflow is not null)
-        {
-            foreach (var (payload, startTime) in Overflow)
+            if (Slot1 is not null)
             {
-                yield return (payload.DisplayName, startTime);
+                result.Add((Slot1.DisplayName, StartTime1));
             }
+
+            if (Slot2 is not null)
+            {
+                result.Add((Slot2.DisplayName, StartTime2));
+            }
+
+            if (Slot3 is not null)
+            {
+                result.Add((Slot3.DisplayName, StartTime3));
+            }
+
+            if (Overflow is not null)
+            {
+                foreach (var (payload, startTime) in Overflow)
+                {
+                    result.Add((payload.DisplayName, startTime));
+                }
+            }
+
+            return result;
         }
     }
 }
