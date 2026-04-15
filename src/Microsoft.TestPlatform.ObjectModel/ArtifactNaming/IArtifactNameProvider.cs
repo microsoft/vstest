@@ -13,10 +13,12 @@ public interface IArtifactNameProvider
 {
     /// <summary>
     /// Resolves a template to a concrete, sanitized, collision-safe file path.
+    /// The result includes metadata about whether the file already existed (overwrite)
+    /// and whether this process owns the output directory.
     /// </summary>
     /// <param name="request">The artifact name request containing template, extension, context, and collision behavior.</param>
-    /// <returns>The fully resolved file path.</returns>
-    string Resolve(ArtifactNameRequest request);
+    /// <returns>The resolution result containing the file path and ownership metadata.</returns>
+    ArtifactNameResult Resolve(ArtifactNameRequest request);
 
     /// <summary>
     /// Expands a template string by replacing <c>{TokenName}</c> placeholders with values

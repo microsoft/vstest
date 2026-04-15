@@ -80,25 +80,15 @@ public sealed class ArtifactNameTemplateTests
     }
 
     [TestMethod]
-    public void ExpandTemplate_FallbackSyntax_UsesFallbackWhenTokenMissing()
+    public void ExpandTemplate_QuestionMarkInToken_KeptLiterally()
     {
         var provider = CreateProvider();
         var context = new Dictionary<string, string>();
 
+        // ? is not a valid path char — kept literally to show misconfiguration.
         string result = provider.ExpandTemplate("{AssemblyName?default}", context);
 
-        Assert.AreEqual("default", result);
-    }
-
-    [TestMethod]
-    public void ExpandTemplate_FallbackSyntax_UsesValueWhenTokenPresent()
-    {
-        var provider = CreateProvider();
-        var context = new Dictionary<string, string> { ["AssemblyName"] = "MyTests" };
-
-        string result = provider.ExpandTemplate("{AssemblyName?default}", context);
-
-        Assert.AreEqual("MyTests", result);
+        Assert.AreEqual("{AssemblyName?default}", result);
     }
 
     [TestMethod]

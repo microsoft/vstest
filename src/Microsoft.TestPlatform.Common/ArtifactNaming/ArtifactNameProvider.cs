@@ -19,6 +19,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ArtifactNaming;
 internal sealed class ArtifactNameProvider : IArtifactNameProvider
 {
     /// <summary>
+    /// Name of the marker file created in per-run directories to claim ownership.
+    /// </summary>
+    internal const string MarkerFileName = ".vstest-run";
+
+    /// <summary>
     /// Characters that are invalid in file names on Windows (superset of Linux restrictions).
     /// Manually listed to produce cross-platform-safe file names even when running on Linux.
     /// </summary>
@@ -35,6 +40,9 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
 
     private readonly Func<DateTime> _timeProvider;
     private readonly Func<string, bool> _fileExists;
+    private readonly Func<string, bool> _directoryExists;
+    private readonly Action<string> _createDirectory;
+    private readonly Func<string, string, bool> _tryCreateMarkerFile;
 
     /// <summary>
     /// Initializes a new instance using the system clock and file system.
@@ -45,16 +53,24 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
     }
 
     /// <summary>
-    /// Initializes a new instance with injectable time and file-existence providers (for testing).
+    /// Initializes a new instance with injectable dependencies (for testing).
     /// </summary>
-    internal ArtifactNameProvider(Func<DateTime> timeProvider, Func<string, bool> fileExists)
+    internal ArtifactNameProvider(
+        Func<DateTime> timeProvider,
+        Func<string, bool> fileExists,
+        Func<string, string, bool>? tryCreateMarkerFile = null,
+        Func<string, bool>? directoryExists = null,
+        Action<string>? createDirectory = null)
     {
         _timeProvider = timeProvider ?? throw new ArgumentNullException(nameof(timeProvider));
         _fileExists = fileExists ?? throw new ArgumentNullException(nameof(fileExists));
+        _tryCreateMarkerFile = tryCreateMarkerFile ?? TryCreateMarkerFileOnDisk;
+        _directoryExists = directoryExists ?? Directory.Exists;
+        _createDirectory = createDirectory ?? (path => Directory.CreateDirectory(path));
     }
 
     /// <inheritdoc />
-    public string Resolve(ArtifactNameRequest request)
+    public ArtifactNameResult Resolve(ArtifactNameRequest request)
     {
         _ = request ?? throw new ArgumentNullException(nameof(request));
 
@@ -80,13 +96,17 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
 
         string basePath = Path.Combine(directory, fileName + extension);
 
+        // 5. Ensure directory exists and determine ownership.
+        bool isDirectoryOwner = EnsureDirectoryWithOwnership(directory);
+
+        // 6. Resolve collision and detect overwrite.
         return request.Collision switch
         {
-            CollisionBehavior.Overwrite => EnsureDirectory(basePath),
-            CollisionBehavior.Fail => FailIfExists(basePath),
-            CollisionBehavior.AppendCounter => ResolveWithCounter(directory, fileName, extension),
-            CollisionBehavior.AppendTimestamp => ResolveWithTimestamp(directory, fileName, extension),
-            _ => EnsureDirectory(basePath),
+            CollisionBehavior.Overwrite => ResolveOverwrite(basePath, isDirectoryOwner),
+            CollisionBehavior.Fail => ResolveFail(basePath, isDirectoryOwner),
+            CollisionBehavior.AppendCounter => ResolveWithCounter(directory, fileName, extension, isDirectoryOwner),
+            CollisionBehavior.AppendTimestamp => ResolveWithTimestamp(directory, fileName, extension, isDirectoryOwner),
+            _ => ResolveOverwrite(basePath, isDirectoryOwner),
         };
     }
 
@@ -147,8 +167,7 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
     }
 
     /// <summary>
-    /// Expands a single token. Supports <c>TokenName</c>, <c>TokenName:format</c>,
-    /// and <c>TokenName?fallback</c>.
+    /// Expands a single token. Supports <c>TokenName</c> and <c>TokenName:format</c>.
     /// Unknown/unavailable tokens are kept literally as <c>{TokenName}</c>.
     /// </summary>
     private static string ExpandToken(string tokenContent, IReadOnlyDictionary<string, string> context)
@@ -156,17 +175,10 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
         // Parse format specifier: {Token:format}
         string tokenName;
         string? format = null;
-        string? fallback = null;
 
         int formatIndex = tokenContent.IndexOf(':');
-        int fallbackIndex = tokenContent.IndexOf('?');
 
-        if (fallbackIndex >= 0)
-        {
-            tokenName = tokenContent.Substring(0, fallbackIndex);
-            fallback = tokenContent.Substring(fallbackIndex + 1);
-        }
-        else if (formatIndex >= 0)
+        if (formatIndex >= 0)
         {
             tokenName = tokenContent.Substring(0, formatIndex);
             format = tokenContent.Substring(formatIndex + 1);
@@ -188,12 +200,7 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
             return value;
         }
 
-        // Token not found — use fallback or keep literal.
-        if (fallback is not null)
-        {
-            return fallback;
-        }
-
+        // Token not found — keep literal so misconfiguration is obvious.
         return "{" + tokenContent + "}";
     }
 
@@ -314,14 +321,13 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
         return result.ToString();
     }
 
-    private string ResolveWithCounter(string directory, string fileName, string extension)
+    private ArtifactNameResult ResolveWithCounter(string directory, string fileName, string extension, bool isDirectoryOwner)
     {
         string path = Path.Combine(directory, fileName + extension);
-        path = EnsureDirectory(path);
 
         if (!_fileExists(path))
         {
-            return path;
+            return new ArtifactNameResult(path, isOverwrite: false, isDirectoryOwner);
         }
 
         for (int i = 2; i < 10000; i++)
@@ -329,32 +335,39 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
             string candidate = Path.Combine(directory, fileName + "_" + i.ToString(CultureInfo.InvariantCulture) + extension);
             if (!_fileExists(candidate))
             {
-                return candidate;
+                return new ArtifactNameResult(candidate, isOverwrite: false, isDirectoryOwner);
             }
         }
 
         // Extremely unlikely: fall back to GUID suffix.
-        return Path.Combine(directory, fileName + "_" + Guid.NewGuid().ToString("N").Substring(0, 8) + extension);
+        string fallback = Path.Combine(directory, fileName + "_" + Guid.NewGuid().ToString("N").Substring(0, 8) + extension);
+
+        return new ArtifactNameResult(fallback, isOverwrite: false, isDirectoryOwner);
     }
 
-    private string ResolveWithTimestamp(string directory, string fileName, string extension)
+    private ArtifactNameResult ResolveWithTimestamp(string directory, string fileName, string extension, bool isDirectoryOwner)
     {
         string timestamp = _timeProvider().ToString("yyyyMMdd'T'HHmmss.fff", CultureInfo.InvariantCulture);
         string path = Path.Combine(directory, fileName + "_" + timestamp + extension);
-        path = EnsureDirectory(path);
 
         if (!_fileExists(path))
         {
-            return path;
+            return new ArtifactNameResult(path, isOverwrite: false, isDirectoryOwner);
         }
 
         // If timestamp collision (parallel runs), fall back to counter.
-        return ResolveWithCounter(directory, fileName + "_" + timestamp, extension);
+        return ResolveWithCounter(directory, fileName + "_" + timestamp, extension, isDirectoryOwner);
     }
 
-    private string FailIfExists(string path)
+    private ArtifactNameResult ResolveOverwrite(string path, bool isDirectoryOwner)
     {
-        path = EnsureDirectory(path);
+        bool isOverwrite = _fileExists(path);
+
+        return new ArtifactNameResult(path, isOverwrite, isDirectoryOwner);
+    }
+
+    private ArtifactNameResult ResolveFail(string path, bool isDirectoryOwner)
+    {
         if (_fileExists(path))
         {
             throw new InvalidOperationException(
@@ -362,17 +375,59 @@ internal sealed class ArtifactNameProvider : IArtifactNameProvider
                     "Artifact path '{0}' already exists and collision behavior is set to Fail.", path));
         }
 
-        return path;
+        return new ArtifactNameResult(path, isOverwrite: false, isDirectoryOwner);
     }
 
-    private static string EnsureDirectory(string filePath)
+    /// <summary>
+    /// Ensures the directory exists and attempts to claim ownership via a marker file.
+    /// Returns <see langword="true"/> if this process created the directory (owns it).
+    /// </summary>
+    private bool EnsureDirectoryWithOwnership(string directory)
     {
-        string? directory = Path.GetDirectoryName(filePath);
-        if (!StringUtils.IsNullOrEmpty(directory))
+        if (StringUtils.IsNullOrEmpty(directory))
         {
-            Directory.CreateDirectory(directory);
+            return false;
         }
 
-        return filePath;
+        bool directoryExisted = _directoryExists(directory);
+        _createDirectory(directory);
+
+        if (directoryExisted)
+        {
+            // Directory already existed — we're not the owner.
+            return false;
+        }
+
+        // New directory — claim ownership with an atomic marker file.
+        string markerPath = Path.Combine(directory, MarkerFileName);
+#if NET
+        string markerContent = Environment.ProcessId.ToString(CultureInfo.InvariantCulture);
+#else
+        string markerContent = System.Diagnostics.Process.GetCurrentProcess().Id.ToString(CultureInfo.InvariantCulture);
+#endif
+
+        return _tryCreateMarkerFile(markerPath, markerContent);
+    }
+
+    /// <summary>
+    /// Atomically creates a marker file using <see cref="FileMode.CreateNew"/>.
+    /// Returns <see langword="true"/> if this call created the file, <see langword="false"/> if it already existed.
+    /// </summary>
+    private static bool TryCreateMarkerFileOnDisk(string path, string content)
+    {
+        try
+        {
+            // FileMode.CreateNew fails atomically if the file already exists.
+            using FileStream fs = new(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+            byte[] bytes = Encoding.UTF8.GetBytes(content);
+            fs.Write(bytes, 0, bytes.Length);
+
+            return true;
+        }
+        catch (IOException)
+        {
+            // File already exists — another process claimed ownership.
+            return false;
+        }
     }
 }

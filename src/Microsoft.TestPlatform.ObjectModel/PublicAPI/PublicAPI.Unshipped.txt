@@ -53,6 +53,12 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.AppendTimestamp = 3 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.Fail = 2 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.Overwrite = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.ArtifactNameResult(string! filePath, bool isOverwrite, bool isDirectoryOwner) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.FilePath.get -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.IsDirectoryOwner.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.IsOverwrite.get -> bool
+override Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.ToString() -> string!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.ExpandTemplate(string! template, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! context) -> string!
-Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.Resolve(Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest! request) -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.Resolve(Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest! request) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult!
