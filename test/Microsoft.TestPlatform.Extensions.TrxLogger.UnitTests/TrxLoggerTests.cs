@@ -641,7 +641,7 @@ public class TrxLoggerTests
 
         var fileName = Path.GetFileName(_testableTrxLogger.TrxFile);
         Assert.IsNotNull(fileName);
-        Assert.Contains("_net10.0", fileName, $"Expected TFM 'net10.0' in filename but got: {fileName}");
+        Assert.Contains("_net11.0", fileName, $"Expected TFM 'net11.0' in filename but got: {fileName}");
         Assert.EndsWith(".trx", fileName, $"Expected .trx extension but got: {fileName}");
     }
 

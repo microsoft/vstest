@@ -27,7 +27,7 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
     // [DataRow("X86", "X64")]
     public void Use_EnvironmentVariables(string architectureFrom, string architectureTo)
     {
-        SetTestEnvironment(_testEnvironment, new RunnerInfo { RunnerFramework = DEFAULT_RUNNER_NETCORE });
+        SetTestEnvironment(_testEnvironment, new RunnerInfo { RunnerFramework = RUNNER_NET });
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architectureFrom);
         string dotnetPathTo = GetDownloadedDotnetMuxerFromTools(architectureTo);
         var vstestConsolePath = GetDotnetRunnerPath();
