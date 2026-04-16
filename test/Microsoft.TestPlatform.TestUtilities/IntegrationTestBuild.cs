@@ -179,7 +179,10 @@ public class IntegrationTestBuild : IntegrationTestBase
         {
             if (s_isSessionMutexOwner)
             {
-                try { s_sessionMutex.ReleaseMutex(); } catch (ApplicationException) { }
+                // AssemblyCleanup may run on a different thread than AssemblyInitialize.
+                // On macOS/Linux the runtime throws InvalidOperationException for
+                // cross-thread release; on Windows it throws ApplicationException.
+                try { s_sessionMutex.ReleaseMutex(); } catch (Exception ex) when (ex is ApplicationException or InvalidOperationException) { }
             }
             s_sessionMutex.Dispose();
             s_sessionMutex = null;
