@@ -20,7 +20,7 @@ function Verify-Nuget-Packages {
         "Microsoft.CodeCoverage"                      = 76
         "Microsoft.NET.Test.Sdk"                      = 26
         "Microsoft.TestPlatform"                      = 545
-        "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 388
+        "Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI" = 389
         "Microsoft.TestPlatform.Build"                = 21
         "Microsoft.TestPlatform.CLI"                  = 483
         "Microsoft.TestPlatform.Extensions.TrxLogger" = 35

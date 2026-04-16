@@ -4,8 +4,7 @@
 #if NETFRAMEWORK || NETSTANDARD2_0
 
 using System;
-using System.ComponentModel;
-using System.Diagnostics;
+using System.Runtime.InteropServices;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -21,38 +20,15 @@ public class PlatformEnvironment : IEnvironment
     {
         get
         {
-            return _architecture ??= Environment.Is64BitOperatingSystem
-                ? IsArm64()
-                    ? PlatformArchitecture.ARM64
-                    : PlatformArchitecture.X64
-                : PlatformArchitecture.X86;
-        }
-    }
-
-    private static bool IsArm64()
-    {
-        try
-        {
-            var currentProcess = Process.GetCurrentProcess();
-            if (!NativeMethods.IsWow64Process2(currentProcess.Handle, out ushort _, out ushort nativeMachine))
+            return _architecture ??= RuntimeInformation.OSArchitecture switch
             {
-                throw new Win32Exception();
-            }
-
-            // If nativeMachine is IMAGE_FILE_MACHINE_ARM64 it means that we're running on ARM64 architecture device.
-            return nativeMachine == NativeMethods.IMAGE_FILE_MACHINE_ARM64;
+                System.Runtime.InteropServices.Architecture.X86 => PlatformArchitecture.X86,
+                System.Runtime.InteropServices.Architecture.X64 => PlatformArchitecture.X64,
+                System.Runtime.InteropServices.Architecture.Arm => PlatformArchitecture.ARM,
+                System.Runtime.InteropServices.Architecture.Arm64 => PlatformArchitecture.ARM64,
+                _ => throw new NotSupportedException(),
+            };
         }
-        catch
-        {
-            // At the moment we cannot log messages inside the Microsoft.TestPlatform.PlatformAbstractions.
-            // We did an attempt in https://github.com/microsoft/vstest/pull/3422 - 17.2.0-preview-20220301-01 - but we reverted after
-            // because we broke a scenario where for .NET Framework application inside the test host
-            // we loaded runner version of Microsoft.TestPlatform.PlatformAbstractions but newer version Microsoft.TestPlatform.ObjectModel(the one close
-            // to the test container) and the old PlatformAbstractions doesn't contain the methods expected by the new ObjectModel throwing
-            // a MissedMethodException.
-        }
-
-        return false;
     }
 
     /// <inheritdoc />
