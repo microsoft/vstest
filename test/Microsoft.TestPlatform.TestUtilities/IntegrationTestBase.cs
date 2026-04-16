@@ -19,6 +19,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -852,6 +853,7 @@ public class IntegrationTestBase
         // Remove this code later, and just pass the variables you want to add.
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(new());
         environmentVariables ??= new();
+
         if (debugEnvironmentVariables.Count > 0)
         {
             Environment.GetEnvironmentVariables().OfType<DictionaryEntry>().ToList().ForEach(e => environmentVariables.Add(e.Key.ToString()!, e.Value?.ToString()));
