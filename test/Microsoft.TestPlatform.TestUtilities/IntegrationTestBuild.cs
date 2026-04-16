@@ -179,7 +179,10 @@ public class IntegrationTestBuild : IntegrationTestBase
         {
             if (s_isSessionMutexOwner)
             {
-                try { s_sessionMutex.ReleaseMutex(); } catch (ApplicationException) { }
+                // AssemblyCleanup may run on a different thread than AssemblyInitialize.
+                // On macOS/Linux the runtime throws InvalidOperationException for
+                // cross-thread release; on Windows it throws ApplicationException.
+                try { s_sessionMutex.ReleaseMutex(); } catch (Exception ex) when (ex is ApplicationException or InvalidOperationException) { }
             }
             s_sessionMutex.Dispose();
             s_sessionMutex = null;
@@ -201,9 +204,9 @@ public class IntegrationTestBuild : IntegrationTestBase
             // Build special project written in IL.
             // This project is used on Windows only Tests. On non-Windows the build fails with: "IlasmToolPath must be set in order to build ilproj's outside of Windows.".
             var cilProject = Path.Combine(Root, "test", "TestAssets", "CILProject", "CILProject.proj");
-            var binPath = Path.Combine(Root, "artifacts", "bin", "TestAssets", "CILProject", IntegrationTestEnvironment.BuildConfiguration, "net462");
+            var binPath = Path.Combine(Root, "artifacts", "bin", "TestAssets", "CILProject", IntegrationTestEnvironment.BuildConfiguration, "net481");
             ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{cilProject}" """);
-            ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath} -nodereuse:false""");
+            ExecuteApplication2(Dotnet, $"""build "{cilProject}" --configuration {IntegrationTestEnvironment.BuildConfiguration} --no-restore --output {binPath}""");
         }
     }
 

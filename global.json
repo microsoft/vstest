@@ -11,25 +11,13 @@
     "architecture": "x64"
   },
   "tools": {
-    "runtimes": {
-      "dotnet/x64": [
-        "8.0.25",
-        "9.0.14",
-        "10.0.4"
-      ],
-      "dotnet/x86": [
-        "8.0.25",
-        "9.0.14",
-        "10.0.4"
-      ]
-    },
     "vs": {
       "version": "17.8.0"
     },
     "dotnet": "11.0.100-preview.3.26170.106"
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.26177.6"
+    "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.26211.1"
   },
   "test": {
     "runner": "Microsoft.Testing.Platform"

@@ -14,8 +14,8 @@
       from appending +<commitId>, which breaks DTAAgent.
     -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>1.0.0</VersionPrefix>
-    <PreReleaseVersionLabel>alpha-stj</PreReleaseVersionLabel>
+    <VersionPrefix>18.8.0</VersionPrefix>
+    <PreReleaseVersionLabel>preview</PreReleaseVersionLabel>
     <PreReleaseVersionIteration></PreReleaseVersionIteration>
     <!-- Allowed values: '', 'prerelease', 'release'. Set to 'release' when stabilizing. -->
     <DotNetFinalVersionKind></DotNetFinalVersionKind>
@@ -70,7 +70,6 @@
     <_MicrosoftVSSDKBuildToolsVersion_>17.14.2119</_MicrosoftVSSDKBuildToolsVersion_>
     <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
     <NewtonsoftJsonVersion>13.0.3</NewtonsoftJsonVersion>
-    <SystemCollectionsImmutableVersion>9.0.11</SystemCollectionsImmutableVersion>
     <SystemMemoryVersion>4.5.5</SystemMemoryVersion>
     <SystemReflectionMetadataVersion>8.0.0</SystemReflectionMetadataVersion>
     <TestPlatformExternalsVersion>18.2.0-preview-1-11429-120</TestPlatformExternalsVersion>

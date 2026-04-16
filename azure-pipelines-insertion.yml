@@ -161,4 +161,4 @@ extends:
               # Avoid warning from subsequent steps.
               - powershell: |
                   mkdir artifacts
-                  displayName: 'Create artifacts dir'
+                displayName: 'Create artifacts dir'
