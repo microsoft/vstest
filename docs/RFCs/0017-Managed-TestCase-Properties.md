@@ -20,7 +20,7 @@ The `ManagedType` test case property represents the fully specified type name in
 
 * The type name must be fully qualified (in the CLR sense), including its namespace. Any generic classes must also include an arity value using backtick notation (`# where # is the number of type arguments that the class requires).
 * Nested classes are appended with a '+' and must also include an arity if generic.
-* `ManagedType` name must be escaped if it doesn't conform to identifier naming rules.
+* `ManagedType` name must not be escaped.
 
 ### `ManagedMethod` Property
 
@@ -131,7 +131,8 @@ The combination of `ManagedType` and `ManagedMethod` will be unique to a particu
 3. It can contain formatting characters. (Unicode categories: `Mn`, `Mc`, `Pc`, and `Cf`.)
 
 ## Escaping
-If an identifier does not conform to identifier naming rules, it gets escaped. An escaped identifier always start and end with a `'`. 
+If an identifier does not conform to identifier naming rules, it gets escaped. An escaped identifier always start and end with a `'`. Note that `ManagedType` is never escaped.
+
 ```console
          Type: CleanNamespaceName.SecondLevel.𝐌𝐲 𝘤𝘭𝘢𝘴𝘴 with 𝘢𝘯 𝒊𝒏𝒂𝒄𝒄𝒆𝒔𝒔𝒊𝒃𝒍𝒆 𝙣𝙖𝙢𝙚 🤷‍♀️
        Method: int Sum(int x, int y)
