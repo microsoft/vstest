@@ -634,7 +634,7 @@ public class TrxLoggerTests
     public void DefaultTrxFileNameShouldIncludeFrameworkWhenAvailable()
     {
         _parameters.Remove(TrxLoggerConstants.LogFileNameKey);
-        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v10.0";
+        _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v11.0";
         _testableTrxLogger.Initialize(_events.Object, _parameters);
 
         MakeTestRunComplete();
