@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TestProject>true</TestProject>
+    <IsTestProject>true</IsTestProject>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>Microsoft.TestPlatform.Client.Async.UnitTests</AssemblyName>
+    <RootNamespace>Microsoft.TestPlatform.Client.Async.UnitTests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Microsoft.TestPlatform.Client.Async\Microsoft.TestPlatform.Client.Async.csproj" />
+  </ItemGroup>
+
+</Project>
