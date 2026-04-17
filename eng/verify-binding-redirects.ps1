@@ -1,6 +1,8 @@
 $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
+$script:isCI = $env:TF_BUILD -eq 'true' -or $env:CI -eq 'true'
+
 # Verifies that binding redirects in source app.config files match the actual
 # assembly versions of the DLLs shipped in the extracted nupkg packages.
 #
@@ -143,7 +145,7 @@ function Verify-BindingRedirects {
                 NewOldVersion = $newOldVersion
             }
 
-            if ($isCI) {
+            if ($script:isCI) {
                 Write-Host "  $assemblyName - MISMATCH: expected $actualVersion, found $currentNewVersion" -ForegroundColor Red
             }
             else {
@@ -152,25 +154,45 @@ function Verify-BindingRedirects {
         }
     }
 
-    # Apply fixes by string replacement to preserve original formatting.
-    if (-not $isCI) {
+    # Apply fixes using XML DOM with whitespace preservation.
+    if (-not $script:isCI) {
         foreach ($configPath in $configsToFix.Keys) {
-            $content = [System.IO.File]::ReadAllText($configPath)
+            $xmlDoc = New-Object System.Xml.XmlDocument
+            $xmlDoc.PreserveWhitespace = $true
+            $xmlDoc.Load($configPath)
+
+            $nsMgr = New-Object System.Xml.XmlNamespaceManager($xmlDoc.NameTable)
+            $nsMgr.AddNamespace("asm", "urn:schemas-microsoft-com:asm.v1")
+
             foreach ($fix in $configsToFix[$configPath]) {
-                $content = $content -replace [regex]::Escape("oldVersion=""$($fix.OldOldVersion)"" newVersion=""$($fix.OldNewVersion)"""), "oldVersion=""$($fix.NewOldVersion)"" newVersion=""$($fix.NewNewVersion)"""
+                $nodes = $xmlDoc.SelectNodes("//asm:dependentAssembly[asm:assemblyIdentity[@name='$($fix.AssemblyName)']]/asm:bindingRedirect", $nsMgr)
+                $applied = $false
+                foreach ($node in $nodes) {
+                    if ($node.GetAttribute("newVersion") -eq $fix.OldNewVersion) {
+                        $node.SetAttribute("oldVersion", $fix.NewOldVersion)
+                        $node.SetAttribute("newVersion", $fix.NewNewVersion)
+                        $applied = $true
+                    }
+                }
+
+                if (-not $applied) {
+                    Write-Error "Failed to apply binding redirect fix for '$($fix.AssemblyName)' in '$configPath'. The expected redirect node was not found."
+                }
             }
 
             # Preserve the original BOM if present.
             $bom = [System.IO.File]::ReadAllBytes($configPath)
             $hasBom = $bom.Length -ge 3 -and $bom[0] -eq 0xEF -and $bom[1] -eq 0xBB -and $bom[2] -eq 0xBF
             $encoding = if ($hasBom) { New-Object System.Text.UTF8Encoding($true) } else { New-Object System.Text.UTF8Encoding($false) }
-            [System.IO.File]::WriteAllText($configPath, $content, $encoding)
+            $writer = New-Object System.IO.StreamWriter($configPath, $false, $encoding)
+            $xmlDoc.Save($writer)
+            $writer.Dispose()
             Write-Host "Updated '$configPath'." -ForegroundColor Green
         }
     }
 
     if ($errors) {
-        if ($isCI) {
+        if ($script:isCI) {
             $message = "Assembly binding redirect mismatches detected:`n"
             $message += ($errors -join "`n")
             $message += "`n`nTo fix this, run the following command locally after building and packing:`n"
