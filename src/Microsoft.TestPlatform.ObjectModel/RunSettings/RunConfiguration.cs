@@ -474,6 +474,13 @@ public class RunConfiguration : TestRunSettings
     /// </summary>
     public bool SkipDefaultAdapters { get; private set; }
 
+    /// <summary>
+    /// Shared timestamp for artifact naming, in ISO 8601 compact format (e.g. "20260415T105100.123").
+    /// When set by the orchestrator, all child processes use this same value so artifacts from
+    /// the same run share a directory. When not set, each process generates its own timestamp.
+    /// </summary>
+    public string? ArtifactRunTimestamp { get; private set; }
+
     /// <inheritdoc/>
     public override XmlElement ToXml()
     {
@@ -608,6 +615,13 @@ public class RunConfiguration : TestRunSettings
         XmlElement skipDefaultAdapters = doc.CreateElement(nameof(SkipDefaultAdapters));
         skipDefaultAdapters.InnerXml = SkipDefaultAdapters.ToString();
         root.AppendChild(skipDefaultAdapters);
+
+        if (ArtifactRunTimestamp is not null)
+        {
+            XmlElement artifactRunTimestamp = doc.CreateElement(nameof(ArtifactRunTimestamp));
+            artifactRunTimestamp.InnerXml = ArtifactRunTimestamp;
+            root.AppendChild(artifactRunTimestamp);
+        }
 
         return root;
     }
@@ -1040,6 +1054,14 @@ public class RunConfiguration : TestRunSettings
                             }
 
                             runConfiguration.SkipDefaultAdapters = boolValue;
+                            break;
+                        }
+
+                    case nameof(ArtifactRunTimestamp):
+                        {
+                            XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                            string element = reader.ReadElementContentAsString();
+                            runConfiguration.ArtifactRunTimestamp = element;
                             break;
                         }
 
