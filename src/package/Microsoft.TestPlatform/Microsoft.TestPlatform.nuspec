@@ -345,7 +345,7 @@
     <file src="net48\Microsoft.Internal.Dia\x64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x64\msdia140.dll.manifest" />
     <file src="net48\Microsoft.Internal.Dia\x86\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll" />
     <file src="net48\Microsoft.Internal.Dia\x86\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\x86\msdia140.dll.manifest" />
-    <file src="net48\Microsoft.Internal.Dia\arm64\msdia140.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\arm64\msdia140.dll" />
+    <!-- arm64\msdia140.dll is already included via the Microsoft.Internal.CodeCoverage wildcard above -->
     <file src="net48\Microsoft.Internal.Dia\arm64\msdia140.dll.manifest" target="tools\net462\Common7\IDE\Extensions\TestPlatform\arm64\msdia140.dll.manifest" />
     <file src="net48\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" />
     <file src="net48\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\zh-Hans\Microsoft.TestPlatform.CoreUtilities.resources.dll" />
