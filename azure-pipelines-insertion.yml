@@ -146,7 +146,6 @@ extends:
                       $insertArgs += "$(CherryPick)"
                     }
 
-                    Write-Host "Running: roslyn-tools $($insertArgs -join ' ')"
                     & roslyn-tools @insertArgs
                     if ($LASTEXITCODE -ne 0) {
                       exit $LASTEXITCODE
