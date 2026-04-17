@@ -2,7 +2,10 @@
 Param(
     [Parameter(Mandatory)]
     [ValidateSet("Debug", "Release")]
-    [string] $configuration
+    [string] $configuration,
+
+    [Parameter(Mandatory)]
+    [string[]] $extractedPackageDirs
 )
 
 $ErrorActionPreference = 'Stop'
@@ -10,44 +13,43 @@ $ErrorActionPreference = 'Stop'
 $isCI = $env:TF_BUILD -eq 'true' -or $env:CI -eq 'true'
 $repoRoot = Resolve-Path "$PSScriptRoot/.."
 
-# Map each project to its app.config and the TFM used for .NET Framework builds.
-$projects = @(
-    @{ Name = "vstest.console";  Config = "src/vstest.console/app.config";  Tfm = "net48" }
-    @{ Name = "testhost.x86";    Config = "src/testhost.x86/app.config";    Tfm = "net462" }
-    @{ Name = "datacollector";   Config = "src/datacollector/app.config";   Tfm = "net48" }
+# Each app.config maps to a specific exe that ships in the packages.
+# We find the exe in the extracted packages and resolve assemblies from that directory.
+$appConfigs = @(
+    @{ Config = "src/vstest.console/app.config";  ExeName = "vstest.console.exe" }
+    @{ Config = "src/testhost.x86/app.config";    ExeName = "testhost.x86.exe" }
+    @{ Config = "src/datacollector/app.config";    ExeName = "datacollector.exe" }
 )
 
 function Get-ManagedAssemblyVersion {
     param([string] $dllPath)
 
     try {
-        $assemblyName = [System.Reflection.AssemblyName]::GetAssemblyName($dllPath)
-
-        return $assemblyName.Version.ToString()
+        return [System.Reflection.AssemblyName]::GetAssemblyName($dllPath).Version.ToString()
     }
     catch {
         return $null
     }
 }
 
-function Resolve-AssemblyPath {
+function Find-ExeInPackages {
     param(
-        [string] $assemblyName,
-        [string] $binDir
+        [string] $exeName,
+        [string[]] $packageDirs
     )
 
-    # Check directly in binDir first, then in RID subdirectories (e.g., win7-x64, win-x86).
-    $dllName = "$assemblyName.dll"
-    $dllPath = Join-Path $binDir $dllName
-    if (Test-Path $dllPath) {
-        return $dllPath
-    }
+    # Search extracted packages for the exe. Prefer the VSIX (most complete layout),
+    # then the main Microsoft.TestPlatform nupkg.
+    foreach ($dir in $packageDirs) {
+        $found = Get-ChildItem $dir -Recurse -Filter $exeName -File -ErrorAction SilentlyContinue
+        if ($found) {
+            # Prefer the one closest to a net462 or root layout (not nested in TestHostNetFramework).
+            $preferred = $found | Where-Object { $_.FullName -notlike "*TestHostNetFramework*" } | Select-Object -First 1
+            if ($preferred) {
+                return $preferred.DirectoryName
+            }
 
-    $ridDirs = Get-ChildItem $binDir -Directory -ErrorAction SilentlyContinue
-    foreach ($ridDir in $ridDirs) {
-        $dllPath = Join-Path $ridDir.FullName $dllName
-        if (Test-Path $dllPath) {
-            return $dllPath
+            return $found[0].DirectoryName
         }
     }
 
@@ -55,23 +57,22 @@ function Resolve-AssemblyPath {
 }
 
 $errors = @()
-$fixes = @()
 $configsToFix = @{}
 
-foreach ($project in $projects) {
-    $configPath = Join-Path $repoRoot $project.Config
+foreach ($entry in $appConfigs) {
+    $configPath = Join-Path $repoRoot $entry.Config
     if (-not (Test-Path $configPath)) {
-        Write-Host "Skipping $($project.Name): '$configPath' not found."
+        Write-Host "Skipping $($entry.ExeName): config '$configPath' not found."
         continue
     }
 
-    $binDir = Join-Path $repoRoot "artifacts/bin/$($project.Name)/$configuration/$($project.Tfm)"
-    if (-not (Test-Path $binDir)) {
-        Write-Host "Skipping $($project.Name): build output '$binDir' not found. Build the project first."
+    $deployDir = Find-ExeInPackages -exeName $entry.ExeName -packageDirs $extractedPackageDirs
+    if (-not $deployDir) {
+        Write-Host "Skipping $($entry.ExeName): not found in any extracted package."
         continue
     }
 
-    Write-Host "Checking assembly redirects for $($project.Name) ($($project.Tfm))..."
+    Write-Host "Checking assembly redirects for $($entry.ExeName) (from '$deployDir')..."
 
     [xml]$xml = Get-Content $configPath -Raw
     $nsMgr = New-Object System.Xml.XmlNamespaceManager($xml.NameTable)
@@ -89,9 +90,14 @@ foreach ($project in $projects) {
         $currentNewVersion = $redirect.GetAttribute("newVersion")
         $currentOldVersion = $redirect.GetAttribute("oldVersion")
 
-        $dllPath = Resolve-AssemblyPath -assemblyName $assemblyName -binDir $binDir
-        if (-not $dllPath) {
-            Write-Host "  $assemblyName - assembly not found in '$binDir', skipping."
+        # Look for the assembly in the same directory as the exe, then in Extensions subfolder.
+        $dllPath = Join-Path $deployDir "$assemblyName.dll"
+        if (-not (Test-Path $dllPath)) {
+            $dllPath = Join-Path $deployDir "Extensions/$assemblyName.dll"
+        }
+
+        if (-not (Test-Path $dllPath)) {
+            Write-Host "  $assemblyName - not found in package layout, skipping."
             continue
         }
 
@@ -112,7 +118,7 @@ foreach ($project in $projects) {
             $newOldVersion = "$($Matches[1])-$actualVersion"
         }
 
-        $errors += "$($project.Name): $assemblyName redirect newVersion is '$currentNewVersion' but actual assembly version is '$actualVersion'"
+        $errors += "$($entry.ExeName): $assemblyName redirect newVersion is '$currentNewVersion' but actual assembly version is '$actualVersion'"
 
         if (-not $configsToFix.ContainsKey($configPath)) {
             $configsToFix[$configPath] = @()
@@ -156,9 +162,9 @@ if ($errors) {
     if ($isCI) {
         $message = "Assembly binding redirect mismatches detected:`n"
         $message += ($errors -join "`n")
-        $message += "`n`nTo fix this, run the following command locally after building:`n"
+        $message += "`n`nTo fix this, run the following command locally after building and packing:`n"
         $message += "  .\build.cmd -c $configuration`n"
-        $message += "This will rebuild and auto-update the app.config files with the correct versions.`n"
+        $message += "This will rebuild, pack, and auto-update the app.config files with the correct versions.`n"
         $message += "Then commit the updated app.config files."
         Write-Error $message
     }

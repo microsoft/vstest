@@ -346,3 +346,6 @@ Start-sleep -Seconds 10
 # skipped, it is hard to find the right dumpbin.exe and corflags tools on server
 # Verify-NugetPackageExe -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
 Verify-NugetPackageVersion -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
+
+# Verify assembly binding redirects against the actual assembly versions in the extracted packages.
+& "$PSScriptRoot/verify-assembly-redirects.ps1" -configuration $configuration -extractedPackageDirs $unzipNugetPackages
