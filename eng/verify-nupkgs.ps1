@@ -141,7 +141,15 @@ function Verify-Nuget-Packages {
                 }
             }
 
-            $updatedCounts | ConvertTo-Json | Set-Content $expectedCountsFile -Encoding UTF8
+            # Write clean JSON (2-space indent, no BOM, no trailing spaces).
+            $lines = @("{")
+            $keys = @($updatedCounts.Keys)
+            for ($i = 0; $i -lt $keys.Count; $i++) {
+                $comma = if ($i -lt $keys.Count - 1) { "," } else { "" }
+                $lines += "  ""$($keys[$i])"": $($updatedCounts[$keys[$i]])$comma"
+            }
+            $lines += "}"
+            [System.IO.File]::WriteAllText($expectedCountsFile, ($lines -join "`n") + "`n", [System.Text.UTF8Encoding]::new($false))
             Write-Host "Updated '$expectedCountsFile'. Please commit the changes." -ForegroundColor Green
         }
     }
