@@ -17,6 +17,9 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $isCI = $env:TF_BUILD -eq 'true' -or $env:CI -eq 'true'
 $expectedCountsFile = Join-Path $PSScriptRoot "expected-nupkg-file-counts.json"
 
+# Import binding redirect verification.
+. "$PSScriptRoot/verify-binding-redirects.ps1"
+
 function Verify-Nuget-Packages {
     Write-Host "Starting Verify-Nuget-Packages."
     $expectedNumOfFiles = @{}
@@ -347,5 +350,5 @@ Start-sleep -Seconds 10
 # Verify-NugetPackageExe -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
 Verify-NugetPackageVersion -configuration $configuration -UnzipNugetPackages $unzipNugetPackages
 
-# Verify assembly binding redirects against the actual assembly versions in the extracted packages.
-& "$PSScriptRoot/verify-assembly-redirects.ps1" -configuration $configuration -extractedPackageDirs $unzipNugetPackages
+Write-Host "`nVerifying binding redirects..."
+Verify-BindingRedirects -PackageDirs $unzipNugetPackages -Configuration $configuration
