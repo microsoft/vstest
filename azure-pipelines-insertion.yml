@@ -95,9 +95,6 @@ extends:
                     Write-Host "Installing .NET SDK version $version from global.json"
                     & eng/common/dotnet-install.ps1 -version $version -runtime ''
 
-              - script: dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json -g
-                displayName: 'Install roslyn-tools CLI'
-
               - task: AzureCLI@2
                 displayName: 'Run VS Insertion'
                 inputs:
@@ -105,6 +102,9 @@ extends:
                   scriptType: pscore
                   scriptLocation: inlineScript
                   inlineScript: |
+                    # Install Roslyn insertion tools from the dnceng feed
+                    dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json -g
+                    
                     # Acquire dnceng AzDO token via WIF service connection
                     $dncengToken = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
                     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($dncengToken)) {
