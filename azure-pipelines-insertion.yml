@@ -124,8 +124,6 @@ extends:
                       "--component-azdo-uri", "$(ComponentAzdoUri)"
                       "--component-project", "$(ComponentProjectName)"
                       "--build-drop-path", "$(DropPath)"
-                      "--no-insert-corext-packages"
-                      "--no-insert-devdiv-source-files"
                       "--title-prefix", "$(OptionalTitlePrefix)"
                       "--reviewer-guid", $team
                       "--dnceng-azdo-token", $dncengToken
