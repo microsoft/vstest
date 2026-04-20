@@ -124,8 +124,10 @@ extends:
                       "--component-azdo-uri", "$(ComponentAzdoUri)"
                       "--component-project", "$(ComponentProjectName)"
                       "--build-drop-path", "$(DropPath)"
+                      "--insert-corext-packages", "false"
+                      "--insert-devdiv-source-files", "false"
                       "--title-prefix", "$(OptionalTitlePrefix)"
-                      "--reviewer-guid", $team
+                      "--reviewer-guid", $team 
                       "--dnceng-azdo-token", $dncengToken
                       "--devdiv-azdo-token", "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)"
                       "--ci"
@@ -149,12 +151,9 @@ extends:
                       $insertArgs += "$(CherryPick)"
                     }
 
+                    "Running: ./roslyn-tools.exe $($insertArgs -join ' ')"
                     ./roslyn-tools.exe @insertArgs
                     if ($LASTEXITCODE -ne 0) {
                       exit $LASTEXITCODE
                     }
 
-              # Avoid warning from subsequent steps.
-              - powershell: |
-                  mkdir artifacts
-                  displayName: 'Create artifacts dir'
