@@ -125,7 +125,7 @@ extends:
                       "--component-project", "$(ComponentProjectName)"
                       "--build-drop-path", "$(DropPath)"
                       "--skip-corext-packages"
-                      "--title-prefix", "'$(OptionalTitlePrefix)'"
+                      "--title-prefix", "$(OptionalTitlePrefix)"
                       "--reviewer-guid", $team 
                       "--dnceng-azdo-token", $dncengToken
                       "--devdiv-azdo-token", "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)"
@@ -150,6 +150,7 @@ extends:
                       $insertArgs += "$(CherryPick)"
                     }
 
+                    "Running: ./roslyn-tools.exe $($insertArgs -join ' ')"
                     ./roslyn-tools.exe @insertArgs
                     if ($LASTEXITCODE -ne 0) {
                       exit $LASTEXITCODE
