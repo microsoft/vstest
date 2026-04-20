@@ -125,7 +125,7 @@ extends:
                       "--component-project", "$(ComponentProjectName)"
                       "--build-drop-path", "$(DropPath)"
                       "--skip-corext-packages"
-                      "--title-prefix", "$(OptionalTitlePrefix)"
+                      "--title-prefix", "'$(OptionalTitlePrefix)'"
                       "--reviewer-guid", $team 
                       "--dnceng-azdo-token", $dncengToken
                       "--devdiv-azdo-token", "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)"
