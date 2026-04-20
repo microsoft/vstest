@@ -102,8 +102,8 @@ extends:
                   scriptType: pscore
                   scriptLocation: inlineScript
                   inlineScript: |
-                    # Install Roslyn insertion tools from the dnceng feed
-                    dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json -g
+                    # Install Roslyn insertion tools from the dnceng feed, --tools-install as workaround for having to reset the process to add path to dotnet tools
+                    dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json --tool-path . 
                     
                     # Acquire dnceng AzDO token via WIF service connection
                     $dncengToken = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
@@ -151,7 +151,7 @@ extends:
                       $insertArgs += "$(CherryPick)"
                     }
 
-                    & roslyn-tools @insertArgs
+                    ./roslyn-tools.exe @insertArgs
                     if ($LASTEXITCODE -ne 0) {
                       exit $LASTEXITCODE
                     }
