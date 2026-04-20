@@ -157,7 +157,3 @@ extends:
                       exit $LASTEXITCODE
                     }
 
-              # Avoid warning from subsequent steps.
-              - powershell: |
-                  mkdir artifacts
-                  displayName: 'Create artifacts dir'
