@@ -93,7 +93,7 @@ extends:
                     $globalJson = Get-Content global.json | ConvertFrom-Json
                     $version = $globalJson.tools.dotnet
                     Write-Host "Installing .NET SDK version $version from global.json"
-                    & eng/common/dotnet-install.ps1 -version $version
+                    & eng/common/dotnet-install.ps1 -version $version -runtime ''
 
               - script: dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json -g
                 displayName: 'Install roslyn-tools CLI'
