@@ -24,8 +24,10 @@ pr:
   paths:
     exclude:
       - .github/*
+      - .gitignore
       - .devcontainer/*
       - docs/*
+      - .vscode/*
       - .markdownlint.json
       - .markdownlintignore
       - CODE_OF_CONDUCT.md
