@@ -90,8 +90,8 @@ extends:
                 inputs:
                   targetType: inline
                   script: |
-                    $globalJson = Get-Content global.json | ConvertFrom-Json
-                    $version = $globalJson.tools.dotnet
+                    $globalJson = Get-Content -Raw global.json | ConvertFrom-Json
+                    $version = $globalJson.sdk.version
                     Write-Host "Installing .NET SDK version $version from global.json"
                     & eng/common/dotnet-install.ps1 -version $version -runtime ''
 
@@ -102,9 +102,10 @@ extends:
                   scriptType: pscore
                   scriptLocation: inlineScript
                   inlineScript: |
-                    # Install Roslyn insertion tools from the dnceng feed, --tools-install as workaround for having to reset the process to add path to dotnet tools
-                    dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json --tool-path . 
-                    
+                    # Install Roslyn insertion tools from the dnceng feed, using --tool-path as a workaround to avoid resetting the process to pick up dotnet tool path changes
+                    $dotnet = "$(Build.SourcesDirectory)\.dotnet\dotnet.exe"
+                    & $dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json --tool-path .
+
                     # Acquire dnceng AzDO token via WIF service connection
                     $dncengToken = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
                     if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($dncengToken)) {
@@ -127,7 +128,7 @@ extends:
                       "--insert-corext-packages", "false"
                       "--insert-devdiv-source-files", "false"
                       "--title-prefix", "$(OptionalTitlePrefix)"
-                      "--reviewer-guid", $team 
+                      "--reviewer-guid", $team
                       "--dnceng-azdo-token", $dncengToken
                       "--devdiv-azdo-token", "$(dn-bot-devdiv-build-e-code-full-release-e-packaging-r)"
                       "--ci"
