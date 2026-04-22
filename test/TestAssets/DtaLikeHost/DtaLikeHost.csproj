@@ -36,14 +36,19 @@
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
   </PropertyGroup>
 
-  <ItemGroup>
+  <ItemGroup Condition="'$(TestPlatformToolsDirOverride)' == ''">
     <!-- Pull the package onto disk; we don't use its compile-time assets (there
          are none for net472 in lib/), we consume its tools/ layout below. -->
-    <PackageReference Include="Microsoft.TestPlatform" Version="18.5.0-dev" GeneratePathProperty="true" ExcludeAssets="all" PrivateAssets="all" />
+    <PackageReference Include="Microsoft.TestPlatform" Version="$(PackageVersion)" GeneratePathProperty="true" ExcludeAssets="all" PrivateAssets="all" />
   </ItemGroup>
 
-  <PropertyGroup>
+  <PropertyGroup Condition="'$(TestPlatformToolsDirOverride)' == ''">
     <_TestPlatformToolsDir>$(PkgMicrosoft_TestPlatform)\tools\net462\Common7\IDE\Extensions\TestPlatform</_TestPlatformToolsDir>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TestPlatformToolsDirOverride)' != ''">
+    <!-- VSIX flat layout: all DLLs + .exe.configs at the root of the extracted VSIX. -->
+    <_TestPlatformToolsDir>$(TestPlatformToolsDirOverride)</_TestPlatformToolsDir>
   </PropertyGroup>
 
   <Target Name="AddTestPlatformToolsReferences" BeforeTargets="ResolveAssemblyReferences" Condition="Exists('$(_TestPlatformToolsDir)')">
