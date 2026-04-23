@@ -70,7 +70,7 @@ public class DistributedTestAgentScenarioTests : AcceptanceTestBase
         // Directory.Build.props, copies eng/Versions.props and inserts the
         // "localy-built-packages" source into NuGet.config so PackageReference to
         // Microsoft.TestPlatform resolves to our locally-built nupkg.
-        var projectPath = GetIsolatedTestAsset("DtaLikeHost.csproj");
+        var projectPath = GetIsolatedTestAsset("DtaLikeHost.csproj", Net472TargetFramework);
         var workingDir = Path.GetDirectoryName(projectPath)!;
 
         var dotnetPath = GetPatchedDotnetPath();
@@ -105,7 +105,7 @@ public class DistributedTestAgentScenarioTests : AcceptanceTestBase
         // System.Collections.Immutable and System.Reflection.Metadata match the DLLs
         // shipped next to it, so the host exe completes normally even without any
         // binding redirects in its app.config.
-        ExecuteApplication(exePath, args: null, out var runOut, out var runErr, out var runExit);
+        ExecuteApplication(exePath, args: string.Empty, out var runOut, out var runErr, out var runExit);
 
         Assert.AreEqual(
             0,
@@ -117,7 +117,7 @@ public class DistributedTestAgentScenarioTests : AcceptanceTestBase
             $"Tools dir: {toolsDirOverride ?? "<nupkg default>"}\n" +
             $"STDOUT:\n{runOut}\nSTDERR:\n{runErr}");
 
-        StringAssert.Contains(runOut, "OK - no binding exception.");
+        Assert.Contains("OK - no binding exception.", runOut);
     }
 
     private static string GetPatchedDotnetPath()
