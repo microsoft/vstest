@@ -15,3 +15,58 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Name.get -> strin
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Properties.get -> System.Collections.Generic.IDictionary<string!, object!>!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.TelemetryEvent(string! name, System.Collections.Generic.IDictionary<string!, object!>! properties) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.CreateNoNewWindow.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.ArtifactKind.get -> string?
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.ArtifactKind.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.ArtifactNameRequest() -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.Collision.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.Collision.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.Context.get -> System.Collections.Generic.IReadOnlyDictionary<string!, string!>!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.Context.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.DirectoryTemplate.get -> string?
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.DirectoryTemplate.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.Extension.get -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.Extension.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.FileTemplate.get -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.FileTemplate.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.ProducerName.get -> string?
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest.ProducerName.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.Architecture = "Architecture" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.AssemblyName = "AssemblyName" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.Configuration = "Configuration" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.Date = "Date" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.HostId = "HostId" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.MachineName = "MachineName" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.Pid = "Pid" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.ProjectName = "ProjectName" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.RunId = "RunId" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.SessionId = "SessionId" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.TestResultsDirectory = "TestResultsDirectory" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.Tfm = "Tfm" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.Timestamp = "Timestamp" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameTokens.UserName = "UserName" -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets.All.get -> System.Collections.Generic.IReadOnlyList<string!>!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets.CI = "ci" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets.Detailed = "detailed" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets.Flat = "flat" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets.Local = "local" -> string!
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNamingPresets.TryGetPreset(string! presetName, out string! directoryTemplate, out string! fileTemplate, out Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior collision) -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.AppendCounter = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.AppendTimestamp = 3 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.Fail = 2 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior.Overwrite = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.CollisionBehavior
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.ArtifactNameResult(string! filePath, bool isOverwrite, bool isDirectoryOwner) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.FilePath.get -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.IsDirectoryOwner.get -> bool
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.IsOverwrite.get -> bool
+override Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult.ToString() -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.ExpandTemplate(string! template, System.Collections.Generic.IReadOnlyDictionary<string!, string!>! context) -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.IArtifactNameProvider.Resolve(Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameRequest! request) -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ArtifactNaming.ArtifactNameResult!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultLoggerParameterNames.TargetArchitecture = "TargetArchitecture" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.DefaultLoggerParameterNames.TestRunTimestamp = "TestRunTimestamp" -> string!
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.ArtifactRunTimestamp.get -> string?

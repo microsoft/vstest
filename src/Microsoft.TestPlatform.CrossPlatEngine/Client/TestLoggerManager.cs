@@ -58,6 +58,16 @@ internal class TestLoggerManager : ITestLoggerManager
     private bool _treatNoTestsAsError;
 
     /// <summary>
+    /// Target architecture (e.g. "x64", "x86", "ARM64").
+    /// </summary>
+    private string? _targetArchitecture;
+
+    /// <summary>
+    /// Shared test run timestamp for artifact naming.
+    /// </summary>
+    private string? _testRunTimestamp;
+
+    /// <summary>
     /// Test Logger Events instance which will be passed to loggers when they are initialized.
     /// </summary>
     private readonly InternalTestLoggerEvents _loggerEvents;
@@ -83,12 +93,17 @@ internal class TestLoggerManager : ITestLoggerManager
     private readonly IAssemblyLoadContext _assemblyLoadContext;
 
     /// <summary>
+    /// Time provider for generating timestamps. Injected for testability.
+    /// </summary>
+    private readonly Func<DateTime> _timeProvider;
+
+    /// <summary>
     /// Test logger manager.
     /// </summary>
     /// <param name="requestData">Request Data for Providing Common Services/Data for Discovery and Execution.</param>
     /// <param name="messageLogger">Message Logger.</param>
     /// <param name="loggerEvents">Logger events.</param>
-    public TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger, InternalTestLoggerEvents loggerEvents) : this(requestData, messageLogger, loggerEvents, new PlatformAssemblyLoadContext())
+    public TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger, InternalTestLoggerEvents loggerEvents) : this(requestData, messageLogger, loggerEvents, new PlatformAssemblyLoadContext(), () => DateTime.UtcNow)
     {
     }
 
@@ -99,14 +114,17 @@ internal class TestLoggerManager : ITestLoggerManager
     /// <param name="messageLogger"></param>
     /// <param name="loggerEvents"></param>
     /// <param name="assemblyLoadContext"></param>
+    /// <param name="timeProvider">Provides current UTC time. Injected for testability.</param>
     internal TestLoggerManager(IRequestData requestData, IMessageLogger messageLogger,
-        InternalTestLoggerEvents loggerEvents, IAssemblyLoadContext assemblyLoadContext)
+        InternalTestLoggerEvents loggerEvents, IAssemblyLoadContext assemblyLoadContext,
+        Func<DateTime> timeProvider)
     {
         _requestData = requestData;
         _messageLogger = messageLogger;
         _testLoggerExtensionManager = null;
         _loggerEvents = loggerEvents;
         _assemblyLoadContext = assemblyLoadContext;
+        _timeProvider = timeProvider;
     }
 
     /// <summary>
@@ -135,6 +153,8 @@ internal class TestLoggerManager : ITestLoggerManager
         // Store test run directory. This runsettings is the final runsettings merging CLI args and runsettings.
         _testRunDirectory = GetResultsDirectory(runSettings);
         _targetFramework = GetTargetFramework(runSettings)?.Name;
+        _targetArchitecture = GetTargetArchitecture(runSettings);
+        _testRunTimestamp = GetOrGenerateTestRunTimestamp(runSettings);
         _treatNoTestsAsError = GetTreatNoTestsAsError(runSettings);
 
         var loggers = XmlRunSettingsUtilities.GetLoggerRunSettings(runSettings);
@@ -479,6 +499,67 @@ internal class TestLoggerManager : ITestLoggerManager
     }
 
     /// <summary>
+    /// Gets the target architecture (e.g. "x64", "x86", "ARM64") from RunSettings.
+    /// </summary>
+    /// <param name="runSettings">Test run settings.</param>
+    /// <returns>Architecture string, or null if not available.</returns>
+    internal static string? GetTargetArchitecture(string? runSettings)
+    {
+        if (runSettings != null)
+        {
+            try
+            {
+                RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+
+                // Only propagate architecture when explicitly set in RunSettings.
+                // Default is the OS architecture, but we don't want to surface that
+                // unless the user or engine has explicitly configured it.
+                if (runConfiguration.TargetPlatformSet)
+                {
+                    return runConfiguration.TargetPlatform.ToString().ToLowerInvariant();
+                }
+            }
+            catch (SettingsException se)
+            {
+                EqtTrace.Error("TestLoggerManager.GetTargetArchitecture: Unable to get the target architecture: Error {0}", se);
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    /// Gets the shared test run timestamp from RunSettings, or generates a new one.
+    /// The timestamp is in ISO 8601 compact format: yyyyMMddTHHmmss.fff
+    /// If <c>&lt;ArtifactRunTimestamp&gt;</c> is already set in RunSettings (e.g. by the
+    /// orchestrator for cross-process synchronization), that value is used.
+    /// Otherwise a new timestamp is generated from the current UTC time.
+    /// </summary>
+    /// <param name="runSettings">Test run settings.</param>
+    /// <returns>Timestamp string.</returns>
+    internal string GetOrGenerateTestRunTimestamp(string? runSettings)
+    {
+        if (runSettings != null)
+        {
+            try
+            {
+                RunConfiguration runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(runSettings);
+                string? existingTimestamp = runConfiguration.ArtifactRunTimestamp;
+                if (!StringUtils.IsNullOrEmpty(existingTimestamp))
+                {
+                    return existingTimestamp;
+                }
+            }
+            catch (SettingsException se)
+            {
+                EqtTrace.Error("TestLoggerManager.GetOrGenerateTestRunTimestamp: Unable to read ArtifactRunTimestamp: Error {0}", se);
+            }
+        }
+
+        return _timeProvider().ToUniversalTime().ToString("yyyyMMdd'T'HHmmss.fff", CultureInfo.InvariantCulture);
+    }
+
+    /// <summary>
     /// Enables sending of events to the loggers which are registered.
     /// </summary>
     /// <remarks>
@@ -636,6 +717,8 @@ internal class TestLoggerManager : ITestLoggerManager
         // Add default logger parameters...
         loggerParams[DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory;
         loggerParams[DefaultLoggerParameterNames.TargetFramework] = _targetFramework;
+        loggerParams[DefaultLoggerParameterNames.TargetArchitecture] = _targetArchitecture;
+        loggerParams[DefaultLoggerParameterNames.TestRunTimestamp] = _testRunTimestamp;
 
         // Add custom logger parameters
         if (_treatNoTestsAsError)

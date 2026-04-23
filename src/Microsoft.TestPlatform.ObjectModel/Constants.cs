@@ -251,10 +251,27 @@ public static class Constants
 /// </summary>
 public static class DefaultLoggerParameterNames
 {
-    // Denotes target location for test run results
-    // For ex. TrxLogger saves test run results at this target
+    /// <summary>
+    /// Denotes target location for test run results.
+    /// For ex. TrxLogger saves test run results at this target.
+    /// </summary>
     public const string TestRunDirectory = "TestRunDirectory";
 
-    // Denotes target framework for the tests.
+    /// <summary>
+    /// Denotes target framework for the tests.
+    /// </summary>
     public const string TargetFramework = "TargetFramework";
+
+    /// <summary>
+    /// Target platform architecture (e.g. "x64", "x86", "ARM64").
+    /// Extracted from RunConfiguration.TargetPlatform.
+    /// </summary>
+    public const string TargetArchitecture = "TargetArchitecture";
+
+    /// <summary>
+    /// Shared timestamp for the current test run in ISO 8601 compact format
+    /// (e.g. "20260415T105100.123"). Generated once per run and propagated
+    /// to all loggers so that artifacts from the same run share a folder.
+    /// </summary>
+    public const string TestRunTimestamp = "TestRunTimestamp";
 }
