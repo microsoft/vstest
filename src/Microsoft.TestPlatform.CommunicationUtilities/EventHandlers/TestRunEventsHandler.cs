@@ -15,7 +15,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.EventHandle
 /// <summary>
 /// The test run events handler.
 /// </summary>
-public class TestRunEventsHandler : IInternalTestRunEventsHandler
+public class TestRunEventsHandler : IInternalTestRunEventsHandler, ITestCaseLifecycleNotifier
 {
     private readonly ITestRequestHandler _requestHandler;
 
@@ -104,4 +104,12 @@ public class TestRunEventsHandler : IInternalTestRunEventsHandler
         EqtTrace.Info("Sending AttachDebuggerToProcess on additional test process with pid: {0}", attachDebuggerInfo.ProcessId);
         return _requestHandler.AttachDebuggerToProcess(attachDebuggerInfo);
     }
+
+    /// <inheritdoc/>
+    void ITestCaseLifecycleNotifier.SendTestCaseStarting(TestCase testCase)
+        => _requestHandler.SendTestCaseStarting(testCase);
+
+    /// <inheritdoc/>
+    void ITestCaseLifecycleNotifier.SendTestCaseFinished(TestCase testCase)
+        => _requestHandler.SendTestCaseFinished(testCase);
 }

@@ -45,9 +45,12 @@ internal class FrameworkHandle : TestExecutionRecorder, IFrameworkHandle2, IDisp
     /// <param name="testRunCache"> The test run cache. </param>
     /// <param name="testExecutionContext"> The test execution context. </param>
     /// <param name="testRunEventsHandler">TestRun Events Handler</param>
+    /// <param name="onTestCaseStarting">Optional callback for real-time in-flight test tracking.</param>
+    /// <param name="onTestCaseFinished">Optional callback for real-time in-flight test tracking.</param>
     public FrameworkHandle(ITestCaseEventsHandler? testCaseEventsHandler, ITestRunCache testRunCache,
-        TestExecutionContext testExecutionContext, IInternalTestRunEventsHandler testRunEventsHandler)
-        : base(testCaseEventsHandler, testRunCache)
+        TestExecutionContext testExecutionContext, IInternalTestRunEventsHandler testRunEventsHandler,
+        Action<TestCase>? onTestCaseStarting = null, Action<TestCase>? onTestCaseFinished = null)
+        : base(testCaseEventsHandler, testRunCache, onTestCaseStarting, onTestCaseFinished)
     {
         _testExecutionContext = testExecutionContext;
         _testRunEventsHandler = testRunEventsHandler;

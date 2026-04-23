@@ -21,6 +21,8 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     private readonly List<AttachmentSet> _attachmentSets;
     private readonly ITestRunCache _testRunCache;
     private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
+    private readonly Action<TestCase>? _onTestCaseStarting;
+    private readonly Action<TestCase>? _onTestCaseFinished;
 
     /// <summary>
     /// Contains TestCase Ids for test cases that are in progress
@@ -35,10 +37,18 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// </summary>
     /// <param name="testCaseEventsHandler"> The test Case Events Handler. </param>
     /// <param name="testRunCache"> The test run cache.  </param>
-    public TestExecutionRecorder(ITestCaseEventsHandler? testCaseEventsHandler, ITestRunCache testRunCache)
+    /// <param name="onTestCaseStarting"> Optional callback invoked when a test case starts, for real-time in-flight tracking. </param>
+    /// <param name="onTestCaseFinished"> Optional callback invoked when a test case finishes, for real-time in-flight tracking. </param>
+    public TestExecutionRecorder(
+        ITestCaseEventsHandler? testCaseEventsHandler,
+        ITestRunCache testRunCache,
+        Action<TestCase>? onTestCaseStarting = null,
+        Action<TestCase>? onTestCaseFinished = null)
     {
         _testRunCache = testRunCache;
         _testCaseEventsHandler = testCaseEventsHandler;
+        _onTestCaseStarting = onTestCaseStarting;
+        _onTestCaseFinished = onTestCaseFinished;
         _attachmentSets = new List<AttachmentSet>();
 
         // As a framework guideline, we should get events in this order:
@@ -70,6 +80,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     {
         EqtTrace.Verbose("TestExecutionRecorder.RecordStart: Starting test: {0}.", testCase.FullyQualifiedName);
         _testRunCache.OnTestStarted(testCase);
+        _onTestCaseStarting?.Invoke(testCase);
 
         if (_testCaseEventsHandler != null)
         {
@@ -115,6 +126,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     {
         EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase.FullyQualifiedName);
         _testRunCache.OnTestCompletion(testCase);
+        _onTestCaseFinished?.Invoke(testCase);
         SendTestCaseEnd(testCase, outcome);
     }
 
