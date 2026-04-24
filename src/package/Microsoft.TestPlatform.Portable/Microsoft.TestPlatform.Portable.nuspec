@@ -51,7 +51,7 @@
     <file src="net48\zh-Hant\Microsoft.CodeCoverage.IO.resources.dll"	target="tools\net462\zh-Hant\Microsoft.CodeCoverage.IO.dll" />
 
     <file src="net48\Newtonsoft.Json.dll"	target="tools\net462\Newtonsoft.Json.dll" />
-    <file src="net48\System.Collections.Immutable.dll"	target="tools\net462\System.Collections.Immutable.dll" />
+    <file src="net48\SCI_Root\System.Collections.Immutable.dll"	target="tools\net462\System.Collections.Immutable.dll" />
     
     <file src="net48\System.Reflection.Metadata.dll"	target="tools\net462\System.Reflection.Metadata.dll" />
     <file src="net48\System.Memory.dll" target="tools\net462\System.Memory.dll" />
