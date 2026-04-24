@@ -107,6 +107,15 @@
       <PackageDepsJsonFiles Include="..\..\Microsoft.TestPlatform.PlatformAbstractions\bin\$(Configuration)\$(TargetFramework)\*.deps.json"></PackageDepsJsonFiles>
       <NewtonsoftJsonFiles Include="$(PkgNewtonsoft_Json)\lib\netstandard2.0\*"></NewtonsoftJsonFiles>
       <SystemCollectionsImmutableFiles Include="$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\*"></SystemCollectionsImmutableFiles>
+      <!--
+        The net462 build of SCI has AssemblyVersion 9.0.0.11, which differs from the other TFMs' 9.0.0.0.
+        We compile Common.dll and friends against the net462 SCI facade (via the central PackageReference
+        in Directory.Build.targets), so the net462 flavor of SCI must ship next to them in the package
+        ROOT (tools/net462/Common7/IDE/Extensions/TestPlatform/) for DTA-style hosts that do not get
+        binding redirects injected. The netstandard2.0 flavor (9.0.0.0) is still used in the nested
+        Extensions\ subfolder to avoid conflicting-version loads in .NET 9 acceptance-test processes.
+      -->
+      <SystemCollectionsImmutableNet462Files Include="$(PkgSystem_Collections_Immutable)\lib\net462\System.Collections.Immutable.dll"></SystemCollectionsImmutableNet462Files>
       <SystemReflectionMetadataFiles Include="$(PkgSystem_Reflection_Metadata)\lib\netstandard2.0\*"></SystemReflectionMetadataFiles>
       <MicrosoftInternalDiaFiles Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*"></MicrosoftInternalDiaFiles>
       <MicrosoftInternalIntellitraceFiles Include="$(PkgMicrosoft_Internal_Intellitrace)\tools\net451\**\*"></MicrosoftInternalIntellitraceFiles>
@@ -127,6 +136,7 @@
     <Copy SourceFiles="@(PlatformAbstractionsDepsJsonFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(NewtonsoftJsonFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(SystemCollectionsImmutableFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
+    <Copy SourceFiles="@(SystemCollectionsImmutableNet462Files)" DestinationFiles="$(OutDir)\SCI_Root\%(Filename)%(Extension)" />
     <Copy SourceFiles="@(SystemReflectionMetadataFiles)" DestinationFiles="$(OutDir)\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalDiaFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Dia\%(RecursiveDir)%(Filename)%(Extension)" />
     <Copy SourceFiles="@(MicrosoftInternalIntellitraceFiles)" DestinationFiles="$(OutDir)\Microsoft.Internal.Intellitrace\%(RecursiveDir)%(Filename)%(Extension)" />
