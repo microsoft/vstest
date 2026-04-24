@@ -88,7 +88,7 @@
       <SystemCollectionsImmutable Include="$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\*" />
       <!-- See note in Microsoft.TestPlatform.csproj: ship net462 SCI (AV 9.0.0.11) alongside Common.dll
            at the package root, while keeping netstandard2.0 (9.0.0.0) in nested Extensions subfolders. -->
-      <SystemCollectionsImmutableNet462 Include="$(PkgSystem_Collections_Immutable)\lib\net462\System.Collections.Immutable.dll" />
+      <SystemCollectionsImmutableNet462 Include="$(PkgSystem_Collections_Immutable)\lib\net462\System.Collections.Immutable.dll" Condition="'$(PkgSystem_Collections_Immutable)' != ''" />
       <SystemReflectionMetadata Include="$(PkgSystem_Reflection_Metadata)\lib\netstandard2.0\*" />
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*" />
     </ItemGroup>
