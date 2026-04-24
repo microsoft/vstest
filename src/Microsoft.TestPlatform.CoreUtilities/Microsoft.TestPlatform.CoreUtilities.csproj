@@ -19,13 +19,6 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Win32.Registry" Version="$(MicrosoftWin32RegistryVersion)" Condition="'$(TargetFramework)' == 'netstandard2.0'" />
     <PackageReference Include="System.Reflection.Metadata" Version="$(SystemReflectionMetadataVersion)" Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'" />
-    <!-- Explicitly reference System.Collections.Immutable on .NET Framework to override the older
-         version pulled in transitively by System.Reflection.Metadata 8.0.0. This ensures the net462
-         build of this assembly (the one shipped in the Microsoft.TestPlatform nupkg's
-         tools/net462/ layout and in the V2.CLI VSIX) references SCI 9.0.0 in its compiled metadata,
-         matching the SCI DLL we actually ship next to it — so consumers that load this DLL without
-         binding redirects (e.g. Azure DevOps Distributed Test Agent) don't hit FileLoadException. -->
-    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'" />
   </ItemGroup>
 
   <ItemGroup>
