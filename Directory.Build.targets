@@ -70,4 +70,16 @@
     </When>
   </Choose>
 
+  <!--
+    Explicitly reference System.Collections.Immutable on .NET Framework for all non-test product
+    projects. This overrides the older version pulled in transitively by System.Reflection.Metadata
+    8.0.0 and ensures every net462 assembly in the shipped nupkg and V2.CLI VSIX references the
+    same SCI version as the SCI DLL we ship next to it. Required to fix FileLoadException in hosts
+    without binding redirects (e.g. Azure DevOps Distributed Test Agent) and to keep DLLs in the
+    VSIX-style Common7/IDE/Extensions/TestPlatform/Extensions/ layout consistent with each other.
+  -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(IsTestProject)' != 'true'">
+    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" />
+  </ItemGroup>
+
 </Project>
