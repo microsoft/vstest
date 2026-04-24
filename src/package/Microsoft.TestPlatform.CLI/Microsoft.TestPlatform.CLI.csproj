@@ -94,8 +94,7 @@
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\netstandard\**\*"></MicrosoftInternalDia>
       <MicrosoftDiagnosticsNETCoreClient Include="$(PkgMicrosoft_Diagnostics_NETCore_Client)\lib\netstandard2.0\**\*"></MicrosoftDiagnosticsNETCoreClient>
       <MicrosoftInternalDia Include="$(PkgMicrosoft_Internal_Dia)\tools\net451\**\*"></MicrosoftInternalDia>
-      <SystemCollectionsImmutableFiles Include="$(PkgSystem_Collections_Immutable)\lib\net462\*" Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'"></SystemCollectionsImmutableFiles>
-      <SystemCollectionsImmutableFiles Include="$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\*" Condition="'$(TargetFrameworkIdentifier)' != '.NETFramework'"></SystemCollectionsImmutableFiles>
+      <SystemCollectionsImmutableFiles Include="$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\*"></SystemCollectionsImmutableFiles>
     </ItemGroup>
 
     <Copy SourceFiles="@(MicrosoftCodeCoverageIO)" DestinationFiles="$(OutDir)\Microsoft.CodeCoverage.IO\%(RecursiveDir)%(Filename)%(Extension)" Condition="'$(DotNetBuildSourceOnly)' != 'true'" />
