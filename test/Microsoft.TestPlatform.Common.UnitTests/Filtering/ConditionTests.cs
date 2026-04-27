@@ -331,5 +331,38 @@ public class ConditionTests
         Assert.IsFalse(condition.Evaluate(propertyName => null));
     }
 
+    [TestMethod]
+    public void EvaluateNoneEqualWithExplicitNoneCategoryShouldReturnTrue()
+    {
+        // A test with [TestCategory("None")] should also match TestCategory=None.
+        // "None" is reserved for uncategorized, but tests that literally use it
+        // are included as well (by design, to avoid silent mismatches).
+        var condition = new Condition("TestCategory", Operation.Equal, "None");
+        bool result = condition.Evaluate(propertyName => new[] { "None" });
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateNoneNotEqualWithExplicitNoneCategoryShouldReturnFalse()
+    {
+        // A test with [TestCategory("None")] should NOT match TestCategory!=None.
+        var condition = new Condition("TestCategory", Operation.NotEqual, "None");
+        bool result = condition.Evaluate(propertyName => new[] { "None" });
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateNoneEqualWithExplicitNoneCategoryAmongOthersShouldReturnTrue()
+    {
+        // A test with [TestCategory("None")] and [TestCategory("CategoryA")]
+        // should match TestCategory=None because one of the values equals "None".
+        var condition = new Condition("TestCategory", Operation.Equal, "None");
+        bool result = condition.Evaluate(propertyName => new[] { "None", "CategoryA" });
+
+        Assert.IsTrue(result);
+    }
+
     #endregion
 }

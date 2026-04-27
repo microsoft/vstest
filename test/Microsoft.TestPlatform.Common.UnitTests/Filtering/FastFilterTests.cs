@@ -494,5 +494,19 @@ public class FastFilterTests
         Assert.IsTrue(fastFilter.Evaluate(s => new[] { "CategoryA" }));
     }
 
+    [TestMethod]
+    public void FastFilterWithNoneEqualShouldAlsoMatchExplicitNoneCategory()
+    {
+        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory=None");
+        var fastFilter = filterExpressionWrapper.FastFilter;
+
+        Assert.IsNotNull(fastFilter);
+
+        // A test with [TestCategory("None")] should also match, since "None" is in the filter set.
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "None" }));
+        // Case-insensitive: "none" should also match.
+        Assert.IsTrue(fastFilter.Evaluate(s => new[] { "none" }));
+    }
+
     #endregion
 }
