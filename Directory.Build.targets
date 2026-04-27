@@ -74,4 +74,26 @@
     </When>
   </Choose>
 
+  <!--
+    Force all .NET Framework product projects to compile against the netstandard2.0 build of
+    System.Collections.Immutable (AssemblyVersion 9.0.0.0) instead of the net462 build
+    (AssemblyVersion 9.0.0.11). This is needed because SCI 9.0.11 introduced an AssemblyVersion
+    divergence between the two TFMs. The nupkg ships the netstandard2.0 DLL, so compiled metadata
+    must reference 9.0.0.0 — otherwise consumers without binding redirects (e.g. Azure DevOps
+    Distributed Test Agent) hit FileLoadException.
+
+    ExcludeAssets="compile" suppresses NuGet's default net462 compile ref; the explicit Reference
+    points to the netstandard2.0 DLL instead.
+
+    Excludes: test projects (they don't ship), src/package/ projects (they only pack).
+  -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'
+                         and '$(IsTestProject)' != 'true'
+                         and !$(MSBuildProjectDirectory.Contains('src\package\'))">
+    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" ExcludeAssets="compile" GeneratePathProperty="true" />
+    <Reference Include="System.Collections.Immutable">
+      <HintPath>$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>
