@@ -104,9 +104,11 @@ internal sealed class Condition
     private bool EvaluateEqualOperation(string[]? multiValue)
     {
         // Special case: empty string filter value matches null/empty property (uncategorized tests).
-        if (Value.Length == 0)
+        // For non-null arrays, fall through to the normal equality check so that arrays containing
+        // empty-string elements (e.g. from [TestCategory("")]) also match, consistent with FastFilter.
+        if (Value.Length == 0 && multiValue is null or { Length: 0 })
         {
-            return multiValue is null or { Length: 0 };
+            return true;
         }
 
         // if any value in multi-valued property matches 'this.Value', for Equal to evaluate true.
@@ -127,9 +129,12 @@ internal sealed class Condition
     private bool EvaluateContainsOperation(string[]? multiValue)
     {
         // Special case: empty string filter value matches null/empty property (uncategorized tests).
+        // We must not fall through to the normal Contains check because every string "contains" the
+        // empty string (IndexOf("") == 0), which would match ALL tests rather than just uncategorized ones.
+        // Also treat arrays where all elements are empty as uncategorized.
         if (Value.Length == 0)
         {
-            return multiValue is null or { Length: 0 };
+            return multiValue is null || Array.TrueForAll(multiValue, static v => v.Length == 0);
         }
 
         if (multiValue != null)

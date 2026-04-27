@@ -398,5 +398,55 @@ public class ConditionTests
         Assert.IsFalse(condition.Evaluate(propertyName => null));
     }
 
+    [TestMethod]
+    public void EvaluateEmptyStringEqualWithEmptyStringPropertyShouldReturnTrue()
+    {
+        // When property provider returns a single empty string (not an array),
+        // GetPropertyValue wraps it into [""], which should match empty-value filter.
+        // This must be consistent with FastFilter's behavior.
+        var condition = new Condition("TestCategory", Operation.Equal, string.Empty);
+        bool result = condition.Evaluate(propertyName => string.Empty);
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringEqualWithArrayContainingEmptyStringShouldReturnTrue()
+    {
+        // An array containing only an empty string (e.g. from [TestCategory("")])
+        // should be treated as uncategorized, consistent with FastFilter.
+        var condition = new Condition("TestCategory", Operation.Equal, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { string.Empty });
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotEqualWithEmptyStringPropertyShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.NotEqual, string.Empty);
+        bool result = condition.Evaluate(propertyName => string.Empty);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringContainsWithArrayContainingEmptyStringShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.Contains, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { string.Empty });
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotContainsWithArrayContainingEmptyStringShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.NotContains, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { string.Empty });
+
+        Assert.IsFalse(result);
+    }
+
     #endregion
 }
