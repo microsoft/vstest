@@ -71,6 +71,11 @@ internal sealed class Condition
     /// </summary>
     public const Operation DefaultOperation = Operation.Contains;
 
+    /// <summary>
+    /// Reserved filter value that matches tests with no value for a given property (uncategorized).
+    /// </summary>
+    internal const string NoneFilterValue = "None";
+
 #if !IS_VSTEST_REPO
     private const string TestCaseFilterFormatException = "Incorrect format for TestCaseFilter {0}. Specify the correct format and try again. Note that the incorrect format can lead to no test getting executed.";
 
@@ -103,10 +108,9 @@ internal sealed class Condition
 
     private bool EvaluateEqualOperation(string[]? multiValue)
     {
-        // Special case: empty string filter value matches null/empty property (uncategorized tests).
-        // For non-null arrays, fall through to the normal equality check so that arrays containing
-        // empty-string elements (e.g. from [TestCategory("")]) also match, consistent with FastFilter.
-        if (Value.Length == 0 && multiValue is null or { Length: 0 })
+        // Reserved keyword: "None" matches tests with no value for this property (uncategorized).
+        if (multiValue is null or { Length: 0 }
+            && string.Equals(Value, NoneFilterValue, StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
@@ -128,15 +132,6 @@ internal sealed class Condition
 
     private bool EvaluateContainsOperation(string[]? multiValue)
     {
-        // Special case: empty string filter value matches null/empty property (uncategorized tests).
-        // We must not fall through to the normal Contains check because every string "contains" the
-        // empty string (IndexOf("") == 0), which would match ALL tests rather than just uncategorized ones.
-        // Also treat arrays where all elements are empty as uncategorized.
-        if (Value.Length == 0)
-        {
-            return multiValue is null || Array.TrueForAll(multiValue, static v => v.Length == 0);
-        }
-
         if (multiValue != null)
         {
             foreach (string propertyValue in multiValue)
@@ -201,32 +196,23 @@ internal sealed class Condition
             return new Condition(DefaultPropertyName, DefaultOperation, FilterHelper.Unescape(conditionString!.Trim()));
         }
 
-        if (parts.Length == 2)
-        {
-            // Two parts means property name and operator with no value (e.g. "TestCategory=").
-            // Treat the value as empty string to support filtering for uncategorized tests.
-            parts = new[] { parts[0], parts[1], string.Empty };
-        }
-
         if (parts.Length != 3)
         {
             ThrownFormatExceptionForInvalidCondition(conditionString);
         }
 
-        // Property name (parts[0]) and operator (parts[1]) must not be empty.
-        // parts[2] (value) can be empty to support filtering for uncategorized tests.
-#if IS_VSTEST_REPO
-        if (parts[0].IsNullOrWhiteSpace() || parts[1].IsNullOrWhiteSpace())
-#else
-        if (string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
-#endif
+        for (int index = 0; index < 3; index++)
         {
-            ThrownFormatExceptionForInvalidCondition(conditionString);
+#if IS_VSTEST_REPO
+            if (parts[index].IsNullOrWhiteSpace())
+#else
+            if (string.IsNullOrWhiteSpace(parts[index]))
+#endif
+            {
+                ThrownFormatExceptionForInvalidCondition(conditionString);
+            }
+            parts[index] = parts[index].Trim();
         }
-
-        parts[0] = parts[0].Trim();
-        parts[1] = parts[1].Trim();
-        parts[2] = parts[2].Trim();
 
         Operation operation = GetOperator(parts[1]);
         Condition condition = new(parts[0], operation, FilterHelper.Unescape(parts[2]));

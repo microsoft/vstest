@@ -82,13 +82,13 @@ internal sealed class FastFilter
         bool matched = false;
         foreach (var name in FilterProperties.Keys)
         {
-            // Special case: if filter contains empty string, check if property is null/empty (uncategorized).
-            bool hasEmptyStringFilter = FilterProperties[name].Contains(string.Empty);
+            // Reserved keyword: "None" matches tests with no value for this property (uncategorized).
+            bool hasNoneFilter = FilterProperties[name].Contains(Condition.NoneFilterValue);
 
-            // If there is no value corresponding to given name, treat it as unmatched unless filtering for empty string.
+            // If there is no value corresponding to given name, treat it as unmatched unless filtering for "None".
             if (!TryGetPropertyValue(name, propertyValueProvider, out var singleValue, out var multiValues))
             {
-                if (hasEmptyStringFilter)
+                if (hasNoneFilter)
                 {
                     matched = true;
                     break;
@@ -107,9 +107,9 @@ internal sealed class FastFilter
                 var values = PropertyValueRegex == null ? multiValues : multiValues?.Select(value => ApplyRegex(value));
                 matched = values?.Any(result => result != null && FilterProperties[name].Contains(result)) == true;
             }
-            else if (hasEmptyStringFilter)
+            else if (hasNoneFilter)
             {
-                // Empty array matches empty string filter.
+                // Empty array matches "None" filter (uncategorized).
                 matched = true;
             }
 

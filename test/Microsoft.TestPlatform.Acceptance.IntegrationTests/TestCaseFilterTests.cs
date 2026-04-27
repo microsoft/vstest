@@ -181,7 +181,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
-    public void RunSelectedTestsWithEmptyTestCategoryFilterMatchesUncategorizedTests(RunnerInfo runnerInfo)
+    public void RunSelectedTestsWithNoneTestCategoryFilterMatchesUncategorizedTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -190,10 +190,10 @@ public class TestCaseFilterTests : AcceptanceTestBase
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        // Empty TestCategory value should match tests without any TestCategory attribute.
+        // "None" is a reserved keyword that matches tests without any TestCategory attribute.
         // In SimpleTestProject: PassingTest (no category) and SkippingTest (no category, ignored).
         // FailingTest has TestCategory("CategoryA") and should NOT be matched.
-        arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=\"");
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=None\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(1, 0, 1);
     }
@@ -201,7 +201,7 @@ public class TestCaseFilterTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
-    public void RunSelectedTestsWithEmptyTestCategoryNotEqualFilterMatchesCategorizedTests(RunnerInfo runnerInfo)
+    public void RunSelectedTestsWithNoneTestCategoryNotEqualFilterMatchesCategorizedTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -210,9 +210,9 @@ public class TestCaseFilterTests : AcceptanceTestBase
             GetTestAdapterPath(),
             string.Empty, FrameworkArgValue,
             runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        // NotEqual to empty TestCategory should match tests WITH categories.
+        // NotEqual to "None" should match tests WITH categories.
         // In SimpleTestProject: only FailingTest has TestCategory("CategoryA").
-        arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory!=\"");
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory!=None\"");
         InvokeVsTest(arguments);
         ValidateSummaryStatus(0, 1, 0);
     }

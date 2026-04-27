@@ -443,12 +443,12 @@ public class FastFilterTests
             }));
     }
 
-    #region Empty value filter tests (uncategorized tests support)
+    #region None filter value tests (uncategorized tests support)
 
     [TestMethod]
-    public void FastFilterWithEmptyEqualShouldMatchNullProperty()
+    public void FastFilterWithNoneEqualShouldMatchNullProperty()
     {
-        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory=");
+        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory=None");
         var fastFilter = filterExpressionWrapper.FastFilter;
 
         Assert.IsNotNull(fastFilter);
@@ -463,9 +463,9 @@ public class FastFilterTests
     }
 
     [TestMethod]
-    public void FastFilterWithEmptyEqualOrSpecificCategoryShouldMatchBoth()
+    public void FastFilterWithNoneEqualOrSpecificCategoryShouldMatchBoth()
     {
-        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory=|TestCategory=CategoryA");
+        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory=None|TestCategory=CategoryA");
         var fastFilter = filterExpressionWrapper.FastFilter;
 
         Assert.IsNotNull(fastFilter);
@@ -480,9 +480,9 @@ public class FastFilterTests
     }
 
     [TestMethod]
-    public void FastFilterWithEmptyNotEqualShouldMatchCategorizedTests()
+    public void FastFilterWithNoneNotEqualShouldMatchCategorizedTests()
     {
-        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory!=");
+        var filterExpressionWrapper = new FilterExpressionWrapper("TestCategory!=None");
         var fastFilter = filterExpressionWrapper.FastFilter;
 
         Assert.IsNotNull(fastFilter);
