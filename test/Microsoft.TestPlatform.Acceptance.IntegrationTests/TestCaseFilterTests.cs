@@ -178,4 +178,43 @@ public class TestCaseFilterTests : AcceptanceTestBase
         ValidateTestsNotDiscovered(listOfNotDiscoveredTests);
     }
 
+    [TestMethod]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunSelectedTestsWithEmptyTestCategoryFilterMatchesUncategorizedTests(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetSampleTestAssembly(),
+            GetTestAdapterPath(),
+            string.Empty, FrameworkArgValue,
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        // Empty TestCategory value should match tests without any TestCategory attribute.
+        // In SimpleTestProject: PassingTest (no category) and SkippingTest (no category, ignored).
+        // FailingTest has TestCategory("CategoryA") and should NOT be matched.
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory=\"");
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(1, 0, 1);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSourceAttribute(inIsolation: true, inProcess: true)]
+    [NetCoreTargetFrameworkDataSource]
+    public void RunSelectedTestsWithEmptyTestCategoryNotEqualFilterMatchesCategorizedTests(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetSampleTestAssembly(),
+            GetTestAdapterPath(),
+            string.Empty, FrameworkArgValue,
+            runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        // NotEqual to empty TestCategory should match tests WITH categories.
+        // In SimpleTestProject: only FailingTest has TestCategory("CategoryA").
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"TestCategory!=\"");
+        InvokeVsTest(arguments);
+        ValidateSummaryStatus(0, 1, 0);
+    }
+
 }

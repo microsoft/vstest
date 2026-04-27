@@ -28,10 +28,13 @@ public class ConditionTests
     }
 
     [TestMethod]
-    public void ParseShouldThrownFormatExceptionOnIncompleteConditionString()
+    public void ParseShouldCreateConditionWithEmptyValueOnTrailingOperator()
     {
         var conditionString = "PropertyName=";
-        Assert.ThrowsExactly<FormatException>(() => Condition.Parse(conditionString));
+        Condition condition = Condition.Parse(conditionString);
+        Assert.AreEqual("PropertyName", condition.Name);
+        Assert.AreEqual(Operation.Equal, condition.Operation);
+        Assert.AreEqual(string.Empty, condition.Value);
     }
 
     [TestMethod]
@@ -235,4 +238,165 @@ public class ConditionTests
         Assert.AreEqual("FullyQualifiedName", tokens[0]);
         Assert.AreEqual("!", tokens[1]);
     }
+
+    #region Empty value filter tests (uncategorized tests support)
+
+    [TestMethod]
+    public void ParseEmptyValueWithNotEqualsShouldCreateConditionWithEmptyValue()
+    {
+        Condition condition = Condition.Parse("TestCategory!=");
+
+        Assert.AreEqual("TestCategory", condition.Name);
+        Assert.AreEqual(Operation.NotEqual, condition.Operation);
+        Assert.AreEqual(string.Empty, condition.Value);
+    }
+
+    [TestMethod]
+    public void ParseEmptyValueWithContainsShouldCreateConditionWithEmptyValue()
+    {
+        Condition condition = Condition.Parse("TestCategory~");
+
+        Assert.AreEqual("TestCategory", condition.Name);
+        Assert.AreEqual(Operation.Contains, condition.Operation);
+        Assert.AreEqual(string.Empty, condition.Value);
+    }
+
+    [TestMethod]
+    public void ParseEmptyValueWithNotContainsShouldCreateConditionWithEmptyValue()
+    {
+        Condition condition = Condition.Parse("TestCategory!~");
+
+        Assert.AreEqual("TestCategory", condition.Name);
+        Assert.AreEqual(Operation.NotContains, condition.Operation);
+        Assert.AreEqual(string.Empty, condition.Value);
+    }
+
+    [TestMethod]
+    public void ParseWhitespaceValueAfterEqualsShouldCreateConditionWithEmptyValue()
+    {
+        Condition condition = Condition.Parse("TestCategory= ");
+
+        Assert.AreEqual("TestCategory", condition.Name);
+        Assert.AreEqual(Operation.Equal, condition.Operation);
+        Assert.AreEqual(string.Empty, condition.Value);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringEqualWithNullPropertyShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.Equal, string.Empty);
+        bool result = condition.Evaluate(propertyName => null);
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringEqualWithEmptyArrayShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.Equal, string.Empty);
+        bool result = condition.Evaluate(propertyName => Array.Empty<string>());
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringEqualWithNonEmptyArrayShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.Equal, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { "CategoryA" });
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotEqualWithNullPropertyShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.NotEqual, string.Empty);
+        bool result = condition.Evaluate(propertyName => null);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotEqualWithEmptyArrayShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.NotEqual, string.Empty);
+        bool result = condition.Evaluate(propertyName => Array.Empty<string>());
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotEqualWithNonEmptyArrayShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.NotEqual, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { "CategoryA" });
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringContainsWithNullPropertyShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.Contains, string.Empty);
+        bool result = condition.Evaluate(propertyName => null);
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringContainsWithEmptyArrayShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.Contains, string.Empty);
+        bool result = condition.Evaluate(propertyName => Array.Empty<string>());
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringContainsWithNonEmptyArrayShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.Contains, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { "CategoryA" });
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotContainsWithNullPropertyShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.NotContains, string.Empty);
+        bool result = condition.Evaluate(propertyName => null);
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotContainsWithEmptyArrayShouldReturnFalse()
+    {
+        var condition = new Condition("TestCategory", Operation.NotContains, string.Empty);
+        bool result = condition.Evaluate(propertyName => Array.Empty<string>());
+
+        Assert.IsFalse(result);
+    }
+
+    [TestMethod]
+    public void EvaluateEmptyStringNotContainsWithNonEmptyArrayShouldReturnTrue()
+    {
+        var condition = new Condition("TestCategory", Operation.NotContains, string.Empty);
+        bool result = condition.Evaluate(propertyName => new[] { "CategoryA" });
+
+        Assert.IsTrue(result);
+    }
+
+    [TestMethod]
+    public void EvaluateNonEmptyStringEqualShouldStillWorkNormally()
+    {
+        var condition = new Condition("TestCategory", Operation.Equal, "CategoryA");
+        Assert.IsTrue(condition.Evaluate(propertyName => new[] { "CategoryA" }));
+        Assert.IsFalse(condition.Evaluate(propertyName => new[] { "CategoryB" }));
+        Assert.IsFalse(condition.Evaluate(propertyName => null));
+    }
+
+    #endregion
 }

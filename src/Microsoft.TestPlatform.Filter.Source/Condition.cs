@@ -103,6 +103,12 @@ internal sealed class Condition
 
     private bool EvaluateEqualOperation(string[]? multiValue)
     {
+        // Special case: empty string filter value matches null/empty property (uncategorized tests).
+        if (Value.Length == 0)
+        {
+            return multiValue is null or { Length: 0 };
+        }
+
         // if any value in multi-valued property matches 'this.Value', for Equal to evaluate true.
         if (multiValue != null)
         {
@@ -120,6 +126,12 @@ internal sealed class Condition
 
     private bool EvaluateContainsOperation(string[]? multiValue)
     {
+        // Special case: empty string filter value matches null/empty property (uncategorized tests).
+        if (Value.Length == 0)
+        {
+            return multiValue is null or { Length: 0 };
+        }
+
         if (multiValue != null)
         {
             foreach (string propertyValue in multiValue)
@@ -184,23 +196,32 @@ internal sealed class Condition
             return new Condition(DefaultPropertyName, DefaultOperation, FilterHelper.Unescape(conditionString!.Trim()));
         }
 
+        if (parts.Length == 2)
+        {
+            // Two parts means property name and operator with no value (e.g. "TestCategory=").
+            // Treat the value as empty string to support filtering for uncategorized tests.
+            parts = new[] { parts[0], parts[1], string.Empty };
+        }
+
         if (parts.Length != 3)
         {
             ThrownFormatExceptionForInvalidCondition(conditionString);
         }
 
-        for (int index = 0; index < 3; index++)
-        {
+        // Property name (parts[0]) and operator (parts[1]) must not be empty.
+        // parts[2] (value) can be empty to support filtering for uncategorized tests.
 #if IS_VSTEST_REPO
-            if (parts[index].IsNullOrWhiteSpace())
+        if (parts[0].IsNullOrWhiteSpace() || parts[1].IsNullOrWhiteSpace())
 #else
-            if (string.IsNullOrWhiteSpace(parts[index]))
+        if (string.IsNullOrWhiteSpace(parts[0]) || string.IsNullOrWhiteSpace(parts[1]))
 #endif
-            {
-                ThrownFormatExceptionForInvalidCondition(conditionString);
-            }
-            parts[index] = parts[index].Trim();
+        {
+            ThrownFormatExceptionForInvalidCondition(conditionString);
         }
+
+        parts[0] = parts[0].Trim();
+        parts[1] = parts[1].Trim();
+        parts[2] = parts[2].Trim();
 
         Operation operation = GetOperator(parts[1]);
         Condition condition = new(parts[0], operation, FilterHelper.Unescape(parts[2]));

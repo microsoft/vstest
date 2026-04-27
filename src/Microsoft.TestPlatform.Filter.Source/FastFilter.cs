@@ -82,9 +82,18 @@ internal sealed class FastFilter
         bool matched = false;
         foreach (var name in FilterProperties.Keys)
         {
-            // If there is no value corresponding to given name, treat it as unmatched.
+            // Special case: if filter contains empty string, check if property is null/empty (uncategorized).
+            bool hasEmptyStringFilter = FilterProperties[name].Contains(string.Empty);
+
+            // If there is no value corresponding to given name, treat it as unmatched unless filtering for empty string.
             if (!TryGetPropertyValue(name, propertyValueProvider, out var singleValue, out var multiValues))
             {
+                if (hasEmptyStringFilter)
+                {
+                    matched = true;
+                    break;
+                }
+
                 continue;
             }
 
@@ -93,10 +102,15 @@ internal sealed class FastFilter
                 var value = PropertyValueRegex == null ? singleValue : ApplyRegex(singleValue);
                 matched = value != null && FilterProperties[name].Contains(value);
             }
-            else
+            else if (multiValues is { Length: > 0 })
             {
                 var values = PropertyValueRegex == null ? multiValues : multiValues?.Select(value => ApplyRegex(value));
                 matched = values?.Any(result => result != null && FilterProperties[name].Contains(result)) == true;
+            }
+            else if (hasEmptyStringFilter)
+            {
+                // Empty array matches empty string filter.
+                matched = true;
             }
 
             if (matched)
