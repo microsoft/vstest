@@ -5,6 +5,16 @@
     <_NetFrameworkHostedCompilersVersion Condition="'$(_NetFrameworkHostedCompilersVersion)' == ''">4.11.0-3.24280.3</_NetFrameworkHostedCompilersVersion>
   </PropertyGroup>
   
+  <PropertyGroup>
+    <!--
+      MSB3277: netstandard2.0 product assemblies reference SCI 9.0.0.0 (from the explicit
+      PackageReference needed for the DTA scenario — see issue #15718), but .NETCoreApp
+      targets have inbox SCI 8.0.0.0. This is harmless: .NET Core assembly loading is
+      version-tolerant and will load the available version regardless of the reference.
+    -->
+    <MSBuildWarningsAsMessages Condition="'$(TargetFrameworkIdentifier)' == '.NETCoreApp'">$(MSBuildWarningsAsMessages);MSB3277</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
   <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
   <!-- Override the version of imported package to avoid infinite restore loop in VisualStudio, https://github.com/dotnet/arcade/issues/16228 -->
   <ItemGroup>
@@ -70,26 +80,5 @@
     </When>
   </Choose>
 
-  <!--
-    Force all .NET Framework product projects to compile against the netstandard2.0 build of
-    System.Collections.Immutable (AssemblyVersion 9.0.0.0) instead of the net462 build
-    (AssemblyVersion 9.0.0.11). This is needed because SCI 9.0.11 introduced an AssemblyVersion
-    divergence between the two TFMs. The nupkg ships the netstandard2.0 DLL, so compiled metadata
-    must reference 9.0.0.0 — otherwise consumers without binding redirects (e.g. Azure DevOps
-    Distributed Test Agent) hit FileLoadException.
-
-    ExcludeAssets="compile" suppresses NuGet's default net462 compile ref; the explicit Reference
-    points to the netstandard2.0 DLL instead.
-
-    Excludes: test projects (they don't ship), src/package/ projects (they only pack).
-  -->
-  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework'
-                         and '$(IsTestProject)' != 'true'
-                         and !$(MSBuildProjectDirectory.Contains('src\package\'))">
-    <PackageReference Include="System.Collections.Immutable" Version="$(SystemCollectionsImmutableVersion)" ExcludeAssets="compile" GeneratePathProperty="true" />
-    <Reference Include="System.Collections.Immutable">
-      <HintPath>$(PkgSystem_Collections_Immutable)\lib\netstandard2.0\System.Collections.Immutable.dll</HintPath>
-    </Reference>
-  </ItemGroup>
 
 </Project>
