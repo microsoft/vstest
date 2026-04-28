@@ -1985,7 +1985,6 @@
       "Microsoft.VisualStudio.TestPlatform.Client.dll": ".NETFramework,Version=v4.8",
       "Microsoft.VisualStudio.TestPlatform.Common.dll": ".NETFramework,Version=v4.6.2",
       "Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": ".NETFramework,Version=v4.6.2",
-      "Newtonsoft.Json.dll": ".NETFramework,Version=v4.5",
       "pl/Microsoft.CodeCoverage.IO.resources.dll": "",
       "pl/Microsoft.TestPlatform.AdapterUtilities.resources.dll": "",
       "pl/Microsoft.TestPlatform.CommunicationUtilities.resources.dll": "",
