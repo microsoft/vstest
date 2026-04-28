@@ -141,6 +141,11 @@ function Verify-DllFrameworks {
                 continue
             }
 
+            # Resource assemblies don't carry a meaningful TFM — skip them.
+            if ($dllName -like '*.resources.dll') {
+                continue
+            }
+
             $tfm = Get-DllTargetFramework -DllPath $dll.FullName
 
             if ($null -eq $tfm) {
