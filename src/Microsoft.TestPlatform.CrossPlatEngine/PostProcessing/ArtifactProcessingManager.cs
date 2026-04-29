@@ -281,7 +281,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         if (result != 0)
         {
             int error = Marshal.GetLastWin32Error();
-            EqtTrace.Warning($"ArtifactProcessingManager: Failed to set permissions on '{path}', errno: {error}");
+            throw new InvalidOperationException($"Failed to set permissions on '{path}', errno: {error}");
         }
     }
 
