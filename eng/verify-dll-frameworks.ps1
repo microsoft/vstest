@@ -39,13 +39,13 @@ function Get-DllTargetFramework {
     $bytes = [System.IO.File]::ReadAllBytes($DllPath)
     $text = [System.Text.Encoding]::ASCII.GetString($bytes)
 
-    $prefixes = @(
-        '.NETCoreApp,Version=v'
-        '.NETFramework,Version=v'
-        '.NETStandard,Version=v'
-    )
+    $familyMap = [ordered]@{
+        '.NETCoreApp,Version=v'   = 'net'
+        '.NETFramework,Version=v' = 'netframework'
+        '.NETStandard,Version=v'  = 'netstandard'
+    }
 
-    foreach ($prefix in $prefixes) {
+    foreach ($prefix in $familyMap.Keys) {
         $startIdx = 0
         while ($true) {
             $idx = $text.IndexOf($prefix, $startIdx, [System.StringComparison]::Ordinal)
@@ -70,14 +70,16 @@ function Get-DllTargetFramework {
                 $bytes[$idx - 3] -eq 0x01 -and
                 $bytes[$idx - 2] -eq 0x00 -and
                 $bytes[$idx - 1] -eq $tfmLength) {
-                return $tfm
+                return $familyMap[$prefix]
             }
 
             $startIdx = $end
         }
     }
 
-    return ""
+    # Managed assembly without TargetFrameworkAttribute — older assemblies
+    # built before the attribute became standard (e.g. BCL compat shims).
+    return "none"
 }
 
 function Verify-DllFrameworks {
