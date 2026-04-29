@@ -20,8 +20,8 @@
     <file src="$SourceBuildTfmCurrent$\datacollector.deps.json" target="contentFiles\any\$SourceBuildTfmCurrent$" />
     <file src="$SourceBuildTfmCurrent$\datacollector.runtimeconfig.json" target="contentFiles\any\$SourceBuildTfmCurrent$" />
 
-    <file src="$SourceBuildTfmCurrent$\Microsoft.Extensions.DependencyModel\Microsoft.Extensions.DependencyModel.dll" target="contentFiles\any\$SourceBuildTfmCurrent$" />
-    <file src="$SourceBuildTfmCurrent$\Microsoft.Extensions.FileSystemGlobbing\Microsoft.Extensions.FileSystemGlobbing.dll" target="contentFiles\any\$SourceBuildTfmCurrent$" />
+    <file src="$SourceBuildTfmCurrent$\Microsoft.Extensions.DependencyModel.dll" target="contentFiles\any\$SourceBuildTfmCurrent$" />
+    <file src="$SourceBuildTfmCurrent$\Microsoft.Extensions.FileSystemGlobbing.dll" target="contentFiles\any\$SourceBuildTfmCurrent$" />
 
     <file src="$SourceBuildTfmCurrent$\Microsoft.TestPlatform.CommunicationUtilities.dll" target="contentFiles\any\$SourceBuildTfmCurrent$" />
     <file src="$SourceBuildTfmCurrent$\Microsoft.TestPlatform.CoreUtilities.dll" target="contentFiles\any\$SourceBuildTfmCurrent$" />
@@ -56,7 +56,7 @@
     <file src="$SourceBuildTfmCurrent$\vstest.console.runtimeconfig.json" target="contentFiles\any\$SourceBuildTfmCurrent$" />
 
     <!-- Extensions -->
-    <file src="$SourceBuildTfmCurrent$\Microsoft.Diagnostics.NETCore.Client\Microsoft.Diagnostics.NETCore.Client.dll" target="contentFiles\any\$SourceBuildTfmCurrent$\Extensions" />
+    <file src="$SourceBuildTfmCurrent$\Microsoft.Diagnostics.NETCore.Client.dll" target="contentFiles\any\$SourceBuildTfmCurrent$\Extensions" />
     <file src="$SourceBuildTfmCurrent$\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" target="contentFiles\any\$SourceBuildTfmCurrent$\Extensions" />
     <file src="$SourceBuildTfmCurrent$\Microsoft.TestPlatform.TesthostRuntimeProvider.dll" target="contentFiles\any\$SourceBuildTfmCurrent$\Extensions" />
     <file src="$SourceBuildTfmCurrent$\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" target="contentFiles\any\$SourceBuildTfmCurrent$\Extensions" />
