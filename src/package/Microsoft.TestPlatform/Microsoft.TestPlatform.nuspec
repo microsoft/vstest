@@ -59,7 +59,7 @@
     <file src="net48\datacollector.arm64.exe.config" target="tools\net462\Common7\IDE\Extensions\TestPlatform\datacollector.arm64.exe.config" />
     <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.DiaSymReader.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.DiaSymReader.dll" />
     <file src="net48\Microsoft.Extensions.DependencyModel.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.DependencyModel.dll" />
-    <file src="net48\Microsoft.Extensions.FileSystemGlobbing\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.FileSystemGlobbing.dll" />
+    <file src="net48\Microsoft.Extensions.FileSystemGlobbing.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Extensions.FileSystemGlobbing.dll" />
     <file src="net48\Microsoft.Internal.TestPlatform.Extensions\Microsoft.IntelliTrace.Core.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.IntelliTrace.Core.dll" />
     <file src="net48\Microsoft.TestPlatform.CommunicationUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CommunicationUtilities.dll" />
     <file src="net48\Microsoft.TestPlatform.CoreUtilities.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.TestPlatform.CoreUtilities.dll" />

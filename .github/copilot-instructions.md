@@ -92,3 +92,9 @@ When working autonomously on issues (e.g. from a milestone), follow this workflo
 ### Troubleshooting
 
 - If a build fails with warnings treated as errors (e.g. IDE0005 unnecessary using), and you cannot reproduce locally, try building with `-c Release` to match CI: `./build.cmd -c Release`.
+
+### Testing rigor
+
+- **Never dismiss test failures as "pre-existing" without verifying.** If tests fail, investigate the actual cause. Find out how to make them pass — check test parameters, missing build steps, environment setup. Run them again with the right setup.
+- Acceptance tests need `--test-parameter BuildCompatibility=true` to build compatibility matrix test assets. Without it, ~100 tests will fail with "Path not found" errors.
+- If a test run has failures, look at the error messages and figure out what's needed. Don't stop at "probably pre-existing."

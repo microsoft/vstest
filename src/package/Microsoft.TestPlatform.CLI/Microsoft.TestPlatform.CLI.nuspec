@@ -21,8 +21,8 @@
     <file src="net10.0\datacollector.runtimeconfig.json" target="contentFiles\any\net10.0" />
 
     <file src="net10.0\Microsoft.CodeCoverage.IO\Microsoft.CodeCoverage.IO.dll" target="contentFiles\any\net10.0" />
-    <file src="net10.0\Microsoft.Extensions.DependencyModel\Microsoft.Extensions.DependencyModel.dll" target="contentFiles\any\net10.0" />
-    <file src="net10.0\Microsoft.Extensions.FileSystemGlobbing\Microsoft.Extensions.FileSystemGlobbing.dll" target="contentFiles\any\net10.0" />
+    <file src="net10.0\Microsoft.Extensions.DependencyModel.dll" target="contentFiles\any\net10.0" />
+    <file src="net10.0\Microsoft.Extensions.FileSystemGlobbing.dll" target="contentFiles\any\net10.0" />
 
     <file src="net10.0\Microsoft.TestPlatform.CommunicationUtilities.dll" target="contentFiles\any\net10.0" />
     <file src="net10.0\Microsoft.TestPlatform.CoreUtilities.dll" target="contentFiles\any\net10.0" />
@@ -63,7 +63,7 @@
     <file src="net10.0\DumpMinitool.x86.exe.config" target="contentFiles\any\net10.0\Extensions\dump" />
     <file src="net10.0\DumpMinitool.arm64.exe" target="contentFiles\any\net10.0\Extensions\dump" />
     <file src="net10.0\DumpMinitool.arm64.exe.config" target="contentFiles\any\net10.0\Extensions\dump" />
-    <file src="net10.0\Microsoft.Diagnostics.NETCore.Client\Microsoft.Diagnostics.NETCore.Client.dll" target="contentFiles\any\net10.0\Extensions" />
+    <file src="net10.0\Microsoft.Diagnostics.NETCore.Client.dll" target="contentFiles\any\net10.0\Extensions" />
     <file src="net10.0\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" target="contentFiles\any\net10.0\Extensions" />
     <file src="net10.0\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" target="contentFiles\any\net10.0\Extensions" />
     <file src="net10.0\Microsoft.TestPlatform.TesthostRuntimeProvider.dll" target="contentFiles\any\net10.0\Extensions" />

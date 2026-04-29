@@ -34,8 +34,8 @@
     <MsDiaFolder>$(TestPlatformBinFolder)Microsoft.Internal.Dia\</MsDiaFolder>
     <CodeCoverageIOFolder>$(TestPlatformBinFolder)Microsoft.CodeCoverage.IO\</CodeCoverageIOFolder>
     <VSQualityToolsFolder>$(TestPlatformBinFolder)Microsoft.VisualStudio.QualityTools\</VSQualityToolsFolder>
-    <DependencyModelFolder>$(TestPlatformBinFolder)Microsoft.Extensions.DependencyModel\</DependencyModelFolder>
-    <FileSystemGlobbingFolder>$(TestPlatformBinFolder)Microsoft.Extensions.FileSystemGlobbing\</FileSystemGlobbingFolder>
+    <DependencyModelFolder>$(TestPlatformBinFolder)</DependencyModelFolder>
+    <FileSystemGlobbingFolder>$(TestPlatformBinFolder)</FileSystemGlobbingFolder>
     <InternalTestPlatformExtensionsFolder>$(TestPlatformBinFolder)Microsoft.Internal.TestPlatform.Extensions\</InternalTestPlatformExtensionsFolder>
   </PropertyGroup>
 
