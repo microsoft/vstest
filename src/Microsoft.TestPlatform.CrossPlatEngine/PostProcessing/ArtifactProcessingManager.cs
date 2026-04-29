@@ -254,18 +254,12 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     /// <summary>
     /// Creates a directory with permissions restricted to the current user on Unix.
     /// </summary>
-    internal /* for testing */ static void CreateDirectoryWithUserOnlyAccess(string path)
+    internal /* for testing */ void CreateDirectoryWithUserOnlyAccess(string path)
     {
-#if NETFRAMEWORK
-        Directory.CreateDirectory(path);
-#else
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        _fileHelper.CreateDirectory(path);
+#if !NETFRAMEWORK
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            Directory.CreateDirectory(path);
-        }
-        else
-        {
-            Directory.CreateDirectory(path);
             SetUnixDirectoryPermissions(path);
         }
 #endif
