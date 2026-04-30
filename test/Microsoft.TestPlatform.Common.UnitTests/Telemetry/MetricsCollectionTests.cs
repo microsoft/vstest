@@ -85,4 +85,25 @@ public class MetricsCollectionTests
 
         Assert.IsGreaterThan(0, _metricsCollection.Metrics.Count);
     }
+
+    [TestMethod]
+    public void ClearShouldRemoveAllMetrics()
+    {
+        _metricsCollection.Add("Key1", "Value1");
+        _metricsCollection.Add("Key2", "Value2");
+        _metricsCollection.Add("Key3", 42);
+
+        _metricsCollection.Clear();
+
+        Assert.IsEmpty(_metricsCollection.Metrics);
+    }
+
+    [TestMethod]
+    public void ClearShouldNotThrowWhenCollectionIsEmpty()
+    {
+        // Collection is empty after construction; clearing should be a no-op.
+        _metricsCollection.Clear();
+
+        Assert.IsEmpty(_metricsCollection.Metrics);
+    }
 }

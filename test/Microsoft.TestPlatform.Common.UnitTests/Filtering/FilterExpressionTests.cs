@@ -99,4 +99,39 @@ public class FilterExpressionTests
         Assert.AreEqual(@"|", tokens[3]);
         Assert.AreEqual(@"T2\)", tokens[4]);
     }
+
+    [TestMethod]
+    public void TokenizeFilterShouldHandleEmptyString()
+    {
+        var conditionString = string.Empty;
+
+        var tokens = FilterExpression.TokenizeFilterExpressionString(conditionString).ToArray();
+
+        Assert.IsEmpty(tokens);
+    }
+
+    [TestMethod]
+    public void TokenizeFilterShouldHandleOnlyWhitespace()
+    {
+        var conditionString = "   ";
+
+        var tokens = FilterExpression.TokenizeFilterExpressionString(conditionString).ToArray();
+
+        Assert.HasCount(1, tokens);
+        Assert.AreEqual("   ", tokens[0]);
+    }
+
+    [TestMethod]
+    public void TokenizeFilterShouldHandleMultipleConsecutivePipes()
+    {
+        var conditionString = "A||B";
+
+        var tokens = FilterExpression.TokenizeFilterExpressionString(conditionString).ToArray();
+
+        Assert.HasCount(4, tokens);
+        Assert.AreEqual("A", tokens[0]);
+        Assert.AreEqual("|", tokens[1]);
+        Assert.AreEqual("|", tokens[2]);
+        Assert.AreEqual("B", tokens[3]);
+    }
 }
