@@ -324,6 +324,32 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
 
     public void OnMessageReceived(object? sender, MessageReceivedEventArgs messageReceivedArgs)
     {
+        try
+        {
+            OnMessageReceivedCore(messageReceivedArgs);
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("TestRequestHandler.OnMessageReceived: Failed to process message, sending ProtocolError and closing session: {0}", ex);
+
+            // Notify the caller about the error so it does not hang
+            // waiting for a response that will never come.
+            try
+            {
+                SendData(_dataSerializer.SerializePayload(MessageType.ProtocolError, ex.Message));
+            }
+            catch (Exception sendEx)
+            {
+                EqtTrace.Error("TestRequestHandler.OnMessageReceived: Failed to send ProtocolError: {0}", sendEx);
+            }
+
+            _sessionCompleted.Set();
+            Close();
+        }
+    }
+
+    private void OnMessageReceivedCore(MessageReceivedEventArgs messageReceivedArgs)
+    {
         var message = _dataSerializer.DeserializeMessage(messageReceivedArgs.Data!);
         EqtTrace.Info("TestRequestHandler.OnMessageReceived: received message: {0}", message);
 
