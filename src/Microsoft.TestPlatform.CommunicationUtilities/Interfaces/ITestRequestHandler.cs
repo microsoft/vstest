@@ -94,4 +94,18 @@ public interface ITestRequestHandler : IDisposable
     /// <param name="attachDebuggerInfo">Process ID and tfm of the process to which the debugger should be attached.</param>
     /// <returns><see langword="true"/> if the debugger was successfully attached to the requested process, <see langword="false"/> otherwise.</returns>
     bool AttachDebuggerToProcess(AttachDebuggerInfo attachDebuggerInfo);
+
+    /// <summary>
+    /// Sends a lightweight notification that a test case has started executing.
+    /// Used for real-time in-flight test tracking on the console side.
+    /// </summary>
+    /// <param name="testCase">The test case that started.</param>
+    void SendTestCaseStarting(TestCase testCase);
+
+    /// <summary>
+    /// Sends a lightweight notification that a test case has finished executing.
+    /// Used for real-time in-flight test tracking on the console side.
+    /// </summary>
+    /// <param name="testCase">The test case that finished.</param>
+    void SendTestCaseFinished(TestCase testCase);
 }
