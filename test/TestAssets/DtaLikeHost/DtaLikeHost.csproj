@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <!--
-    Minimal repro for System.Collections.Immutable 8.0.0 binding mismatch.
+    Minimal repro for System.Collections.Immutable binding mismatch.
 
     Simulates how Azure DevOps' Distributed Test Agent (DTAExecutionHost) consumes
     the Microsoft.TestPlatform nupkg:
@@ -17,10 +17,9 @@
     ImmutableDictionary / ImmutableHashSet, which forces System.Collections.Immutable
     to load.
 
-    In 18.5.0 Common.dll's metadata references System.Collections.Immutable v8.0.0.0
-    and System.Reflection.Metadata v8.0.0.0, while the package ships v9.0.0.0 of both
-    next to it, so any host without a matching binding redirect is expected to
-    FileLoadException when SCI / SRM is loaded.
+    With the fix, Common.dll's metadata references System.Collections.Immutable v10.0.0.0
+    and the package ships v10.0.0.0 next to it, so hosts without binding redirects
+    can load SCI without FileLoadException.
   -->
 
   <PropertyGroup>
@@ -61,10 +60,14 @@
         <HintPath>$(_TestPlatformToolsDir)\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll</HintPath>
         <Private>true</Private>
       </Reference>
-      <!-- Copy the SCI and SRM that actually ship next to Common.dll so the runtime
+      <!-- Copy the assemblies that actually ship next to Common.dll so the runtime
            probing sees exactly what DTA would see on the build agent. -->
       <Content Include="$(_TestPlatformToolsDir)\System.Collections.Immutable.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
       <Content Include="$(_TestPlatformToolsDir)\System.Reflection.Metadata.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+      <!-- SCI 10.0.0 for net462 has transitive dependencies that also ship in the layout. -->
+      <Content Include="$(_TestPlatformToolsDir)\System.Memory.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+      <Content Include="$(_TestPlatformToolsDir)\System.Buffers.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+      <Content Include="$(_TestPlatformToolsDir)\System.Runtime.CompilerServices.Unsafe.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
     </ItemGroup>
   </Target>
 

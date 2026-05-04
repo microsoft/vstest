@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Runtime.Loader;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -107,37 +106,15 @@ public class DiscoveryTests : AcceptanceTestBase
             }
         };
 
-        // Use a custom AssemblyLoadContext so that dependencies (e.g. SCI 10.0.0)
-        // resolve from the extensions directory rather than the test host's runtime.
-        var parentDirectory = Path.GetDirectoryName(extensionsDirectory)!;
-        var alc = new AssemblyLoadContext("ExtensionTest", isCollectible: true);
-        alc.Resolving += (context, name) =>
+        foreach (var extension in extensionsToVerify.Keys)
         {
-            var path = Path.Combine(extensionsDirectory, name.Name + ".dll");
-            if (File.Exists(path))
-                return context.LoadFromAssemblyPath(path);
-            path = Path.Combine(parentDirectory, name.Name + ".dll");
-            if (File.Exists(path))
-                return context.LoadFromAssemblyPath(path);
-            return null;
-        };
+            var assemblyFile = Path.Combine(extensionsDirectory, extension);
+            var assembly = Assembly.LoadFrom(assemblyFile);
 
-        try
-        {
-            foreach (var extension in extensionsToVerify.Keys)
-            {
-                var assemblyFile = Path.Combine(extensionsDirectory, extension);
-                var assembly = alc.LoadFromAssemblyPath(assemblyFile);
+            var expected = extensionsToVerify[extension];
+            var actual = TypesToLoadUtilities.GetTypesToLoad(assembly).Select(i => i.FullName).ToArray();
 
-                var expected = extensionsToVerify[extension];
-                var actual = TypesToLoadUtilities.GetTypesToLoad(assembly).Select(i => i.FullName).ToArray();
-
-                CollectionAssert.AreEquivalent(expected, actual, $"Specified types using TypesToLoadAttribute in \"{extension}\" assembly doesn't match the expected.");
-            }
-        }
-        finally
-        {
-            alc.Unload();
+            CollectionAssert.AreEquivalent(expected, actual, $"Specified types using TypesToLoadAttribute in \"{extension}\" assembly doesn't match the expected.");
         }
     }
 
