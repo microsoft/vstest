@@ -258,7 +258,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     {
         _fileHelper.CreateDirectory(path);
 #if !NETFRAMEWORK
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Directory.Exists(path))
         {
             SetUnixDirectoryPermissions(path);
         }
