@@ -213,8 +213,11 @@ extends:
                         }
                         $latestCommitId = $refResponse.value[0].objectId
 
-                        # Read the app.config from the vstest checkout
-                        $appConfigContent = Get-Content -Raw -Path "$(Build.SourcesDirectory)/src/vstest.console/app.config"
+                        # Read the app.config from the ComponentBranchName, not from the checkout (which is always main)
+                        $componentBranch = "$(ComponentBranchName)"
+                        $appConfigUrl = "https://raw.githubusercontent.com/microsoft/vstest/$componentBranch/src/vstest.console/app.config"
+                        Write-Host "Fetching app.config from $appConfigUrl"
+                        $appConfigContent = Invoke-RestMethod -Uri $appConfigUrl
 
                         # Push the app.config to the insertion branch
                         $pushUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/pushes?api-version=7.1"
