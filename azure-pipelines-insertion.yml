@@ -213,19 +213,6 @@ extends:
                         }
                         $latestCommitId = $refResponse.value[0].objectId
 
-                        # Check if the target file already exists to decide changeType
-                        $changeType = "add"
-                        try {
-                          $encodedPath = [Uri]::EscapeDataString($targetFilePath)
-                          $itemUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/items?path=$encodedPath&versionDescriptor.version=$refFilter&versionDescriptor.versionType=branch&`$format=json&api-version=7.1"
-                          $null = Invoke-RestMethod -Uri $itemUrl -Headers $headers -Method Get -ErrorAction Stop
-                          Write-Host "Target file exists, using 'edit' changeType."
-                          $changeType = "edit"
-                        }
-                        catch {
-                          Write-Host "Target file does not exist yet, using 'add' changeType."
-                        }
-
                         # Read the app.config from the vstest checkout
                         $appConfigContent = Get-Content -Raw -Path "$(Build.SourcesDirectory)/src/vstest.console/app.config"
 
@@ -243,7 +230,7 @@ extends:
                               comment = "Update RocksteadyCLI App.config from vstest"
                               changes = @(
                                 @{
-                                  changeType = $changeType
+                                  changeType = "edit"
                                   item = @{
                                     path = $targetFilePath
                                   }
