@@ -223,9 +223,14 @@ extends:
 
                         $sourceCommit = $null
 
-                        # Try to extract the commit SHA from the markdown output: ([sha](sourcesUrl))
-                        if ($outputText -match '\[([0-9a-f]{7,40})\]\(https://dev\.azure\.com/dnceng/[^)]+/_apis/build/builds/\d+/sources\)') {
-                          $sourceCommit = $Matches[1]
+                        # Extract the build ID from the "Updated Updating VS Test Platform from [...] to [buildnum](url) ([sha](sourcesUrl))" line.
+                        # We use the build ID to resolve the full commit SHA via the builds API.
+                        if ($outputText -match 'Updated Updating VS Test Platform from .+ to \[\S+\]\([^)]+\) \(\[[0-9a-f]{7,40}\]\(https://dev\.azure\.com/dnceng/[^)]+/_apis/build/builds/(\d+)/sources\)\)') {
+                          $sourceBuildId = $Matches[1]
+                          Write-Host "Resolving source commit from build ID $sourceBuildId"
+                          $buildUrl = "$dncengBase/_apis/build/builds/${sourceBuildId}?api-version=7.1"
+                          $buildResponse = Invoke-RestMethod -Uri $buildUrl -Headers $dncengHeaders -Method Get
+                          $sourceCommit = $buildResponse.sourceVersion
                         }
 
                         if (-not $sourceCommit) {
