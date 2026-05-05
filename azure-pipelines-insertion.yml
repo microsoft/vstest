@@ -214,15 +214,16 @@ extends:
                         $latestCommitId = $refResponse.value[0].objectId
 
                         # Check if the target file already exists to decide changeType
-                        $changeType = "edit"
+                        $changeType = "add"
                         try {
                           $encodedPath = [Uri]::EscapeDataString($targetFilePath)
-                          $itemUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/items?path=$encodedPath&versionDescriptor.version=$refFilter&versionDescriptor.versionType=branch&api-version=7.1"
-                          $null = Invoke-RestMethod -Uri $itemUrl -Headers $headers -Method Head
+                          $itemUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/items?path=$encodedPath&versionDescriptor.version=$refFilter&versionDescriptor.versionType=branch&`$format=json&api-version=7.1"
+                          $null = Invoke-RestMethod -Uri $itemUrl -Headers $headers -Method Get -ErrorAction Stop
+                          Write-Host "Target file exists, using 'edit' changeType."
+                          $changeType = "edit"
                         }
                         catch {
                           Write-Host "Target file does not exist yet, using 'add' changeType."
-                          $changeType = "add"
                         }
 
                         # Read the app.config from the vstest checkout
