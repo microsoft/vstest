@@ -74,6 +74,10 @@ public partial class JsonDataSerializer
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        // Use the source-generated context so STJ has type metadata available
+        // without runtime reflection. This is required for NativeAOT consumers
+        // where reflection-based serialization is disabled by default.
+        TypeInfoResolver = TestPlatformJsonContext.Default,
     };
 
     private static partial (int version, string? messageType) ParseHeaderFromJson(string rawMessage)
@@ -188,7 +192,7 @@ public partial class JsonDataSerializer
             if (payload is null)
                 return string.Empty;
 
-            var serializedPayload = JsonSerializer.SerializeToElement(payload, payloadOptions);
+            var serializedPayload = JsonSerializer.SerializeToElement(payload, payload.GetType(), payloadOptions);
 
             return version > 1 ?
                 Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload }) :
@@ -196,7 +200,16 @@ public partial class JsonDataSerializer
         }
         else
         {
-            return Serialize(FastOptions, new VersionedMessageForSerialization { MessageType = messageType, Version = version, Payload = payload });
+            // Serialize the payload to a JsonElement first using the versioned options
+            // (which have the custom converters). Then embed it in the envelope.
+            // Use payload.GetType() to tell STJ the actual runtime type, since the
+            // parameter is typed as object? and source-gen can't infer it.
+            if (payload is null)
+                return string.Empty;
+
+            var serializedPayload = JsonSerializer.SerializeToElement(payload, payload.GetType(), payloadOptions);
+
+            return Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload });
         }
     }
 
@@ -258,7 +271,7 @@ public partial class JsonDataSerializer
     /// This grabs payload from the message, we already know version and message type.
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    private class PayloadedMessage<T>
+    internal class PayloadedMessage<T>
     {
         public T? Payload { get; set; }
     }
@@ -267,31 +280,31 @@ public partial class JsonDataSerializer
     /// Serialization-only DTO for building the JSON wire format (without Version).
     /// NOT a Message — this is never returned to callers.
     /// </summary>
-    private class MessageEnvelope
+    internal class MessageEnvelope
     {
         public string? MessageType { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object? Payload { get; set; }
+        public JsonElement? Payload { get; set; }
     }
 
     /// <summary>
     /// Serialization-only DTO for building the JSON wire format (with Version).
     /// NOT a Message — this is never returned to callers.
     /// </summary>
-    private class VersionedMessageEnvelope
+    internal class VersionedMessageEnvelope
     {
         public int Version { get; set; }
         public string? MessageType { get; set; }
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
-        public object? Payload { get; set; }
+        public JsonElement? Payload { get; set; }
     }
 
     /// <summary>
     /// For serialization directly into string, without first converting to JsonElement, and then from JsonElement to string.
     /// </summary>
-    private class VersionedMessageForSerialization
+    internal class VersionedMessageForSerialization
     {
         /// <summary>
         /// Gets or sets the version of the message

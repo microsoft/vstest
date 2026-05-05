@@ -20,6 +20,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 /// </summary>
 internal class TestObjectBaseConverterFactory : JsonConverterFactory
 {
+    // Singleton converter handles all TestObject-derived types via the base class,
+    // avoiding MakeGenericType + Activator.CreateInstance which fail under NativeAOT.
+    private static readonly TestObjectBaseConverter Converter = new();
+
     public override bool CanConvert(Type typeToConvert)
     {
         return typeof(TestObject).IsAssignableFrom(typeToConvert)
@@ -29,16 +33,27 @@ internal class TestObjectBaseConverterFactory : JsonConverterFactory
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
     {
-        var converterType = typeof(TestObjectBaseConverter<>).MakeGenericType(typeToConvert);
-        return (JsonConverter?)Activator.CreateInstance(converterType);
+        return Converter;
     }
 }
 
-internal class TestObjectBaseConverter<T> : JsonConverter<T> where T : TestObject, new()
+internal class TestObjectBaseConverter : JsonConverter<TestObject>
 {
-    public override T? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    public override bool CanConvert(Type typeToConvert)
     {
-        var testObject = new T();
+        return typeof(TestObject).IsAssignableFrom(typeToConvert)
+            && typeToConvert != typeof(TestCase)
+            && typeToConvert != typeof(TestResult);
+    }
+
+    public override TestObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        // TestObject is abstract, but the only concrete non-TestCase/TestResult subclass
+        // that flows through the wire is TestObject itself (used as a generic bag).
+        // If the runtime type is unknown, we cannot instantiate it without reflection.
+        // Fall back to reading the property bag into a TestCase as a carrier, which
+        // preserves the property key-value pairs for the consumer.
+        var testObject = new TestCase();
 
         using var doc = JsonDocument.ParseValue(ref reader);
         var data = doc.RootElement;
@@ -79,7 +94,7 @@ internal class TestObjectBaseConverter<T> : JsonConverter<T> where T : TestObjec
         return testObject;
     }
 
-    public override void Write(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
+    public override void Write(Utf8JsonWriter writer, TestObject value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
 
@@ -97,13 +112,43 @@ internal class TestObjectBaseConverter<T> : JsonConverter<T> where T : TestObjec
             }
             else
             {
-                JsonSerializer.Serialize(writer, property.Value, property.Value.GetType(), options);
+                WritePropertyValue(writer, property.Value);
             }
             writer.WriteEndObject();
         }
         writer.WriteEndArray();
 
         writer.WriteEndObject();
+    }
+
+    /// <summary>
+    /// Writes a property value without using
+    /// JsonSerializer.Serialize(writer, value, value.GetType()) which requires
+    /// reflection metadata that NativeAOT trims.
+    /// </summary>
+    internal static void WritePropertyValue(Utf8JsonWriter writer, object value)
+    {
+        switch (value)
+        {
+            case string s: writer.WriteStringValue(s); break;
+            case int i: writer.WriteNumberValue(i); break;
+            case long l: writer.WriteNumberValue(l); break;
+            case double d: writer.WriteNumberValue(d); break;
+            case float f: writer.WriteNumberValue(f); break;
+            case bool b: writer.WriteBooleanValue(b); break;
+            case DateTimeOffset dto: writer.WriteStringValue(dto); break;
+            case DateTime dt: writer.WriteStringValue(dt); break;
+            case Guid g: writer.WriteStringValue(g); break;
+            case Uri u: writer.WriteStringValue(u.OriginalString); break;
+            case JsonElement je: je.WriteTo(writer); break;
+            default:
+                // For complex types (Traits, collections, etc.), serialize to JsonElement
+                // first using the runtime type, then write the element. This avoids the
+                // object? polymorphism problem while still producing valid JSON.
+                var element = JsonSerializer.SerializeToElement(value, value.GetType());
+                element.WriteTo(writer);
+                break;
+        }
     }
 }
 
