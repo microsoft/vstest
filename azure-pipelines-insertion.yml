@@ -213,11 +213,42 @@ extends:
                         }
                         $latestCommitId = $refResponse.value[0].objectId
 
-                        # Read the app.config from the ComponentBranchName, not from the checkout (which is always main)
-                        $componentBranch = "$(ComponentBranchName)"
-                        $appConfigUrl = "https://raw.githubusercontent.com/microsoft/vstest/$componentBranch/src/vstest.console/app.config"
-                        Write-Host "Fetching app.config from $appConfigUrl"
-                        $appConfigContent = Invoke-RestMethod -Uri $appConfigUrl
+                        # Fetch the app.config from the mirror repo at the exact commit used by the insertion.
+                        # roslyn-tools logs "Found microsoft-vstest build number X" — resolve the source commit from that build.
+                        $mirrorRepoId = "microsoft-vstest"
+                        $dncengBase = "https://dnceng.visualstudio.com/internal"
+                        $dncengHeaders = @{
+                          Authorization = "Bearer $dncengToken"
+                        }
+
+                        $sourceCommit = $null
+
+                        # Try to extract the commit SHA from the markdown output: ([sha](sourcesUrl))
+                        if ($outputText -match '\[([0-9a-f]{7,40})\]\(https://dev\.azure\.com/dnceng/[^)]+/_apis/build/builds/\d+/sources\)') {
+                          $sourceCommit = $Matches[1]
+                        }
+
+                        if (-not $sourceCommit) {
+                          # Fallback: resolve source commit from build number via AzDO API
+                          if ($outputText -match 'Found microsoft-vstest build number (\S+)') {
+                            $buildNumber = $Matches[1]
+                            Write-Host "Resolving source commit from build number $buildNumber"
+                            $buildsUrl = "$dncengBase/_apis/build/builds?buildNumber=$buildNumber&api-version=7.1"
+                            $buildsResponse = Invoke-RestMethod -Uri $buildsUrl -Headers $dncengHeaders -Method Get
+                            if ($buildsResponse.value -and $buildsResponse.value.Count -gt 0) {
+                              $sourceCommit = $buildsResponse.value[0].sourceVersion
+                            }
+                          }
+                        }
+
+                        if (-not $sourceCommit) {
+                          throw "Could not determine source commit from roslyn-tools output"
+                        }
+
+                        Write-Host "Fetching app.config from mirror repo at commit $sourceCommit"
+                        $encodedPath = [Uri]::EscapeDataString("/src/vstest.console/app.config")
+                        $itemUrl = "$dncengBase/_apis/git/repositories/$mirrorRepoId/items?path=$encodedPath&versionDescriptor.version=$sourceCommit&versionDescriptor.versionType=commit&api-version=7.1"
+                        $appConfigContent = Invoke-RestMethod -Uri $itemUrl -Headers $dncengHeaders -Method Get
 
                         # Push the app.config to the insertion branch
                         $pushUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/pushes?api-version=7.1"
