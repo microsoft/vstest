@@ -86,7 +86,7 @@ extends:
               steps:
 
               - task: PowerShell@2
-                displayName: 'Install .NET SDK from global.json'
+                displayName: '🚀 Install .NET SDK from global.json'
                 inputs:
                   targetType: inline
                   script: |
@@ -96,12 +96,16 @@ extends:
                     & eng/common/dotnet-install.ps1 -version $version -runtime ''
 
               - task: AzureCLI@2
-                displayName: 'Run VS Insertion'
+                displayName: '🚀 Run VS Insertion'
                 inputs:
                   azureSubscription: 'DncEng Insertion: Roslyn and Razor'
                   scriptType: pscore
                   scriptLocation: inlineScript
                   inlineScript: |
+                    # Disable .NET first-time experience to avoid delays
+                    $env:DOTNET_NOLOGO = '1'
+                    $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = '1'
+
                     # Install Roslyn insertion tools from the dnceng feed, using --tool-path as a workaround to avoid resetting the process to pick up dotnet tool path changes
                     $dotnet = "$(Build.SourcesDirectory)\.dotnet\dotnet.exe"
                     & $dotnet tool install Microsoft.RoslynTools --prerelease --add-source https://pkgs.dev.azure.com/dnceng/public/_packaging/dotnet-eng/nuget/v3/index.json --tool-path .
@@ -173,21 +177,21 @@ extends:
                     $targetFilePath = "/src/vset/Agile/TestPlatform/RocksteadyCLI/App.config"
 
                     # Extract the PR number from roslyn-tools output.
-                    # The tool logs lines like "Created Pull Request #12345" or a PR URL containing the ID.
+                    # The tool logs a PR URL like: https://dev.azure.com/devdiv/DevDiv/_git/VS/pullrequest/735439
+                    # We match the URL pattern specifically to avoid grabbing timestamps from PR titles.
                     $outputText = $roslynOutput -join "`n"
                     $prId = $null
-                    if ($outputText -match 'pullrequests/(\d+)') {
+                    if ($outputText -match '/pullrequest/(\d+)') {
                       $prId = $Matches[1]
-                    } elseif ($outputText -match 'Pull Request[^\d]*#?(\d+)') {
-                      $prId = $Matches[1]
-                    } elseif ($outputText -match '/pullrequest/(\d+)') {
+                    } elseif ($outputText -match 'pullrequests/(\d+)') {
                       $prId = $Matches[1]
                     }
 
                     if (-not $prId) {
-                      Write-Warning "Could not extract PR ID from roslyn-tools output. Skipping App.config insertion."
+                      Write-Error "Could not extract PR ID from roslyn-tools output. Cannot push App.config."
                       Write-Host "roslyn-tools output was:"
                       Write-Host $outputText
+                      exit 1
                     }
                     else {
                       Write-Host "Detected insertion PR #$prId, pushing App.config..."
@@ -256,8 +260,8 @@ extends:
                         Write-Host "Pushed App.config to insertion branch. Commit: $($pushResponse.commits[0].commitId)"
                       }
                       catch {
-                        Write-Warning "Failed to push App.config to insertion branch: $_"
-                        Write-Warning "The insertion PR was created successfully. App.config will need to be updated manually."
+                        Write-Error "Failed to push App.config to insertion branch: $_"
+                        exit 1
                       }
                     }
 
