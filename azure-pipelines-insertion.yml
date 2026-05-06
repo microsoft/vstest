@@ -188,13 +188,13 @@ extends:
                     }
 
                     if (-not $prId) {
-                      Write-Error "Could not extract PR ID from roslyn-tools output. Cannot push App.config."
+                      Write-Error "Could not extract PR ID from roslyn-tools output. Cannot push App.config and revision.txt."
                       Write-Host "roslyn-tools output was:"
                       Write-Host $outputText
                       exit 1
                     }
                     else {
-                      Write-Host "Detected insertion PR #$prId, pushing App.config..."
+                      Write-Host "Detected insertion PR #$prId, pushing App.config and revision.txt..."
 
                       try {
                         # Get the PR to find its source branch
@@ -255,7 +255,24 @@ extends:
                         $itemUrl = "$dncengBase/_apis/git/repositories/$mirrorRepoId/items?path=$encodedPath&versionDescriptor.version=$sourceCommit&versionDescriptor.versionType=commit&api-version=7.1"
                         $appConfigContent = Invoke-RestMethod -Uri $itemUrl -Headers $dncengHeaders -Method Get
 
-                        # Push the app.config to the insertion branch
+                        # Read revision.txt from the VS target branch and bump the revision number.
+                        # revision.txt has two lines: an integer revision number and a GUID.
+                        $revisionFilePath = "/src/SetupPackages/TestTools/TestPlatform/V1/CLI/core/Shared/revision.txt"
+                        $targetBranch = $pr.targetRefName
+                        Write-Host "PR target branch: $targetBranch"
+
+                        $targetBranchName = ($targetBranch -replace '^refs/heads/', '')
+                        $encodedRevPath = [Uri]::EscapeDataString($revisionFilePath)
+                        $revisionUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/items?path=$encodedRevPath&versionDescriptor.version=$targetBranchName&versionDescriptor.versionType=branch&api-version=7.1"
+                        $revisionContent = Invoke-RestMethod -Uri $revisionUrl -Headers $headers -Method Get
+                        $revisionLines = $revisionContent -split "`n"
+                        $currentRevision = [int]($revisionLines[0].Trim())
+                        $newRevision = $currentRevision + 1
+                        $revisionLines[0] = $newRevision.ToString()
+                        $newRevisionContent = $revisionLines -join "`n"
+                        Write-Host "Bumping revision.txt: $currentRevision -> $newRevision"
+
+                        # Push app.config and revision.txt to the insertion branch in a single commit.
                         $pushUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/pushes?api-version=7.1"
                         $pushBody = @{
                           refUpdates = @(
@@ -266,7 +283,7 @@ extends:
                           )
                           commits = @(
                             @{
-                              comment = "Update RocksteadyCLI App.config from vstest"
+                              comment = "Update RocksteadyCLI App.config and bump revision.txt"
                               changes = @(
                                 @{
                                   changeType = "edit"
@@ -277,6 +294,16 @@ extends:
                                     content = $appConfigContent
                                     contentType = "rawtext"
                                   }
+                                },
+                                @{
+                                  changeType = "edit"
+                                  item = @{
+                                    path = $revisionFilePath
+                                  }
+                                  newContent = @{
+                                    content = $newRevisionContent
+                                    contentType = "rawtext"
+                                  }
                                 }
                               )
                             }
@@ -284,10 +311,10 @@ extends:
                         } | ConvertTo-Json -Depth 10
 
                         $pushResponse = Invoke-RestMethod -Uri $pushUrl -Headers $headers -Method Post -Body $pushBody
-                        Write-Host "Pushed App.config to insertion branch. Commit: $($pushResponse.commits[0].commitId)"
+                        Write-Host "Pushed App.config and revision.txt to insertion branch. Commit: $($pushResponse.commits[0].commitId)"
                       }
                       catch {
-                        Write-Error "Failed to push App.config to insertion branch: $_"
+                        Write-Error "Failed to push App.config and revision.txt to insertion branch: $_"
                         exit 1
                       }
                     }
