@@ -155,7 +155,7 @@ extends:
                       $insertArgs += "$(CherryPick)"
                     }
 
-                    "Running: ./roslyn-tools.exe $($insertArgs -join ' ')"
+                    "Running: ./roslyn-tools.exe $(($insertArgs -join ' ') -replace [regex]::Escape($dncengToken), '***')"
                     $roslynOutput = ./roslyn-tools.exe @insertArgs 2>&1 | ForEach-Object { Write-Host $_; $_ }
                     if ($LASTEXITCODE -ne 0) {
                       exit $LASTEXITCODE
