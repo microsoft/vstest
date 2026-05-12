@@ -362,7 +362,8 @@ public class TrxLoggerTests
         _testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
         Assert.AreEqual(1, _testableTrxLogger.TestResultCount, "TestResultHandler is not creating hierarchical results when parent result is present.");
-        Assert.AreEqual(3, _testableTrxLogger.TotalTestCount, "TestResultHandler is not adding all inner results in parent test result.");
+        // The parent DataDrivenTest aggregation should not be counted; only the 2 child DataRow results.
+        Assert.AreEqual(2, _testableTrxLogger.TotalTestCount, "TestResultHandler should count only the child DataRow results, not the parent aggregation.");
     }
 
     [TestMethod]
@@ -423,6 +424,47 @@ public class TrxLoggerTests
         _testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
         Assert.AreEqual(1, _testableTrxLogger.TestEntryCount, "TestResultHandler is adding multiple test entries for data driven tests.");
+    }
+
+    [TestMethod]
+    public void TestResultHandlerShouldNotDoubleCountDataDrivenTestResults()
+    {
+        // Regression test for: DataDrivenTest double-counted in trx logging
+        // https://github.com/microsoft/vstest/issues/15643
+        //
+        // For a [DataTestMethod] with 2 [DataRow] attributes MSTest sends:
+        //   - 1 parent aggregation result (no parentExecId)
+        //   - 1 child result per DataRow (with parentExecId set)
+        // Only the 2 children represent actual test executions; the parent must not be counted.
+
+        TestCase testCase = CreateTestCase("DataDrivenTest");
+        Guid parentExecutionId = Guid.NewGuid();
+
+        // Parent aggregation result (passed overall)
+        VisualStudio.TestPlatform.ObjectModel.TestResult parent = new(testCase);
+        parent.Outcome = TestOutcome.Passed;
+        parent.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+
+        // First DataRow child — passes
+        VisualStudio.TestPlatform.ObjectModel.TestResult child1 = new(testCase);
+        child1.Outcome = TestOutcome.Passed;
+        child1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+        child1.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+        // Second DataRow child — fails
+        VisualStudio.TestPlatform.ObjectModel.TestResult child2 = new(testCase);
+        child2.Outcome = TestOutcome.Failed;
+        child2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+        child2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+        _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(parent).Object);
+        _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(child1).Object);
+        _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(child2).Object);
+
+        // Only the 2 DataRow children should be counted, not the parent aggregation.
+        Assert.AreEqual(2, _testableTrxLogger.TotalTestCount, "DataDrivenTest parent must not be counted; only each DataRow child counts.");
+        Assert.AreEqual(1, _testableTrxLogger.PassedTestCount, "Only the one passing DataRow child should be counted as passed.");
+        Assert.AreEqual(1, _testableTrxLogger.FailedTestCount, "Only the one failing DataRow child should be counted as failed.");
     }
 
     [TestMethod]

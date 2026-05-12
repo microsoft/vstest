@@ -302,7 +302,10 @@ public class TrxLogger : ITestLoggerWithParameters
         // Update test entries
         UpdateTestEntries(executionId, parentExecutionId, testElement, parentTestElement);
 
-        // Set various counts (passed tests, failed tests, total tests)
+        // Set various counts (passed tests, failed tests, total tests).
+        // Data-driven tests (DataRow) report both a parent aggregation result and individual child results.
+        // Only the child results represent actual test executions, so when the first child is processed
+        // (DataRowInfo == 1), we undo the parent's contribution to the counts to avoid double-counting.
         Interlocked.Increment(ref _totalTestCount);
         if (testResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
         {
@@ -312,6 +315,18 @@ public class TrxLogger : ITestLoggerWithParameters
         else if (testResult.Outcome == TrxLoggerObjectModel.TestOutcome.Passed)
         {
             Interlocked.Increment(ref _passedTestCount);
+        }
+
+        // Undo the parent DataDrivenTest aggregation's count when the first child result is processed.
+        if (testResult.ResultType == TrxLoggerConstants.InnerDataDrivenResultType
+            && testResult.DataRowInfo == 1
+            && parentTestResult != null)
+        {
+            Interlocked.Decrement(ref _totalTestCount);
+            if (parentTestResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
+                Interlocked.Decrement(ref _failedTestCount);
+            else if (parentTestResult.Outcome == TrxLoggerObjectModel.TestOutcome.Passed)
+                Interlocked.Decrement(ref _passedTestCount);
         }
     }
 
