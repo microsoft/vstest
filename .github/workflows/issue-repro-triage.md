@@ -21,6 +21,7 @@ network:
     - dotnet
 
 tools:
+  cache-memory: true
   github:
     lockdown: true
     toolsets: [issues, repos, pull_requests]
@@ -152,6 +153,13 @@ The PR description should include:
 - Root cause analysis
 - What the fix does
 - Test that verifies the fix
+
+After creating the PR, make sure the PR Iteration workflow can find it using a **shared, queryable signal**:
+- Apply a stable label such as `agent:auto-fix`
+- Include the issue link in the PR description
+- If another machine-readable marker is available in PR metadata, set it as well
+
+Do **not** rely on workflow-local cache-memory to register the PR for follow-up.
 
 **If the fix is too complex or risky:**
 - Comment on the issue with your analysis of the root cause
