@@ -92,3 +92,11 @@ After packaging changes, regenerate `eng/expected-nupkg-file-counts.json` and `e
 - Never force-push PR branches — squash-merge at the end
 - Push to fork remote, PR against `microsoft/vstest`
 - Don't create draft PRs — undrafting forces a rebuild
+
+### Agentic Workflows (gh-aw)
+
+- Use `gh aw secrets set` to manage secrets, NOT `gh secret set`. Plain `gh secret set` creates the repo secret but gh-aw can't see it.
+- Two secrets needed: `COPILOT_GITHUB_TOKEN` (Copilot API access) and `GH_AW_GITHUB_TOKEN` (repo interactions).
+- Workflow source files are `.md` in `.github/workflows/`. Compiled `.lock.yml` files are generated — don't hand-edit them.
+- To recompile after editing a workflow: `gh aw compile` from the repo root.
+- `.github/*` and `AGENTS.md` are excluded from CI path triggers — editing workflows won't trigger a full build.

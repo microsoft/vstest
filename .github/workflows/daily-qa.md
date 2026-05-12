@@ -47,19 +47,7 @@ tools:
     lockdown: true
     toolsets: [repos, pull_requests, issues]
     min-integrity: none
-  bash:
-    - "gh *"
-    - "jq *"
-    - "cat *"
-    - "dotnet *"
-    - "./build.sh *"
-    - "./test.sh *"
-    - "grep *"
-    - "find *"
-    - "diff *"
-    - "head *"
-    - "tail *"
-    - "wc *"
+  bash: true
   edit:
 ---
 
