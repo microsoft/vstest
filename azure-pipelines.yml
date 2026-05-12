@@ -16,8 +16,10 @@ trigger:
     - rel/17.6
   paths:
     exclude:
+      - .github/*
       - .gitignore
       - .vscode/*
+      - AGENTS.md
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
@@ -34,6 +36,7 @@ pr:
       - .markdownlint.json
       - .markdownlintignore
       - .gitignore
+      - AGENTS.md
       - CODE_OF_CONDUCT.md
       - CONTRIBUTING.md
       - README.md
