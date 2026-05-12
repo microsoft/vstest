@@ -44,7 +44,7 @@ schedules:
     displayName: Daily midnight insertion to VS
     branches:
       include:
-      - rel/18.7
+      - main
     always: true
 
 resources:
