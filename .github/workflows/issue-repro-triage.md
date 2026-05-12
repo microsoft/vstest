@@ -21,6 +21,7 @@ network:
     - dotnet
 
 tools:
+  cache-memory: true
   github:
     lockdown: true
     toolsets: [issues, repos, pull_requests]
@@ -152,6 +153,16 @@ The PR description should include:
 - Root cause analysis
 - What the fix does
 - Test that verifies the fix
+
+After creating the PR, **register it in cache-memory** so the PR Iteration workflow knows to follow up:
+
+```json
+// Read existing cache first, then update
+// Key: "auto-fix-prs"
+// Value: array of { "pr": <number>, "issue": <number>, "created": "<date>" }
+```
+
+Write to cache-memory key `auto-fix-prs`, appending the new PR to the existing array.
 
 **If the fix is too complex or risky:**
 - Comment on the issue with your analysis of the root cause
