@@ -162,36 +162,77 @@ extends:
               image: windows.vs2026preview.scout.amd64
               os: windows
             steps:
-            - pwsh: |
-                # Environment block on Windows is UTF-16: each entry is "NAME=VALUE\0" → (len + 2) * 2 bytes.
-                # The block itself ends with an extra \0 (2 bytes).
+            - powershell: |
+                # .NET Framework Process.Start checks env block LENGTH IN CHARS against 65535,
+                # but the error message misleadingly says "bytes". Measure in chars to match.
                 $entries = [System.Environment]::GetEnvironmentVariables().GetEnumerator() | ForEach-Object {
                     $name  = [string]$_.Key
                     $value = [string]$_.Value
-                    $bytes = ($name.Length + $value.Length + 2) * 2  # +1 for '=', +1 for '\0', *2 for UTF-16
+                    $chars = $name.Length + $value.Length + 2  # +1 for '=', +1 for '\0'
                     [PSCustomObject]@{
-                        Name      = $name
-                        ValueLen  = $value.Length
-                        Bytes     = $bytes
+                        Name     = $name
+                        ValueLen = $value.Length
+                        Chars    = $chars
                     }
-                } | Sort-Object Bytes -Descending
+                } | Sort-Object Chars -Descending
 
-                $totalBytes = ($entries | Measure-Object -Property Bytes -Sum).Sum + 2  # trailing \0
+                $totalChars = ($entries | Measure-Object -Property Chars -Sum).Sum + 1  # trailing \0
 
                 Write-Host "===== Environment Block Size Report ====="
                 Write-Host ""
-                Write-Host ("{0,-60} {1,10} {2,10}" -f "Variable", "ValueLen", "Bytes")
+                Write-Host ("{0,-60} {1,10} {2,10}" -f "Variable", "ValueLen", "Chars")
                 Write-Host ("{0,-60} {1,10} {2,10}" -f ("=" * 60), ("=" * 10), ("=" * 10))
                 foreach ($e in $entries) {
-                    Write-Host ("{0,-60} {1,10} {2,10}" -f $e.Name, $e.ValueLen, $e.Bytes)
+                    Write-Host ("{0,-60} {1,10} {2,10}" -f $e.Name, $e.ValueLen, $e.Chars)
                 }
                 Write-Host ""
                 Write-Host "Total entries : $($entries.Count)"
-                Write-Host "Total bytes   : $totalBytes / 65535"
-                Write-Host "Remaining     : $(65535 - $totalBytes) bytes"
-                if ($totalBytes -gt 65535) {
-                    Write-Host "##vso[task.logissue type=warning]Environment block ($totalBytes bytes) exceeds the 65535-byte limit!"
+                Write-Host "Total chars   : $totalChars / 65535  (this is what .NET Framework checks)"
+                Write-Host "Remaining     : $(65535 - $totalChars) chars"
+
+                # Now try Add-Type to see if CodeDom/csc adds extra env vars that push it over.
+                # Pad to just under the limit and let Add-Type tell us the real size.
+                $pad = 65535 - $totalChars - 20  # leave 20 chars short so we see CodeDom overhead
+                if ($pad -gt 0) {
+                    $varName = "__ENVPROBE"
+                    $valueLen = $pad - $varName.Length - 2
+                    if ($valueLen -gt 0) {
+                        [System.Environment]::SetEnvironmentVariable($varName, ("X" * $valueLen))
+                    }
                 }
+                Write-Host ""
+                Write-Host "Padded env to ~65515 chars, trying Add-Type to measure CodeDom overhead..."
+                try {
+                    Add-Type -TypeDefinition 'public class __EnvProbeType { }' -ErrorAction Stop 2>$null
+                    Write-Host "Add-Type succeeded — CodeDom overhead fits in the 20-char margin."
+                } catch {
+                    Write-Host "Add-Type FAILED: $($_.Exception.Message)"
+                    Write-Host "This means CodeDom/csc injects more than 20 chars of extra env vars."
+                }
+                [System.Environment]::SetEnvironmentVariable("__ENVPROBE", $null)
+
+                # Now pad way over and capture the exact size .NET Framework reports.
+                $overPad = 10000
+                [System.Environment]::SetEnvironmentVariable("__ENVPROBE", ("X" * $overPad))
+                Write-Host ""
+                Write-Host "Padded env by extra $overPad chars, triggering Add-Type to get .NET Framework reported size..."
+                try {
+                    Add-Type -TypeDefinition 'public class __EnvProbeType2 { }' -ErrorAction Stop 2>$null
+                    Write-Host "Add-Type unexpectedly succeeded."
+                } catch {
+                    Write-Host "Add-Type reported: $($_.Exception.Message)"
+                    # Parse out the reported size
+                    if ($_.Exception.Message -match 'is (\d+) bytes') {
+                        $reported = [int]$Matches[1]
+                        $expected = $totalChars + $overPad + "__ENVPROBE".Length + 2
+                        $overhead = $reported - $expected
+                        Write-Host ""
+                        Write-Host "Our env chars  : $expected"
+                        Write-Host "Reported chars : $reported  (called 'bytes' in the error but it is chars)"
+                        Write-Host "CodeDom overhead: $overhead chars (extra env vars injected for csc.exe)"
+                    }
+                }
+                [System.Environment]::SetEnvironmentVariable("__ENVPROBE", $null)
               displayName: 'Diagnose environment block size'
               condition: always()
 
@@ -333,34 +374,75 @@ extends:
                 image: windows.vs2026preview.scout.amd64
                 os: windows
             steps:
-              - pwsh: |
+              - powershell: |
+                  # .NET Framework Process.Start checks env block LENGTH IN CHARS against 65535,
+                  # but the error message misleadingly says "bytes". Measure in chars to match.
                   $entries = [System.Environment]::GetEnvironmentVariables().GetEnumerator() | ForEach-Object {
                       $name  = [string]$_.Key
                       $value = [string]$_.Value
-                      $bytes = ($name.Length + $value.Length + 2) * 2
+                      $chars = $name.Length + $value.Length + 2  # +1 for '=', +1 for '\0'
                       [PSCustomObject]@{
-                          Name      = $name
-                          ValueLen  = $value.Length
-                          Bytes     = $bytes
+                          Name     = $name
+                          ValueLen = $value.Length
+                          Chars    = $chars
                       }
-                  } | Sort-Object Bytes -Descending
+                  } | Sort-Object Chars -Descending
 
-                  $totalBytes = ($entries | Measure-Object -Property Bytes -Sum).Sum + 2
+                  $totalChars = ($entries | Measure-Object -Property Chars -Sum).Sum + 1  # trailing \0
 
                   Write-Host "===== Environment Block Size Report ====="
                   Write-Host ""
-                  Write-Host ("{0,-60} {1,10} {2,10}" -f "Variable", "ValueLen", "Bytes")
+                  Write-Host ("{0,-60} {1,10} {2,10}" -f "Variable", "ValueLen", "Chars")
                   Write-Host ("{0,-60} {1,10} {2,10}" -f ("=" * 60), ("=" * 10), ("=" * 10))
                   foreach ($e in $entries) {
-                      Write-Host ("{0,-60} {1,10} {2,10}" -f $e.Name, $e.ValueLen, $e.Bytes)
+                      Write-Host ("{0,-60} {1,10} {2,10}" -f $e.Name, $e.ValueLen, $e.Chars)
                   }
                   Write-Host ""
                   Write-Host "Total entries : $($entries.Count)"
-                  Write-Host "Total bytes   : $totalBytes / 65535"
-                  Write-Host "Remaining     : $(65535 - $totalBytes) bytes"
-                  if ($totalBytes -gt 65535) {
-                      Write-Host "##vso[task.logissue type=warning]Environment block ($totalBytes bytes) exceeds the 65535-byte limit!"
+                  Write-Host "Total chars   : $totalChars / 65535  (this is what .NET Framework checks)"
+                  Write-Host "Remaining     : $(65535 - $totalChars) chars"
+
+                  # Now try Add-Type to see if CodeDom/csc adds extra env vars that push it over.
+                  $pad = 65535 - $totalChars - 20
+                  if ($pad -gt 0) {
+                      $varName = "__ENVPROBE"
+                      $valueLen = $pad - $varName.Length - 2
+                      if ($valueLen -gt 0) {
+                          [System.Environment]::SetEnvironmentVariable($varName, ("X" * $valueLen))
+                      }
                   }
+                  Write-Host ""
+                  Write-Host "Padded env to ~65515 chars, trying Add-Type to measure CodeDom overhead..."
+                  try {
+                      Add-Type -TypeDefinition 'public class __EnvProbeType { }' -ErrorAction Stop 2>$null
+                      Write-Host "Add-Type succeeded - CodeDom overhead fits in the 20-char margin."
+                  } catch {
+                      Write-Host "Add-Type FAILED: $($_.Exception.Message)"
+                      Write-Host "This means CodeDom/csc injects more than 20 chars of extra env vars."
+                  }
+                  [System.Environment]::SetEnvironmentVariable("__ENVPROBE", $null)
+
+                  # Pad way over and capture the exact size .NET Framework reports.
+                  $overPad = 10000
+                  [System.Environment]::SetEnvironmentVariable("__ENVPROBE", ("X" * $overPad))
+                  Write-Host ""
+                  Write-Host "Padded env by extra $overPad chars, triggering Add-Type to get .NET Framework reported size..."
+                  try {
+                      Add-Type -TypeDefinition 'public class __EnvProbeType2 { }' -ErrorAction Stop 2>$null
+                      Write-Host "Add-Type unexpectedly succeeded."
+                  } catch {
+                      Write-Host "Add-Type reported: $($_.Exception.Message)"
+                      if ($_.Exception.Message -match 'is (\d+) bytes') {
+                          $reported = [int]$Matches[1]
+                          $expected = $totalChars + $overPad + "__ENVPROBE".Length + 2
+                          $overhead = $reported - $expected
+                          Write-Host ""
+                          Write-Host "Our env chars  : $expected"
+                          Write-Host "Reported chars : $reported  (called 'bytes' in the error but it is chars)"
+                          Write-Host "CodeDom overhead: $overhead chars (extra env vars injected for csc.exe)"
+                      }
+                  }
+                  [System.Environment]::SetEnvironmentVariable("__ENVPROBE", $null)
                 displayName: 'Diagnose environment block size'
                 condition: always()
 
