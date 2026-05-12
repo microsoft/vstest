@@ -162,6 +162,38 @@ extends:
               image: windows.vs2026preview.scout.amd64
               os: windows
             steps:
+            - pwsh: |
+                # Environment block on Windows is UTF-16: each entry is "NAME=VALUE\0" → (len + 2) * 2 bytes.
+                # The block itself ends with an extra \0 (2 bytes).
+                $entries = [System.Environment]::GetEnvironmentVariables().GetEnumerator() | ForEach-Object {
+                    $name  = [string]$_.Key
+                    $value = [string]$_.Value
+                    $bytes = ($name.Length + $value.Length + 2) * 2  # +1 for '=', +1 for '\0', *2 for UTF-16
+                    [PSCustomObject]@{
+                        Name      = $name
+                        ValueLen  = $value.Length
+                        Bytes     = $bytes
+                    }
+                } | Sort-Object Bytes -Descending
+
+                $totalBytes = ($entries | Measure-Object -Property Bytes -Sum).Sum + 2  # trailing \0
+
+                Write-Host "===== Environment Block Size Report ====="
+                Write-Host ""
+                Write-Host ("{0,-60} {1,10} {2,10}" -f "Variable", "ValueLen", "Bytes")
+                Write-Host ("{0,-60} {1,10} {2,10}" -f ("=" * 60), ("=" * 10), ("=" * 10))
+                foreach ($e in $entries) {
+                    Write-Host ("{0,-60} {1,10} {2,10}" -f $e.Name, $e.ValueLen, $e.Bytes)
+                }
+                Write-Host ""
+                Write-Host "Total entries : $($entries.Count)"
+                Write-Host "Total bytes   : $totalBytes / 65535"
+                Write-Host "Remaining     : $(65535 - $totalBytes) bytes"
+                if ($totalBytes -gt 65535) {
+                    Write-Host "##vso[task.logissue type=warning]Environment block ($totalBytes bytes) exceeds the 65535-byte limit!"
+                }
+              displayName: 'Diagnose environment block size'
+
             # This steps help to understand versions of .NET runtime installed on the machine,
             # which is useful to diagnose some governance issues.
             - task: DotNetCoreCLI@2
@@ -300,6 +332,36 @@ extends:
                 image: windows.vs2026preview.scout.amd64
                 os: windows
             steps:
+              - pwsh: |
+                  $entries = [System.Environment]::GetEnvironmentVariables().GetEnumerator() | ForEach-Object {
+                      $name  = [string]$_.Key
+                      $value = [string]$_.Value
+                      $bytes = ($name.Length + $value.Length + 2) * 2
+                      [PSCustomObject]@{
+                          Name      = $name
+                          ValueLen  = $value.Length
+                          Bytes     = $bytes
+                      }
+                  } | Sort-Object Bytes -Descending
+
+                  $totalBytes = ($entries | Measure-Object -Property Bytes -Sum).Sum + 2
+
+                  Write-Host "===== Environment Block Size Report ====="
+                  Write-Host ""
+                  Write-Host ("{0,-60} {1,10} {2,10}" -f "Variable", "ValueLen", "Bytes")
+                  Write-Host ("{0,-60} {1,10} {2,10}" -f ("=" * 60), ("=" * 10), ("=" * 10))
+                  foreach ($e in $entries) {
+                      Write-Host ("{0,-60} {1,10} {2,10}" -f $e.Name, $e.ValueLen, $e.Bytes)
+                  }
+                  Write-Host ""
+                  Write-Host "Total entries : $($entries.Count)"
+                  Write-Host "Total bytes   : $totalBytes / 65535"
+                  Write-Host "Remaining     : $(65535 - $totalBytes) bytes"
+                  if ($totalBytes -gt 65535) {
+                      Write-Host "##vso[task.logissue type=warning]Environment block ($totalBytes bytes) exceeds the 65535-byte limit!"
+                  }
+                displayName: 'Diagnose environment block size'
+
               # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
               # the whole stage, which is not what we want to do. So we write an empty file instead.
               - pwsh: 'New-Item -Type file -Force "$(Build.SourcesDirectory)/artifacts/log/Release/empty.log"'
