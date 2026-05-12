@@ -193,6 +193,7 @@ extends:
                     Write-Host "##vso[task.logissue type=warning]Environment block ($totalBytes bytes) exceeds the 65535-byte limit!"
                 }
               displayName: 'Diagnose environment block size'
+              condition: always()
 
             # This steps help to understand versions of .NET runtime installed on the machine,
             # which is useful to diagnose some governance issues.
@@ -361,6 +362,7 @@ extends:
                       Write-Host "##vso[task.logissue type=warning]Environment block ($totalBytes bytes) exceeds the 65535-byte limit!"
                   }
                 displayName: 'Diagnose environment block size'
+                condition: always()
 
               # The template job needs a log, otherwise it writes a warning. We can disable log uploading only for
               # the whole stage, which is not what we want to do. So we write an empty file instead.
