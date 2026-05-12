@@ -19,6 +19,7 @@ pr:
       - .markdownlint.json
       - .markdownlintignore
       - .gitignore
+      - AGENTS.md
       - CODE_OF_CONDUCT.md
       - CONTRIBUTING.md
       - README.md
