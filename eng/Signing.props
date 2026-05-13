@@ -28,6 +28,5 @@
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.Package.dll" CertificateName="3PartySHA2" />
 
-    <FileExtensionSignInfo Include=".cab" CertificateName="None" />
   </ItemGroup>
 </Project>
