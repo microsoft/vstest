@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Collections.Generic;
@@ -8,7 +8,9 @@ using System.Linq;
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
+
+using NuGet.Versioning;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -23,7 +25,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
     // [DataRow("X86")]
     public void VerifyHostArchitecture(string architecture)
     {
-        _testEnvironment.RunnerFramework = "net8.0";
+        _testEnvironment.RunnerFramework = CoreRunnerFramework;
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architecture);
         var vstestConsolePath = GetDotnetRunnerPath();
         var dotnetRunnerPath = TempDirectory.CreateDirectory("dotnetrunner");
@@ -32,13 +34,12 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
         string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
-        JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
-        patchRuntimeConfig!["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
-        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
+        var patchRuntimeConfig = JsonNode.Parse(File.ReadAllText(runtimeConfigFile))!;
+        patchRuntimeConfig["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
+        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToJsonString());
 
         var environmentVariables = new Dictionary<string, string?>
         {
-            ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             ["ExpectedArchitecture"] = architecture
         };
 
@@ -67,5 +68,12 @@ public class UnitTest1
     }
 
     private static string GetLatestSdkVersion(string dotnetPath)
-        => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
+    {
+        var folders = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).Select(f => new
+        {
+            FullName = f,
+            SemanticVersion = SemanticVersion.Parse(new DirectoryInfo(f).Name)
+        }).OrderByDescending(x => x.SemanticVersion).ToList();
+        return Path.GetFileName(folders.First().FullName);
+    }
 }

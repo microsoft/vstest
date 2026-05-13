@@ -8,9 +8,12 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-using Newtonsoft.Json.Linq;
+using System.Text.Json.Nodes;
+
+using NuGet.Versioning;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -24,7 +27,7 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
     // [DataRow("X86", "X64")]
     public void Use_EnvironmentVariables(string architectureFrom, string architectureTo)
     {
-        SetTestEnvironment(_testEnvironment, new RunnerInfo { RunnerFramework = DEFAULT_RUNNER_NETCORE });
+        SetTestEnvironment(_testEnvironment, new RunnerInfo { RunnerFramework = RUNNER_NET });
         string dotnetPath = GetDownloadedDotnetMuxerFromTools(architectureFrom);
         string dotnetPathTo = GetDownloadedDotnetMuxerFromTools(architectureTo);
         var vstestConsolePath = GetDotnetRunnerPath();
@@ -34,13 +37,12 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         // Patch the runner
         string sdkVersion = GetLatestSdkVersion(dotnetPath);
         string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
-        JObject patchRuntimeConfig = JObject.Parse(File.ReadAllText(runtimeConfigFile));
-        patchRuntimeConfig!["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
-        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToString());
+        var patchRuntimeConfig = JsonNode.Parse(File.ReadAllText(runtimeConfigFile))!;
+        patchRuntimeConfig["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
+        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToJsonString());
 
         var environmentVariables = new Dictionary<string, string?>
         {
-            ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo)!,
             ["ExpectedArchitecture"] = architectureTo
         };
@@ -74,7 +76,6 @@ public class UnitTest1
 
         environmentVariables = new Dictionary<string, string?>
         {
-            ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             ["DOTNET_ROOT"] = Path.GetDirectoryName(dotnetPathTo),
             ["ExpectedArchitecture"] = architectureTo
         };
@@ -88,7 +89,6 @@ public class UnitTest1
 
         environmentVariables = new Dictionary<string, string?>
         {
-            ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo),
             ["DOTNET_ROOT"] = "WE SHOULD PICK THE ABOVE ONE BEFORE FALLBACK TO DOTNET_ROOT",
             ["ExpectedArchitecture"] = architectureTo
@@ -103,7 +103,14 @@ public class UnitTest1
     }
 
     private static string GetLatestSdkVersion(string dotnetPath)
-        => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
+    {
+        var folders = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).Select(f => new
+        {
+            FullName = f,
+            SemanticVersion = SemanticVersion.Parse(new DirectoryInfo(f).Name)
+        }).OrderByDescending(x => x.SemanticVersion).ToList();
+        return Path.GetFileName(folders.First().FullName);
+    }
 }
 
 #endif

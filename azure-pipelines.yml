@@ -1,19 +1,8 @@
-# Branches that trigger a build on commit
-trigger:
-  branches:
-    include:
-    - main
-    - rel/*
-    exclude:
-    - rel/15.*
-    - rel/16.*
-    - rel/17.0
-    - rel/17.1
-    - rel/17.2
-    - rel/17.3
-    - rel/17.4
-    - rel/17.5
-    - rel/17.6
+# The public pipeline is intended to run only on PRs, not on branch pushes.
+# An explicit `trigger: none` is required to satisfy the dnceng requirement
+# (dotnet/dnceng#6014) of having an explicit trigger section, while avoiding
+# duplicate builds for non-fork PRs (one for the push, one for the PR).
+trigger: none
 
 # Branch(es) that trigger(s) build(s) on PR
 pr:
@@ -26,12 +15,17 @@ pr:
       - .github/*
       - .devcontainer/*
       - docs/*
+      - .vscode/*
       - .markdownlint.json
       - .markdownlintignore
+      - .gitignore
+      - AGENTS.md
       - CODE_OF_CONDUCT.md
       - CONTRIBUTING.md
       - README.md
       - SECURITY.md
+      - azure-pipelines-official.yml
+      - azure-pipelines-insertion.yml
 
 variables:
   # Cannot use key:value syntax in root defined variables
@@ -54,11 +48,6 @@ variables:
     value: ' '
   - name: _ReleaseVersionKind
     value: ''
-  # Arcade is using global cache of nugets in non-windows build
-  # under some circumstances, but we don't respect that in our code and try to find them
-  # in .packages. Force the location of packages to that folder.
-  - name: NUGET_PACKAGES
-    value: '$(Build.SourcesDirectory)/.packages/'
 
 stages:
 
@@ -103,6 +92,18 @@ stages:
             /p:SourceBranchName=$(Build.SourceBranchName)
           name: Build
           displayName: Build
+        
+        # -ci is allowing to import some environment variables and some required configurations
+        # -nobl avoid overwriting binlog of the main Build
+        - script: Test.cmd
+            -configuration $(_BuildConfig)
+            -ci
+            -nobl
+            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/UnitTest.binlog
+          name: Test
+          displayName: Unit Test
+          env:
+            DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 
         # -ci is allowing to import some environment variables and some required configurations
         # -nobl avoid overwriting binlog of the main Build
@@ -111,10 +112,9 @@ stages:
             -ci
             -nobl
             -integrationTest
-            -performanceTest
-            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/Test.binlog
-          name: Test
-          displayName: Test
+            /bl:$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)/IntegrationTest.binlog
+          name: IntegrationTest
+          displayName: Integration Test
           env:
             DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 
@@ -134,7 +134,7 @@ stages:
             ArtifactName: PackageArtifacts
 
         - task: PublishBuildArtifacts@1
-          displayName: 'Publish NonShippping Packages'
+          displayName: 'Publish NonShipping Packages'
           inputs:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/packages/$(_BuildConfig)/NonShipping'
             ArtifactName: PackageArtifacts
@@ -156,10 +156,10 @@ stages:
             value: Release
         strategy:
           matrix:
-            Ubuntu_22_04:
+            ubuntu:
               vmImage: ubuntu-22.04
               pwsh: true
-            macOS_12:
+            macOS:
               vmImage: macos-14
               pwsh: true
         pool:
@@ -191,6 +191,8 @@ stages:
             --performanceTest
           name: Test
           displayName: Test
+          env:
+            DOTNET_ROOT: $(Build.SourcesDirectory)/.dotnet
 
         # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
         # through the console or trx
@@ -200,4 +202,3 @@ stages:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
           condition: failed()
-
