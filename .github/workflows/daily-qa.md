@@ -159,7 +159,7 @@ gh pr list --repo ${{ github.repository }} \
 | Category | Count |
 |---|---|
 | Total open issues | N |
-| Untriaged (`Needs: Triage`) | N |
+| Untriaged (`Needs: Triage :mag:`) | N |
 | Waiting for info (`Needs: Additional Info`) | N |
 | Blocked / Design needed | N |
 | Actionable bugs (has repro, no linked PR) | N |
