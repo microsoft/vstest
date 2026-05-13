@@ -43,6 +43,7 @@ safe-outputs:
     title-prefix: "[fix] "
     max: 2
     protected-files: fallback-to-issue
+    github-token: ${{ secrets.GH_AW_GITHUB_TOKEN }}
   noop:
     report-as-issue: false
   messages:
