@@ -68,6 +68,10 @@ public class TrxLogger : ITestLoggerWithParameters
     private ConcurrentDictionary<Guid, ITestResult>? _innerResults;
     private ConcurrentDictionary<Guid, TestEntry>? _innerTestEntries;
 
+    // Tracks which parent data-driven test results have already had their count contribution corrected.
+    // Using TryAdd ensures the decrement fires exactly once even under concurrent dispatch.
+    private ConcurrentDictionary<Guid, bool>? _parentResultsCorrected;
+
     private readonly TrxFileHelper _trxFileHelper;
 
     /// <summary>
@@ -93,11 +97,11 @@ public class TrxLogger : ITestLoggerWithParameters
 
     #region ITestLogger
 
-    [MemberNotNullWhen(true, nameof(_testResultsDirPath), nameof(_results), nameof(_innerResults), nameof(_testElements), nameof(_entries), nameof(_innerTestEntries), nameof(_runLevelErrorsAndWarnings), nameof(_runLevelStdOut))]
+    [MemberNotNullWhen(true, nameof(_testResultsDirPath), nameof(_results), nameof(_innerResults), nameof(_testElements), nameof(_entries), nameof(_innerTestEntries), nameof(_runLevelErrorsAndWarnings), nameof(_runLevelStdOut), nameof(_parentResultsCorrected))]
     private bool IsInitialized { get; set; }
 
     /// <inheritdoc/>
-    [MemberNotNull(nameof(_testResultsDirPath), nameof(_results), nameof(_innerResults), nameof(_testElements), nameof(_entries), nameof(_innerTestEntries), nameof(_runLevelErrorsAndWarnings), nameof(_runLevelStdOut))]
+    [MemberNotNull(nameof(_testResultsDirPath), nameof(_results), nameof(_innerResults), nameof(_testElements), nameof(_entries), nameof(_innerTestEntries), nameof(_runLevelErrorsAndWarnings), nameof(_runLevelStdOut), nameof(_parentResultsCorrected))]
     public void Initialize(TestLoggerEvents events, string testResultsDirPath)
     {
         ValidateArg.NotNull(events, nameof(events));
@@ -120,6 +124,7 @@ public class TrxLogger : ITestLoggerWithParameters
         PassedTestCount = 0;
         FailedTestCount = 0;
         _runLevelStdOut = new StringBuilder();
+        _parentResultsCorrected = new ConcurrentDictionary<Guid, bool>();
         TestRunStartTime = DateTime.UtcNow;
 
         IsInitialized = true;
@@ -316,11 +321,12 @@ public class TrxLogger : ITestLoggerWithParameters
 
         // For data-driven tests, the parent result is a container whose counts should not be
         // included in the summary — only the individual data row results should be counted.
-        // When we encounter the first inner data-driven result, undo the parent's contribution.
+        // When the first inner data-driven result arrives, undo the parent's contribution exactly once.
+        // TryAdd is atomic, so this is safe under concurrent dispatch.
         if (parentTestElement != null
             && parentTestElement.TestType.Equals(TrxLoggerConstants.UnitTestType)
-            && parentTestResult is TestResultAggregation parentAggregation
-            && parentAggregation.InnerResults.Count == 1)
+            && parentTestResult is TestResultAggregation
+            && _parentResultsCorrected!.TryAdd(parentExecutionId, true))
         {
             Interlocked.Decrement(ref _totalTestCount);
             if (parentTestResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
