@@ -61,7 +61,7 @@ If triggered by `schedule` or `workflow_dispatch`, check ALL PRs in the list and
 
 - **Never push more than 3 iterations per PR per day.** If you've pushed 3 times and it's still failing, comment on the PR explaining what's blocking and stop.
 - **Never comment if a human commented in the last 48 hours** — they're handling it.
-- **Prefer amending/fixup commits** over adding many small commits.
+- **Prefer a small number of clear follow-up commits** over rewriting PR history; do not amend/rebase or force-push PR branches.
 
 ## Process
 
@@ -89,7 +89,7 @@ If triggered by `schedule` or `workflow_dispatch`, check ALL PRs in the list and
       - Determine if it's a code issue (fix it) or infrastructure flake (comment and skip)
       - Push a fix if possible
    c. Check for unaddressed review comments. If any, address them.
-   d. Check for merge conflicts. If conflicted, rebase on main and push.
+   d. Check for merge conflicts. If conflicted, merge main and push.
 3. Update cache-memory with the cleaned-up list (remove merged/closed PRs).
 
 ### Deciding what to fix
