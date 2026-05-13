@@ -607,8 +607,9 @@ public class HtmlLoggerTests
     [TestMethod]
     public void TestCompleteHandlerShouldRetryUniqueFileNameWhenCreateNewCollides()
     {
-        string? collidedPath = null;
         var collisionInjected = false;
+
+        _mockFileHelper.Setup(x => x.Exists(It.IsAny<string>())).Returns(true);
 
         _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.CreateNew, FileAccess.Write, FileShare.None))
             .Returns<string, FileMode, FileAccess, FileShare>((path, _, _, _) =>
@@ -616,8 +617,6 @@ public class HtmlLoggerTests
                 if (!collisionInjected)
                 {
                     collisionInjected = true;
-                    collidedPath = path;
-                    File.WriteAllText(path, string.Empty);
                     throw new IOException("collision");
                 }
 
@@ -627,21 +626,11 @@ public class HtmlLoggerTests
         _mockFileHelper.Setup(x => x.GetStream(It.IsAny<string>(), FileMode.OpenOrCreate, FileAccess.ReadWrite))
             .Returns(new Mock<Stream>().Object);
 
-        try
-        {
-            _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
-            Assert.IsNotNull(_htmlLogger.XmlFilePath);
-            Assert.Contains("[1].xml", _htmlLogger.XmlFilePath);
-            _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.CreateNew, FileAccess.Write, FileShare.None), Times.AtLeast(2));
-        }
-        finally
-        {
-            if (!string.IsNullOrEmpty(collidedPath) && File.Exists(collidedPath))
-            {
-                File.Delete(collidedPath);
-            }
-        }
+        Assert.IsNotNull(_htmlLogger.XmlFilePath);
+        Assert.Contains("[1].xml", _htmlLogger.XmlFilePath);
+        _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.CreateNew, FileAccess.Write, FileShare.None), Times.AtLeast(2));
     }
 
     private static TestCase CreateTestCase(string testCaseName)
