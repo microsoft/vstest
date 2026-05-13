@@ -313,6 +313,25 @@ public class TrxLogger : ITestLoggerWithParameters
         {
             Interlocked.Increment(ref _passedTestCount);
         }
+
+        // When the first inner DataDriven result is encountered, the parent is promoted to a
+        // DataDrivenTest container. Undo the count that was previously recorded for the parent,
+        // since the parent is only a container and should not be counted as a separate test result.
+        if (parentTestElement != null
+            && parentTestElement.TestType.Equals(TrxLoggerConstants.UnitTestType)
+            && parentTestResult is TestResultAggregation aggregation
+            && aggregation.InnerResults.Count == 1)
+        {
+            Interlocked.Decrement(ref _totalTestCount);
+            if (parentTestResult.Outcome == TrxLoggerObjectModel.TestOutcome.Failed)
+            {
+                Interlocked.Decrement(ref _failedTestCount);
+            }
+            else if (parentTestResult.Outcome == TrxLoggerObjectModel.TestOutcome.Passed)
+            {
+                Interlocked.Decrement(ref _passedTestCount);
+            }
+        }
     }
 
     /// <summary>
