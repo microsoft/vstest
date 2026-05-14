@@ -187,6 +187,8 @@ Then submit an overall review using `submit-pull-request-review` with:
   - `COMMENT` — if findings are performance suggestions, defensive coding improvements, or minor concerns
   - `APPROVE` — if no issues found and the code is solid
 
+**Do NOT include a "Reviewed by" footer or signature in your review body.** The framework appends one automatically. Including your own causes duplication.
+
 ### Step 7: Update Memory Cache
 
 After the review, update:

@@ -90,7 +90,8 @@ If triggered by `schedule` or `workflow_dispatch`, check ALL your PRs and iterat
    d. Make the requested changes
    e. Build and run tests to verify
    f. Push the fix
-   g. Reply briefly to the review comment confirming what you changed
+   g. Verify the PR description accurately describes the code changes. If it's a template placeholder or doesn't match the diff, rewrite it.
+   h. Reply briefly to the review comment confirming what you changed
 4. If the comment is just a question or discussion, reply if you can add useful context. Otherwise noop.
 
 ### On `schedule` (daily) or `workflow_dispatch`
@@ -103,7 +104,8 @@ If triggered by `schedule` or `workflow_dispatch`, check ALL your PRs and iterat
       - Determine if it's a code issue (fix it) or infrastructure flake (comment and skip)
       - Push a fix if possible
    c. Check for unaddressed review comments. If any, address them.
-   d. Check for merge conflicts. If conflicted, merge main and push.
+   d. Check that the PR description accurately describes the code changes. If it's a template placeholder or doesn't match the diff, rewrite it.
+   e. Check for merge conflicts. If conflicted, merge main and push.
 3. Update cache-memory with the cleaned-up list (remove merged/closed PRs).
 
 ### Deciding what to fix
