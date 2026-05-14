@@ -44,6 +44,7 @@ safe-outputs:
     draft: true
     title-prefix: "[fix] "
     max: 3
+    allowed-base-branches: ["main", "rel/*"]
     protected-files: fallback-to-issue
     github-token: ${{ secrets.GH_AW_GITHUB_TOKEN }}
   noop:
