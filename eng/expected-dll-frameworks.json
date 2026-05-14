@@ -101,6 +101,7 @@
       "tools/net462/Common7/IDE/Extensions/TestPlatform/it/Microsoft.CodeCoverage.IO.dll": "none",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/ja/Microsoft.CodeCoverage.IO.dll": "none",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/ko/Microsoft.CodeCoverage.IO.dll": "none",
+      "tools/net462/Common7/IDE/Extensions/TestPlatform/Microsoft.Bcl.AsyncInterfaces.dll": "netframework",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/Microsoft.CodeCoverage.IO.dll": "netstandard",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/Microsoft.DiaSymReader.dll": "netstandard",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/Microsoft.Extensions.DependencyModel.dll": "netframework",
@@ -131,6 +132,8 @@
       "tools/net462/Common7/IDE/Extensions/TestPlatform/System.Numerics.Vectors.dll": "netframework",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/System.Reflection.Metadata.dll": "netstandard",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/System.Runtime.CompilerServices.Unsafe.dll": "none",
+      "tools/net462/Common7/IDE/Extensions/TestPlatform/System.Text.Encodings.Web.dll": "netframework",
+      "tools/net462/Common7/IDE/Extensions/TestPlatform/System.Threading.Tasks.Extensions.dll": "none",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CommunicationUtilities.dll": "netframework",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CoreUtilities.dll": "netframework",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CrossPlatEngine.dll": "netframework",
@@ -431,6 +434,7 @@
       "Extensions/Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll": "none",
       "Extensions/Microsoft.VisualStudio.TestTools.DataCollection.VideoRecorderCollector.dll": "netframework",
       "Extensions/VideoRecorder/Microsoft.VisualStudio.TestTools.DataCollection.MediaRecorder.Model.dll": "none",
+      "Microsoft.Bcl.AsyncInterfaces.dll": "netframework",
       "Microsoft.CodeCoverage.IO.dll": "netstandard",
       "Microsoft.DiaSymReader.dll": "netstandard",
       "Microsoft.Extensions.DependencyModel.dll": "netframework",
@@ -458,7 +462,9 @@
       "System.Numerics.Vectors.dll": "netframework",
       "System.Reflection.Metadata.dll": "netstandard",
       "System.Runtime.CompilerServices.Unsafe.dll": "none",
+      "System.Text.Encodings.Web.dll": "netframework",
       "System.Text.Json.dll": "netframework",
+      "System.Threading.Tasks.Extensions.dll": "none",
       "System.ValueTuple.dll": "none"
     }
   }
