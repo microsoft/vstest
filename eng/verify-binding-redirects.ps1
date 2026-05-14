@@ -2,6 +2,7 @@ $ErrorActionPreference = "Stop"
 Set-StrictMode -Version Latest
 
 $script:isCI = $env:TF_BUILD -eq 'true' -or $env:CI -eq 'true'
+$script:hasUnfixableErrors = $false
 
 # Verifies that binding redirects in source app.config files match the actual
 # assembly versions of the DLLs shipped in the extracted nupkg packages.
@@ -128,9 +129,11 @@ function Verify-BindingRedirects {
                 # The deploy directory exists (package was found) but the DLL is missing.
                 # A binding redirect pointing to a DLL that doesn't ship causes runtime
                 # failures (e.g. #15765). Fail so the redirect gets removed.
+                # This cannot be auto-fixed — the redirect must be manually removed or the DLL shipped.
                 $errors += "$($entry.ExeName): $assemblyName has a binding redirect but the DLL is not in the package layout"
+                $script:hasUnfixableErrors = $true
                 if ($script:isCI) {
-                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package" -ForegroundColor Red
+                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package — remove the redirect or ship the DLL" -ForegroundColor Red
                 }
                 else {
                     Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package — remove the redirect from $($entry.Config)" -ForegroundColor Red
@@ -217,16 +220,26 @@ function Verify-BindingRedirects {
 
     if ($errors) {
         if ($script:isCI) {
-            $message = "Assembly binding redirect mismatches detected:`n"
+            $message = "Assembly binding redirect errors detected:`n"
             $message += ($errors -join "`n")
-            $message += "`n`nTo fix this, run the following command locally after building and packing:`n"
-            $message += "  .\build.cmd -c $Configuration`n"
-            $message += "This will rebuild, pack, and auto-update the app.config files with the correct versions.`n"
-            $message += "Then commit the updated app.config files."
+            if ($configsToFix.Count -gt 0) {
+                $message += "`n`nFor version mismatches, run the following command locally after building and packing:`n"
+                $message += "  .\build.cmd -c $Configuration`n"
+                $message += "This will rebuild, pack, and auto-update the app.config files with the correct versions.`n"
+                $message += "Then commit the updated app.config files."
+            }
+            if ($script:hasUnfixableErrors) {
+                $message += "`n`nFor missing-DLL errors, remove the binding redirect from the app.config or add the DLL to the package."
+            }
             Write-Error $message
         }
         else {
-            Write-Host "`nFixed $($errors.Count) binding redirect(s). Please commit the updated app.config files." -ForegroundColor Green
+            if ($configsToFix.Count -gt 0) {
+                Write-Host "`nFixed $($configsToFix.Count) version mismatch(es). Please commit the updated app.config files." -ForegroundColor Green
+            }
+            if ($script:hasUnfixableErrors) {
+                Write-Error "Missing-DLL binding redirect errors detected — these cannot be auto-fixed. Remove the redirect(s) listed above from the app.config file(s)."
+            }
         }
     }
     else {
