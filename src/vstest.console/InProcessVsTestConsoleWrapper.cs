@@ -1354,7 +1354,7 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
                     }
                     else
                     {
-                        // Key with no value (just "=key" or "=key=").
+                        // Key with no value (just "=key", no second '=').
                         yield return (entry, null);
                     }
                 }
