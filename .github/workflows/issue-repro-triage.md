@@ -43,6 +43,7 @@ safe-outputs:
     title-prefix: "[fix] "
     max: 2
     protected-files: fallback-to-issue
+    github-token: ${{ secrets.GH_AW_GITHUB_TOKEN }}
   noop:
     report-as-issue: false
   messages:
@@ -89,10 +90,17 @@ Evaluate the new issue immediately.
 
 ### On `schedule` (daily)
 
-Process open issues:
-1. Issues labeled `Needs: Additional Info` that have been updated (reporter may have added repro steps)
-2. Open bug issues without PRs that have repro steps — attempt reproduction and fix
-3. Skip issues labeled `State: Blocked`, `Needs: Design`, `State: Approved`, or `State: In-PR`
+Your daily goal: **drive open issues to zero.** Process the backlog systematically:
+
+1. **Follow-ups first**: Check issues labeled `Needs: Additional Info` that have been updated since labeling — the reporter may have added repro steps. Re-evaluate them.
+2. **Backlog nibble**: Pick **one** open bug issue to work on. Selection priority:
+   a. Issues with `Needs: Triage :mag:` label (untriaged, newest first)
+   b. Oldest open bug issues that have repro steps but no linked PR
+   c. Issues without repro steps that you can investigate from the description alone
+3. **Skip**: issues labeled `State: Blocked`, `Needs: Design`, `State: Approved`, or `State: In-PR`
+4. **Skip**: issues you already commented on in the last 7 days (don't re-triage the same issue)
+
+The goal is steady progress: one issue per day = the backlog shrinks consistently. The maintainer wakes up to either a draft fix PR or a root cause analysis comment — actionable work ready to go.
 
 ## Process
 
