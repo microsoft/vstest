@@ -92,7 +92,7 @@ If triggered by `schedule` or `workflow_dispatch`, check ALL your PRs and iterat
 
 ### On `pull_request_review` or `issue_comment`
 
-1. Read cache-memory key `auto-fix-prs`. Also check if the PR title starts with `[fix]`. If neither matches, noop.
+1. Read cache-memory key `auto-fix-prs`. Also check if the PR title starts with `[fix]`, or if the triggering comment is `/iterate`. If none match, noop. If `/iterate`, register the PR in cache-memory first.
 2. Read the review comments or issue comment.
 3. If the review requests changes:
    a. Read AGENTS.md for repo conventions
