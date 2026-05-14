@@ -23,8 +23,8 @@ imports:
 safe-outputs:
   noop:
     report-as-issue: false
-  mentions: false
-  allowed-github-references: []
+  mentions: true
+  allowed-github-references: ["@nohwnd"]
   create-issue:
     max: 1
     title-prefix: "Daily Maintenance Digest"
