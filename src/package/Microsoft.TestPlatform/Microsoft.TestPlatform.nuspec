@@ -83,6 +83,10 @@
     <file src="net48\System.Runtime.CompilerServices.Unsafe.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Runtime.CompilerServices.Unsafe.dll" />
     <file src="net48\System.Numerics.Vectors.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Numerics.Vectors.dll" />
     <file src="net48\System.Buffers.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Buffers.dll" />
+    <!-- System.Text.Json net462 companion assemblies (required for .NET Framework runtime) -->
+    <file src="net48\Microsoft.Bcl.AsyncInterfaces.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Microsoft.Bcl.AsyncInterfaces.dll" />
+    <file src="net48\System.Text.Encodings.Web.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Text.Encodings.Web.dll" />
+    <file src="net48\System.Threading.Tasks.Extensions.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\System.Threading.Tasks.Extensions.dll" />
 
     <file src="net48\System.Collections.Immutable.dll" target="tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\System.Collections.Immutable.dll" />
     <!-- end System.Reflection.Metadata -->

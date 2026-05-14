@@ -98,6 +98,10 @@
       <VsixSourceItem Include="$(TestPlatformBinFolder)System.Collections.Immutable.dll" />
       <VsixSourceItem Include="$(TestPlatformBinFolder)System.Memory.dll" />
       <VsixSourceItem Include="$(TestPlatformBinFolder)System.Text.Json.dll" />
+      <!-- System.Text.Json net462 companion assemblies (required for .NET Framework runtime) -->
+      <VsixSourceItem Include="$(TestPlatformBinFolder)Microsoft.Bcl.AsyncInterfaces.dll" />
+      <VsixSourceItem Include="$(TestPlatformBinFolder)System.Text.Encodings.Web.dll" />
+      <VsixSourceItem Include="$(TestPlatformBinFolder)System.Threading.Tasks.Extensions.dll" />
       <VsixSourceItem Include="$(TestPlatformBinFolder)System.Runtime.CompilerServices.Unsafe.dll" />
       <VsixSourceItem Include="$(TestPlatformBinFolder)System.Numerics.Vectors.dll" />
       <VsixSourceItem Include="$(TestPlatformBinFolder)System.Buffers.dll" />
