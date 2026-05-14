@@ -43,7 +43,23 @@ public class AssemblyResolveEventArgs : EventArgs
     }
 
     /// <summary>
+    /// Initializes a new instance of the <see cref="AssemblyResolveEventArgs"/> class.
+    /// </summary>
+    /// <param name="name">The full name of an assembly to resolve.</param>
+    /// <param name="requestingAssembly">The assembly whose dependency is being resolved, or null if unknown.</param>
+    public AssemblyResolveEventArgs(string? name, Assembly? requestingAssembly)
+    {
+        Name = name;
+        RequestingAssembly = requestingAssembly;
+    }
+
+    /// <summary>
     /// Gets or sets the name of the item to resolve.
     /// </summary>
     public string? Name { get; set; }
+
+    /// <summary>
+    /// Gets the assembly whose dependency is being resolved.
+    /// </summary>
+    public Assembly? RequestingAssembly { get; }
 }
