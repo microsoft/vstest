@@ -17,7 +17,6 @@ $script:hasUnfixableErrors = $false
 $script:AllowMissingDlls = @(
     "Microsoft.VisualStudio.TestWindow.Interfaces"
     "Microsoft.VisualStudio.QualityTools.UnitTestFramework"
-    "Microsoft.Extensions.FileSystemGlobbing"
 )
 
 # Each source app.config maps to a specific exe that ships in the packages.
