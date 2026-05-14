@@ -9,6 +9,16 @@ $script:isCI = $env:TF_BUILD -eq 'true' -or $env:CI -eq 'true'
 # In CI: validates and fails with instructions to run locally.
 # Locally: auto-fixes the source app.config files with the correct versions.
 
+# Assemblies that have binding redirects but are intentionally NOT shipped in the
+# CLI/SDK package. These are loaded from Visual Studio at runtime when testhost
+# runs inside VS. A redirect without a DLL is safe here because the DLL comes
+# from VS's probing path, not from the package layout.
+$script:AllowMissingDlls = @(
+    "Microsoft.VisualStudio.TestWindow.Interfaces"
+    "Microsoft.VisualStudio.QualityTools.UnitTestFramework"
+    "Microsoft.Extensions.FileSystemGlobbing"
+)
+
 # Each source app.config maps to a specific exe that ships in the packages.
 $script:AppConfigs = @(
     @{ Config = "src/vstest.console/app.config";  ExeName = "vstest.console.exe" }
@@ -110,7 +120,21 @@ function Verify-BindingRedirects {
             }
 
             if (-not $dllPath) {
-                Write-Host "  $assemblyName - not found in package layout, skipping."
+                if ($assemblyName -in $script:AllowMissingDlls) {
+                    Write-Host "  $assemblyName - SKIP (allowed missing — loaded from VS at runtime)"
+                    continue
+                }
+
+                # The deploy directory exists (package was found) but the DLL is missing.
+                # A binding redirect pointing to a DLL that doesn't ship causes runtime
+                # failures (e.g. #15765). Fail so the redirect gets removed.
+                $errors += "$($entry.ExeName): $assemblyName has a binding redirect but the DLL is not in the package layout"
+                if ($script:isCI) {
+                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package" -ForegroundColor Red
+                }
+                else {
+                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package — remove the redirect from $($entry.Config)" -ForegroundColor Red
+                }
                 continue
             }
 
