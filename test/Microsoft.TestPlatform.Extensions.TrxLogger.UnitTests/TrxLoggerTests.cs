@@ -362,7 +362,7 @@ public class TrxLoggerTests
         _testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
         Assert.AreEqual(1, _testableTrxLogger.TestResultCount, "TestResultHandler is not creating hierarchical results when parent result is present.");
-        Assert.AreEqual(3, _testableTrxLogger.TotalTestCount, "TestResultHandler is not adding all inner results in parent test result.");
+        Assert.AreEqual(2, _testableTrxLogger.TotalTestCount, "DataDriven parent result should not be counted; only inner (DataRow) results should contribute to the total.");
     }
 
     [TestMethod]
@@ -423,6 +423,42 @@ public class TrxLoggerTests
         _testableTrxLogger.TestResultHandler(new object(), resultEventArg3.Object);
 
         Assert.AreEqual(1, _testableTrxLogger.TestEntryCount, "TestResultHandler is adding multiple test entries for data driven tests.");
+    }
+
+    [TestMethod]
+    public void TestResultHandlerShouldNotDoubleCountDataDrivenTestResults()
+    {
+        // Regression test for https://github.com/microsoft/vstest/issues/15643
+        // DataDriven (data row) tests produce a parent result and N inner results.
+        // Only the inner results should be counted in the summary totals; the parent
+        // aggregate must not be counted, otherwise totals are inflated.
+        TestCase testCase1 = CreateTestCase("TestCase1");
+
+        Guid parentExecutionId = Guid.NewGuid();
+
+        // Parent result (aggregate, no parent execution id)
+        VisualStudio.TestPlatform.ObjectModel.TestResult parentResult = new(testCase1);
+        parentResult.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, parentExecutionId);
+
+        // Inner result 1 – passed
+        VisualStudio.TestPlatform.ObjectModel.TestResult innerResult1 = new(testCase1);
+        innerResult1.Outcome = TestOutcome.Passed;
+        innerResult1.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+        innerResult1.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+        // Inner result 2 – failed
+        VisualStudio.TestPlatform.ObjectModel.TestResult innerResult2 = new(testCase1);
+        innerResult2.Outcome = TestOutcome.Failed;
+        innerResult2.SetPropertyValue(TrxLoggerConstants.ExecutionIdProperty, Guid.NewGuid());
+        innerResult2.SetPropertyValue(TrxLoggerConstants.ParentExecIdProperty, parentExecutionId);
+
+        _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(parentResult).Object);
+        _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(innerResult1).Object);
+        _testableTrxLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(innerResult2).Object);
+
+        Assert.AreEqual(2, _testableTrxLogger.TotalTestCount, "Parent DataDriven result must not be counted; only the 2 inner DataRow results should be counted.");
+        Assert.AreEqual(1, _testableTrxLogger.PassedTestCount, "Only 1 DataRow result passed.");
+        Assert.AreEqual(1, _testableTrxLogger.FailedTestCount, "Only 1 DataRow result failed.");
     }
 
     [TestMethod]
