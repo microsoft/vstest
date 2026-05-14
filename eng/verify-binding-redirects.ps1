@@ -122,21 +122,21 @@ function Verify-BindingRedirects {
 
             if (-not $dllPath) {
                 if ($assemblyName -in $script:AllowMissingDlls) {
-                    Write-Host "  $assemblyName - SKIP (allowed missing — loaded from VS at runtime)"
+                    Write-Host "  $assemblyName - SKIP (allowed missing - loaded from VS at runtime)"
                     continue
                 }
 
                 # The deploy directory exists (package was found) but the DLL is missing.
                 # A binding redirect pointing to a DLL that doesn't ship causes runtime
                 # failures (e.g. #15765). Fail so the redirect gets removed.
-                # This cannot be auto-fixed — the redirect must be manually removed or the DLL shipped.
+                # This cannot be auto-fixed - the redirect must be manually removed or the DLL shipped.
                 $errors += "$($entry.ExeName): $assemblyName has a binding redirect but the DLL is not in the package layout"
                 $script:hasUnfixableErrors = $true
                 if ($script:isCI) {
-                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package — remove the redirect or ship the DLL" -ForegroundColor Red
+                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package - remove the redirect or ship the DLL" -ForegroundColor Red
                 }
                 else {
-                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package — remove the redirect from $($entry.Config)" -ForegroundColor Red
+                    Write-Host "  $assemblyName - ERROR: binding redirect exists but DLL not found in package - remove the redirect from $($entry.Config)" -ForegroundColor Red
                 }
                 continue
             }
@@ -238,7 +238,7 @@ function Verify-BindingRedirects {
                 Write-Host "`nFixed $($configsToFix.Count) version mismatch(es). Please commit the updated app.config files." -ForegroundColor Green
             }
             if ($script:hasUnfixableErrors) {
-                Write-Error "Missing-DLL binding redirect errors detected — these cannot be auto-fixed. Remove the redirect(s) listed above from the app.config file(s)."
+                Write-Error "Missing-DLL binding redirect errors detected - these cannot be auto-fixed. Remove the redirect(s) listed above from the app.config file(s)."
             }
         }
     }
