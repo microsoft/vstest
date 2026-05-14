@@ -16,7 +16,7 @@ This collector captures crash and hang dumps. It operates under extreme conditio
 ## Environment Variable Contracts
 
 - Every env-var switch must have documented ownership, precedence, and side-effect contract.
-- Follow `VSTEST_DISABLE_*` (opt-out) or `VSTEST_OPTIN_*` (opt-in) naming conventions for new flags.
+- Follow `VSTEST_DISABLE_*` (opt-out) or very rarely `VSTEST_OPTIN_*` (opt-in) naming conventions for new flags.
 - Variable propagation from console → testhost → child processes must be verified.
 
 ## Diagnostic Clarity

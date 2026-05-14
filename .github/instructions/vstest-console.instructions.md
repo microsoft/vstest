@@ -21,7 +21,7 @@ This is the main entry point for `dotnet test` and `vstest.console.exe`. It hand
 
 ## Environment Variable Contracts
 
-- New env vars must follow `VSTEST_DISABLE_*` / `VSTEST_OPTIN_*` naming.
+- New env vars must follow `VSTEST_DISABLE_*` / rarely `VSTEST_OPTIN_*` naming.
 - Environment inheritance to child processes must be explicit and predictable.
 - Feature flags need a clear default and documented migration path before shipping.
 

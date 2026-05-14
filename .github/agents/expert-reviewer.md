@@ -116,7 +116,7 @@ Error messages must help users fix problems. Trace logs must identify exact meth
 
 VSTEST_* environment variables and feature flags must follow naming conventions, have clear opt-in/opt-out semantics, and be treated as stable contracts once shipped.
 
-- CHECK: New env vars follow VSTEST_DISABLE_* (opt-out) or VSTEST_OPTIN_* (opt-in) naming
+- CHECK: New env vars follow VSTEST_DISABLE_* (opt-out) or very rarely VSTEST_OPTIN_* (opt-in) naming
 - CHECK: Environment variables that cross process boundaries are documented
 - CHECK: Removed features use [Obsolete] annotation path before removal
 - CHECK: Feature flags have a clear default and migration path
