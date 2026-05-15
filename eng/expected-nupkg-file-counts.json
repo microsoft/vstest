@@ -4,7 +4,7 @@
   "Microsoft.TestPlatform": 548,
   "Microsoft.TestPlatform.AdapterUtilities": 62,
   "Microsoft.TestPlatform.Build": 21,
-  "Microsoft.TestPlatform.CLI": 483,
+  "Microsoft.TestPlatform.CLI": 484,
   "Microsoft.TestPlatform.Extensions.TrxLogger": 35,
   "Microsoft.TestPlatform.Filter.Source": 13,
   "Microsoft.TestPlatform.Internal.Uwp": 39,
