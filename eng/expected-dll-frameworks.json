@@ -278,6 +278,7 @@
       "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.Overlapped.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.Tasks.dll": "none",
+      "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.Tasks.Extensions.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.Tasks.Parallel.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.Thread.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Threading.ThreadPool.dll": "none",
