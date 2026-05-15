@@ -221,9 +221,9 @@ extends:
 
                         $sourceCommit = $null
 
-                        # Extract the build ID from the "Updated Updating VS Test Platform from [...] to [buildnum](url) ([sha](sourcesUrl))" line.
+                        # Extract the build ID from the "Updating VS Test Platform from [...] to [buildnum](url) ([sha](sourcesUrl))" line.
                         # We use the build ID to resolve the full commit SHA via the builds API.
-                        if ($outputText -match 'Updated Updating VS Test Platform from .+ to \[\S+\]\([^)]+\) \(\[[0-9a-f]{7,40}\]\(https://dev\.azure\.com/dnceng/[^)]+/_apis/build/builds/(\d+)/sources\)\)') {
+                        if ($outputText -match 'Updating VS Test Platform from .+ to \[\S+\]\([^)]+\) \(\[[0-9a-f]{7,40}\]\(https://dev\.azure\.com/dnceng/[^)]+/_apis/build/builds/(\d+)/sources\)\)') {
                           $sourceBuildId = $Matches[1]
                           Write-Host "Resolving source commit from build ID $sourceBuildId"
                           $buildUrl = "$dncengBase/_apis/build/builds/${sourceBuildId}?api-version=7.1"
@@ -232,14 +232,17 @@ extends:
                         }
 
                         if (-not $sourceCommit) {
-                          # Fallback: resolve source commit from build number via AzDO API
+                          # Fallback: resolve source commit from build number via AzDO API.
+                          # buildNumber is not unique across pipelines (e.g. "20260514.9" matches dotnet-roslyn,
+                          # dotnet-runtime, microsoft-vstest, ...) so filter the result by the mirror pipeline name.
                           if ($outputText -match 'Found microsoft-vstest build number (\S+)') {
                             $buildNumber = $Matches[1]
                             Write-Host "Resolving source commit from build number $buildNumber"
                             $buildsUrl = "$dncengBase/_apis/build/builds?buildNumber=$buildNumber&api-version=7.1"
                             $buildsResponse = Invoke-RestMethod -Uri $buildsUrl -Headers $dncengHeaders -Method Get
-                            if ($buildsResponse.value -and $buildsResponse.value.Count -gt 0) {
-                              $sourceCommit = $buildsResponse.value[0].sourceVersion
+                            $matchingBuild = $buildsResponse.value | Where-Object { $_.definition.name -eq $mirrorRepoId } | Select-Object -First 1
+                            if ($matchingBuild) {
+                              $sourceCommit = $matchingBuild.sourceVersion
                             }
                           }
                         }
