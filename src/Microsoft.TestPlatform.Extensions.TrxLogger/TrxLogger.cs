@@ -88,7 +88,6 @@ public class TrxLogger : ITestLoggerWithParameters
     /// Gets the directory under which default trx file and test results attachments should be saved.
     /// </summary>
     private string? _testResultsDirPath;
-    private bool _warnOnFileOverwrite;
 
 
     #region ITestLogger
@@ -137,14 +136,6 @@ public class TrxLogger : ITestLoggerWithParameters
 
         var isLogFilePrefixParameterExists = parameters.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out _);
         var isLogFileNameParameterExists = parameters.TryGetValue(TrxLoggerConstants.LogFileNameKey, out _);
-        _warnOnFileOverwrite = parameters.TryGetValue(TrxLoggerConstants.WarnOnFileOverwrite, out string? warnOnOverwriteString)
-            ? bool.TryParse(warnOnOverwriteString, out bool providedValue)
-                ? providedValue
-                // We found the option but could not parse the value.
-                : true
-            // We did not find the option and want to fallback to warning on write, because that was the default before.
-            : true;
-
         if (isLogFilePrefixParameterExists && isLogFileNameParameterExists)
         {
             var trxParameterErrorMsg = TrxLoggerResources.PrefixAndNameProvidedError;
@@ -459,28 +450,16 @@ public class TrxLogger : ITestLoggerWithParameters
     {
         for (short retries = 0; retries != short.MaxValue; retries++)
         {
-            var filePath = AcquireTrxFileNamePath(out var shouldOverwrite);
+            var filePath = AcquireTrxFileNamePath();
 
-            if (shouldOverwrite && File.Exists(filePath))
+            try
             {
-                if (_warnOnFileOverwrite)
-                {
-                    var overwriteWarningMsg = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.TrxLoggerResultsFileOverwriteWarning, filePath);
-                    ConsoleOutput.Instance.Warning(false, overwriteWarningMsg);
-                    EqtTrace.Warning(overwriteWarningMsg);
-                }
+                using var fs = File.Open(filePath, FileMode.CreateNew);
             }
-            else
+            catch (IOException)
             {
-                try
-                {
-                    using var fs = File.Open(filePath, FileMode.CreateNew);
-                }
-                catch (IOException)
-                {
-                    // File already exists, try again!
-                    continue;
-                }
+                // File already exists, try again!
+                continue;
             }
 
             _trxFilePath = filePath;
@@ -488,11 +467,10 @@ public class TrxLogger : ITestLoggerWithParameters
         }
     }
 
-    private string AcquireTrxFileNamePath(out bool shouldOverwrite)
+    private string AcquireTrxFileNamePath()
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
 
-        shouldOverwrite = false;
         string? filePath = null;
 
         if (_parametersDictionary is not null)
