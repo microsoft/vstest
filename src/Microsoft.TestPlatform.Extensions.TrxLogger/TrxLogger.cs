@@ -144,6 +144,11 @@ public class TrxLogger : ITestLoggerWithParameters
             throw new ArgumentException(trxParameterErrorMsg);
         }
 
+        if (parameters.ContainsKey(TrxLoggerConstants.WarnOnFileOverwrite))
+        {
+            EqtTrace.Warning("TrxLogger: The '{0}' parameter is no longer supported and has no effect. File-name collisions between concurrent logger instances are now resolved automatically via iteration.", TrxLoggerConstants.WarnOnFileOverwrite);
+        }
+
         _parametersDictionary = parameters;
         Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]!);
     }
