@@ -511,8 +511,9 @@ public class TrxLogger : ITestLoggerWithParameters
             }
             else if (isLogFileNameParameterExists)
             {
-                filePath = Path.Combine(_testResultsDirPath, logFileNameValue!);
-                shouldOverwrite = true;
+                // Use iteration naming so that when multiple test assemblies in a solution
+                // each try to write to the same LogFileName, they each get a unique file.
+                filePath = TrxFileHelper.GetNextIterationFileName(_testResultsDirPath, logFileNameValue!, false);
             }
         }
 
