@@ -15,6 +15,7 @@
   <PropertyGroup>
     <TestProject>true</TestProject>
     <IsTestProject>true</IsTestProject>
+    <IsPackable Condition="'$(IsPackable)' == ''">false</IsPackable>
   </PropertyGroup>
 
   <ItemGroup>
