@@ -147,7 +147,13 @@ public class InProcessVsTestConsoleWrapperTests
             new Mock<ITestPlatformEventSource>().Object,
             new());
 
-        Assert.AreEqual(3, ProcessHelper.ExternalEnvironmentVariables?.Count);
+        // On Windows, GetWindowsNativeEqualsEnvironmentVariables() may add '='-prefixed
+        // drive-relative current-directory entries (e.g. "=C:=C:\...") from the native
+        // environment block. Exclude those when verifying the expected managed-API count.
+        int nonNativeCount = ProcessHelper.ExternalEnvironmentVariables?.Keys
+            .Cast<string>()
+            .Count(k => !k.StartsWith("=", StringComparison.Ordinal)) ?? 0;
+        Assert.AreEqual(3, nonNativeCount);
         Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName1));
         Assert.AreEqual("1", ProcessHelper.ExternalEnvironmentVariables?[environmentVariableName1]);
         Assert.IsTrue(ProcessHelper.ExternalEnvironmentVariables?.ContainsKey(environmentVariableName2));
