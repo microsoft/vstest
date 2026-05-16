@@ -8,6 +8,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -115,6 +116,18 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
             foreach (DictionaryEntry? entry in _environmentVariableHelper.GetEnvironmentVariables())
             {
                 environmentVariableBaseline[entry?.Key.ToString()!] = entry?.Value?.ToString();
+            }
+
+            // On Windows, Environment.GetEnvironmentVariables() omits entries whose keys start
+            // with '=' (e.g. "=C:=C:\path" — drive-relative current directory entries kept by
+            // the native environment block). Supplement the managed snapshot with those entries
+            // so that testhost receives a complete environment.
+            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                foreach (var (key, value) in GetWindowsNativeEqualsEnvironmentVariables())
+                {
+                    environmentVariableBaseline[key] = value;
+                }
             }
         }
 
@@ -1301,4 +1314,64 @@ internal class InProcessVsTestConsoleWrapper : IVsTestConsoleWrapper
         _testPlatformEventSource.TranslationLayerInitializeStop();
         return true;
     }
+
+    /// <summary>
+    /// On Windows, reads the raw native environment block via P/Invoke to collect entries
+    /// whose keys start with '=' (drive-relative current directory entries). These are silently
+    /// omitted by <see cref="Environment.GetEnvironmentVariables()"/> but are present in the
+    /// native environment block. They must be forwarded to the testhost so that drive-relative
+    /// paths resolve correctly.
+    /// </summary>
+    private static IEnumerable<(string Key, string? Value)> GetWindowsNativeEqualsEnvironmentVariables()
+    {
+        IntPtr block = GetEnvironmentStringsW();
+        if (block == IntPtr.Zero)
+        {
+            yield break;
+        }
+
+        try
+        {
+            int offset = 0;
+            while (true)
+            {
+                string entry = Marshal.PtrToStringUni(IntPtr.Add(block, offset * 2))!;
+                if (entry.Length == 0)
+                {
+                    break;
+                }
+
+                // Only yield entries whose key starts with '=' — these are the ones that the
+                // managed API drops. All other entries are already included via GetEnvironmentVariables().
+                if (entry.StartsWith("=", StringComparison.Ordinal))
+                {
+                    int separatorIndex = entry.IndexOf('=', 1);
+                    if (separatorIndex > 0)
+                    {
+                        string key = entry.Substring(0, separatorIndex);
+                        string value = entry.Substring(separatorIndex + 1);
+                        yield return (key, value);
+                    }
+                    else
+                    {
+                        // Key with no value (just "=key", no second '=').
+                        yield return (entry, null);
+                    }
+                }
+
+                offset += entry.Length + 1;
+            }
+        }
+        finally
+        {
+            FreeEnvironmentStringsW(block);
+        }
+    }
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    private static extern IntPtr GetEnvironmentStringsW();
+
+    [DllImport("kernel32.dll", CharSet = CharSet.Unicode, SetLastError = true)]
+    [return: MarshalAs(UnmanagedType.Bool)]
+    private static extern bool FreeEnvironmentStringsW(IntPtr lpszEnvironmentBlock);
 }
