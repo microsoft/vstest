@@ -13,14 +13,22 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- This target required to enable /collect:"Code Coverage" in "dotnet publish" scenario with "dotnet vstest".
-       E.g: Release pipelines where user/project nuget cache not available on current machine. -->
+       E.g: Release pipelines where user/project nuget cache not available on current machine.
+       Skipped when Microsoft.Testing.Extensions.CodeCoverage is referenced, as that package already
+       provides the correct version of its artifacts and this copy would overwrite them with older files. -->
   <Target Name="CopyTraceDataCollectorArtifacts" AfterTargets="ComputeFilesToPublish">
 
+    <!-- Detect whether Microsoft.Testing.Extensions.CodeCoverage is directly referenced. -->
     <ItemGroup>
+      <_MtpCodeCoverageRef Include="@(PackageReference)" Condition="'%(PackageReference.Identity)' == 'Microsoft.Testing.Extensions.CodeCoverage'" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'@(_MtpCodeCoverageRef)' == ''">
       <TraceDataCollectorArtifacts Include="$(MSBuildThisFileDirectory)\**\*.*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)" />
+    <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)"
+          Condition="'@(_MtpCodeCoverageRef)' == ''" />
 
   </Target>
 
