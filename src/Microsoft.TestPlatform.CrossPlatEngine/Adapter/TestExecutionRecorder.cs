@@ -35,6 +35,13 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// explicit RecordEnd fires for an ID, subsequent RecordResult calls must not send a
     /// spurious extra TestCaseEnd that would consume the parent's pending count slot.
     /// The ID is removed when the last in-progress count reaches zero.
+    /// <para>
+    /// <b>Known limitation:</b> suppression is ID-scoped, not per-invocation. If an adapter
+    /// calls <see cref="RecordEnd"/> for some rows sharing the same <see cref="TestCase.Id"/>
+    /// but relies on the <see cref="RecordResult"/> safety-net for others, those latter rows
+    /// will have their safety-net suppressed. In practice this is not a concern because
+    /// real adapters apply <see cref="RecordEnd"/> uniformly across all rows with the same ID.
+    /// </para>
     /// </summary>
     private readonly HashSet<Guid> _testCaseEndCalledSet;
 
