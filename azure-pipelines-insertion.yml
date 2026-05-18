@@ -25,7 +25,7 @@ variables:
 - name: CherryPick
   value: ''
 - name: AutoComplete
-  value: 'true'
+  value: 'false'
 - name: ComponentBranchName
   value: '${{ parameters.ComponentBranchName }}'
 - name: CreateDraftPR
@@ -137,9 +137,10 @@ extends:
                       "--ci"
                     )
 
-                    if ("$(AutoComplete)" -eq "true") {
-                      $insertArgs += "--set-auto-complete"
-                    }
+                    # AutoComplete disabled — WIF token cannot vote on behalf of others (TF401186)
+                    # if ("$(AutoComplete)" -eq "true") {
+                    #   $insertArgs += "--set-auto-complete"
+                    # }
 
                     if ("$(CreateDraftPR)" -eq "true") {
                       $insertArgs += "--create-draft-pr"
