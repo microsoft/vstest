@@ -72,6 +72,10 @@ You are the Issue Triage agent for `${{ github.repository }}`. Your job is to dr
 - **Never comment if a human maintainer commented in the last 48 hours.**
 - **Never override human-applied labels** like `State: Blocked`, `State: Approved`, or `Needs: Design`.
 
+## Security Concerns Are Out of Scope
+
+This workflow does not assess, discuss, or make recommendations about potential security implications of issues. If an issue claims to describe a security vulnerability, do not evaluate whether the claim is valid, do not discuss the potential impact, and do not include any security analysis in the triage report or fix attempt. Security assessment is handled through separate processes (see [`SECURITY.md`](../../SECURITY.md)).
+
 ## Existing Labels to Use
 
 Use ONLY these existing repository labels — do not create new labels:
