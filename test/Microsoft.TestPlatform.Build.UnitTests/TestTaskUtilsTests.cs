@@ -30,9 +30,7 @@ public class TestTaskUtilsTests
         const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
         const string arg2 = "MSTest.DeploymentEnabled";
 
-        _vsTestTask.VSTestCLIRunSettings = new string[2];
-        _vsTestTask.VSTestCLIRunSettings[0] = arg1;
-        _vsTestTask.VSTestCLIRunSettings[1] = arg2;
+        _vsTestTask.VSTestCLIRunSettings = $"{arg1}\n{arg2}";
 
         var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
 
@@ -52,15 +50,27 @@ public class TestTaskUtilsTests
         const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
         const string arg2 = "MSTest.DeploymentEnabled";
 
-        _vsTestTask.VSTestCLIRunSettings = new string[2];
-        _vsTestTask.VSTestCLIRunSettings[0] = arg1;
-        _vsTestTask.VSTestCLIRunSettings[1] = arg2;
+        _vsTestTask.VSTestCLIRunSettings = $"{arg1}\n{arg2}";
 
         var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
 
         Assert.Contains(" -- ", commandline);
         Assert.Contains($"\"{arg1}\"", commandline);
         Assert.Contains($"{arg2}", commandline);
+    }
+
+    [TestMethod]
+    public void CreateArgumentShouldPreserveBackslashesInCLIRunSettings()
+    {
+        // Backslashes in CLI run settings (e.g. regex patterns on Unix) must not be converted to forward slashes.
+        const string arg = @"NUnit.Where=namespace =~ /Abc\.Space1($|\.)/";
+
+        _vsTestTask.VSTestCLIRunSettings = arg;
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        Assert.Contains(" -- ", commandline);
+        Assert.Contains(@"Abc\.Space1", commandline);
     }
 
     [TestMethod]
