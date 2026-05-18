@@ -25,7 +25,7 @@ variables:
 - name: CherryPick
   value: ''
 - name: AutoComplete
-  value: 'true'
+  value: 'false'
 - name: ComponentBranchName
   value: '${{ parameters.ComponentBranchName }}'
 - name: CreateDraftPR
@@ -137,9 +137,10 @@ extends:
                       "--ci"
                     )
 
-                    if ("$(AutoComplete)" -eq "true") {
-                      $insertArgs += "--set-auto-complete"
-                    }
+                    # AutoComplete disabled — WIF token cannot vote on behalf of others (TF401186)
+                    # if ("$(AutoComplete)" -eq "true") {
+                    #   $insertArgs += "--set-auto-complete"
+                    # }
 
                     if ("$(CreateDraftPR)" -eq "true") {
                       $insertArgs += "--create-draft-pr"
@@ -254,7 +255,15 @@ extends:
                         Write-Host "Fetching app.config from mirror repo at commit $sourceCommit"
                         $encodedPath = [Uri]::EscapeDataString("/src/vstest.console/app.config")
                         $itemUrl = "$dncengBase/_apis/git/repositories/$mirrorRepoId/items?path=$encodedPath&versionDescriptor.version=$sourceCommit&versionDescriptor.versionType=commit&api-version=7.1"
-                        $appConfigContent = Invoke-RestMethod -Uri $itemUrl -Headers $dncengHeaders -Method Get
+                        # Use Invoke-WebRequest and decode to string explicitly.
+                        # Invoke-RestMethod auto-parses XML into XmlDocument (depth overflow),
+                        # and Invoke-WebRequest.Content returns byte[] when charset is missing.
+                        $appConfigResponse = Invoke-WebRequest -Uri $itemUrl -Headers $dncengHeaders -Method Get -UseBasicParsing
+                        $appConfigContent = if ($appConfigResponse.Content -is [byte[]]) {
+                          [System.Text.Encoding]::UTF8.GetString($appConfigResponse.Content)
+                        } else {
+                          $appConfigResponse.Content
+                        }
 
                         # Read revision.txt from the VS target branch and bump the revision number.
                         # revision.txt has two lines: an integer revision number and a GUID.
@@ -265,7 +274,12 @@ extends:
                         $targetBranchName = ($targetBranch -replace '^refs/heads/', '')
                         $encodedRevPath = [Uri]::EscapeDataString($revisionFilePath)
                         $revisionUrl = "$devdivOrg/$project/_apis/git/repositories/$vsRepoId/items?path=$encodedRevPath&versionDescriptor.version=$targetBranchName&versionDescriptor.versionType=branch&api-version=7.1"
-                        $revisionContent = Invoke-RestMethod -Uri $revisionUrl -Headers $headers -Method Get
+                        $revResponse = Invoke-WebRequest -Uri $revisionUrl -Headers $headers -Method Get -UseBasicParsing
+                        $revisionContent = if ($revResponse.Content -is [byte[]]) {
+                          [System.Text.Encoding]::UTF8.GetString($revResponse.Content)
+                        } else {
+                          $revResponse.Content
+                        }
                         $revisionLines = $revisionContent -split "`n"
                         $currentRevision = [int]($revisionLines[0].Trim())
                         $newRevision = $currentRevision + 1
@@ -311,7 +325,12 @@ extends:
                           )
                         } | ConvertTo-Json -Depth 10
 
-                        $pushResponse = Invoke-RestMethod -Uri $pushUrl -Headers $headers -Method Post -Body $pushBody
+                        # Debug: show content types to diagnose serialization issues
+                        Write-Host "appConfigContent type: $($appConfigContent.GetType().FullName), length: $($appConfigContent.Length)"
+                        Write-Host "newRevisionContent type: $($newRevisionContent.GetType().FullName), length: $($newRevisionContent.Length)"
+                        Write-Host "pushBody length: $($pushBody.Length)"
+
+                        $pushResponse = Invoke-RestMethod -Uri $pushUrl -Headers $headers -Method Post -Body ([System.Text.Encoding]::UTF8.GetBytes($pushBody)) -ContentType 'application/json; charset=utf-8'
                         Write-Host "Pushed App.config and revision.txt to insertion branch. Commit: $($pushResponse.commits[0].commitId)"
                       }
                       catch {
