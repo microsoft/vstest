@@ -497,4 +497,23 @@ public class ExecutionTests : AcceptanceTestBase
 
         StdErr.Should().Be("No test source files were specified. ", "because all platform files we provided were filtered out");
     }
+
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [NetFullTargetFrameworkDataSource]
+    public void Net462TestProjectUsingSystemThreadingTasksExtensionsShouldNotCrash(RunnerInfo runnerInfo)
+    {
+        // Regression test for https://github.com/microsoft/vstest/issues/15713
+        // A net462 test project that transitively loads System.Threading.Tasks.Extensions
+        // would crash with FileLoadException if the DLL is not shipped in TestHostNetFramework
+        // and binding redirects are missing.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPath = GetTestDllForFramework("ThreadingTasksExtensionsTestProject.dll", Net462TargetFramework);
+        var arguments = PrepareArguments(assemblyPath, null, string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+
+        InvokeVsTest(arguments);
+
+        ValidateSummaryStatus(1, 0, 0);
+    }
 }
