@@ -236,5 +236,30 @@ public class TestExecutionRecorderTests
         Assert.Contains(_testResult, _testableTestRunCache.TestResultList);
     }
 
+    [TestMethod]
+    public void RecordResultShouldNotSendSpuriousTestCaseEndForParentInNestedDataDrivenScenario()
+    {
+        // Regression test for the nested data-driven scenario where the parent test and its row
+        // executions share the same TestCase.Id (same fully-qualified name).
+        //
+        // Pattern: Start(parent) → Start(row1) → End(row1) → Result(row1) → End(parent)
+        //
+        // Before the fix, RecordResult's safety-net would fire after End(row1) decremented
+        // the count to 1, consuming the count slot that belonged to the parent and causing
+        // the subsequent End(parent) to be silently dropped.
+        _testResult.Outcome = TestOutcome.Passed;
+
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);                       // parent start → count=1
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);                       // row1 start  → count=2
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);     // row1 end    → count=1, sends End
+        _testRecorderWithTestEventsHandler.RecordResult(_testResult);                    // row1 result → safety-net must NOT fire
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);     // parent end  → count=0, sends End
+
+        // Exactly two Ends: one for row1 (from RecordEnd) and one for the parent (from RecordEnd).
+        // A third End from the RecordResult safety-net would indicate the regression is present.
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(2));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestResult(_testResult), Times.Once);
+    }
+
     #endregion
 }

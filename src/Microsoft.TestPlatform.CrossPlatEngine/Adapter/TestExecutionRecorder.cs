@@ -28,6 +28,16 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// </summary>
     private readonly Dictionary<Guid, int> _testCaseInProgressMap;
 
+    /// <summary>
+    /// Tracks test case IDs for which <see cref="RecordEnd"/> has been called at least once
+    /// while the entry is still in progress (count &gt; 0). Used to suppress the
+    /// <see cref="RecordResult"/> safety-net in nested data-driven scenarios: once an
+    /// explicit RecordEnd fires for an ID, subsequent RecordResult calls must not send a
+    /// spurious extra TestCaseEnd that would consume the parent's pending count slot.
+    /// The ID is removed when the last in-progress count reaches zero.
+    /// </summary>
+    private readonly HashSet<Guid> _testCaseEndCalledSet;
+
     private readonly object _testCaseInProgressSyncObject = new();
 
     /// <summary>
@@ -48,6 +58,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         // If that is not that case.
         // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
         _testCaseInProgressMap = new Dictionary<Guid, int>();
+        _testCaseEndCalledSet = new HashSet<Guid>();
     }
 
     /// <summary>
@@ -96,8 +107,29 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         EqtTrace.Verbose("TestExecutionRecorder.RecordResult: Received result for test: {0}.", testResult.TestCase.FullyQualifiedName);
         if (_testCaseEventsHandler != null)
         {
-            // Send TestCaseEnd in case RecordEnd was not called.
-            SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
+            lock (_testCaseInProgressSyncObject)
+            {
+                // Safety net: send TestCaseEnd in case RecordEnd was not called.
+                // Guard: skip if RecordEnd was already called for this ID (indicated by presence in
+                // _testCaseEndCalledSet) to avoid consuming a count slot belonging to a parent or
+                // sibling in a nested data-driven scenario where all rows share the same TestCase.Id.
+                if (_testCaseInProgressMap.TryGetValue(testResult.TestCase.Id, out int count)
+                    && count > 0
+                    && !_testCaseEndCalledSet.Contains(testResult.TestCase.Id))
+                {
+                    _testCaseEventsHandler.SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
+
+                    if (count == 1)
+                    {
+                        _testCaseInProgressMap.Remove(testResult.TestCase.Id);
+                    }
+                    else
+                    {
+                        _testCaseInProgressMap[testResult.TestCase.Id] = count - 1;
+                    }
+                }
+            }
+
             _testCaseEventsHandler.SendTestResult(testResult);
         }
 
@@ -115,16 +147,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     {
         EqtTrace.Verbose("TestExecutionRecorder.RecordEnd: test: {0} execution completed.", testCase.FullyQualifiedName);
         _testRunCache.OnTestCompletion(testCase);
-        SendTestCaseEnd(testCase, outcome);
-    }
 
-    /// <summary>
-    /// Send TestCaseEnd event for given testCase if not sent already
-    /// </summary>
-    /// <param name="testCase"></param>
-    /// <param name="outcome"></param>
-    private void SendTestCaseEnd(TestCase testCase, TestOutcome outcome)
-    {
         if (_testCaseEventsHandler != null)
         {
             lock (_testCaseInProgressSyncObject)
@@ -133,13 +156,18 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
                 // Use the reference count to ensure we send exactly one End for each Start.
                 if (_testCaseInProgressMap.TryGetValue(testCase.Id, out int count) && count > 0)
                 {
-                    // Send test case end event to handler.
+                    // Mark that RecordEnd was called for this ID while it is still in progress.
+                    // This suppresses the RecordResult safety-net for any subsequent Result calls
+                    // that share the same ID (e.g., row results in a nested data-driven test).
+                    _testCaseEndCalledSet.Add(testCase.Id);
+
                     _testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
 
-                    // Decrement the count; remove the entry when there are no more in-progress starts.
+                    // Decrement the count; remove both tracking entries when there are no more in-progress starts.
                     if (count == 1)
                     {
                         _testCaseInProgressMap.Remove(testCase.Id);
+                        _testCaseEndCalledSet.Remove(testCase.Id);
                     }
                     else
                     {
