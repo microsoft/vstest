@@ -241,4 +241,42 @@ public class DataCollectionTests : AcceptanceTestBase
         CreateDataCollectionRunSettingsFile(runsettingsPath, dataCollectionAttributes);
         return runsettingsPath;
     }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void DataCollectorReceivesTestCaseStartForEveryDataDrivenRow(RunnerInfo runnerInfo)
+    {
+        // Regression test for https://github.com/microsoft/vstest/issues/4997
+        // When data-driven tests share the same TestCase.Id, TestCaseStart events
+        // must still fire for every row execution so data collectors can track each one.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPaths = GetAssetFullPath("DataDrivenTestProject.dll");
+        string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
+        string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
+        var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
+        var arguments = PrepareArguments(assemblyPaths, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
+
+        var env = new Dictionary<string, string?>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+        };
+
+        InvokeVsTest(arguments, env);
+
+        // DataDrivenTestProject has 4 test executions: 3 DataRow rows + 1 simple test.
+        ValidateSummaryStatus(4, 0, 0);
+
+        // The SampleDataCollector creates one testcasefilename{i}.txt per TestCaseStart event.
+        // Before the fix, DataRow rows sharing the same TestCase.Id would get deduplicated,
+        // producing fewer files than actual test executions.
+        var resultFiles = Directory.GetFiles(TempDirectory.Path, "testcasefilename*", SearchOption.AllDirectories);
+        Assert.HasCount(4, resultFiles);
+
+        // Verify the collector logged start/end for each execution.
+        StdOutputContains("TestCaseStarted");
+        StdOutputContains("TestCaseEnded");
+    }
 }
