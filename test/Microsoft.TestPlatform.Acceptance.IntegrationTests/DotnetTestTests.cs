@@ -128,6 +128,13 @@ public class DotnetTestTests : AcceptanceTestBase
         // Regression test for https://github.com/microsoft/vstest/issues/15043
         // VSTestCLIRunSettings was string[] which MSBuild treated as ITaskItem[],
         // causing backslash normalization on Unix. The fix changes it to string.
+        //
+        // NOTE: This integration test is restricted to Windows because patched dotnet is not
+        // published on non-Windows systems. The bug itself only manifests on Unix (ITaskItem
+        // normalizes backslashes only there). The unit test
+        // CreateArgumentShouldPreserveBackslashesInCLIRunSettings in TestTaskUtilsTests serves
+        // as the primary regression guard for Unix: it verifies that CreateCommandLineArguments
+        // passes backslashes through unchanged, covering the fixed code path directly.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("BackslashParameterTestProject.csproj", runnerInfo.TargetFramework);
