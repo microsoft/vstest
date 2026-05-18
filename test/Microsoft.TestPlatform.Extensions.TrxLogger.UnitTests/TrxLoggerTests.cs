@@ -704,11 +704,11 @@ public class TrxLoggerTests
     }
 
     [TestMethod]
-    public void TrxFileNameShouldNotIterate()
+    public void TrxFileNameShouldIterateWhenMultipleLoggerInstances()
     {
         var files = TestMultipleTrxLoggers();
 
-        Assert.HasCount(1, files, "All logger instances should get the same file name!");
+        Assert.HasCount(MultipleLoggerInstanceCount, files, "All logger instances should get different file names to avoid overwriting each other!");
     }
 
     [TestMethod]

@@ -254,4 +254,31 @@ public class LoggerTests : AcceptanceTestBase
 
         return null;
     }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void TrxLoggerShouldNotOverwriteWhenMultipleAssembliesUseSameLogFileName(RunnerInfo runnerInfo)
+    {
+        // Regression test for https://github.com/microsoft/vstest/issues/15673
+        // When multiple test assemblies in a solution use the same LogFileName,
+        // each should get a unique file (via iteration) instead of overwriting.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assembly1 = GetAssetFullPath("SimpleTestProject.dll");
+        var assembly2 = GetAssetFullPath("SimpleTestProject2.dll");
+        var assemblyPaths = $"{assembly1}\" \"{assembly2}";
+        var trxFileName = "SharedName.trx";
+        var arguments = PrepareArguments(assemblyPaths, null, string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
+
+        InvokeVsTest(arguments);
+
+        // Both assemblies should produce TRX files. With the fix, the second gets an
+        // iterated name (e.g. SharedName[1].trx) instead of overwriting the first.
+        var trxFiles = Directory.GetFiles(TempDirectory.Path, "*.trx", SearchOption.AllDirectories);
+        Assert.IsGreaterThanOrEqualTo(trxFiles.Length, 2,
+            $"Expected at least 2 TRX files (one per assembly) but found {trxFiles.Length}: " +
+            string.Join(", ", trxFiles.Select(Path.GetFileName)));
+    }
 }
