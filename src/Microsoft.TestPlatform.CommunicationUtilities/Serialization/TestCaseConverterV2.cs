@@ -49,7 +49,7 @@ internal class TestCaseConverterV2 : JsonConverter<TestCase>
                 if (!prop.TryGetProperty("Key", out var keyElement))
                     continue;
 
-                var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement, options);
+                var testProperty = StjSafe.Deserialize<TestProperty>(keyElement, options);
                 if (testProperty is null)
                     continue;
 
@@ -91,7 +91,7 @@ internal class TestCaseConverterV2 : JsonConverter<TestCase>
         {
             writer.WriteStartObject();
             writer.WritePropertyName("Key");
-            JsonSerializer.Serialize(writer, property.Key, options);
+            StjSafe.Serialize(writer, property.Key, options);
             writer.WritePropertyName("Value");
             if (property.Value is null)
             {

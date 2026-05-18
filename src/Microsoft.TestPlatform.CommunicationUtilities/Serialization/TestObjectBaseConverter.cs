@@ -68,7 +68,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
             if (!prop.TryGetProperty("Key", out var keyElement))
                 continue;
 
-            var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement.GetRawText(), options);
+            var testProperty = StjSafe.Deserialize<TestProperty>(keyElement.GetRawText(), options);
             if (testProperty is null)
                 continue;
 
@@ -104,7 +104,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
         {
             writer.WriteStartObject();
             writer.WritePropertyName("Key");
-            JsonSerializer.Serialize(writer, property.Key, options);
+            StjSafe.Serialize(writer, property.Key, options);
             writer.WritePropertyName("Value");
             if (property.Value is null)
             {
@@ -145,7 +145,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
                 // For complex types (Traits, collections, etc.), serialize to JsonElement
                 // first using the runtime type, then write the element. This avoids the
                 // object? polymorphism problem while still producing valid JSON.
-                var element = JsonSerializer.SerializeToElement(value, value.GetType(), options);
+                var element = StjSafe.SerializeToElement(value, value.GetType(), options);
                 element.WriteTo(writer);
                 break;
         }

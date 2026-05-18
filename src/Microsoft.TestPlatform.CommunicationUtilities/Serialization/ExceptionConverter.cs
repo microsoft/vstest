@@ -35,7 +35,7 @@ internal class ExceptionConverter : JsonConverter<Exception>
         Exception? innerException = null;
         if (root.TryGetProperty("InnerException", out var innerProp) && innerProp.ValueKind != JsonValueKind.Null)
         {
-            innerException = JsonSerializer.Deserialize<Exception>(innerProp.GetRawText(), options);
+            innerException = StjSafe.Deserialize<Exception>(innerProp.GetRawText(), options);
         }
 
         var exception = message is not null
@@ -62,7 +62,7 @@ internal class ExceptionConverter : JsonConverter<Exception>
         }
         else
         {
-            JsonSerializer.Serialize(writer, value.InnerException, options);
+            StjSafe.Serialize(writer, value.InnerException, options);
         }
 
         writer.WriteEndObject();

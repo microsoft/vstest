@@ -41,7 +41,7 @@ internal class TestObjectConverter : JsonConverter<List<KeyValuePair<TestPropert
             if (!element.TryGetProperty("Key", out var keyElement))
                 continue;
 
-            var testProperty = JsonSerializer.Deserialize<TestProperty>(keyElement, options);
+            var testProperty = StjSafe.Deserialize<TestProperty>(keyElement, options);
             if (testProperty is null)
                 continue;
 
@@ -75,7 +75,7 @@ internal class TestObjectConverter : JsonConverter<List<KeyValuePair<TestPropert
         {
             writer.WriteStartObject();
             writer.WritePropertyName("Key");
-            JsonSerializer.Serialize(writer, kvp.Key, options);
+            StjSafe.Serialize(writer, kvp.Key, options);
             writer.WritePropertyName("Value");
             if (kvp.Value is null)
             {

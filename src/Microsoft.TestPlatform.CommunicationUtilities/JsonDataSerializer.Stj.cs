@@ -4,6 +4,7 @@
 #if NETCOREAPP
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
@@ -64,6 +65,7 @@ public partial class JsonDataSerializer
         FastOptions = new JsonSerializerOptions(PayloadOptionsV2);
     }
 
+    [UnconditionalSuppressMessage("AOT", "IL3050", Justification = "DefaultJsonTypeInfoResolver is only used as a fallback for non-AoT builds.")]
     private static JsonSerializerOptions CreateBaseOptions() => new()
     {
         PropertyNameCaseInsensitive = true,
@@ -112,7 +114,7 @@ public partial class JsonDataSerializer
             using var doc = JsonDocument.Parse(message.RawMessage!);
             if (doc.RootElement.TryGetProperty("Payload", out var payloadElement))
             {
-                result = JsonSerializer.Deserialize<T>(payloadElement, payloadOptions);
+                result = StjSafe.Deserialize<T>(payloadElement, payloadOptions);
             }
             else
             {
@@ -195,7 +197,7 @@ public partial class JsonDataSerializer
             if (payload is null)
                 return string.Empty;
 
-            var serializedPayload = JsonSerializer.SerializeToElement(payload, payload.GetType(), payloadOptions);
+            var serializedPayload = StjSafe.SerializeToElement(payload, payload.GetType(), payloadOptions);
 
             return version > 1 ?
                 Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload }) :
@@ -210,7 +212,7 @@ public partial class JsonDataSerializer
             if (payload is null)
                 return string.Empty;
 
-            var serializedPayload = JsonSerializer.SerializeToElement(payload, payload.GetType(), payloadOptions);
+            var serializedPayload = StjSafe.SerializeToElement(payload, payload.GetType(), payloadOptions);
 
             return Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload });
         }
@@ -224,7 +226,7 @@ public partial class JsonDataSerializer
 
     private static T? DeserializeObjectFast<T>(string value)
     {
-        return JsonSerializer.Deserialize<T>(value, FastOptions);
+        return StjSafe.Deserialize<T>(value, FastOptions);
     }
 
     /// <summary>
@@ -236,7 +238,7 @@ public partial class JsonDataSerializer
     /// <returns>Serialized data.</returns>
     private static string Serialize<T>(JsonSerializerOptions options, T data)
     {
-        return JsonSerializer.Serialize(data, options);
+        return StjSafe.Serialize(data, options);
     }
 
     /// <summary>
@@ -248,7 +250,7 @@ public partial class JsonDataSerializer
     /// <returns>Deserialized data.</returns>
     private static T? Deserialize<T>(JsonSerializerOptions options, string data)
     {
-        return JsonSerializer.Deserialize<T>(data, options);
+        return StjSafe.Deserialize<T>(data, options);
     }
 
     private static JsonSerializerOptions GetPayloadOptions(int? version)
