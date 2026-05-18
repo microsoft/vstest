@@ -146,7 +146,7 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
             {
                 // Avoid JsonSerializer.Serialize(writer, value, value.GetType(), options) which
                 // requires reflection metadata that NativeAOT trims.
-                TestObjectBaseConverter.WritePropertyValue(writer, property.Value);
+                TestObjectBaseConverter.WritePropertyValue(writer, property.Value, options);
             }
             writer.WriteEndObject();
         }

@@ -65,7 +65,7 @@ internal class ObjectConverter : JsonConverter<object>
     {
         // Avoid JsonSerializer.Serialize(writer, value, value.GetType(), options) which requires
         // reflection metadata that NativeAOT trims. Write known primitives directly.
-        TestObjectBaseConverter.WritePropertyValue(writer, value);
+        TestObjectBaseConverter.WritePropertyValue(writer, value, options);
     }
 }
 
@@ -130,7 +130,7 @@ internal class ObjectDictionaryConverter : JsonConverter<IDictionary<string, obj
             {
                 // Avoid JsonSerializer.Serialize(writer, value, value.GetType(), options) which
                 // requires reflection metadata that NativeAOT trims.
-                TestObjectBaseConverter.WritePropertyValue(writer, kvp.Value);
+                TestObjectBaseConverter.WritePropertyValue(writer, kvp.Value, options);
             }
         }
 

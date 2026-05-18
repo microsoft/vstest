@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
@@ -41,6 +42,7 @@ public partial class JsonDataSerializer
         DefaultOptions.Converters.Add(new TestProcessAttachDebuggerPayloadConverter());
         DefaultOptions.Converters.Add(new TestSessionInfoConverter());
         DefaultOptions.Converters.Add(new DiscoveryCriteriaConverter());
+        DefaultOptions.Converters.Add(new ExceptionConverter());
 
         // V2 options: clone DefaultOptions and add V2-specific converters
         PayloadOptionsV2 = new JsonSerializerOptions(DefaultOptions);
@@ -74,10 +76,11 @@ public partial class JsonDataSerializer
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
-        // Use the source-generated context so STJ has type metadata available
-        // without runtime reflection. This is required for NativeAOT consumers
-        // where reflection-based serialization is disabled by default.
-        TypeInfoResolver = TestPlatformJsonContext.Default,
+        // Chain the source-generated context (for NativeAOT where reflection is
+        // disabled) with the default reflection-based resolver (for types not
+        // covered by the source-gen context in non-AoT builds). Under NativeAOT,
+        // DefaultJsonTypeInfoResolver is a no-op for trimmed types.
+        TypeInfoResolver = JsonTypeInfoResolver.Combine(TestPlatformJsonContext.Default, new DefaultJsonTypeInfoResolver()),
     };
 
     private static partial (int version, string? messageType) ParseHeaderFromJson(string rawMessage)

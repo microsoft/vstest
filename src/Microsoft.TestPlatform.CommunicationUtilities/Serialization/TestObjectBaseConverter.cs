@@ -112,7 +112,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
             }
             else
             {
-                WritePropertyValue(writer, property.Value);
+                WritePropertyValue(writer, property.Value, options);
             }
             writer.WriteEndObject();
         }
@@ -126,7 +126,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
     /// JsonSerializer.Serialize(writer, value, value.GetType()) which requires
     /// reflection metadata that NativeAOT trims.
     /// </summary>
-    internal static void WritePropertyValue(Utf8JsonWriter writer, object value)
+    internal static void WritePropertyValue(Utf8JsonWriter writer, object value, JsonSerializerOptions options)
     {
         switch (value)
         {
@@ -145,7 +145,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
                 // For complex types (Traits, collections, etc.), serialize to JsonElement
                 // first using the runtime type, then write the element. This avoids the
                 // object? polymorphism problem while still producing valid JSON.
-                var element = JsonSerializer.SerializeToElement(value, value.GetType());
+                var element = JsonSerializer.SerializeToElement(value, value.GetType(), options);
                 element.WriteTo(writer);
                 break;
         }
