@@ -57,6 +57,7 @@
   <Project Path="NUTestProject/NUTestProject.csproj" />
   <Project Path="OutOfProcDataCollector/OutOfProcDataCollector.csproj" />
   <Project Path="OutputtingTestProject/OutputtingTestProject.csproj" />
+  <Project Path="BackslashParameterTestProject/BackslashParameterTestProject.csproj" />
   <Project Path="ParametrizedTestProject/ParametrizedTestProject.csproj" />
   <Project Path="problematic-child/problematic-child.csproj" />
   <Project Path="ProjectFileRunSettingsTestProject/ProjectFileRunSettingsTestProject.csproj" />
