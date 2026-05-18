@@ -254,7 +254,10 @@ extends:
                         Write-Host "Fetching app.config from mirror repo at commit $sourceCommit"
                         $encodedPath = [Uri]::EscapeDataString("/src/vstest.console/app.config")
                         $itemUrl = "$dncengBase/_apis/git/repositories/$mirrorRepoId/items?path=$encodedPath&versionDescriptor.version=$sourceCommit&versionDescriptor.versionType=commit&api-version=7.1"
-                        $appConfigContent = Invoke-RestMethod -Uri $itemUrl -Headers $dncengHeaders -Method Get
+                        # Use Invoke-WebRequest to get raw string content. Invoke-RestMethod
+                        # auto-parses XML into XmlDocument which overflows ConvertTo-Json depth.
+                        $appConfigResponse = Invoke-WebRequest -Uri $itemUrl -Headers $dncengHeaders -Method Get -UseBasicParsing
+                        $appConfigContent = $appConfigResponse.Content
 
                         # Read revision.txt from the VS target branch and bump the revision number.
                         # revision.txt has two lines: an integer revision number and a GUID.
