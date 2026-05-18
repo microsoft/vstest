@@ -48,12 +48,12 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
 
     public override TestObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        // TestObject is abstract, but the only concrete non-TestCase/TestResult subclass
-        // that flows through the wire is TestObject itself (used as a generic bag).
-        // If the runtime type is unknown, we cannot instantiate it without reflection.
-        // Fall back to reading the property bag into a TestCase as a carrier, which
-        // preserves the property key-value pairs for the consumer.
-        var testObject = new TestCase();
+        // Create an instance of the requested type if possible. TestCase is the
+        // fallback for abstract types or types without a parameterless constructor
+        // because it is a concrete TestObject that preserves the property bag.
+        var testObject = typeToConvert != typeof(TestObject) && !typeToConvert.IsAbstract
+            ? (TestObject)(Activator.CreateInstance(typeToConvert) ?? new TestCase())
+            : new TestCase();
 
         using var doc = JsonDocument.ParseValue(ref reader);
         var data = doc.RootElement;
