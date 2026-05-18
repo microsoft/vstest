@@ -2,13 +2,9 @@
 description: >
   Triages new issues for completeness and reproducibility.
   Validates structured repro steps when present.
-  Attempts to fix reproducible bugs by creating draft PRs.
+  Attempts to fix reproducible bugs by creating PRs.
 
 on:
-  issues:
-    types: [opened]
-  issue_comment:
-    types: [created]
   schedule: every 12h
   workflow_dispatch:
 
@@ -41,7 +37,7 @@ safe-outputs:
   remove-labels:
     max: 15
   create-pull-request:
-    draft: true
+    draft: false
     title-prefix: "[fix] "
     max: 3
     allowed-base-branches: ["main", "rel/*"]
@@ -86,18 +82,6 @@ Use ONLY these existing repository labels — do not create new labels:
 - `Needs: Triage :mag:` — default label from issue template, remove once triaged
 
 ## Triggers
-
-### On `issues.opened`
-
-Evaluate the new issue immediately.
-
-### On `issue_comment` (maintainer comments on an issue)
-
-A maintainer commented on an issue — they likely added context, repro steps, or clarification. Treat this as a signal to act on the issue:
-
-1. Read the full issue and all comments.
-2. If the maintainer's comment explicitly says to hold off (e.g., "don't triage this yet", "leave this alone", "not now", "skip this") → `noop`.
-3. Otherwise, treat the issue as if it was just opened — evaluate completeness, attempt repro if possible, attempt fix if reproducible. The maintainer's comment likely provides additional context that makes the issue more actionable.
 
 ### On `schedule` (every 12 hours)
 
