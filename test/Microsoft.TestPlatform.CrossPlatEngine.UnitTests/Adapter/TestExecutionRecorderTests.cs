@@ -156,15 +156,32 @@ public class TestExecutionRecorderTests
     }
 
     [TestMethod]
-    public void RecordStartAndRecordEndShouldIgnoreRedundantTestCaseStartAndTestCaseEnd()
+    public void RecordStartAndRecordEndShouldForwardAllTestCaseStartAndEndEvents()
     {
         _testRecorderWithTestEventsHandler.RecordStart(_testCase);
         _testRecorderWithTestEventsHandler.RecordStart(_testCase);
         _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);
         _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);
 
-        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Exactly(1));
-        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(1));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Exactly(2));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(2));
+    }
+
+    [TestMethod]
+    public void RecordStartAndRecordEndShouldSendEventsForNestedDataDrivenTestsWithSameId()
+    {
+        // Simulate a data-driven scenario where the parent test and its row executions
+        // share the same TestCase.Id (same fully-qualified name), with nested Start calls:
+        // Start(parent) → Start(row1) → End(row1) → Start(row2) → End(row2) → End(parent)
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);   // parent start
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);   // row1 start (same ID)
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);   // row1 end
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);   // row2 start (same ID)
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);   // row2 end
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);   // parent end
+
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Exactly(3));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(3));
     }
 
     [TestMethod]

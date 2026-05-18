@@ -23,10 +23,10 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     private readonly ITestCaseEventsHandler? _testCaseEventsHandler;
 
     /// <summary>
-    /// Contains TestCase Ids for test cases that are in progress
-    /// Start has been recorded but End has not yet been recorded.
+    /// Tracks the number of in-progress starts per test case ID.
+    /// Multiple data-driven test executions sharing the same ID are each counted.
     /// </summary>
-    private readonly HashSet<Guid> _testCaseInProgressMap;
+    private readonly Dictionary<Guid, int> _testCaseInProgressMap;
 
     private readonly object _testCaseInProgressSyncObject = new();
 
@@ -47,7 +47,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         // 3. Test Case Result.
         // If that is not that case.
         // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
-        _testCaseInProgressMap = new HashSet<Guid>();
+        _testCaseInProgressMap = new Dictionary<Guid, int>();
     }
 
     /// <summary>
@@ -75,12 +75,12 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
-                // Do not send TestCaseStart for a test in progress
-                if (!_testCaseInProgressMap.Contains(testCase.Id))
-                {
-                    _testCaseInProgressMap.Add(testCase.Id);
-                    _testCaseEventsHandler.SendTestCaseStart(testCase);
-                }
+                // Track the number of in-progress starts for this test case ID.
+                // Data-driven tests may call RecordStart multiple times with the same ID
+                // (when rows share the same fully-qualified name), so we must forward
+                // every start rather than deduplicating by ID.
+                _testCaseInProgressMap[testCase.Id] = _testCaseInProgressMap.TryGetValue(testCase.Id, out int count) ? count + 1 : 1;
+                _testCaseEventsHandler.SendTestCaseStart(testCase);
             }
         }
     }
@@ -129,14 +129,22 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
-                // TestCaseEnd must always be preceded by TestCaseStart for a given test case id
-                if (_testCaseInProgressMap.Contains(testCase.Id))
+                // TestCaseEnd must always be preceded by TestCaseStart for a given test case id.
+                // Use the reference count to ensure we send exactly one End for each Start.
+                if (_testCaseInProgressMap.TryGetValue(testCase.Id, out int count) && count > 0)
                 {
                     // Send test case end event to handler.
                     _testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
 
-                    // Remove it from map so that we send only one TestCaseEnd for every TestCaseStart.
-                    _testCaseInProgressMap.Remove(testCase.Id);
+                    // Decrement the count; remove the entry when there are no more in-progress starts.
+                    if (count == 1)
+                    {
+                        _testCaseInProgressMap.Remove(testCase.Id);
+                    }
+                    else
+                    {
+                        _testCaseInProgressMap[testCase.Id] = count - 1;
+                    }
                 }
             }
         }
