@@ -105,11 +105,13 @@ internal static class TestTaskUtils
         // add the logger and verbosity, so we know what to use in vstest.console.
         if (!isLoggerSpecifiedByUser)
         {
-            // When a settings file is provided, the user may have configured the logger verbosity
-            // in LoggerRunSettings. Don't inject Verbosity here so that the settings file configuration
-            // takes precedence. When no settings file is used, map the MSBuild verbosity to the
-            // vstest console logger verbosity.
-            if (isRunSettingsEnabled)
+            // For VSTestTask (Console logger): when a settings file is provided, the user may have
+            // configured the logger verbosity in LoggerRunSettings. Don't inject Verbosity here so
+            // that the settings file configuration takes precedence.
+            // For VSTestTask2 (MSBuildLogger): always inject the MSBuild-derived verbosity. The
+            // MSBuildLogger verbosity is driven by MSBuild, not by user settings, so it must always
+            // reflect the MSBuild-derived value regardless of whether a settings file is present.
+            if (isRunSettingsEnabled && task is VSTestTask)
             {
                 builder.AppendSwitchUnquotedIfNotNull("--logger:", loggerToUse);
             }

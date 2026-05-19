@@ -336,4 +336,24 @@ public class TestTaskUtilsTests
         // Without a settings file, verbosity is injected from MSBuild verbosity.
         Assert.Contains("--logger:Console;Verbosity=normal", commandline);
     }
+
+    [TestMethod]
+    public void CreateArgumentShouldInjectVerbosityForVSTestTask2EvenWhenSettingsFileIsProvided()
+    {
+        // VSTestTask2 uses MSBuildLogger whose verbosity is always driven by MSBuild, not by
+        // the user's settings file. Even when a settings file is in use, MSBuildLogger must
+        // receive the MSBuild-derived verbosity so it doesn't silently fall back to a default.
+        ITestTask vsTestTask2 = new VSTestTask2
+        {
+            BuildEngine = new FakeBuildEngine(),
+            TestFileFullPath = new TaskItem(@"C:\path\to\test-assembly.dll"),
+            VSTestFramework = ".NETCoreapp,Version2.0",
+            VSTestVerbosity = "normal",
+            VSTestSetting = @"c:\path\to\sample.runsettings",
+        };
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(vsTestTask2);
+
+        Assert.Contains("--logger:Microsoft.TestPlatform.MSBuildLogger;Verbosity=normal", commandline);
+    }
 }
