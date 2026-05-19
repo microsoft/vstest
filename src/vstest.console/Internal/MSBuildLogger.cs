@@ -246,7 +246,7 @@ internal class MSBuildLogger : ITestLoggerWithParameters
         Output.Information(appendPrefix: false, message);
     }
 
-    private static string FormatMessage(string name, params string?[] data)
+    internal static string FormatMessage(string name, params string?[] data)
     {
         return $"||||{name}||||{string.Join("||||", data.Select(Escape))}";
     }
