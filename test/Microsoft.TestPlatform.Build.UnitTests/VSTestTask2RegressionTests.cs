@@ -175,6 +175,53 @@ public class VSTestTask2RegressionTests
         task.TestLogEventsFromTextOutput("||||output-info||||", MessageImportance.High);
     }
 
+    [TestMethod]
+    public void LogEventsFromTextOutput_TestFailed_TildeCharsInMessage_ShouldNotBeCorrupted()
+    {
+        // Regression test for #15268 — tilde characters in test output were being replaced with underscores
+        var task = CreateVSTestTask2();
+        var engine = (RecordingBuildEngine)task.BuildEngine;
+
+        // 5 tilde chars in the error message — the old encoding replaced ~~~~ (4 tildes) with ____
+        var tildeString = new string('~', 5);
+        task.TestLogEventsFromTextOutput($"||||test-failed||||{tildeString}||||TestFile.cs||||42", MessageImportance.High);
+
+        Assert.HasCount(1, engine.Errors);
+        Assert.Contains(tildeString, engine.Errors[0].Message ?? string.Empty);
+    }
+
+    [TestMethod]
+    public void LogEventsFromTextOutput_TestFailed_ExclamationCharsInMessage_ShouldNotBeCorrupted()
+    {
+        // Regression test for #15268 — exclamation characters in test output were being replaced with underscores
+        var task = CreateVSTestTask2();
+        var engine = (RecordingBuildEngine)task.BuildEngine;
+
+        // 4 exclamation marks in the error message — the old encoding replaced !!!! (4 bangs) with ____
+        var bangString = new string('!', 4);
+        task.TestLogEventsFromTextOutput($"||||test-failed||||{bangString}||||TestFile.cs||||42", MessageImportance.High);
+
+        Assert.HasCount(1, engine.Errors);
+        Assert.Contains(bangString, engine.Errors[0].Message ?? string.Empty);
+    }
+
+    [TestMethod]
+    public void LogEventsFromTextOutput_TestFailed_NewlinesEncodedWithControlChars_ShouldBeRestored()
+    {
+        // Regression test for #15268 — newlines must survive the encode/decode round-trip
+        // MSBuildLogger now encodes \r as \x02 and \n as \x03
+        var task = CreateVSTestTask2();
+        var engine = (RecordingBuildEngine)task.BuildEngine;
+
+        // Simulate what MSBuildLogger.Escape produces: \r → \x02, \n → \x03
+        var messageWithNewlines = "Assert failed\x02\x03  at MyTest()";
+        task.TestLogEventsFromTextOutput($"||||test-failed||||{messageWithNewlines}||||TestFile.cs||||42", MessageImportance.High);
+
+        Assert.HasCount(1, engine.Errors);
+        Assert.Contains("Assert failed\r\n  at MyTest()", engine.Errors[0].Message ?? string.Empty);
+    }
+
+
     private static TestableVSTestTask2 CreateVSTestTask2()
     {
         var engine = new RecordingBuildEngine();

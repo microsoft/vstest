@@ -230,10 +230,10 @@ internal class MSBuildLogger : ITestLoggerWithParameters
 
     /// <summary>
     /// Writes message to standard output, with the name of the message followed by the number of
-    /// parameters. With each parameter delimited by '||||', and newlines replaced with ~~~~ and !!!!.
+    /// parameters. With each parameter delimited by '||||', and newlines replaced with STX (\x02) and ETX (\x03).
     /// Such as:
     ///  ||||run-start1||||s:\t\mstest97\bin\Debug\net8.0\mstest97.dll
-    ///  ||||test-failed6||||TestMethod5||||Assert.IsTrue failed. ||||   at mstest97.UnitTest1.TestMethod5() in s:\t\mstest97\UnitTest1.cs:line 27~~~~!!!!   at Syste...
+    ///  ||||test-failed6||||TestMethod5||||Assert.IsTrue failed. ||||   at mstest97.UnitTest1.TestMethod5() in s:\t\mstest97\UnitTest1.cs:line 27\x02\x03   at Syste...
     /// </summary>
     /// <param name="name"></param>
     /// <param name="data"></param>
@@ -259,10 +259,13 @@ internal class MSBuildLogger : ITestLoggerWithParameters
         }
 
         return input
-            // Cleanup characters that we are using ourselves to delimit the message
-            .Replace("||||", "____").Replace("~~~~", "____").Replace("!!!!", "____")
+            // Cleanup characters that we are using ourselves to delimit the message.
+            .Replace("||||", "____")
             // Replace new line characters that would change how the message is consumed.
-            .Replace("\r", "~~~~").Replace("\n", "!!!!");
+            // Use ASCII control characters STX (\x02) and ETX (\x03) which cannot appear in normal
+            // test output, rather than ~~~~ and !!!! which can appear in test data and get corrupted.
+            .Replace("\r", "\x02")
+            .Replace("\n", "\x03");
     }
 
     /// <summary>
