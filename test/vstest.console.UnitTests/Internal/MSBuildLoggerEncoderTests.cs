@@ -16,6 +16,9 @@ namespace vstest.console.UnitTests.Internal;
 public class MSBuildLoggerEncoderTests
 {
     // Mirrors VSTestTask2.TryGetMessage decode logic to keep the round-trip self-contained.
+    // WARNING: This must stay in sync with the actual decode logic in VSTestTask2.TryGetMessage.
+    // If VSTestTask2's decoder changes (e.g., different control chars), update this helper too,
+    // otherwise these round-trip tests will pass while real round-trips break.
     private static string?[] Decode(string encoded)
     {
         var parts = encoded.Split(new[] { "||||" }, StringSplitOptions.None);

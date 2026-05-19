@@ -209,7 +209,9 @@ public class VSTestTask2RegressionTests
     public void LogEventsFromTextOutput_TestFailed_NewlinesEncodedWithControlChars_ShouldBeRestored()
     {
         // Regression test for #15268 — newlines must survive the encode/decode round-trip
-        // MSBuildLogger now encodes \r as \x02 and \n as \x03
+        // MSBuildLogger now encodes \r as \x02 and \n as \x03.
+        // Full encoder→decoder round-trip tests (using MSBuildLogger.FormatMessage) are in
+        // vstest.console.UnitTests/Internal/MSBuildLoggerEncoderTests.cs.
         var task = CreateVSTestTask2();
         var engine = (RecordingBuildEngine)task.BuildEngine;
 
