@@ -311,4 +311,29 @@ public class TestTaskUtilsTests
 
         Assert.Contains("--nologo", commandline);
     }
+
+    [TestMethod]
+    public void CreateArgumentShouldNotInjectVerbosityWhenSettingsFileIsProvided()
+    {
+        _vsTestTask.VSTestVerbosity = "normal";
+        _vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        // When a settings file is used, verbosity is NOT injected — the settings file may
+        // configure LoggerRunSettings with its own verbosity.
+        Assert.DoesNotMatchRegex(new Regex("(--logger:Console;Verbosity=)"), commandline);
+        Assert.Contains("--logger:Console", commandline);
+    }
+
+    [TestMethod]
+    public void CreateArgumentShouldInjectVerbosityWhenNoSettingsFileIsProvided()
+    {
+        _vsTestTask.VSTestVerbosity = "normal";
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        // Without a settings file, verbosity is injected from MSBuild verbosity.
+        Assert.Contains("--logger:Console;Verbosity=normal", commandline);
+    }
 }

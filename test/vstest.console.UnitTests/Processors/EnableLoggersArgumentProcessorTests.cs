@@ -533,4 +533,91 @@ public class EnableLoggersArgumentProcessorTests
 
         Assert.AreEqual(expectedSettingsXml, RunSettingsManager.Instance.ActiveRunSettings?.SettingsXml);
     }
+
+    [TestMethod]
+    public void ExecutorInitializeShouldPreserveExistingConfigurationWhenNoNewParametersAreProvided()
+    {
+        // When the MSBuild task adds "--logger:Console" (no verbosity) because a settings file
+        // is in use, the existing Configuration from the .runsettings LoggerRunSettings should
+        // be preserved — not silently discarded.
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""console"" enabled=""True"">
+                        <Configuration>
+                          <Verbosity>normal</Verbosity>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+        var runSettings = new RunSettings();
+        runSettings.LoadSettingsXml(settingsXml);
+        RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+
+        var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
+        executor.Initialize("console");  // no verbosity param — simulates "--logger:Console" from MSBuild
+
+        string expectedSettingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-16""?>
+<RunSettings>
+  <LoggerRunSettings>
+    <Loggers>
+      <Logger friendlyName=""console"" enabled=""True"">
+        <Configuration>
+          <Verbosity>normal</Verbosity>
+        </Configuration>
+      </Logger>
+    </Loggers>
+  </LoggerRunSettings>
+</RunSettings>";
+
+        Assert.AreEqual(expectedSettingsXml, RunSettingsManager.Instance.ActiveRunSettings?.SettingsXml);
+    }
+
+    [TestMethod]
+    public void ExecutorInitializeShouldOverrideExistingConfigurationWhenNewParametersAreProvided()
+    {
+        // When the user explicitly passes "--logger:console;verbosity=quiet", the explicit
+        // CLI verbosity should override whatever is in the .runsettings file.
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""console"" enabled=""True"">
+                        <Configuration>
+                          <Verbosity>normal</Verbosity>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+        var runSettings = new RunSettings();
+        runSettings.LoadSettingsXml(settingsXml);
+        RunSettingsManager.Instance.SetActiveRunSettings(runSettings);
+
+        var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
+        executor.Initialize("console;verbosity=quiet");  // explicit CLI verbosity
+
+        string expectedSettingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-16""?>
+<RunSettings>
+  <LoggerRunSettings>
+    <Loggers>
+      <Logger friendlyName=""console"" enabled=""True"">
+        <Configuration>
+          <verbosity>quiet</verbosity>
+        </Configuration>
+      </Logger>
+    </Loggers>
+  </LoggerRunSettings>
+</RunSettings>";
+
+        Assert.AreEqual(expectedSettingsXml, RunSettingsManager.Instance.ActiveRunSettings?.SettingsXml);
+    }
 }
