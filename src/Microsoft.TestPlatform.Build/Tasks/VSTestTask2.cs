@@ -265,13 +265,48 @@ public class VSTestTask2 : ToolTask, ITestTask
         {
             var parts = singleLine.Split(_messageSplitterArray, StringSplitOptions.None);
             name = parts[1];
-            data = parts.Skip(2).Take(parts.Length).Select(p => p?.Replace("\x02", "\r").Replace("\x03", "\n")).ToArray();
+            data = parts.Skip(2).Take(parts.Length).Select(Unescape).ToArray();
             return true;
         }
 
         name = string.Empty;
         data = [];
         return false;
+    }
+
+    /// <summary>
+    /// Reverses MSBuildLogger.Escape. Single-pass scanner to correctly handle
+    /// sequences like <c>%%n</c> (literal <c>%n</c>, not <c>%</c> + newline).
+    /// </summary>
+    private static string? Unescape(string? input)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+
+        var sb = new StringBuilder(input.Length);
+        for (int i = 0; i < input.Length; i++)
+        {
+            if (input[i] == '%' && i + 1 < input.Length)
+            {
+                char next = input[++i];
+                sb.Append(next switch
+                {
+                    '%' => '%',
+                    'p' => '|',
+                    'r' => '\r',
+                    'n' => '\n',
+                    _ => $"%{next}",
+                });
+            }
+            else
+            {
+                sb.Append(input[i]);
+            }
+        }
+
+        return sb.ToString();
     }
 
     protected override string? GenerateCommandLineCommands()

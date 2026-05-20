@@ -178,11 +178,10 @@ public class VSTestTask2RegressionTests
     [TestMethod]
     public void LogEventsFromTextOutput_TestFailed_TildeCharsInMessage_ShouldNotBeCorrupted()
     {
-        // Regression test for #15268 — tilde characters in test output were being replaced with underscores
         var task = CreateVSTestTask2();
         var engine = (RecordingBuildEngine)task.BuildEngine;
 
-        // 5 tilde chars in the error message — the old encoding replaced ~~~~ (4 tildes) with ____
+        // 5 tilde chars — the old encoding replaced ~~~~ (4 tildes) with ____
         var tildeString = new string('~', 5);
         task.TestLogEventsFromTextOutput($"||||test-failed||||{tildeString}||||TestFile.cs||||42", MessageImportance.High);
 
@@ -193,11 +192,10 @@ public class VSTestTask2RegressionTests
     [TestMethod]
     public void LogEventsFromTextOutput_TestFailed_ExclamationCharsInMessage_ShouldNotBeCorrupted()
     {
-        // Regression test for #15268 — exclamation characters in test output were being replaced with underscores
         var task = CreateVSTestTask2();
         var engine = (RecordingBuildEngine)task.BuildEngine;
 
-        // 4 exclamation marks in the error message — the old encoding replaced !!!! (4 bangs) with ____
+        // 4 exclamation marks — the old encoding replaced !!!! (4 bangs) with ____
         var bangString = new string('!', 4);
         task.TestLogEventsFromTextOutput($"||||test-failed||||{bangString}||||TestFile.cs||||42", MessageImportance.High);
 
@@ -206,23 +204,46 @@ public class VSTestTask2RegressionTests
     }
 
     [TestMethod]
-    public void LogEventsFromTextOutput_TestFailed_NewlinesEncodedWithControlChars_ShouldBeRestored()
+    public void LogEventsFromTextOutput_TestFailed_NewlinesEncodedWithPercentEscapes_ShouldBeRestored()
     {
-        // Regression test for #15268 — newlines must survive the encode/decode round-trip
-        // MSBuildLogger now encodes \r as \x02 and \n as \x03.
-        // Full encoder→decoder round-trip tests (using MSBuildLogger.FormatMessage) are in
-        // vstest.console.UnitTests/Internal/MSBuildLoggerEncoderTests.cs.
         var task = CreateVSTestTask2();
         var engine = (RecordingBuildEngine)task.BuildEngine;
 
-        // Simulate what MSBuildLogger.Escape produces: \r → \x02, \n → \x03
-        var messageWithNewlines = "Assert failed\x02\x03  at MyTest()";
+        // Simulate what MSBuildLogger.Escape produces: \r → %r, \n → %n
+        var messageWithNewlines = "Assert failed%r%n  at MyTest()";
         task.TestLogEventsFromTextOutput($"||||test-failed||||{messageWithNewlines}||||TestFile.cs||||42", MessageImportance.High);
 
         Assert.HasCount(1, engine.Errors);
         Assert.Contains("Assert failed\r\n  at MyTest()", engine.Errors[0].Message ?? string.Empty);
     }
 
+    [TestMethod]
+    public void LogEventsFromTextOutput_TestFailed_PipesInMessage_ShouldNotBreakParsing()
+    {
+        var task = CreateVSTestTask2();
+        var engine = (RecordingBuildEngine)task.BuildEngine;
+
+        // Pipes are escaped as %p by MSBuildLogger.Escape, so they can't break the |||| delimiter.
+        var messageWithPipes = "expected: a]%p%p%p%p[b";
+        task.TestLogEventsFromTextOutput($"||||test-failed||||{messageWithPipes}||||TestFile.cs||||42", MessageImportance.High);
+
+        Assert.HasCount(1, engine.Errors);
+        Assert.Contains("expected: a]||||[b", engine.Errors[0].Message ?? string.Empty);
+    }
+
+    [TestMethod]
+    public void LogEventsFromTextOutput_TestFailed_PercentInMessage_ShouldNotBeCorrupted()
+    {
+        var task = CreateVSTestTask2();
+        var engine = (RecordingBuildEngine)task.BuildEngine;
+
+        // %% is the escape for literal %, and %%n must decode to %n not to %+newline.
+        var messageWithPercent = "100%%%% done %%n not a newline";
+        task.TestLogEventsFromTextOutput($"||||test-failed||||{messageWithPercent}||||TestFile.cs||||42", MessageImportance.High);
+
+        Assert.HasCount(1, engine.Errors);
+        Assert.Contains("100%% done %n not a newline", engine.Errors[0].Message ?? string.Empty);
+    }
 
     private static TestableVSTestTask2 CreateVSTestTask2()
     {
