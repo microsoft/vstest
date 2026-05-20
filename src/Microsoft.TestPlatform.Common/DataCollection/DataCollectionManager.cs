@@ -317,7 +317,11 @@ internal class DataCollectionManager : IDataCollectionManager
         }
 
         TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
-        TPDebug.Assert(testCaseStartEventArgs.TestElement is not null, "testCaseStartEventArgs.TestElement is null");
+        if (testCaseStartEventArgs.TestElement is null)
+        {
+            throw new InvalidOperationException("TestCaseStartEventArgs.TestElement is null. The data collector cannot start a test case without a test element.");
+        }
+
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
         testCaseStartEventArgs.Context = context;
 
@@ -333,7 +337,11 @@ internal class DataCollectionManager : IDataCollectionManager
         }
 
         TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
-        TPDebug.Assert(testCaseEndEventArgs.TestElement is not null, "testCaseEndEventArgs.TestElement is null");
+        if (testCaseEndEventArgs.TestElement is null)
+        {
+            throw new InvalidOperationException("TestCaseEndEventArgs.TestElement is null. The data collector cannot end a test case without a test element.");
+        }
+
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
         testCaseEndEventArgs.Context = context;
 
