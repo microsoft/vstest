@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
@@ -195,10 +196,10 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         var testResult = new ObjectModel.TestResult
         {
-            DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,
-            FullyQualifiedName = e.Result.TestCase.FullyQualifiedName,
-            ErrorStackTrace = e.Result.ErrorStackTrace,
-            ErrorMessage = e.Result.ErrorMessage,
+            DisplayName = RemoveInvalidXmlChars(e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName),
+            FullyQualifiedName = RemoveInvalidXmlChars(e.Result.TestCase.FullyQualifiedName),
+            ErrorStackTrace = RemoveInvalidXmlChars(e.Result.ErrorStackTrace),
+            ErrorMessage = RemoveInvalidXmlChars(e.Result.ErrorMessage),
             TestResultId = e.Result.TestCase.Id,
             Duration = GetFormattedDurationString(e.Result.Duration),
             ResultOutcome = e.Result.Outcome
@@ -453,5 +454,27 @@ public class HtmlLogger : ITestLoggerWithParameters
         }
 
         return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
+    }
+
+    /// <summary>
+    /// Removes characters that are invalid in XML 1.0 from a string.
+    /// </summary>
+    /// <remarks>
+    /// XML 1.0 valid characters: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD].
+    /// Control characters in the range #x00-#x08, #x0B, #x0C, #x0E-#x1F are not valid and
+    /// will cause <see cref="DataContractSerializer"/> to throw an <see cref="System.Xml.XmlException"/>.
+    /// Invalid characters are replaced with their Unicode escape representation.
+    /// </remarks>
+    private static string? RemoveInvalidXmlChars(string? str)
+    {
+        if (str is null)
+        {
+            return null;
+        }
+
+        // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        const string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
+        return Regex.Replace(str, invalidChar, m => $@"\u{(ushort)m.Value[0]:x4}");
     }
 }
