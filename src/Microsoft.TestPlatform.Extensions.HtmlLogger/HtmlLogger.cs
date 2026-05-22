@@ -37,6 +37,14 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly IHtmlTransformer _htmlTransformer;
     private Dictionary<string, string?>? _parametersDictionary;
 
+    // Matches XML 1.0 invalid characters (excluding valid surrogate pairs).
+    // Valid chars per spec: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    // The pattern allows valid high+low surrogate pairs to pass through unchanged;
+    // lone surrogates are treated as invalid.
+    private static readonly Regex InvalidXmlCharsRegex = new(
+        @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\uD800-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]",
+        RegexOptions.Compiled);
+
     public HtmlLogger()
         : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestRunDetails)))
     {
@@ -474,7 +482,8 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
         // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-        const string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
-        return Regex.Replace(str, invalidChar, m => $@"\u{(ushort)m.Value[0]:x4}");
+        // Valid surrogate pairs (representing U+10000–U+10FFFF) are allowed through unchanged;
+        // lone surrogates are replaced with their Unicode escape representation.
+        return InvalidXmlCharsRegex.Replace(str, m => $@"\u{(ushort)m.Value[0]:x4}");
     }
 }
