@@ -1082,12 +1082,12 @@ public class IntegrationTestBase
 
     private static bool IsDiagAlreadyEnabled(string arguments)
     {
-        // If user passed /diag, --diag, or -diag, throw to prevent silently skipping the auto-injected
-        // diag and losing the attachment. Tests that need to inspect diagnostic logs should use
-        // DiagLogsDirectory instead of passing /diag manually.
-        if (arguments.Contains("--diag", StringComparison.OrdinalIgnoreCase)
-            || arguments.Contains("/diag", StringComparison.OrdinalIgnoreCase)
-            || arguments.Contains("-diag", StringComparison.OrdinalIgnoreCase))
+        // If user passed /diag, --diag, or -diag as a standalone flag, throw to prevent silently skipping
+        // the auto-injected diag and losing the attachment. Tests that need to inspect diagnostic logs
+        // should use DiagLogsDirectory instead of passing /diag manually.
+        // The pattern requires the flag to appear as a standalone token (preceded by whitespace or start of
+        // string) to avoid false positives from substrings like "--logger:my-diagnostics.trx".
+        if (Regex.IsMatch(arguments, @"(^|\s)(--diag|/diag|-diag)([:=\s]|$)", RegexOptions.IgnoreCase))
         {
             throw new InvalidOperationException(
                 "Do not pass /diag (or --diag / -diag) directly in test arguments. " +
