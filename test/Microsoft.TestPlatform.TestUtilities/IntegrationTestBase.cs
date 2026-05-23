@@ -87,6 +87,12 @@ public class IntegrationTestBase
 
     public TempDirectory TempDirectory { get; }
 
+    /// <summary>
+    /// Returns the directory where diagnostic log files are automatically placed by <see cref="InvokeVsTest"/> and <see cref="InvokeDotnetTest"/>.
+    /// Use this property in tests that need to inspect the diagnostic log files.
+    /// </summary>
+    protected string DiagLogsDirectory => Path.Combine(TempDirectory.Path, "logs");
+
     public TestContext TestContext { get; set; } = null!;
 
     public string BuildConfiguration { get; }
@@ -216,11 +222,10 @@ public class IntegrationTestBase
     {
         if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments ?? ""))
         {
-            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
-            Directory.CreateDirectory(diagLogsDir);
-            arguments = string.Concat(arguments, GetDiagArg(diagLogsDir));
-            _attachments.Add(diagLogsDir);
-            Console.WriteLine($"Diagnostic logs directory: {diagLogsDir}");
+            Directory.CreateDirectory(DiagLogsDirectory);
+            arguments = string.Concat(arguments, GetDiagArg(DiagLogsDirectory));
+            _attachments.Add(DiagLogsDirectory);
+            Console.WriteLine($"Diagnostic logs directory: {DiagLogsDirectory}");
         }
 
         var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
@@ -286,9 +291,8 @@ public class IntegrationTestBase
 
         if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments))
         {
-            var diagLogsDir = Path.Combine(TempDirectory.Path, "logs");
-            Directory.CreateDirectory(diagLogsDir);
-            var diagPath = Path.Combine(diagLogsDir, "log.txt");
+            Directory.CreateDirectory(DiagLogsDirectory);
+            var diagPath = Path.Combine(DiagLogsDirectory, "log.txt");
             var diagArg = " --diag " + diagPath.AddDoubleQuote();
 
             // Insert --diag before the -- separator so dotnet test forwards it to vstest.console.
@@ -302,8 +306,8 @@ public class IntegrationTestBase
                 arguments = arguments.Insert(separatorPos, diagArg);
             }
 
-            _attachments.Add(diagLogsDir);
-            Console.WriteLine($"Diagnostic logs directory: {diagLogsDir}");
+            _attachments.Add(DiagLogsDirectory);
+            Console.WriteLine($"Diagnostic logs directory: {DiagLogsDirectory}");
         }
 
         IntegrationTestBase.ExecutePatchedDotnet("test", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
@@ -1078,12 +1082,17 @@ public class IntegrationTestBase
 
     private static bool IsDiagAlreadyEnabled(string arguments)
     {
-        // Check args for --diag, /diag, -diag (case-insensitive)
+        // If user passed /diag, --diag, or -diag, throw to prevent silently skipping the auto-injected
+        // diag and losing the attachment. Tests that need to inspect diagnostic logs should use
+        // DiagLogsDirectory instead of passing /diag manually.
         if (arguments.Contains("--diag", StringComparison.OrdinalIgnoreCase)
             || arguments.Contains("/diag", StringComparison.OrdinalIgnoreCase)
             || arguments.Contains("-diag", StringComparison.OrdinalIgnoreCase))
         {
-            return true;
+            throw new InvalidOperationException(
+                "Do not pass /diag (or --diag / -diag) directly in test arguments. " +
+                "The test framework auto-injects diagnostics and attaches them on failure. " +
+                "Use the DiagLogsDirectory property to find the path to the diagnostic log files.");
         }
 
         // Check environment variable
@@ -1093,6 +1102,19 @@ public class IntegrationTestBase
 
     protected static string GetDiagArg(string rootDir)
         => " --diag:" + Path.Combine(rootDir, "log.txt");
+
+    /// <summary>
+    /// Reads all diagnostic log files from <see cref="DiagLogsDirectory"/> and returns their combined content.
+    /// </summary>
+    protected string GetDiagLogContents()
+    {
+        if (!Directory.Exists(DiagLogsDirectory))
+        {
+            return string.Empty;
+        }
+
+        return string.Join("\n", Directory.GetFiles(DiagLogsDirectory, "*.txt", SearchOption.AllDirectories).Select(File.ReadAllText));
+    }
 
     /// <summary>
     /// Counts the number of logs following the '*.host.*' pattern in the given folder.
