@@ -15,6 +15,9 @@ Copyright (c) .NET Foundation. All rights reserved.
     <VSTestTaskAssemblyFile Condition="$(VSTestTaskAssemblyFile) == ''">Microsoft.TestPlatform.Build.dll</VSTestTaskAssemblyFile>
     <VSTestConsolePath Condition="$(VSTestConsolePath) == ''">$([System.IO.Path]::Combine($(MSBuildThisFileDirectory),"vstest.console.dll"))</VSTestConsolePath>
     <VSTestNoBuild Condition="'$(VSTestNoBuild)' == ''">False</VSTestNoBuild>
+    <!-- When terminal logger is active and user has not opted out, default to MSBuild output mode so
+         test output from parallel MSBuild nodes is not lost. Users can opt out with VsTestUseMSBuildOutput=false. -->
+    <VsTestUseMSBuildOutput Condition="'$(VsTestUseMSBuildOutput)' == '' AND '$(_MSBUILDTLENABLED)' == '1'">True</VsTestUseMSBuildOutput>
     <VsTestUseMSBuildOutput Condition="'$(VsTestUseMSBuildOutput)' == ''">False</VsTestUseMSBuildOutput>
   </PropertyGroup>
   <UsingTask TaskName="Microsoft.TestPlatform.Build.Tasks.VSTestTask" AssemblyFile="$(VSTestTaskAssemblyFile)" />
@@ -32,8 +35,9 @@ Copyright (c) .NET Foundation. All rights reserved.
     <!-- Fallback to this old view when terminal logger is not enabled (_MSBUILDTLENABLED==0) , or when user explicitly opts out (VsTestUseMSBuildOutput != true) -->
     <CallTarget Targets="_VSTestConsole" Condition="$(_MSBUILDTLENABLED) == '0' OR !$(VsTestUseMSBuildOutput) OR $(MSBUILDENSURESTDOUTFORTASKPROCESSES) == '1'" />
     <!-- Proper MSBuild integration, but no custom colorization -->
-    <!-- Use the new view whe terminal logger is enabled (_MSBUILDTLENABLED==0), and user did not opt out (VsTestUseMSBuildOutput == true) -->
-    <CallTarget Targets="_VSTestMSBuild" Condition="$(_MSBUILDTLENABLED) == '1' AND $(VsTestUseMSBuildOutput)" />
+    <!-- Use the new view when terminal logger is enabled (_MSBUILDTLENABLED==1), user did not opt out (VsTestUseMSBuildOutput == true),
+         and MSBUILDENSURESTDOUTFORTASKPROCESSES is not set (set by dotnet test, which uses the console path instead). -->
+    <CallTarget Targets="_VSTestMSBuild" Condition="$(_MSBUILDTLENABLED) == '1' AND $(VsTestUseMSBuildOutput) AND $(MSBUILDENSURESTDOUTFORTASKPROCESSES) != '1'" />
   </Target>
 
   <!--

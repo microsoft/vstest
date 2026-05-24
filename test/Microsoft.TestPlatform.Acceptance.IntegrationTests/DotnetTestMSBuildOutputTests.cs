@@ -81,4 +81,23 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 
         ExitCodeEquals(1);
     }
+
+    [TestMethod]
+    // patched dotnet is not published on non-windows systems
+    [TestCategory("Windows-Review")]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    public void MSBuildLoggerIsUsedAutomaticallyWithDotnetMSBuildWhenTerminalLoggerIsActive(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj", runnerInfo.TargetFramework);
+        // Invoke via dotnet msbuild /t:VSTest with terminal logger on and no explicit VsTestUseMSBuildOutput property.
+        // The MSBuild output path should be used automatically when the terminal logger is active.
+        InvokeDotnetMSBuildTest($@"-t:VSTest {projectPath} -tl:on -nodereuse:false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", workingDirectory: Path.GetDirectoryName(projectPath));
+
+        StdOutputContains("TESTERROR");
+        StdOutputContains("FailingTest (");
+        ExitCodeEquals(1);
+    }
+
 }
