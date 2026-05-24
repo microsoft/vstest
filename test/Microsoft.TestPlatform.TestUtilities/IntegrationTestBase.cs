@@ -318,8 +318,6 @@ public class IntegrationTestBase
         var consolePathParameter = $@" -p:VsTestConsolePath=""{vstestConsolePath}""";
         arguments += consolePathParameter;
 
-        debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
-
         IntegrationTestBase.ExecutePatchedDotnet("msbuild", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
         FormatStandardOutCome();
     }
