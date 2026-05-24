@@ -310,6 +310,20 @@ public class IntegrationTestBase
         FormatStandardOutCome();
     }
 
+    public void InvokeDotnetMSBuildTest(string arguments, Dictionary<string, string?>? environmentVariables = null, string? workingDirectory = null)
+    {
+        var debugEnvironmentVariables = AddDebugEnvironmentVariables(environmentVariables);
+
+        var vstestConsolePath = GetDotnetRunnerPath();
+        var consolePathParameter = $@" -p:VsTestConsolePath=""{vstestConsolePath}""";
+        arguments += consolePathParameter;
+
+        debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
+
+        IntegrationTestBase.ExecutePatchedDotnet("msbuild", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
+        FormatStandardOutCome();
+    }
+
     /// <summary>
     /// Invokes <c>vstest.console</c> to execute tests in a test assembly.
     /// </summary>
