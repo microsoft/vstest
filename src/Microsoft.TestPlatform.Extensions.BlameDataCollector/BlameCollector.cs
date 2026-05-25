@@ -210,7 +210,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// Starts and waits for a new proc dump process to collect a single dump and then
     /// kills the testhost process.
     /// </summary>
-    private void CollectDumpAndAbortTesthost()
+    private protected void CollectDumpAndAbortTesthost()
     {
         TPDebug.Assert(_logger != null && _context != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
         _inactivityTimerAlreadyFired = true;

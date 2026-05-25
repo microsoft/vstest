@@ -168,18 +168,16 @@ public class BlameCollectorTests
         _blameDataCollector = new TestableBlameCollector(
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
-            null,
+            _mockInactivityTimer.Object,
             _mockFileHelper.Object,
             _mockProcessHelper.Object);
 
         var dumpFile = "abc_hang.dmp";
-        var hangBasedDumpcollected = new ManualResetEventSlim();
 
         _mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
         _mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
         _mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()));
         _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Returns(new[] { dumpFile });
-        _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set());
 
         _blameDataCollector.Initialize(
             GetDumpConfigurationElement(false, false, true, 50),
@@ -188,10 +186,12 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        // Simulate testhost launching before the timer fires.
+        // Raise TestHostLaunched so the process ID is set before we trigger the callback.
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
-        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
+        // Trigger the timer callback synchronously — no race condition.
+        ((TestableBlameCollector)_blameDataCollector).TriggerTimerCallback();
+
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
         _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
@@ -207,16 +207,14 @@ public class BlameCollectorTests
         _blameDataCollector = new TestableBlameCollector(
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
-            null,
+            _mockInactivityTimer.Object,
             _mockFileHelper.Object,
             _mockProcessHelper.Object);
-
-        var hangBasedDumpcollected = new ManualResetEventSlim();
 
         _mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
         _mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
         _mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()));
-        _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
+        _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Throws(new Exception("Some exception"));
 
         _blameDataCollector.Initialize(
             GetDumpConfigurationElement(false, false, true, 50),
@@ -225,10 +223,12 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        // Simulate testhost launching before the timer fires.
+        // Raise TestHostLaunched so the process ID is set before we trigger the callback.
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
-        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
+        // Trigger the timer callback synchronously — no race condition.
+        ((TestableBlameCollector)_blameDataCollector).TriggerTimerCallback();
+
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
     }
@@ -243,18 +243,17 @@ public class BlameCollectorTests
         _blameDataCollector = new TestableBlameCollector(
             _mockBlameReaderWriter.Object,
             _mockProcessDumpUtility.Object,
-            null,
+            _mockInactivityTimer.Object,
             _mockFileHelper.Object,
             _mockProcessHelper.Object);
 
         var dumpFile = "abc_hang.dmp";
-        var hangBasedDumpcollected = new ManualResetEventSlim();
 
         _mockFileHelper.Setup(x => x.Exists(It.Is<string>(y => y == "abc_hang.dmp"))).Returns(true);
         _mockFileHelper.Setup(x => x.GetFullPath(It.Is<string>(y => y == "abc_hang.dmp"))).Returns("abc_hang.dmp");
         _mockProcessDumpUtility.Setup(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()));
         _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Returns(new[] { dumpFile });
-        _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some other exception"));
+        _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Throws(new Exception("Some other exception"));
 
         _blameDataCollector.Initialize(
             GetDumpConfigurationElement(false, false, true, 50),
@@ -263,10 +262,12 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        // Simulate testhost launching before the timer fires.
+        // Raise TestHostLaunched so the process ID is set before we trigger the callback.
         _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
-        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
+        // Trigger the timer callback synchronously — no race condition.
+        ((TestableBlameCollector)_blameDataCollector).TriggerTimerCallback();
+
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
         _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
@@ -864,5 +865,11 @@ public class BlameCollectorTests
             : base(blameReaderWriter, processDumpUtility, inactivityTimer, mockFileHelper, mockProcessHelper)
         {
         }
+
+        /// <summary>
+        /// Directly invokes the hang-dump timer callback so tests can trigger it synchronously
+        /// without relying on a real timer, eliminating race conditions.
+        /// </summary>
+        internal void TriggerTimerCallback() => CollectDumpAndAbortTesthost();
     }
 }
