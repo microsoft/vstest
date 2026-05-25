@@ -206,5 +206,14 @@ namespace Microsoft.TestPlatform.Extensions.BlameDataCollector.Resources {
                 return ResourceManager.GetString("UnexpectedValueForInactivityTimespanValue", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Looks up a localized string similar to Test host process has not launched yet. Cannot collect hang dump.
+        /// </summary>
+        internal static string TestHostNotLaunchedCannotCollectHangDump {
+            get {
+                return ResourceManager.GetString("TestHostNotLaunchedCannotCollectHangDump", resourceCulture);
+            }
+        }
     }
 }

@@ -88,6 +88,11 @@ Ce test est éventuellement à l'origine du plantage.</target>
         <target state="translated">'DumpDirectoryPath' non valide pour l’analyse du débogueur post-mortem</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
+        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
+        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

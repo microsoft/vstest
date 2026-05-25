@@ -182,13 +182,16 @@ public class BlameCollectorTests
         _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set());
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            GetDumpConfigurationElement(false, false, true, 50),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000, TestContext.CancellationToken);
+        // Simulate testhost launching before the timer fires.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
         _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
@@ -216,13 +219,16 @@ public class BlameCollectorTests
         _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            GetDumpConfigurationElement(false, false, true, 50),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000, TestContext.CancellationToken);
+        // Simulate testhost launching before the timer fires.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
     }
@@ -251,16 +257,55 @@ public class BlameCollectorTests
         _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some other exception"));
 
         _blameDataCollector.Initialize(
+            GetDumpConfigurationElement(false, false, true, 50),
+            _mockDataColectionEvents.Object,
+            _mockDataCollectionSink.Object,
+            _mockLogger.Object,
+            _context);
+
+        // Simulate testhost launching before the timer fires.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
+        _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
+        _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
+        _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
+    }
+
+    /// <summary>
+    /// If the inactivity timer fires before testhost has launched, the hang dump should not be
+    /// attempted (which would target PID 0 — the Idle process on Windows / Swapper on Linux).
+    /// </summary>
+    [TestMethod]
+    public void InitializeWithDumpForHangShouldSkipDumpIfTestHostHasNotLaunchedYet()
+    {
+        _blameDataCollector = new TestableBlameCollector(
+            _mockBlameReaderWriter.Object,
+            _mockProcessDumpUtility.Object,
+            null,
+            _mockFileHelper.Object,
+            _mockProcessHelper.Object);
+
+        // Signal that fires once the timer callback completes (warning logged).
+        var warningLogged = new ManualResetEventSlim();
+        _mockLogger
+            .Setup(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.IsAny<string>()))
+            .Callback(() => warningLogged.Set());
+
+        _blameDataCollector.Initialize(
             GetDumpConfigurationElement(false, false, true, 0),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000, TestContext.CancellationToken);
-        _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
-        _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
-        _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
+        // Do NOT raise TestHostLaunched — _testHostProcessId stays 0.
+        warningLogged.Wait(1000, TestContext.CancellationToken);
+
+        // The hang dump must not have been attempted against PID 0.
+        _mockProcessDumpUtility.Verify(
+            x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()),
+            Times.Never);
     }
 
     /// <summary>

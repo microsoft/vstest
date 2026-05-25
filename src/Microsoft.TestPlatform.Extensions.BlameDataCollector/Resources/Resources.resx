@@ -174,4 +174,7 @@ This test may, or may not be the source of the crash.</value>
   <data name="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter" xml:space="preserve">
     <value>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</value>
   </data>
+  <data name="TestHostNotLaunchedCannotCollectHangDump" xml:space="preserve">
+    <value>Test host process has not launched yet. Cannot collect hang dump.</value>
+  </data>
 </root>

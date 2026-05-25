@@ -88,6 +88,11 @@ Esse teste pode ser a origem da falha ou não.</target>
         <target state="translated">'DumpDirectoryPath' inválido para o monitor do depurador postmortem</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
+        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
+        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

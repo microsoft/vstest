@@ -88,6 +88,11 @@ Ten test może, ale nie musi być źródłem awarii.</target>
         <target state="translated">Nieprawidłowy element „DumpDirectoryPath” dla monitora debugera postmortem</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
+        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
+        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

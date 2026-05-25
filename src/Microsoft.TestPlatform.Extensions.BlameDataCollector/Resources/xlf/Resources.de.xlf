@@ -88,6 +88,11 @@ Dieser Test kann, muss aber nicht unbedingt die Absturzursache sein.</target>
         <target state="translated">Ungültiger "DumpDirectoryPath" für Postmortemdebuggermonitor</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
+        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
+        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
