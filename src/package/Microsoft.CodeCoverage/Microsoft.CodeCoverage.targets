@@ -33,7 +33,11 @@
   </PropertyGroup>
 
   <!-- This target required to store deterministic sources mapping.
-       It is modified version of https://github.com/coverlet-coverage/coverlet/blob/d1ca364b7dbff38abce0457d94c4ce1b7e3a4cd9/src/coverlet.collector/build/coverlet.collector.targets#L35 -->
+       It is modified version of https://github.com/coverlet-coverage/coverlet/blob/d1ca364b7dbff38abce0457d94c4ce1b7e3a4cd9/src/coverlet.collector/build/coverlet.collector.targets#L35
+       Note: The '$(IsGraphBuild)' != 'true' condition skips this target during MSBuild graph builds (-graphBuild:true)
+       because the MSBuild sub-invocation with Properties="TargetFramework=..." violates the project isolation contract.
+       As a trade-off, msCoverageSourceRootsMapping_* files are not generated in graph build mode.
+       For builds using -isolateProjects without -graphBuild, use $(DisableMsCoverageReferencedPathMaps)=true as an escape hatch. -->
   <Target Condition="'$(NETCoreSdkVersion)' != '' and '$(DisableMsCoverageReferencedPathMaps)' != 'true' and '$(IsGraphBuild)' != 'true'" Name="MsCoverageReferencedPathMaps" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" >
     <MSBuild Projects="@(AnnotatedProjects->'%(FullPath)')"
              Targets="$(_msCoverageSourceRootTargetName)"
