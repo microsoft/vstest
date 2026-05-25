@@ -188,7 +188,7 @@ The `@expert-reviewer` agent determines the review verdict (COMMENT / REQUEST_CH
 **APPROVE is not available to this workflow.** Only human maintainers approve PRs in this repo. When the agent would otherwise have approved (no issues found), submit a `COMMENT`-state review summarizing what was checked and what looked clean — leave the approval decision to the maintainer. The safe-output layer enforces this via `allowed-events: [COMMENT, REQUEST_CHANGES]`, so emitting `APPROVE` will be rejected.
 
 This workflow adds one workflow-level override:
-- If the PR description is materially misleading about the change's scope or intent, the review must be a `COMMENT` (never `REQUEST_CHANGES` solely on description grounds) regardless of code findings.
+- If the PR description is materially misleading about the change's scope or intent, that description issue by itself must result in a `COMMENT`, not `REQUEST_CHANGES`. However, if `@expert-reviewer` identifies code findings that independently warrant `REQUEST_CHANGES`, the review should still be `REQUEST_CHANGES`, and the misleading PR description should be mentioned in the review body.
 
 ## Edge Cases
 
