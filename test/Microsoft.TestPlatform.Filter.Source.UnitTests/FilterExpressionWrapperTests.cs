@@ -43,6 +43,16 @@ public class FilterExpressionWrapperTests
     }
 
     [TestMethod]
+    public void ParseErrorShouldBeSetForEmptyParenthesisAfterEscapedBackslash()
+    {
+        // An escaped backslash "\\" leaves the following "(" unescaped, so "\\()" is still
+        // a genuine empty parenthesis group and must be reported.
+        var wrapper = new FilterExpressionWrapper(@"Name~foo\\&()");
+        Assert.IsNotNull(wrapper.ParseError);
+        Assert.Contains("Empty parenthesis", wrapper.ParseError!);
+    }
+
+    [TestMethod]
     public void ParseErrorShouldNotBeSetWhenOpenParenthesisIsEscaped()
     {
         // Regression for https://github.com/microsoft/testfx/issues/7515 — an escaped
