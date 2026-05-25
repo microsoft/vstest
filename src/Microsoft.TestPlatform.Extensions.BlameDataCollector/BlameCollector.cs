@@ -59,7 +59,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private IInactivityTimer? _inactivityTimer;
     private TimeSpan _inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
 
-    private int _testHostProcessId;
+    private volatile int _testHostProcessId;
     private string? _testHostProcessName;
     private string? _targetFramework;
     private readonly List<KeyValuePair<string, string>> _environmentVariables = new();
