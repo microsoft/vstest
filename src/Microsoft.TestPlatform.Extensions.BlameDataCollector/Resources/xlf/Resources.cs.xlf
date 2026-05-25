@@ -88,6 +88,11 @@ Tento test může a nemusí být příčinou chybového ukončení.</target>
         <target state="translated">Neplatná vlastnost DumpDirectoryPath pro monitorování ladicího programu postmortem</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
+        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
+        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>

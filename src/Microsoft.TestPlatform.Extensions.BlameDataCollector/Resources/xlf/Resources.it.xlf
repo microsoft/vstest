@@ -88,6 +88,11 @@ Il test potrebbe essere l'origine dell'arresto anomalo.</target>
         <target state="translated">Il valore di 'DumpDirectoryPath' non è valido per il monitoraggio del debugger effettuato dopo che l'applicazione è terminata.</target>
         <note />
       </trans-unit>
+      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
+        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
+        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
+        <note />
+      </trans-unit>
     </body>
   </file>
 </xliff>
