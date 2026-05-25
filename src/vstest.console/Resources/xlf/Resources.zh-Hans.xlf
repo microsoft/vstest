@@ -17,6 +17,11 @@
         <target state="translated">以下测试执行外接程序可用:</target>
         <note />
       </trans-unit>
+            <trans-unit id="AvailableExtensionFormat">
+        <source>    {0}</source>
+        <target state="translated">    {0}</target>
+        <note>{Locked}</note>
+      </trans-unit>
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
         <target state="translated">        {0}: {1}</target>
@@ -27,6 +32,12 @@
         <target state="translated">以下测试记录器加载项可用:</target>
         <note />
       </trans-unit>
+      <trans-unit id="AvailableTestsFormat">
+        <source>    {0}</source>
+        <target state="translated">    {0}</target>
+        <note>{Locked}</note>
+      </trans-unit>
+
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
         <target state="translated">错误: {0}</target>
