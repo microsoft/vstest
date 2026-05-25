@@ -188,7 +188,10 @@ internal sealed class FilterExpression
 #endif
 
         // Below parsing doesn't error out on pattern (), so explicitly search for that (empty parenthesis).
-        var invalidInput = Regex.Match(filterString, @"\(\s*\)");
+        // The negative lookbehind (?<!\\) ensures we don't flag an escaped open parenthesis (e.g., \()
+        // as an empty group. This is required to support filtering parametrized tests whose display
+        // names contain '(' (e.g., `DisplayName~MyTest \(`).
+        var invalidInput = Regex.Match(filterString, @"(?<!\\)\(\s*\)");
         if (invalidInput.Success)
         {
             throw new FormatException(string.Format(CultureInfo.CurrentCulture, TestCaseFilterFormatException, EmptyParenthesis));
