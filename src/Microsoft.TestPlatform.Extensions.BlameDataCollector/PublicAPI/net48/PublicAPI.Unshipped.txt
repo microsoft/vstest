@@ -1,1 +1,2 @@
 #nullable enable
+Microsoft.TestPlatform.Extensions.BlameDataCollector.BlameCollector.CollectDumpAndAbortTesthost() -> void
