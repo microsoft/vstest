@@ -213,6 +213,16 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     protected void CollectDumpAndAbortTesthost()
     {
         TPDebug.Assert(_logger != null && _context != null && _dataCollectionSink != null, "Initialize must be called before calling this method");
+
+        // If testhost has not launched yet, we cannot dump or kill it. Do not mark the timer as
+        // fired so that ResetInactivityTimer can re-arm it once the testhost eventually launches.
+        if (_testHostProcessId == 0)
+        {
+            EqtTrace.Warning("BlameCollector.CollectDumpAndAbortTesthost: Test host process has not launched yet. Skipping hang dump.");
+            _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.TestHostNotLaunchedCannotCollectHangDump);
+            return;
+        }
+
         _inactivityTimerAlreadyFired = true;
 
         string value;
@@ -242,14 +252,6 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         catch
         {
             EqtTrace.Verbose("Inactivity timer is already disposed.");
-        }
-
-        // If testhost has not launched yet, we cannot dump or kill it.
-        if (_testHostProcessId == 0)
-        {
-            EqtTrace.Warning("BlameCollector.CollectDumpAndAbortTesthost: Test host process has not launched yet. Skipping hang dump.");
-            _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.TestHostNotLaunchedCannotCollectHangDump);
-            return;
         }
 
         if (_collectProcessDumpOnCrash)
