@@ -27,6 +27,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// Custom converters (TestCaseConverterV2, TestPropertyConverter, etc.) are registered
 /// on the <see cref="JsonSerializerOptions"/> separately — this context provides the
 /// fallback metadata for types the converters delegate to STJ for.
+///
+/// <para><b>Maintenance checklist:</b></para>
+/// <list type="bullet">
+/// <item>When adding a new payload type to <c>MessageType</c>, add a <c>[JsonSerializable]</c>
+/// attribute for it here.</item>
+/// <item>If the new type is deserialized via <c>DeserializePayload&lt;T&gt;</c>, also add
+/// <c>[JsonSerializable(typeof(JsonDataSerializer.PayloadedMessage&lt;T&gt;))]</c>.</item>
+/// <item>Types reachable from declared types' properties are generated transitively —
+/// you only need to list root payload/envelope types explicitly.</item>
+/// </list>
 /// </summary>
 // --- Primitive / built-in types used as payloads ---
 [JsonSerializable(typeof(int))]
@@ -70,6 +80,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 [JsonSerializable(typeof(BeforeTestRunStartResult))]
 [JsonSerializable(typeof(Collection<AttachmentSet>))]
 // --- Collection / dictionary types used in payloads ---
+// Note: IDictionary<string, object> and Dictionary<string, object> are handled at runtime
+// by ObjectDictionaryConverterFactory, but are listed here so the source-gen context
+// provides the JsonTypeInfo entry point that STJ needs to dispatch to the converter.
 [JsonSerializable(typeof(IDictionary<string, object>))]
 [JsonSerializable(typeof(Dictionary<string, object>))]
 [JsonSerializable(typeof(IDictionary<string, string>))]

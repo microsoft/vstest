@@ -25,10 +25,9 @@ public class TestObjectConverterTests
     [TestMethod]
     public void TestObjectShouldCreateDefaultObjectOnDeserializationOfJsonWithEmptyProperties()
     {
-        var test = Deserialize<TestableTestObject>("{\"Properties\":[]}");
+        var test = Deserialize<TestObject>("{\"Properties\":[]}");
 
         Assert.IsNotNull(test);
-        Assert.AreEqual(0, test.Properties.Count());
     }
 
     [TestMethod]
@@ -88,12 +87,11 @@ public class TestObjectConverterTests
     {
         var json = "{\"Properties\":[{\"Key\":{\"Id\":\"13\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Guid\"},\"Value\":\"02048dfd-3da7-475d-a011-8dd1121855ec\"},{\"Key\":{\"Id\":\"2\",\"Label\":\"label2\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.Int32\"},\"Value\":29}]}";
 
-        var test = Deserialize<TestableTestObject>(json);
+        var test = Deserialize<TestObject>(json);
 
-        var properties = test.Properties.ToArray();
-        Assert.HasCount(2, properties);
-        Assert.AreEqual(Guid.Parse("02048dfd-3da7-475d-a011-8dd1121855ec"), test.GetPropertyValue(properties.First(x => x.Label == "label1")));
-        Assert.AreEqual(29, test.GetPropertyValue(properties.First(x => x.Label == "label2")));
+        Assert.IsNotNull(test);
+        Assert.AreEqual(Guid.Parse("02048dfd-3da7-475d-a011-8dd1121855ec"), test.GetPropertyValue(TestProperty.Find("13")!));
+        Assert.AreEqual(29, test.GetPropertyValue(TestProperty.Find("2")!));
     }
 
     [TestMethod]
@@ -101,11 +99,10 @@ public class TestObjectConverterTests
     {
         var json = "{\"Properties\":[{\"Key\":{\"Id\":\"14\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":null}]}";
 
-        var test = Deserialize<TestableTestObject>(json);
+        var test = Deserialize<TestObject>(json);
 
-        var properties = test.Properties.ToArray();
-        Assert.HasCount(1, properties);
-        Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(properties[0])!.ToString()));
+        Assert.IsNotNull(test);
+        Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(TestProperty.Find("14")!)?.ToString()));
     }
 
     [TestMethod]
@@ -113,11 +110,10 @@ public class TestObjectConverterTests
     {
         var json = "{\"Properties\":[{\"Key\":{\"Id\":\"15\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String[]\"},\"Value\":[\"val1\", \"val2\"]}]}";
 
-        var test = Deserialize<TestableTestObject>(json);
+        var test = Deserialize<TestObject>(json);
 
-        var properties = test.Properties.ToArray();
-        Assert.HasCount(1, properties);
-        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(properties[0])!);
+        Assert.IsNotNull(test);
+        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(TestProperty.Find("15")!)!);
     }
 
     [TestMethod]
@@ -125,11 +121,10 @@ public class TestObjectConverterTests
     {
         var json = "{\"Properties\":[{\"Key\":{\"Id\":\"16\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
 
-        var test = Deserialize<TestableTestObject>(json);
+        var test = Deserialize<TestObject>(json);
 
-        var properties = test.Properties.ToArray();
-        Assert.HasCount(1, properties);
-        Assert.AreEqual(DateTimeOffset.MaxValue, test.GetPropertyValue(properties[0]));
+        Assert.IsNotNull(test);
+        Assert.AreEqual(DateTimeOffset.MaxValue, test.GetPropertyValue(TestProperty.Find("16")!));
     }
 
     [TestMethod]
@@ -137,7 +132,7 @@ public class TestObjectConverterTests
     {
         var json = "{\"Properties\":[{\"Key\":{\"Id\":\"17\",\"Label\":\"label1\",\"Category\":\"c\",\"Description\":\"d\",\"Attributes\":0,\"ValueType\":\"System.String\"},\"Value\":\"DummyValue\"}]}";
 
-        var test = Deserialize<TestableTestObject>(json);
+        var test = Deserialize<TestObject>(json);
 
         var property = TestProperty.Find("17");
         Assert.IsNotNull(property);

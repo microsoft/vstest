@@ -205,10 +205,11 @@ public partial class JsonDataSerializer
         }
         else
         {
-            // Serialize the payload to a JsonElement first using the versioned options
-            // (which have the custom converters). Then embed it in the envelope.
-            // Use payload.GetType() to tell STJ the actual runtime type, since the
-            // parameter is typed as object? and source-gen can't infer it.
+            // Previously this was a "fast path" that serialized the payload directly into
+            // VersionedMessageForSerialization (with object? Payload) in a single pass.
+            // That optimization is intentionally removed: object? Payload requires STJ to
+            // resolve the runtime type polymorphically, which is incompatible with NativeAOT.
+            // Serializing to JsonElement first is slightly slower but AoT-safe.
             if (payload is null)
                 return string.Empty;
 

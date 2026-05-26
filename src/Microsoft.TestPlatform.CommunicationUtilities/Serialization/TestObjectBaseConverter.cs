@@ -48,12 +48,14 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
 
     public override TestObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
     {
-        // Create an instance of the requested type if possible. TestCase is the
-        // fallback for abstract types or types without a parameterless constructor
-        // because it is a concrete TestObject that preserves the property bag.
-        var testObject = typeToConvert != typeof(TestObject) && !typeToConvert.IsAbstract
-            ? (TestObject)(Activator.CreateInstance(typeToConvert) ?? new TestCase())
-            : new TestCase();
+        // Always instantiate a TestCase as the carrier for the property bag.
+        // TestObject is abstract, and the only concrete subclass that flows through
+        // the wire protocol (other than TestCase/TestResult, which have their own
+        // converters) is TestObject-as-generic-bag. Using TestCase preserves the
+        // property key-value pairs for the consumer. We intentionally avoid
+        // Activator.CreateInstance(typeToConvert) because it requires reflection
+        // metadata that NativeAOT trims.
+        var testObject = new TestCase();
 
         using var doc = JsonDocument.ParseValue(ref reader);
         var data = doc.RootElement;
@@ -136,11 +138,20 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
             case double d: writer.WriteNumberValue(d); break;
             case float f: writer.WriteNumberValue(f); break;
             case bool b: writer.WriteBooleanValue(b); break;
+            case short s: writer.WriteNumberValue(s); break;
+            case ushort us: writer.WriteNumberValue(us); break;
+            case uint ui: writer.WriteNumberValue(ui); break;
+            case ulong ul: writer.WriteNumberValue(ul); break;
+            case byte by: writer.WriteNumberValue(by); break;
+            case sbyte sb: writer.WriteNumberValue(sb); break;
+            case decimal dec: writer.WriteNumberValue(dec); break;
+            case char c: writer.WriteStringValue(c.ToString()); break;
             case DateTimeOffset dto: writer.WriteStringValue(dto); break;
             case DateTime dt: writer.WriteStringValue(dt); break;
             case Guid g: writer.WriteStringValue(g); break;
             case Uri u: writer.WriteStringValue(u.OriginalString); break;
             case JsonElement je: je.WriteTo(writer); break;
+            case Enum e: writer.WriteNumberValue(Convert.ToInt64(e, System.Globalization.CultureInfo.InvariantCulture)); break;
             default:
                 // For complex types (Traits, collections, etc.), serialize to JsonElement
                 // first using the runtime type, then write the element. This avoids the

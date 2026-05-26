@@ -14,6 +14,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 /// (<c>Message</c>, <c>StackTrace</c>) which STJ's source-generated metadata cannot populate
 /// via the parameterless constructor. Uses the <c>Exception(string, Exception)</c> constructor
 /// to preserve Message and InnerException during deserialization.
+/// <para>
+/// Note: the original exception type is erased during deserialization — all exceptions are
+/// materialized as <see cref="Exception"/>. <c>StackTrace</c> is not round-trippable because
+/// it is computed, not settable. <c>HResult</c> and <c>Source</c> are restored where present.
+/// </para>
 /// </summary>
 internal class ExceptionConverter : JsonConverter<Exception>
 {
@@ -41,6 +46,16 @@ internal class ExceptionConverter : JsonConverter<Exception>
         var exception = message is not null
             ? new Exception(message, innerException)
             : new Exception();
+
+        if (root.TryGetProperty("HResult", out var hresultProp) && hresultProp.ValueKind == JsonValueKind.Number)
+        {
+            exception.HResult = hresultProp.GetInt32();
+        }
+
+        if (root.TryGetProperty("Source", out var sourceProp) && sourceProp.ValueKind == JsonValueKind.String)
+        {
+            exception.Source = sourceProp.GetString();
+        }
 
         return exception;
     }

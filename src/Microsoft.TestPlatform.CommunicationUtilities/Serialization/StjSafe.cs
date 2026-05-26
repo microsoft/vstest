@@ -4,8 +4,10 @@
 #if NETCOREAPP
 
 using System;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
+using System.Text.Json.Serialization.Metadata;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 
@@ -13,36 +15,60 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 /// Thin wrappers around <see cref="JsonSerializer"/> that suppress IL2026/IL3050 trimming
 /// and AOT warnings. These are safe because every <see cref="JsonSerializerOptions"/> instance
 /// in this assembly is configured with <see cref="TestPlatformJsonContext"/> (source-generated)
-/// as the primary <see cref="System.Text.Json.Serialization.Metadata.IJsonTypeInfoResolver"/>.
+/// as the primary <see cref="IJsonTypeInfoResolver"/>.
 /// </summary>
 internal static class StjSafe
 {
     private const string Justification = "Options are configured with TestPlatformJsonContext source-gen resolver.";
 
+    [Conditional("DEBUG")]
+    private static void AssertResolverConfigured(JsonSerializerOptions options)
+    {
+        Debug.Assert(
+            options.TypeInfoResolver is not null,
+            "StjSafe methods require options with a TypeInfoResolver (source-gen context). "
+            + "Ensure options were created via JsonDataSerializer.CreateBaseOptions().");
+    }
+
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = Justification)]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = Justification)]
     internal static T? Deserialize<T>(string json, JsonSerializerOptions options)
-        => JsonSerializer.Deserialize<T>(json, options);
+    {
+        AssertResolverConfigured(options);
+        return JsonSerializer.Deserialize<T>(json, options);
+    }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = Justification)]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = Justification)]
     internal static T? Deserialize<T>(JsonElement element, JsonSerializerOptions options)
-        => JsonSerializer.Deserialize<T>(element, options);
+    {
+        AssertResolverConfigured(options);
+        return JsonSerializer.Deserialize<T>(element, options);
+    }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = Justification)]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = Justification)]
     internal static void Serialize<T>(Utf8JsonWriter writer, T value, JsonSerializerOptions options)
-        => JsonSerializer.Serialize(writer, value, options);
+    {
+        AssertResolverConfigured(options);
+        JsonSerializer.Serialize(writer, value, options);
+    }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = Justification)]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = Justification)]
     internal static string Serialize<T>(T value, JsonSerializerOptions options)
-        => JsonSerializer.Serialize(value, options);
+    {
+        AssertResolverConfigured(options);
+        return JsonSerializer.Serialize(value, options);
+    }
 
     [UnconditionalSuppressMessage("Trimming", "IL2026", Justification = Justification)]
     [UnconditionalSuppressMessage("AOT", "IL3050", Justification = Justification)]
     internal static JsonElement SerializeToElement(object value, Type inputType, JsonSerializerOptions options)
-        => JsonSerializer.SerializeToElement(value, inputType, options);
+    {
+        AssertResolverConfigured(options);
+        return JsonSerializer.SerializeToElement(value, inputType, options);
+    }
 }
 
 #endif
