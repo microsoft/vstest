@@ -14,17 +14,14 @@ using System.Text.Json.Serialization.Metadata;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 public partial class JsonDataSerializer
 {
-    private static readonly bool DisableFastJson = FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_FASTER_JSON_SERIALIZATION);
-
     private static readonly JsonSerializerOptions PayloadOptionsV1; // payload options for version <= 1
     private static readonly JsonSerializerOptions PayloadOptionsV2; // payload options for version >= 2
-    private static readonly JsonSerializerOptions FastOptions; // options for faster json
+    private static readonly JsonSerializerOptions FastOptions; // options for fast deserialization
     private static readonly JsonSerializerOptions DefaultOptions; // generic options
 
     static JsonDataSerializer()
@@ -189,34 +186,20 @@ public partial class JsonDataSerializer
 
     private static partial string SerializePayloadCore(string? messageType, object? payload, int version)
     {
+        if (payload is null)
+            return string.Empty;
+
         var payloadOptions = GetPayloadOptions(version);
-        // Fast json is only equivalent to the serialization that is used for protocol version 2 and upwards (or more precisely for the paths that use PayloadOptionsV2)
-        // so when we resolved the old options we should use non-fast path.
-        if (DisableFastJson || payloadOptions == PayloadOptionsV1)
-        {
-            if (payload is null)
-                return string.Empty;
 
-            var serializedPayload = StjSafe.SerializeToElement(payload, payload.GetType(), payloadOptions);
+        // Serialize payload to JsonElement first using the versioned options (which have the
+        // custom converters), then embed in the envelope. This two-step approach is required
+        // for NativeAOT: serializing object? Payload directly would require STJ to resolve
+        // the runtime type polymorphically via reflection.
+        var serializedPayload = StjSafe.SerializeToElement(payload, payload.GetType(), payloadOptions);
 
-            return version > 1 ?
-                Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload }) :
-                Serialize(DefaultOptions, new MessageEnvelope { MessageType = messageType, Payload = serializedPayload });
-        }
-        else
-        {
-            // Previously this was a "fast path" that serialized the payload directly into
-            // VersionedMessageForSerialization (with object? Payload) in a single pass.
-            // That optimization is intentionally removed: object? Payload requires STJ to
-            // resolve the runtime type polymorphically, which is incompatible with NativeAOT.
-            // Serializing to JsonElement first is slightly slower but AoT-safe.
-            if (payload is null)
-                return string.Empty;
-
-            var serializedPayload = StjSafe.SerializeToElement(payload, payload.GetType(), payloadOptions);
-
-            return Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload });
-        }
+        return version > 1 ?
+            Serialize(DefaultOptions, new VersionedMessageEnvelope { MessageType = messageType, Version = version, Payload = serializedPayload }) :
+            Serialize(DefaultOptions, new MessageEnvelope { MessageType = messageType, Payload = serializedPayload });
     }
 
     private static partial string SerializeCore<T>(T data, int version)
