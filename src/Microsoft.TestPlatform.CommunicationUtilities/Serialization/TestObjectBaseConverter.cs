@@ -26,9 +26,10 @@ internal class TestObjectBaseConverterFactory : JsonConverterFactory
 
     public override bool CanConvert(Type typeToConvert)
     {
-        return typeof(TestObject).IsAssignableFrom(typeToConvert)
-            && typeToConvert != typeof(TestCase)
-            && typeToConvert != typeof(TestResult);
+        // Only handle the abstract TestObject base type itself. TestCase and TestResult
+        // have their own dedicated converters. Other derived types are not expected on
+        // the wire protocol.
+        return typeToConvert == typeof(TestObject);
     }
 
     public override JsonConverter? CreateConverter(Type typeToConvert, JsonSerializerOptions options)
@@ -41,9 +42,7 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
 {
     public override bool CanConvert(Type typeToConvert)
     {
-        return typeof(TestObject).IsAssignableFrom(typeToConvert)
-            && typeToConvert != typeof(TestCase)
-            && typeToConvert != typeof(TestResult);
+        return typeToConvert == typeof(TestObject);
     }
 
     public override TestObject? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
@@ -151,7 +150,6 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
             case Guid g: writer.WriteStringValue(g); break;
             case Uri u: writer.WriteStringValue(u.OriginalString); break;
             case JsonElement je: je.WriteTo(writer); break;
-            case Enum e: writer.WriteNumberValue(Convert.ToInt64(e, System.Globalization.CultureInfo.InvariantCulture)); break;
             default:
                 // For complex types (Traits, collections, etc.), serialize to JsonElement
                 // first using the runtime type, then write the element. This avoids the

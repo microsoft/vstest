@@ -11,17 +11,20 @@
 // full call graph.
 
 using System;
-using System.Collections.Generic;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
-using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 
-// Reference the VsTestConsoleWrapper constructor to pull in the TranslationLayer.
-// This is enough for the linker to transitively analyze JsonDataSerializer,
-// the source-gen context, and all the custom converters.
+// Reference VsTestConsoleWrapper to pull in the TranslationLayer and ensure
+// the linker transitively analyzes JsonDataSerializer, the source-gen context,
+// and all the custom converters.
 Console.WriteLine("NativeAOT TranslationLayer consumer — linker analysis target.");
+
+// Touch the VsTestConsoleWrapper type so the linker doesn't remove it.
+// We can't actually connect (no vstest.console running), but the linker
+// needs to see the type is used to analyze its full dependency graph.
+Console.WriteLine($"VsTestConsoleWrapper type: {typeof(VsTestConsoleWrapper).FullName}");
 
 var parameters = new ConsoleParameters();
 Console.WriteLine($"ConsoleParameters created: LogFilePath={parameters.LogFilePath}");
@@ -33,5 +36,12 @@ Console.WriteLine($"TestCase: {testCase.FullyQualifiedName}");
 
 var testResult = new TestResult(testCase) { Outcome = TestOutcome.Passed };
 Console.WriteLine($"TestResult: {testResult.Outcome}");
+
+// Touch payload types to ensure they're preserved.
+var discoveryPayload = new DiscoveryRequestPayload { Sources = ["test.dll"], RunSettings = "<RunSettings/>" };
+Console.WriteLine($"DiscoveryRequestPayload sources: {string.Join(",", discoveryPayload.Sources!)}");
+
+var testRunPayload = new TestRunRequestPayload { Sources = ["test.dll"], RunSettings = "<RunSettings/>" };
+Console.WriteLine($"TestRunRequestPayload sources: {string.Join(",", testRunPayload.Sources!)}");
 
 Console.WriteLine("Done — if this published without IL2026/IL3050 warnings, AoT compatibility is verified.");

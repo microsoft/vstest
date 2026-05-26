@@ -71,6 +71,9 @@ public class NativeAotCompatibilityTests
         var exited = process.WaitForExit(TimeSpan.FromMinutes(10));
         Assert.IsTrue(exited, "dotnet publish timed out after 10 minutes.");
 
+        // Ensure all async output has been drained before reading the buffer.
+        process.WaitForExit();
+
         var output = outputBuilder.ToString();
 
         // Publish must succeed.

@@ -17,7 +17,7 @@ public class TestObjectConverterTests
     [TestMethod]
     public void TestObjectJsonShouldContainOnlyProperties()
     {
-        var json = Serialize(new TestableTestObject());
+        var json = Serialize<TestObject>(new TestableTestObject());
 
         Assert.AreEqual("{\"Properties\":[]}", json);
     }
@@ -41,7 +41,7 @@ public class TestObjectConverterTests
         test.SetPropertyValue(testProperty1, testPropertyData1);
         test.SetPropertyValue(testProperty2, testPropertyData2);
 
-        var json = Serialize(test);
+        var json = Serialize<TestObject>(test);
 
         // Use raw deserialization to validate basic properties
         // Because properties are backed up by a ConcurrentDictionary we don't have control over the order of serialization
@@ -62,7 +62,7 @@ public class TestObjectConverterTests
         var testPropertyData1 = new[] { "val1", "val2" };
         test.SetPropertyValue(testProperty1, testPropertyData1);
 
-        var json = Serialize(test);
+        var json = Serialize<TestObject>(test);
 
         var expectedJson = "{\"Properties\":[{\"Key\":{\"Id\":\"11\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.String[]\"},\"Value\":[\"val1\",\"val2\"]}]}";
         Assert.AreEqual(expectedJson, json);
@@ -76,7 +76,7 @@ public class TestObjectConverterTests
         var testPropertyData1 = DateTimeOffset.MaxValue;
         test.SetPropertyValue(testProperty1, testPropertyData1);
 
-        var json = Serialize(test);
+        var json = Serialize<TestObject>(test);
 
         var expectedJson = "{\"Properties\":[{\"Key\":{\"Id\":\"12\",\"Label\":\"label1\",\"Category\":\"\",\"Description\":\"\",\"Attributes\":0,\"ValueType\":\"System.DateTimeOffset\"},\"Value\":\"9999-12-31T23:59:59.9999999+00:00\"}]}";
         Assert.AreEqual(expectedJson, json);
@@ -90,8 +90,12 @@ public class TestObjectConverterTests
         var test = Deserialize<TestObject>(json);
 
         Assert.IsNotNull(test);
-        Assert.AreEqual(Guid.Parse("02048dfd-3da7-475d-a011-8dd1121855ec"), test.GetPropertyValue(TestProperty.Find("13")!));
-        Assert.AreEqual(29, test.GetPropertyValue(TestProperty.Find("2")!));
+        var prop13 = TestProperty.Find("13");
+        Assert.IsNotNull(prop13);
+        var prop2 = TestProperty.Find("2");
+        Assert.IsNotNull(prop2);
+        Assert.AreEqual(Guid.Parse("02048dfd-3da7-475d-a011-8dd1121855ec"), test.GetPropertyValue(prop13));
+        Assert.AreEqual(29, test.GetPropertyValue(prop2));
     }
 
     [TestMethod]
@@ -102,7 +106,9 @@ public class TestObjectConverterTests
         var test = Deserialize<TestObject>(json);
 
         Assert.IsNotNull(test);
-        Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(TestProperty.Find("14")!)?.ToString()));
+        var prop14 = TestProperty.Find("14");
+        Assert.IsNotNull(prop14);
+        Assert.IsTrue(string.IsNullOrEmpty(test.GetPropertyValue(prop14)?.ToString()));
     }
 
     [TestMethod]
@@ -113,7 +119,9 @@ public class TestObjectConverterTests
         var test = Deserialize<TestObject>(json);
 
         Assert.IsNotNull(test);
-        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(TestProperty.Find("15")!)!);
+        var prop15 = TestProperty.Find("15");
+        Assert.IsNotNull(prop15);
+        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(prop15)!);
     }
 
     [TestMethod]
@@ -124,7 +132,9 @@ public class TestObjectConverterTests
         var test = Deserialize<TestObject>(json);
 
         Assert.IsNotNull(test);
-        Assert.AreEqual(DateTimeOffset.MaxValue, test.GetPropertyValue(TestProperty.Find("16")!));
+        var prop16 = TestProperty.Find("16");
+        Assert.IsNotNull(prop16);
+        Assert.AreEqual(DateTimeOffset.MaxValue, test.GetPropertyValue(prop16));
     }
 
     [TestMethod]
