@@ -239,6 +239,33 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [NetCoreTargetFrameworkDataSource]
+    public void HangDumpShouldNotHangWhenTestHostFailsToStart(RunnerInfo runnerInfo)
+    {
+        // When testhost can't start (e.g. wrong runtime version), the inactivity timer
+        // must not try to dump PID 0. It should exit cleanly because the timer only starts
+        // after TestHostLaunched, which never fires here.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+        const string testAssetProjectName = "SimpleTestProjectMessedUpTargetFramework";
+        var assemblyPath = GetTestDllForFramework(testAssetProjectName + ".dll", Core11TargetFramework);
+
+        // Make testhost fail immediately by targeting a non-existent runtime.
+        var runtimeConfigJson = Path.Combine(Path.GetDirectoryName(assemblyPath)!, testAssetProjectName + ".runtimeconfig.json");
+        var fileContent = File.ReadAllText(runtimeConfigJson);
+        var updatedContent = fileContent.Replace("\"version\": \"11.0.0", "\"version\": \"9999.0.0");
+        File.WriteAllText(runtimeConfigJson, updatedContent);
+
+        var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
+        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=30s""");
+        InvokeVsTest(arguments);
+
+        // vstest should exit with failure (testhost didn't start), but not hang and not crash.
+        ExitCodeEquals(1);
+        Assert.DoesNotContain(".dmp", StdOut, "no dump should be collected when testhost never launched");
+    }
+
+    [TestMethod]
     [TestCategory("Windows-Review")]
     [DoNotParallelize] // Installs/uninstalls procdump as machine-wide postmortem debugger via HKLM registry.
     [NetFullTargetFrameworkDataSource]
