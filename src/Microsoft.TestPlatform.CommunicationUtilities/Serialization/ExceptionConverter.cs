@@ -4,6 +4,7 @@
 #if NETCOREAPP
 
 using System;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -12,12 +13,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 /// <summary>
 /// JSON converter for <see cref="Exception"/> that handles the read-only properties
 /// (<c>Message</c>, <c>StackTrace</c>) which STJ's source-generated metadata cannot populate
-/// via the parameterless constructor. Uses the <c>Exception(string, Exception)</c> constructor
-/// to preserve Message and InnerException during deserialization.
+/// via the parameterless constructor.
 /// <para>
-/// Note: the original exception type is erased during deserialization — all exceptions are
-/// materialized as <see cref="Exception"/>. <c>StackTrace</c> is not round-trippable because
-/// it is computed, not settable. <c>HResult</c> and <c>Source</c> are restored where present.
+/// On deserialization, produces a <see cref="RemoteException"/> that preserves the original
+/// type name, message, stack trace, and inner exception. The original exception type is erased
+/// (all exceptions materialize as <see cref="RemoteException"/>) but <c>ToString()</c> renders
+/// the full original information including type name and stack trace.
 /// </para>
 /// </summary>
 internal class ExceptionConverter : JsonConverter<Exception>
@@ -33,8 +34,16 @@ internal class ExceptionConverter : JsonConverter<Exception>
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
 
+        string? className = root.TryGetProperty("ClassName", out var clsProp) && clsProp.ValueKind == JsonValueKind.String
+            ? clsProp.GetString()
+            : null;
+
         string? message = root.TryGetProperty("Message", out var msgProp) && msgProp.ValueKind != JsonValueKind.Null
             ? msgProp.GetString()
+            : null;
+
+        string? stackTrace = root.TryGetProperty("StackTraceString", out var stProp) && stProp.ValueKind == JsonValueKind.String
+            ? stProp.GetString()
             : null;
 
         Exception? innerException = null;
@@ -43,9 +52,7 @@ internal class ExceptionConverter : JsonConverter<Exception>
             innerException = StjSafe.Deserialize<Exception>(innerProp.GetRawText(), options);
         }
 
-        var exception = message is not null
-            ? new Exception(message, innerException)
-            : new Exception();
+        var exception = new RemoteException(className, message, stackTrace, innerException);
 
         if (root.TryGetProperty("HResult", out var hresultProp) && hresultProp.ValueKind == JsonValueKind.Number)
         {
@@ -64,9 +71,15 @@ internal class ExceptionConverter : JsonConverter<Exception>
     public override void Write(Utf8JsonWriter writer, Exception value, JsonSerializerOptions options)
     {
         writer.WriteStartObject();
-        writer.WriteString("ClassName", value.GetType().FullName);
+
+        // For RemoteException (already deserialized once), preserve the original ClassName.
+        writer.WriteString("ClassName", value is RemoteException remote
+            ? remote.ClassName
+            : value.GetType().FullName);
         writer.WriteString("Message", value.Message);
-        writer.WriteString("StackTraceString", value.StackTrace);
+        writer.WriteString("StackTraceString", value is RemoteException re
+            ? re.RemoteStackTrace
+            : value.StackTrace);
         writer.WriteString("Source", value.Source);
         writer.WriteNumber("HResult", value.HResult);
 
@@ -81,6 +94,56 @@ internal class ExceptionConverter : JsonConverter<Exception>
         }
 
         writer.WriteEndObject();
+    }
+}
+
+/// <summary>
+/// Exception that preserves diagnostic information from a remotely-serialized exception,
+/// including the original type name and stack trace. Since the original exception type may
+/// not be available (or may be trimmed under NativeAOT), this type acts as a carrier that
+/// faithfully reproduces the original <c>ToString()</c> output.
+/// </summary>
+internal sealed class RemoteException : Exception
+{
+    /// <summary>
+    /// Gets the fully qualified name of the original exception type (e.g.
+    /// <c>"System.InvalidOperationException"</c>).
+    /// </summary>
+    public string? ClassName { get; }
+
+    /// <summary>
+    /// Gets the original stack trace string as captured from the remote process.
+    /// </summary>
+    public string? RemoteStackTrace { get; }
+
+    public RemoteException(string? className, string? message, string? stackTrace, Exception? innerException)
+        : base(message, innerException)
+    {
+        ClassName = className;
+        RemoteStackTrace = stackTrace;
+    }
+
+    public override string ToString()
+    {
+        var sb = new StringBuilder();
+        sb.Append(ClassName ?? nameof(RemoteException));
+        if (!string.IsNullOrEmpty(Message))
+        {
+            sb.Append(": ").Append(Message);
+        }
+
+        if (InnerException is not null)
+        {
+            sb.Append(" ---> ").Append(InnerException).AppendLine()
+              .Append("   --- End of inner exception stack trace ---");
+        }
+
+        if (!string.IsNullOrEmpty(RemoteStackTrace))
+        {
+            sb.AppendLine().Append(RemoteStackTrace);
+        }
+
+        return sb.ToString();
     }
 }
 
