@@ -251,18 +251,25 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
         // Make testhost fail immediately by targeting a non-existent runtime.
         var runtimeConfigJson = Path.Combine(Path.GetDirectoryName(assemblyPath)!, testAssetProjectName + ".runtimeconfig.json");
-        var fileContent = File.ReadAllText(runtimeConfigJson);
-        var updatedContent = fileContent.Replace("\"version\": \"11.0.0", "\"version\": \"9999.0.0");
-        File.WriteAllText(runtimeConfigJson, updatedContent);
+        var originalContent = File.ReadAllText(runtimeConfigJson);
+        try
+        {
+            var updatedContent = originalContent.Replace("\"version\": \"11.0.0", "\"version\": \"9999.0.0");
+            File.WriteAllText(runtimeConfigJson, updatedContent);
 
-        var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
-        arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
-        arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=30s""");
-        InvokeVsTest(arguments);
+            var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
+            arguments = string.Concat(arguments, $" /ResultsDirectory:{TempDirectory.Path}");
+            arguments = string.Concat(arguments, $@" /Blame:""CollectHangDump;HangDumpType=mini;TestTimeout=30s""");
+            InvokeVsTest(arguments);
 
-        // vstest should exit with failure (testhost didn't start), but not hang and not crash.
-        ExitCodeEquals(1);
-        Assert.DoesNotContain(".dmp", StdOut, "no dump should be collected when testhost never launched");
+            // vstest should exit with failure (testhost didn't start), but not hang and not crash.
+            ExitCodeEquals(1);
+            Assert.DoesNotContain(".dmp", StdOut, "no dump should be collected when testhost never launched");
+        }
+        finally
+        {
+            File.WriteAllText(runtimeConfigJson, originalContent);
+        }
     }
 
     [TestMethod]
