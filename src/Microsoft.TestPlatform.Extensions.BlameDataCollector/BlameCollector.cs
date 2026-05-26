@@ -59,7 +59,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     private IInactivityTimer? _inactivityTimer;
     private TimeSpan _inactivityTimespan = TimeSpan.FromMinutes(DefaultInactivityTimeInMinutes);
 
-    private volatile int _testHostProcessId;
+    private int _testHostProcessId;
     private string? _testHostProcessName;
     private string? _targetFramework;
     private readonly List<KeyValuePair<string, string>> _environmentVariables = new();
@@ -200,7 +200,8 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
         if (_collectProcessDumpOnHang)
         {
             _inactivityTimer ??= new InactivityTimer(CollectDumpAndAbortTesthost);
-            ResetInactivityTimer();
+            // Don't start the timer here — wait until TestHostLaunched so we know
+            // which process to dump. ResetInactivityTimer is called from TestHostLaunchedHandler.
         }
     }
 
@@ -244,13 +245,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             EqtTrace.Verbose("Inactivity timer is already disposed.");
         }
 
-        // If testhost has not launched yet, we cannot dump or kill it.
-        if (_testHostProcessId == 0)
-        {
-            EqtTrace.Warning("BlameCollector.CollectDumpAndAbortTesthost: Test host process has not launched yet. Skipping hang dump.");
-            _logger.LogWarning(_context.SessionDataCollectionContext, Resources.Resources.TestHostNotLaunchedCannotCollectHangDump);
-            return;
-        }
+        // If testhost has not launched yet, the timer should not have been started,
+        // so this callback should not fire. Assert to catch unexpected paths.
+        TPDebug.Assert(_testHostProcessId != 0, "CollectDumpAndAbortTesthost called but testhost has not launched yet.");
 
         if (_collectProcessDumpOnCrash)
         {
@@ -638,9 +635,9 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="args">TestHostLaunchedEventArgs</param>
     private void TestHostLaunchedHandler(object? sender, TestHostLaunchedEventArgs args)
     {
-        ResetInactivityTimer();
         _testHostProcessId = args.TestHostProcessId;
         _testHostProcessName = _processHelper.GetProcessName(args.TestHostProcessId);
+        ResetInactivityTimer();
 
         if (!_collectProcessDumpOnCrash)
         {

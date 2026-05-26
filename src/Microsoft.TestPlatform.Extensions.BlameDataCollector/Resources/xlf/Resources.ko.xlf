@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx" target-language="ko">
     <body>
@@ -86,11 +86,6 @@ This test may, or may not be the source of the crash.</source>
       <trans-unit id="MonitorPostmortemDebuggerInvalidDumpDirectoryPathParameter">
         <source>Invalid 'DumpDirectoryPath' for postmortem debugger monitor</source>
         <target state="translated">사후 디버거 모니터에 대한 잘못된 'DumpDirectoryPath'</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="TestHostNotLaunchedCannotCollectHangDump">
-        <source>Test host process has not launched yet. Cannot collect hang dump.</source>
-        <target state="new">Test host process has not launched yet. Cannot collect hang dump.</target>
         <note />
       </trans-unit>
     </body>

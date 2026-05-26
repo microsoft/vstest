@@ -111,7 +111,7 @@ public class BlameCollectorTests
 
     /// <summary>
     /// Initializing with collect dump for hang should configure the timer with the right values and should
-    /// not call the reset method if no events are received.
+    /// start the timer when testhost launches (not during Initialize).
     /// </summary>
     [TestMethod]
     public void InitializeWithDumpForHangShouldInitializeInactivityTimerAndCallResetOnce()
@@ -127,12 +127,17 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        Assert.AreEqual(1, resetCalledCount, "Should have called InactivityTimer.Reset exactly once since no events were received");
+        Assert.AreEqual(0, resetCalledCount, "Should not have called InactivityTimer.Reset during Initialize — timer starts on TestHostLaunched");
+
+        // Simulate testhost launching — this should start the timer.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        Assert.AreEqual(1, resetCalledCount, "Should have called InactivityTimer.Reset exactly once after TestHostLaunched");
     }
 
     /// <summary>
     /// Initializing with collect dump for hang should configure the timer with the right values and should
-    /// reset for each event received
+    /// reset for each event received (including TestHostLaunched which starts the timer).
     /// </summary>
     [TestMethod]
     public void InitializeWithDumpForHangShouldInitializeInactivityTimerAndResetForEachEventReceived()
@@ -150,6 +155,9 @@ public class BlameCollectorTests
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
+
+        // Simulate testhost launching — this starts the timer (1st reset).
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         TestCase testcase = new("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
 
@@ -273,11 +281,11 @@ public class BlameCollectorTests
     }
 
     /// <summary>
-    /// If the inactivity timer fires before testhost has launched, the hang dump should not be
-    /// attempted (which would target PID 0 — the Idle process on Windows / Swapper on Linux).
+    /// If testhost has not launched, the inactivity timer should not be started, so no hang dump
+    /// should be attempted even after the configured timeout elapses.
     /// </summary>
     [TestMethod]
-    public void InitializeWithDumpForHangShouldSkipDumpIfTestHostHasNotLaunchedYet()
+    public void InitializeWithDumpForHangShouldNotStartTimerIfTestHostHasNotLaunchedYet()
     {
         _blameDataCollector = new TestableBlameCollector(
             _mockBlameReaderWriter.Object,
@@ -286,12 +294,6 @@ public class BlameCollectorTests
             _mockFileHelper.Object,
             _mockProcessHelper.Object);
 
-        // Signal that fires once the timer callback completes (warning logged).
-        var warningLogged = new ManualResetEventSlim();
-        _mockLogger
-            .Setup(x => x.LogWarning(It.IsAny<DataCollectionContext>(), It.IsAny<string>()))
-            .Callback(() => warningLogged.Set());
-
         _blameDataCollector.Initialize(
             GetDumpConfigurationElement(false, false, true, 0),
             _mockDataColectionEvents.Object,
@@ -299,10 +301,11 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        // Do NOT raise TestHostLaunched — _testHostProcessId stays 0.
-        warningLogged.Wait(1000, TestContext.CancellationToken);
+        // Do NOT raise TestHostLaunched — timer should never start.
+        // Wait long enough that a started timer with timeout 0 would have fired.
+        Thread.Sleep(100);
 
-        // The hang dump must not have been attempted against PID 0.
+        // The hang dump must not have been attempted.
         _mockProcessDumpUtility.Verify(
             x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()),
             Times.Never);
