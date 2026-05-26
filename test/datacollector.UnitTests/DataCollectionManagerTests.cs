@@ -445,6 +445,28 @@ public class DataCollectionManagerTests
     }
 
     [TestMethod]
+    public void TestCaseStartedShouldThrowIfTestElementIsNull()
+    {
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseStart += (sender, eventArgs) => { });
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var args = new TestCaseStartEventArgs() { TestElement = null };
+
+        Assert.ThrowsExactly<InvalidOperationException>(() => _dataCollectionManager.TestCaseStarted(args));
+    }
+
+    [TestMethod]
+    public void TestCaseEndedShouldThrowIfTestElementIsNull()
+    {
+        SetupMockDataCollector((XmlElement a, DataCollectionEvents b, DataCollectionSink c, DataCollectionLogger d, DataCollectionEnvironmentContext e) => b.TestCaseEnd += (sender, eventArgs) => { });
+
+        _dataCollectionManager.InitializeDataCollectors(_dataCollectorSettings);
+        var args = new TestCaseEndEventArgs() { TestElement = null };
+
+        Assert.ThrowsExactly<InvalidOperationException>(() => _dataCollectionManager.TestCaseEnded(args));
+    }
+
+    [TestMethod]
     public void TestCaseEndedShouldSendEventToDataCollector()
     {
         var isEndInvoked = false;
