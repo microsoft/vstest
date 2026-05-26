@@ -31,6 +31,27 @@ public class TestObjectConverterTests
     }
 
     [TestMethod]
+    public void TestObjectShouldRoundTripCustomPropertiesFromConcreteSubtype()
+    {
+        var original = new TestableTestObject();
+        var stringProp = TestProperty.Register("rt1", "RoundTripString", typeof(string), typeof(TestableTestObject));
+        var intProp = TestProperty.Register("rt2", "RoundTripInt", typeof(int), typeof(TestableTestObject));
+        original.SetPropertyValue(stringProp, "hello");
+        original.SetPropertyValue(intProp, 42);
+
+        var json = Serialize<TestObject>(original);
+        var deserialized = Deserialize<TestObject>(json);
+
+        Assert.IsNotNull(deserialized);
+        var foundString = TestProperty.Find("rt1");
+        var foundInt = TestProperty.Find("rt2");
+        Assert.IsNotNull(foundString);
+        Assert.IsNotNull(foundInt);
+        Assert.AreEqual("hello", deserialized.GetPropertyValue(foundString));
+        Assert.AreEqual(42, deserialized.GetPropertyValue(foundInt));
+    }
+
+    [TestMethod]
     public void TestCaseObjectShouldSerializeCustomProperties()
     {
         var test = new TestableTestObject();
