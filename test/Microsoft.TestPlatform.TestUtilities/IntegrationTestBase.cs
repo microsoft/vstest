@@ -223,7 +223,20 @@ public class IntegrationTestBase
         if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments ?? ""))
         {
             Directory.CreateDirectory(DiagLogsDirectory);
-            arguments = string.Concat(arguments, GetDiagArg(DiagLogsDirectory));
+            var diagArg = GetDiagArg(DiagLogsDirectory);
+
+            // Insert --diag before the -- separator so it's treated as a vstest.console argument,
+            // not as a runsettings parameter.
+            var separatorPos = arguments?.IndexOf(" -- ") ?? -1;
+            if (separatorPos == -1)
+            {
+                arguments = string.Concat(arguments, diagArg);
+            }
+            else
+            {
+                arguments = arguments!.Insert(separatorPos, diagArg);
+            }
+
             _attachments.Add(DiagLogsDirectory);
             Console.WriteLine($"Diagnostic logs directory: {DiagLogsDirectory}");
         }

@@ -197,7 +197,6 @@ public class DataCollectionTests : AcceptanceTestBase
         // Verify attachments
         var isTestRunLevelAttachmentFound = false;
         var testCaseLevelAttachmentsCount = 0;
-        var diaglogsFileCount = 0;
 
         var resultFiles = Directory.GetFiles(resultsDir, "*.txt", SearchOption.AllDirectories);
 
@@ -214,15 +213,16 @@ public class DataCollectionTests : AcceptanceTestBase
             {
                 testCaseLevelAttachmentsCount++;
             }
-
-            if (file.Contains("diaglog"))
-            {
-                diaglogsFileCount++;
-            }
         }
 
         Assert.IsTrue(isTestRunLevelAttachmentFound);
         Assert.AreEqual(3, testCaseLevelAttachmentsCount);
+
+        // Diag logs are placed in DiagLogsDirectory by the auto-injected --diag flag.
+        // The files are named log.txt, log.host.*.txt, log.datacollector.*.txt.
+        var diaglogsFileCount = Directory.Exists(DiagLogsDirectory)
+            ? Directory.GetFiles(DiagLogsDirectory, "log*", SearchOption.TopDirectoryOnly).Length
+            : 0;
         Assert.AreEqual(3, diaglogsFileCount);
     }
 
