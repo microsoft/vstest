@@ -4,6 +4,7 @@
 #if NETCOREAPP
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Text.Json;
@@ -150,10 +151,50 @@ internal class TestObjectBaseConverter : JsonConverter<TestObject>
             case Guid g: writer.WriteStringValue(g); break;
             case Uri u: writer.WriteStringValue(u.OriginalString); break;
             case JsonElement je: je.WriteTo(writer); break;
+            case TimeSpan ts: writer.WriteStringValue(ts.ToString()); break;
+            case Enum e:
+                // Write enums as their underlying numeric value.
+                writer.WriteNumberValue(Convert.ToInt64(e, CultureInfo.InvariantCulture));
+                break;
+            case string[] sa:
+                writer.WriteStartArray();
+                foreach (var item in sa) writer.WriteStringValue(item);
+                writer.WriteEndArray();
+                break;
+            case KeyValuePair<string, string>[] kvps:
+                writer.WriteStartArray();
+                foreach (var kvp in kvps)
+                {
+                    writer.WriteStartObject();
+                    writer.WriteString("Key", kvp.Key);
+                    writer.WriteString("Value", kvp.Value);
+                    writer.WriteEndObject();
+                }
+                writer.WriteEndArray();
+                break;
+            case IDictionary dict:
+                writer.WriteStartObject();
+                foreach (DictionaryEntry entry in dict)
+                {
+                    writer.WritePropertyName(Convert.ToString(entry.Key, CultureInfo.InvariantCulture)!);
+                    if (entry.Value is null) writer.WriteNullValue();
+                    else WritePropertyValue(writer, entry.Value, options);
+                }
+                writer.WriteEndObject();
+                break;
+            case IEnumerable enumerable:
+                writer.WriteStartArray();
+                foreach (var item in enumerable)
+                {
+                    if (item is null) writer.WriteNullValue();
+                    else WritePropertyValue(writer, item, options);
+                }
+                writer.WriteEndArray();
+                break;
             default:
-                // For complex types (Traits, collections, etc.), serialize to JsonElement
-                // first using the runtime type, then write the element. This avoids the
-                // object? polymorphism problem while still producing valid JSON.
+                // Last resort for types not handled above. Under NativeAOT this may
+                // fail for types not in the source-gen context, but all known property
+                // value types used in the wire protocol are handled explicitly.
                 var element = StjSafe.SerializeToElement(value, value.GetType(), options);
                 element.WriteTo(writer);
                 break;
