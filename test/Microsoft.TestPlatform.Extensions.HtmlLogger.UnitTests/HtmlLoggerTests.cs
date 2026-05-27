@@ -253,8 +253,8 @@ public class HtmlLoggerTests
     {
         // Characters like \x01 (SOH) are invalid in XML 1.0 and would cause DataContractSerializer to throw.
         var testCase = CreateTestCase("Pass1");
-        testCase.FullyQualifiedName = "fully";
         testCase.Source = "abc/def.dll";
+        testCase.FullyQualifiedName = "Namespace.Class.\x04Method";
 
         var testResult = new ObjectModel.TestResult(testCase)
         {
@@ -268,6 +268,7 @@ public class HtmlLoggerTests
         var result = _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First();
 
         Assert.AreEqual(@"TestMethod(\u0001value)", result.DisplayName);
+        Assert.AreEqual(@"Namespace.Class.\u0004Method", result.FullyQualifiedName);
         Assert.AreEqual(@"error\u0002message", result.ErrorMessage);
         Assert.AreEqual(@"stack\u0003trace", result.ErrorStackTrace);
     }
