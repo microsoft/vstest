@@ -11,26 +11,21 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
-public class DataCollectorTestsCoverlets : IntegrationTestBase
+public class DataCollectorTestsCoverlets : AcceptanceTestBase
 {
     [TestMethod]
-    public void RunCoverletCoverage()
+    [NetCoreRunner(HOST_NET)]
+    public void RunCoverletCoverage(RunnerInfo runnerInfo)
     {
-        // REVIEW ME: @Marco do we need to update this test?
-        // Collector is supported only for netcoreapp2.1, is compiled for netcoreapp2.1 and packaged as netstandard
-        if (_testEnvironment.TargetFramework != CoreRunnerFramework)
-        {
-            return;
-        }
+        SetTestEnvironment(_testEnvironment, runnerInfo);
 
         // We use netcoreapp runner
-        // "...\vstest\tools\dotnet\dotnet.exe "...\vstest\artifacts\Debug\net8.0\vstest.console.dll" --collect:"XPlat Code Coverage" ...
-        _testEnvironment.RunnerFramework = CoreRunnerFramework;
+        // "...\vstest\tools\dotnet\dotnet.exe "...\vstest\artifacts\Debug\net11.0\vstest.console.dll" --collect:"XPlat Code Coverage" ...
         var resultsDir = new TempDirectory();
 
         string coverletAdapterPath = Path.GetDirectoryName(Directory.GetFiles(_testEnvironment.GetNugetPackage("coverlet.collector"), "coverlet.collector.dll", SearchOption.AllDirectories).Single())!;
         string assemblyPath = GetAssetFullPath("CoverletCoverageTestProject.dll").Trim('\"');
-        string argument = $"--collect:{"XPlat Code Coverage".AddDoubleQuote()} {PrepareArguments(assemblyPath, coverletAdapterPath, "", ".NETCoreApp,Version=v2.1", resultsDirectory: resultsDir.Path)}";
+        string argument = $"--collect:{"XPlat Code Coverage".AddDoubleQuote()} {PrepareArguments(assemblyPath, coverletAdapterPath, "", FrameworkArgValue, resultsDirectory: resultsDir.Path)}";
         InvokeVsTest(argument);
 
         // Verify vstest.console.dll CollectArgumentProcessor fix codeBase for coverlet package
@@ -40,11 +35,12 @@ public class DataCollectorTestsCoverlets : IntegrationTestBase
         Assert.Contains("CoverletDataCollector in-process codeBase path", File.ReadAllText(log));
 
         // Verify out-of-proc coverlet collector load
-        var dataCollectorLog = Directory.GetFiles(DiagLogsDirectory, "log.txt.datacollector*").Single();
+        // Diag log naming: Path.ChangeExtension("log.txt", "datacollector.{ts}_{tid}.txt") produces "log.datacollector.*.txt"
+        var dataCollectorLog = Directory.GetFiles(DiagLogsDirectory, "log.datacollector*").Single();
         Assert.Contains("[coverlet]Initializing CoverletCoverageDataCollector", File.ReadAllText(dataCollectorLog));
 
         // Verify in-proc coverlet collector load
-        var hostLog = Directory.GetFiles(DiagLogsDirectory, "log.txt.host*").Single();
+        var hostLog = Directory.GetFiles(DiagLogsDirectory, "log.host*").Single();
         Assert.Contains("[coverlet]Initialize CoverletInProcDataCollector", File.ReadAllText(hostLog));
 
         // Verify default coverage file is generated
