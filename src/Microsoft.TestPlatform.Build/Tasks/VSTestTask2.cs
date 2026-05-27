@@ -291,14 +291,14 @@ public class VSTestTask2 : ToolTask, ITestTask
             if (input[i] == '%' && i + 1 < input.Length)
             {
                 char next = input[++i];
-                sb.Append(next switch
+                switch (next)
                 {
-                    '%' => '%',
-                    'p' => '|',
-                    'r' => '\r',
-                    'n' => '\n',
-                    _ => $"%{next}",
-                });
+                    case '%': sb.Append('%'); break;
+                    case 'p': sb.Append('|'); break;
+                    case 'r': sb.Append('\r'); break;
+                    case 'n': sb.Append('\n'); break;
+                    default: sb.Append('%'); sb.Append(next); break;
+                }
             }
             else
             {

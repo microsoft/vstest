@@ -229,11 +229,12 @@ internal class MSBuildLogger : ITestLoggerWithParameters
     }
 
     /// <summary>
-    /// Writes message to standard output, with the name of the message followed by the number of
-    /// parameters. With each parameter delimited by '||||', and special characters escaped with '%'.
+    /// Writes message to standard output, with the name of the message followed by
+    /// parameters. Each parameter is delimited by '||||', and special characters are
+    /// escaped with '%' (see <see cref="Escape"/>).
     /// Such as:
-    ///  ||||run-start1||||s:\t\mstest97\bin\Debug\net8.0\mstest97.dll
-    ///  ||||test-failed6||||TestMethod5||||Assert.IsTrue failed. ||||   at mstest97.UnitTest1.TestMethod5() in s:\t\mstest97\UnitTest1.cs:line 27%r%n   at Syste...
+    ///  ||||run-start||||s:\t\mstest97\bin\Debug\net8.0\mstest97.dll
+    ///  ||||test-failed||||TestMethod5||||Assert.IsTrue failed. ||||   at mstest97.UnitTest1.TestMethod5() in s:\t\mstest97\UnitTest1.cs:line 27%r%n   at Syste...
     /// </summary>
     /// <param name="name"></param>
     /// <param name="data"></param>
@@ -285,14 +286,14 @@ internal class MSBuildLogger : ITestLoggerWithParameters
             if (input[i] == '%' && i + 1 < input.Length)
             {
                 char next = input[++i];
-                sb.Append(next switch
+                switch (next)
                 {
-                    '%' => '%',
-                    'p' => '|',
-                    'r' => '\r',
-                    'n' => '\n',
-                    _ => $"%{next}", // unknown escape — preserve as-is
-                });
+                    case '%': sb.Append('%'); break;
+                    case 'p': sb.Append('|'); break;
+                    case 'r': sb.Append('\r'); break;
+                    case 'n': sb.Append('\n'); break;
+                    default: sb.Append('%'); sb.Append(next); break;
+                }
             }
             else
             {
