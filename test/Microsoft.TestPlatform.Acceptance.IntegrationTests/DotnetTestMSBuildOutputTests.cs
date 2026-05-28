@@ -91,9 +91,9 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj", runnerInfo.TargetFramework);
-        // Invoke via dotnet msbuild /t:VSTest with terminal logger on and no explicit VsTestUseMSBuildOutput property.
+        // Invoke via dotnet msbuild /t:Build;VSTest with terminal logger on and no explicit VsTestUseMSBuildOutput property.
         // The MSBuild output path should be used automatically when the terminal logger is active.
-        InvokeDotnetMSBuildTest($@"-t:VSTest {projectPath} -tl:on -nodereuse:false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", workingDirectory: Path.GetDirectoryName(projectPath));
+        InvokeDotnetMSBuildTest($@"-t:Build;VSTest {projectPath} -tl:on -nodereuse:false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", workingDirectory: Path.GetDirectoryName(projectPath));
 
         StdOutputContains("TESTERROR");
         StdOutputContains("FailingTest (");
