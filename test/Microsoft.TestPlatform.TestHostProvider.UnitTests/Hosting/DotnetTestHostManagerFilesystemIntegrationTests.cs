@@ -40,7 +40,6 @@ public class DotnetTestHostManagerFilesystemIntegrationTests
     private readonly Mock<IRunSettingsHelper> _mockRunsettingsHelper = new();
     private readonly Mock<IWindowsRegistryHelper> _mockWindowsRegistry = new();
     private readonly Mock<IEnvironmentVariableHelper> _mockEnvironmentVariable = new();
-    private readonly Mock<IDotnetHostHelper> _mockDotnetHostHelper = new();
     private readonly TestRunnerConnectionInfo _connectionInfo = new()
     {
         Port = 123,
