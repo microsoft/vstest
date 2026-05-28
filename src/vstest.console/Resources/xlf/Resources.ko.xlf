@@ -17,7 +17,7 @@
         <target state="translated">다음 테스트 실행 추가 기능을 사용할 수 있습니다.</target>
         <note />
       </trans-unit>
-            <trans-unit id="AvailableExtensionFormat">
+      <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
         <target state="translated">    {0}</target>
         <note>{Locked}</note>

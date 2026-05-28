@@ -17,7 +17,7 @@
         <target state="translated">Şu Test Yürütmesi eklentileri kullanılabilir:</target>
         <note />
       </trans-unit>
-            <trans-unit id="AvailableExtensionFormat">
+      <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
         <target state="translated">    {0}</target>
         <note>{Locked}</note>
