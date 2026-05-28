@@ -37,7 +37,6 @@
         <target state="translated">    {0}</target>
         <note>{Locked}</note>
       </trans-unit>
-
       <trans-unit id="CommandLineError">
         <source>Error: {0}</source>
         <target state="translated">Erro: {0}</target>
