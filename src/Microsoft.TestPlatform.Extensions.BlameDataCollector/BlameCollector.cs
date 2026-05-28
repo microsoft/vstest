@@ -635,7 +635,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// <param name="args">TestHostLaunchedEventArgs</param>
     private void TestHostLaunchedHandler(object? sender, TestHostLaunchedEventArgs args)
     {
-        _testHostProcessId = args.TestHostProcessId;
+        Interlocked.Exchange(ref _testHostProcessId, args.TestHostProcessId);
         _testHostProcessName = _processHelper.GetProcessName(args.TestHostProcessId);
         ResetInactivityTimer();
 
