@@ -163,6 +163,38 @@ public class InProcessVsTestConsoleWrapperTests
     }
 
     [TestMethod]
+    [TestCategory("Windows")]
+    [OSCondition(OperatingSystems.Windows)]
+    public void InProcessWrapperConstructorWithRealEnvironmentHelper_OnWindows_IncludesNativeEqualsEnvironmentVariablesInProcessHelper()
+    {
+        var consoleParams = new ConsoleParameters { InheritEnvironmentVariables = true };
+
+        // Use a real IEnvironmentVariableHelper so that GetEnvironmentVariables() returns the
+        // actual managed snapshot (which omits '='-prefixed keys on Windows). The fix in
+        // InProcessVsTestConsoleWrapper must supplement that snapshot via P/Invoke so that
+        // testhost receives the full native environment block.
+        _ = new InProcessVsTestConsoleWrapper(
+            consoleParams,
+            new RealEnvironmentVariableHelper(),
+            _mockRequestSender.Object,
+            _mockTestRequestManager.Object,
+            new Executor(_mockOutput.Object, new Mock<ITestPlatformEventSource>().Object, new ProcessHelper(), new PlatformEnvironment()),
+            new Mock<ITestPlatformEventSource>().Object,
+            new());
+
+        // Windows always maintains at least one '=<Drive>:' entry in the native env block (e.g.
+        // "=C:=C:\..."). Without the fix these entries are invisible to the managed API and would
+        // not be forwarded to testhost.
+        var hasEqualsKey = ProcessHelper.ExternalEnvironmentVariables?.Keys
+            .Cast<string>()
+            .Any(k => k.StartsWith("=", StringComparison.Ordinal));
+
+        Assert.IsTrue(hasEqualsKey,
+            "ProcessHelper.ExternalEnvironmentVariables must contain at least one '='-prefixed " +
+            "drive-relative current-directory entry on Windows when InheritEnvironmentVariables is true.");
+    }
+
+    [TestMethod]
     public void InProcessWrapperConstructorShouldSetTheCultureSpecifiedByTheUser()
     {
         // Arrange
@@ -1116,5 +1148,33 @@ public class InProcessVsTestConsoleWrapperTests
                 It.IsAny<TestRunAttachmentsProcessingPayload>(),
                 It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(),
                 It.IsAny<ProtocolConfig>()), Times.Once);
+    }
+
+    /// <summary>
+    /// A non-mocked <see cref="IEnvironmentVariableHelper"/> that delegates to the real
+    /// <see cref="Environment"/> APIs. Used to exercise the native Windows P/Invoke code path
+    /// inside <see cref="InProcessVsTestConsoleWrapper"/> that supplements the managed env snapshot
+    /// with <c>=</c>-prefixed drive-relative current-directory entries.
+    /// </summary>
+    private sealed class RealEnvironmentVariableHelper : IEnvironmentVariableHelper
+    {
+        public IDictionary GetEnvironmentVariables() => Environment.GetEnvironmentVariables();
+
+        public string? GetEnvironmentVariable(string variable) => Environment.GetEnvironmentVariable(variable);
+
+        public TEnum GetEnvironmentVariableAsEnum<TEnum>(string variable, TEnum defaultValue = default)
+            where TEnum : struct, Enum
+        {
+            var value = Environment.GetEnvironmentVariable(variable);
+            if (string.IsNullOrEmpty(value))
+            {
+                return defaultValue;
+            }
+
+            return Enum.TryParse<TEnum>(value, out var result) ? result : defaultValue;
+        }
+
+        public void SetEnvironmentVariable(string variable, string value) =>
+            Environment.SetEnvironmentVariable(variable, value);
     }
 }
