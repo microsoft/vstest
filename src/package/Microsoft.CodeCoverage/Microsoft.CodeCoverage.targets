@@ -14,29 +14,16 @@
 
   <!-- This target required to enable /collect:"Code Coverage" in "dotnet publish" scenario with "dotnet vstest".
        E.g: Release pipelines where user/project nuget cache not available on current machine.
-       Skipped when Microsoft.Testing.Extensions.CodeCoverage is referenced (directly or transitively),
-       as that package already provides the correct version of its artifacts and this copy would overwrite
-       them with older files. -->
+       Uses Overwrite="false" so that files already placed by Microsoft.Testing.Extensions.CodeCoverage
+       (which runs before this target) are not overwritten with older versions from this package. -->
   <Target Name="CopyTraceDataCollectorArtifacts" AfterTargets="ComputeFilesToPublish">
 
-    <!-- Detect whether Microsoft.Testing.Extensions.CodeCoverage is referenced (directly or transitively).
-         @(PackageReference) covers direct references; $(Pkgmicrosoft_Testing_Extensions_CodeCoverage)
-         is set by NuGet for all resolved packages including transitive ones. -->
     <ItemGroup>
-      <_MtpCodeCoverageRef Include="@(PackageReference)" Condition="'%(PackageReference.Identity)' == 'Microsoft.Testing.Extensions.CodeCoverage'" />
-    </ItemGroup>
-
-    <PropertyGroup>
-      <_MtpCodeCoveragePresent Condition="'@(_MtpCodeCoverageRef)' != '' or '$(Pkgmicrosoft_Testing_Extensions_CodeCoverage)' != ''">true</_MtpCodeCoveragePresent>
-      <_MtpCodeCoveragePresent Condition="'$(_MtpCodeCoveragePresent)' == ''">false</_MtpCodeCoveragePresent>
-    </PropertyGroup>
-
-    <ItemGroup Condition="'$(_MtpCodeCoveragePresent)' == 'false'">
       <TraceDataCollectorArtifacts Include="$(MSBuildThisFileDirectory)\**\*.*" />
     </ItemGroup>
 
     <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)"
-          Condition="'$(_MtpCodeCoveragePresent)' == 'false'" />
+          Overwrite="false" />
 
   </Target>
 
