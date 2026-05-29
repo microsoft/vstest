@@ -239,6 +239,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [DoNotParallelize] // Modifies the test asset's runtimeconfig.json on disk.
     [NetCoreTargetFrameworkDataSource]
     public void HangDumpShouldNotHangWhenTestHostFailsToStart(RunnerInfo runnerInfo)
     {
@@ -254,7 +255,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var originalContent = File.ReadAllText(runtimeConfigJson);
         try
         {
-            var updatedContent = originalContent.Replace("\"version\": \"11.0.0", "\"version\": \"9999.0.0");
+            var updatedContent = Regex.Replace(originalContent, @"""version""\s*:\s*""[\d.]+""", @"""version"": ""9999.0.0""");
             File.WriteAllText(runtimeConfigJson, updatedContent);
 
             var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
@@ -264,6 +265,8 @@ public class BlameDataCollectorTests : AcceptanceTestBase
 
             // vstest should exit with failure (testhost didn't start), but not hang and not crash.
             ExitCodeEquals(1);
+            // Verify the failure was specifically because the runtime wasn't found, not some other error.
+            Assert.MatchesRegex(new Regex(@"framework.*9999\.0\.0|9999\.0\.0.*not found|compatible framework version", RegexOptions.IgnoreCase), StdOut + Environment.NewLine + StdErr, "testhost should fail because the runtime version was not found");
             Assert.DoesNotContain(".dmp", StdOut, "no dump should be collected when testhost never launched");
         }
         finally
