@@ -265,9 +265,7 @@ public class LoggerTests : AcceptanceTestBase
         // each should get a unique file (via iteration) instead of overwriting.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var assembly1 = GetAssetFullPath("SimpleTestProject.dll");
-        var assembly2 = GetAssetFullPath("SimpleTestProject2.dll");
-        var assemblyPaths = $"{assembly1}\" \"{assembly2}";
+        var assemblyPaths = BuildMultipleAssemblyPath("SimpleTestProject.dll", "SimpleTestProject2.dll");
         var trxFileName = "SharedName.trx";
         var arguments = PrepareArguments(assemblyPaths, null, string.Empty, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFileName}\"");
