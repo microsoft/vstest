@@ -11,12 +11,15 @@ $script:hasUnfixableErrors = $false
 # Locally: auto-fixes the source app.config files with the correct versions.
 
 # Assemblies that have binding redirects but are intentionally NOT shipped in the
-# CLI/SDK package. These are loaded from Visual Studio at runtime when testhost
-# runs inside VS. A redirect without a DLL is safe here because the DLL comes
-# from VS's probing path, not from the package layout.
+# CLI/SDK package. A redirect without a DLL is safe here because the DLL is
+# provided at runtime from another probing path (VS install directory or the
+# test project's own output directory).
 $script:AllowMissingDlls = @(
     "Microsoft.VisualStudio.TestWindow.Interfaces"
     "Microsoft.VisualStudio.QualityTools.UnitTestFramework"
+    # Provided by the test project's own NuGet reference, not shipped by vstest.
+    # The redirect is needed to forward version conflicts in net462 testhosts.
+    "System.Threading.Tasks.Extensions"
 )
 
 # Each source app.config maps to a specific exe that ships in the packages.
