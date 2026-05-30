@@ -36,6 +36,11 @@ Verify that:
         <target state="translated">Nie można znaleźć elementu {0}. Opublikuj swój projekt testowy i spróbuj ponownie.</target>
         <note />
       </trans-unit>
+      <trans-unit id="MissingTestSdkWarning">
+        <source>Test source '{0}' does not include the test host assembly 'testhost.dll'. This can happen when the test project does not reference the 'Microsoft.NET.Test.Sdk' NuGet package. Falling back to the test host from the test runner installation, which may fail if the versions are incompatible.</source>
+        <target state="new">Test source '{0}' does not include the test host assembly 'testhost.dll'. This can happen when the test project does not reference the 'Microsoft.NET.Test.Sdk' NuGet package. Falling back to the test host from the test runner installation, which may fail if the versions are incompatible.</target>
+        <note>'{0}' is the path to the test source (DLL/EXE).</note>
+      </trans-unit>
       <trans-unit id="NoDotnetMuxerFoundForArchitecture">
         <source>Could not find '{0}' host for the '{1}' architecture.
 
