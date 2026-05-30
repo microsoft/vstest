@@ -384,7 +384,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 if (_fileHelper.Exists(depsFilePath) && _fileHelper.Exists(runtimeConfigDevPath))
                 {
                     string message = string.Format(CultureInfo.CurrentCulture, Resources.MissingTestSdkWarning, sourcePath);
-                    EqtTrace.Warning("DotnetTestHostManager.GetTestHostStartInfo: {0}", message);
+                    EqtTrace.Warning("DotnetTestHostManager.GetTestHostProcessStartInfo: {0}", message);
                     _messageLogger?.SendMessage(TestMessageLevel.Warning, message);
                 }
 #if NETFRAMEWORK
