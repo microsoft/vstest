@@ -266,7 +266,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             // vstest should exit with failure (testhost didn't start), but not hang and not crash.
             ExitCodeEquals(1);
             // Verify the failure was specifically because the runtime wasn't found, not some other error.
-            Assert.MatchesRegex(new Regex(@"framework.*9999\.0\.0|9999\.0\.0.*not found|compatible framework version", RegexOptions.IgnoreCase), StdOut + Environment.NewLine + StdErr, "testhost should fail because the runtime version was not found");
+            StdErrorRegexIsMatch("9999\\.0\\.0");
             Assert.DoesNotContain(".dmp", StdOut, "no dump should be collected when testhost never launched");
         }
         finally
