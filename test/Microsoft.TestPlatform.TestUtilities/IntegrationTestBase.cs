@@ -220,7 +220,8 @@ public class IntegrationTestBase
     /// <param name="collectDiagnostics">When true, automatically adds --diag flag and attaches logs to test results on failure.</param>
     public void InvokeVsTest(string? arguments, Dictionary<string, string?>? environmentVariables = null, bool collectDiagnostics = true)
     {
-        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments ?? ""))
+        ThrowIfDiagInArguments(arguments ?? "");
+        if (collectDiagnostics && !IsDiagInEnvironment())
         {
             Directory.CreateDirectory(DiagLogsDirectory);
             var diagArg = GetDiagArg(DiagLogsDirectory);
@@ -302,7 +303,8 @@ public class IntegrationTestBase
         // https://github.com/dotnet/sdk/blob/main/src/Cli/dotnet/commands/dotnet-test/VSTestForwardingApp.cs#L30-L39
         debugEnvironmentVariables["VSTEST_CONSOLE_PATH"] = vstestConsolePath;
 
-        if (collectDiagnostics && !IsDiagAlreadyEnabled(arguments))
+        ThrowIfDiagInArguments(arguments);
+        if (collectDiagnostics && !IsDiagInEnvironment())
         {
             Directory.CreateDirectory(DiagLogsDirectory);
             var diagPath = Path.Combine(DiagLogsDirectory, "log.txt");
@@ -1093,22 +1095,25 @@ public class IntegrationTestBase
         return string.Join(" ", GetTestDlls(assetNames).Select(a => a.AddDoubleQuote()));
     }
 
-    private static bool IsDiagAlreadyEnabled(string arguments)
+    // Matches /diag, --diag, or -diag as a standalone flag token (preceded by whitespace or start of string,
+    // followed by '=', ':', whitespace, or end of string). Avoids false positives from substrings like
+    // "--logger:my-diagnostics.trx". Internal for testability.
+    internal static readonly Regex DiagFlagPattern = new(@"(^|\s)(--diag|/diag|-diag)([:=\s]|$)", RegexOptions.IgnoreCase | RegexOptions.Compiled);
+
+    private static void ThrowIfDiagInArguments(string arguments)
     {
-        // If user passed /diag, --diag, or -diag as a standalone flag, throw to prevent silently skipping
-        // the auto-injected diag and losing the attachment. Tests that need to inspect diagnostic logs
-        // should use DiagLogsDirectory instead of passing /diag manually.
-        // The pattern requires the flag to appear as a standalone token (preceded by whitespace or start of
-        // string) to avoid false positives from substrings like "--logger:my-diagnostics.trx".
-        if (Regex.IsMatch(arguments, @"(^|\s)(--diag|/diag|-diag)([:=\s]|$)", RegexOptions.IgnoreCase))
+        var match = DiagFlagPattern.Match(arguments);
+        if (match.Success)
         {
             throw new InvalidOperationException(
-                "Do not pass /diag (or --diag / -diag) directly in test arguments. " +
+                $"Do not pass diag flags directly in test arguments (found '{match.Value.Trim()}' in '{arguments}'). " +
                 "The test framework auto-injects diagnostics and attaches them on failure. " +
-                "Use the DiagLogsDirectory property to find the path to the diagnostic log files.");
+                "Use IntegrationTestBase.DiagLogsDirectory to find the path to the diagnostic log files.");
         }
+    }
 
-        // Check environment variable
+    private static bool IsDiagInEnvironment()
+    {
         var envDiag = Environment.GetEnvironmentVariable("VSTEST_DIAG");
         return !StringUtils.IsNullOrEmpty(envDiag);
     }
@@ -1126,7 +1131,7 @@ public class IntegrationTestBase
             return string.Empty;
         }
 
-        return string.Join("\n", Directory.GetFiles(DiagLogsDirectory, "*.txt", SearchOption.AllDirectories).Select(File.ReadAllText));
+        return string.Join("\n", Directory.GetFiles(DiagLogsDirectory, "*.txt", SearchOption.TopDirectoryOnly).Select(File.ReadAllText));
     }
 
     /// <summary>
