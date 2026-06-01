@@ -301,7 +301,11 @@ internal class DataCollectionManager : IDataCollectionManager
             return false;
         }
 
-        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        if (_dataCollectionEnvironmentContext is null)
+        {
+            throw new InvalidOperationException(Resources.Resources.DataCollectionContextNotInitialized);
+        }
+
         sessionStartEventArgs.Context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId);
         SendEvent(sessionStartEventArgs);
 
@@ -316,10 +320,14 @@ internal class DataCollectionManager : IDataCollectionManager
             return;
         }
 
-        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        if (_dataCollectionEnvironmentContext is null)
+        {
+            throw new InvalidOperationException(Resources.Resources.DataCollectionContextNotInitialized);
+        }
+
         if (testCaseStartEventArgs.TestElement is null)
         {
-            throw new InvalidOperationException("TestCaseStartEventArgs.TestElement is null. The data collector cannot start a test case without a test element.");
+            throw new InvalidOperationException(Resources.Resources.DataCollectionTestCaseStartMissingTestElement);
         }
 
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseStartEventArgs.TestElement);
@@ -336,10 +344,14 @@ internal class DataCollectionManager : IDataCollectionManager
             return new Collection<AttachmentSet>();
         }
 
-        TPDebug.Assert(_dataCollectionEnvironmentContext is not null, "_dataCollectionEnvironmentContext is null");
+        if (_dataCollectionEnvironmentContext is null)
+        {
+            throw new InvalidOperationException(Resources.Resources.DataCollectionContextNotInitialized);
+        }
+
         if (testCaseEndEventArgs.TestElement is null)
         {
-            throw new InvalidOperationException("TestCaseEndEventArgs.TestElement is null. The data collector cannot end a test case without a test element.");
+            throw new InvalidOperationException(Resources.Resources.DataCollectionTestCaseEndMissingTestElement);
         }
 
         var context = new DataCollectionContext(_dataCollectionEnvironmentContext.SessionDataCollectionContext.SessionId, testCaseEndEventArgs.TestElement);
