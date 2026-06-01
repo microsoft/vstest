@@ -61,5 +61,11 @@ public class AssemblyResolveEventArgs : EventArgs
     /// <summary>
     /// Gets the assembly whose dependency is being resolved.
     /// </summary>
+    /// <remarks>
+    /// This property is populated on .NET Framework (net462+) where <c>AppDomain.AssemblyResolve</c>
+    /// exposes the requesting assembly via <see cref="ResolveEventArgs.RequestingAssembly"/>.
+    /// On .NET (Core), <c>AssemblyLoadContext.Resolving</c> does not expose the requesting assembly,
+    /// so this property is always <see langword="null"/> in that environment.
+    /// </remarks>
     public Assembly? RequestingAssembly { get; }
 }
