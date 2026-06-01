@@ -266,7 +266,10 @@ public class BlameDataCollectorTests : AcceptanceTestBase
             // vstest should exit with failure (testhost didn't start), but not hang and not crash.
             ExitCodeEquals(1);
             // Verify the failure was specifically because the runtime wasn't found, not some other error.
-            StdErrorRegexIsMatch("9999\\.0\\.0");
+            // The .NET runtime error can appear in stderr or stdout depending on the platform/host.
+            Assert.IsTrue(
+                Regex.IsMatch(StdErr, "9999\\.0\\.0") || Regex.IsMatch(StdOut, "9999\\.0\\.0"),
+                $"Expected '9999.0.0' in output.\nStdErr: {StdErr}\nStdOut: {StdOut}");
             Assert.DoesNotContain(".dmp", StdOut, "no dump should be collected when testhost never launched");
         }
         finally
