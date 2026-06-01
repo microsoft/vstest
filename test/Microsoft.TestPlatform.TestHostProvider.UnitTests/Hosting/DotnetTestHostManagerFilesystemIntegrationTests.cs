@@ -70,9 +70,16 @@ public class DotnetTestHostManagerFilesystemIntegrationTests
     [TestCleanup]
     public void TearDown()
     {
-        if (Directory.Exists(_tempDir))
+        try
         {
-            Directory.Delete(_tempDir, recursive: true);
+            if (Directory.Exists(_tempDir))
+            {
+                Directory.Delete(_tempDir, recursive: true);
+            }
+        }
+        catch
+        {
+            // Best-effort cleanup; do not fail the test on a leaked temp dir.
         }
     }
 
@@ -120,7 +127,7 @@ public class DotnetTestHostManagerFilesystemIntegrationTests
             {
                 "runtimeOptions": {
                     "additionalProbingPaths": [
-                        "{{packagesDir.Replace("\\", "\\\\").Replace("/", "/")}}"
+                        "{{packagesDir.Replace("\\", "\\\\")}}"
                     ]
                 }
             }
@@ -139,9 +146,7 @@ public class DotnetTestHostManagerFilesystemIntegrationTests
 
         // Assert — testhost.dll is resolved via probing path from runtimeconfig.dev.json
         Assert.IsNotNull(startInfo.Arguments);
-        Assert.Contains("testhost.dll", startInfo.Arguments);
-        // The actual testhost path derived from probing path should be present in args
-        Assert.Contains("microsoft.testplatform.testhost", startInfo.Arguments);
+        Assert.Contains(testhostFullPath, startInfo.Arguments);
     }
 
     [TestMethod]
@@ -207,7 +212,7 @@ public class DotnetTestHostManagerFilesystemIntegrationTests
     }
 
     [TestMethod]
-    public void GetTestHostProcessStartInfo_FindsTestHostDllNextToSourceWhenNoRuntimeConfigDev()
+    public void GetTestHostProcessStartInfo_FindsTestHostDllNextToSourceWhenNoDepsJson()
     {
         // Arrange — no runtimeconfig.dev.json, testhost.dll is placed next to the source dll.
         string sourceDll = Path.Combine(_tempDir, "TestProject.dll");
