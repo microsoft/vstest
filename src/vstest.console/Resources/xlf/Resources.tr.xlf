@@ -17,11 +17,6 @@
         <target state="translated">Şu Test Yürütmesi eklentileri kullanılabilir:</target>
         <note />
       </trans-unit>
-      <trans-unit id="AvailableExtensionFormat">
-        <source>    {0}</source>
-        <target state="translated">    {0}</target>
-        <note>{Locked}</note>
-      </trans-unit>
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
         <target state="translated">        {0}: {1}</target>
@@ -165,11 +160,6 @@
         <source>The following Settings Providers Add-Ins are available:</source>
         <target state="translated">Şu Ayar Sağlayıcısı Eklentileri kullanılabilir:</target>
         <note />
-      </trans-unit>
-      <trans-unit id="AvailableTestsFormat">
-        <source>    {0}</source>
-        <target state="translated">    {0}</target>
-        <note>{Locked}</note>
       </trans-unit>
       <trans-unit id="RunSettingsArgumentHelp">
         <source>--Settings|/Settings:&lt;Settings File&gt;
