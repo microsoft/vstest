@@ -120,8 +120,6 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithCLIRunSettingsContainingBackslashes(RunnerInfo runnerInfo)
     {
