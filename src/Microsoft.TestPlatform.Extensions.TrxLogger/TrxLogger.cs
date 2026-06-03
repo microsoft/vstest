@@ -150,7 +150,23 @@ public class TrxLogger : ITestLoggerWithParameters
         }
 
         _parametersDictionary = parameters;
-        Initialize(events, _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]!);
+
+        var testRunDirectory = _parametersDictionary[DefaultLoggerParameterNames.TestRunDirectory]!;
+
+        // If LogFileName contains a directory component, attachments should be placed relative
+        // to the directory that will contain the TRX file so that TRX viewers can resolve them.
+        if (!isLogFilePrefixParameterExists
+            && _parametersDictionary.TryGetValue(TrxLoggerConstants.LogFileNameKey, out string? logFileNameInit)
+            && !logFileNameInit.IsNullOrWhiteSpace())
+        {
+            var logFileDir = Path.GetDirectoryName(logFileNameInit);
+            if (!logFileDir.IsNullOrWhiteSpace())
+            {
+                testRunDirectory = Path.Combine(testRunDirectory, logFileDir);
+            }
+        }
+
+        Initialize(events, testRunDirectory);
     }
     #endregion
 
@@ -494,9 +510,11 @@ public class TrxLogger : ITestLoggerWithParameters
             }
             else if (isLogFileNameParameterExists)
             {
-                // Use iteration naming so that when multiple test assemblies in a solution
-                // each try to write to the same LogFileName, they each get a unique file.
-                filePath = TrxFileHelper.GetNextIterationFileName(_testResultsDirPath, logFileNameValue!, false);
+                // _testResultsDirPath already includes any subdirectory from LogFileName (adjusted in Initialize),
+                // so use only the filename portion here to avoid duplicating the directory.
+                // Use iteration naming so multiple logger instances with the same LogFileName
+                // don't overwrite each other.
+                filePath = TrxFileHelper.GetNextIterationFileName(_testResultsDirPath, Path.GetFileName(logFileNameValue!), false);
             }
         }
 
