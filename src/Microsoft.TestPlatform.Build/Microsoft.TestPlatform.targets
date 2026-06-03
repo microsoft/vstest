@@ -32,12 +32,11 @@ Copyright (c) .NET Foundation. All rights reserved.
   -->
   <Target Name="VSTest" DependsOnTargets="ShowInfoMessageIfProjectHasNoIsTestProjectProperty">
     <!-- Unloggable colorized output (cf. https://github.com/microsoft/vstest/issues/680) -->
-    <!-- Fallback to this old view when terminal logger is not enabled (_MSBUILDTLENABLED==0) , or when user explicitly opts out (VsTestUseMSBuildOutput != true) -->
-    <CallTarget Targets="_VSTestConsole" Condition="$(_MSBUILDTLENABLED) == '0' OR !$(VsTestUseMSBuildOutput) OR $(MSBUILDENSURESTDOUTFORTASKPROCESSES) == '1'" />
-    <!-- Proper MSBuild integration, but no custom colorization -->
-    <!-- Use the new view when terminal logger is enabled (_MSBUILDTLENABLED==1), user did not opt out (VsTestUseMSBuildOutput == true),
-         and MSBUILDENSURESTDOUTFORTASKPROCESSES is not set (set by dotnet test, which uses the console path instead). -->
-    <CallTarget Targets="_VSTestMSBuild" Condition="$(_MSBUILDTLENABLED) == '1' AND $(VsTestUseMSBuildOutput) AND $(MSBUILDENSURESTDOUTFORTASKPROCESSES) != '1'" />
+    <!-- Use the console path when user explicitly opts out of MSBuild output, or when dotnet test is used (MSBUILDENSURESTDOUTFORTASKPROCESSES=1). -->
+    <CallTarget Targets="_VSTestConsole" Condition="!$(VsTestUseMSBuildOutput) OR $(MSBUILDENSURESTDOUTFORTASKPROCESSES) == '1'" />
+    <!-- Use the MSBuild path when MSBuild output is enabled (set automatically when terminal logger is active, or explicitly by the user).
+         Not used when invoked via dotnet test (MSBUILDENSURESTDOUTFORTASKPROCESSES=1). -->
+    <CallTarget Targets="_VSTestMSBuild" Condition="$(VsTestUseMSBuildOutput) AND $(MSBUILDENSURESTDOUTFORTASKPROCESSES) != '1'" />
   </Target>
 
   <!--

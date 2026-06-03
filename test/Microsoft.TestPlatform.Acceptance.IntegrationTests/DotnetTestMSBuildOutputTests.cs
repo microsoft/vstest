@@ -86,17 +86,17 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void MSBuildLoggerIsUsedAutomaticallyWithDotnetMSBuildWhenTerminalLoggerIsActive(RunnerInfo runnerInfo)
+    public void MSBuildLoggerIsUsedWithDotnetMSBuildWhenVsTestUseMSBuildOutputIsEnabled(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj", runnerInfo.TargetFramework);
-        // Invoke via dotnet msbuild /t:Build;VSTest with _MSBUILDTLENABLED=1 set to simulate the terminal logger being
-        // active. VsTestUseMSBuildOutput should be auto-detected as true when _MSBUILDTLENABLED=1, causing VSTestTask2
-        // to route output through MSBuild error/warning messages rather than writing directly to stdout.
-        // We use /p:_MSBUILDTLENABLED=1 directly rather than -tl:on because the terminal logger may not set this
-        // property in non-interactive (non-TTY) CI environments.
-        InvokeDotnetMSBuildTest($@"-t:Build;VSTest {projectPath} -nodereuse:false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} /p:_MSBUILDTLENABLED=1", workingDirectory: Path.GetDirectoryName(projectPath));
+        // Invoke via dotnet msbuild /t:Build;VSTest with VsTestUseMSBuildOutput=true to force the MSBuild output path.
+        // VSTestTask2 routes test failure output through MSBuild error/warning messages rather than writing directly
+        // to stdout, so errors appear as "error TESTERROR: ..." in the MSBuild output.
+        // In real usage, VsTestUseMSBuildOutput is auto-detected from _MSBUILDTLENABLED when the terminal logger is
+        // active; here we set it explicitly to avoid a dependency on terminal logger TTY detection in CI.
+        InvokeDotnetMSBuildTest($@"-t:Build;VSTest {projectPath} -nodereuse:false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} /p:VsTestUseMSBuildOutput=true", workingDirectory: Path.GetDirectoryName(projectPath));
 
         StdOutputContains("TESTERROR");
         StdOutputContains("FailingTest (");
