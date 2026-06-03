@@ -146,7 +146,11 @@ public class DotnetTestHostManagerFilesystemIntegrationTests
 
         // Assert — testhost.dll is resolved via probing path from runtimeconfig.dev.json
         Assert.IsNotNull(startInfo.Arguments);
-        Assert.Contains(testhostFullPath, startInfo.Arguments);
+        // Normalize path separators: deps.json paths use forward slashes while Path.Combine may produce
+        // backslashes on Windows, resulting in mixed separators in the resolved path.
+        Assert.Contains(
+            testhostFullPath.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar),
+            startInfo.Arguments.Replace(Path.AltDirectorySeparatorChar, Path.DirectorySeparatorChar));
     }
 
     [TestMethod]
