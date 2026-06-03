@@ -669,7 +669,10 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
     /// </summary>
     private void ResetInactivityTimer()
     {
-        if (!_collectProcessDumpOnHang || _inactivityTimerAlreadyFired)
+        // Don't start or reset the timer until testhost has launched.
+        // _testHostProcessId is set in TestHostLaunchedHandler; if it is still 0, testhost
+        // hasn't started yet and there is no process to dump.
+        if (!_collectProcessDumpOnHang || _inactivityTimerAlreadyFired || _testHostProcessId == 0)
         {
             return;
         }
