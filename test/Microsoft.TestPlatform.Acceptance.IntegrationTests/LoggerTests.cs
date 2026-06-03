@@ -280,6 +280,9 @@ public class LoggerTests : AcceptanceTestBase
             string.Join(", ", trxFiles.Select(Path.GetFileName)));
     }
 
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
     public void TrxLoggerShouldPlaceTrxFileInSubdirectoryWhenLogFileNameContainsPath(RunnerInfo runnerInfo)
     {
         // Regression test for https://github.com/microsoft/vstest/issues/15271
