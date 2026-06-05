@@ -82,7 +82,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     /// <inheritdoc />
     public void SendTestCaseStart(TestCaseStartEventArgs e)
     {
-        _communicationManager.SendMessage(MessageType.DataCollectionTestStart, e);
+        _communicationManager.SendMessage(MessageType.DataCollectionTestStart, e, ProtocolVersioning.HighestSupportedVersion);
 
         var message = _communicationManager.ReceiveMessage();
         if (message != null && message.MessageType != MessageType.DataCollectionTestStartAck)
@@ -95,7 +95,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     public Collection<AttachmentSet>? SendTestCaseEnd(TestCaseEndEventArgs e)
     {
         var attachmentSets = new Collection<AttachmentSet>();
-        _communicationManager.SendMessage(MessageType.DataCollectionTestEnd, e);
+        _communicationManager.SendMessage(MessageType.DataCollectionTestEnd, e, ProtocolVersioning.HighestSupportedVersion);
 
         var message = _communicationManager.ReceiveMessage();
         if (message != null && message.MessageType == MessageType.DataCollectionTestEndResult)
@@ -109,6 +109,6 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
     /// <inheritdoc />
     public void SendTestSessionEnd(SessionEndEventArgs e)
     {
-        _communicationManager.SendMessage(MessageType.SessionEnd, e);
+        _communicationManager.SendMessage(MessageType.SessionEnd, e, ProtocolVersioning.HighestSupportedVersion);
     }
 }

@@ -149,7 +149,7 @@ public class DataCollectionTestCaseEventHandlerTests
         requestHandler.ProcessRequests();
 
         _mockDataCollectionManager.Verify(x => x.TestCaseEnded(It.IsAny<TestCaseEndEventArgs>()), Times.Once);
-        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestEndResult, It.IsAny<Collection<AttachmentSet>>()));
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestEndResult, It.IsAny<Collection<AttachmentSet>>(), It.IsAny<int>()));
     }
 
     [TestMethod]

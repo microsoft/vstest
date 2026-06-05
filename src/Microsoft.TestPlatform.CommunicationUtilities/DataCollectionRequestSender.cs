@@ -25,6 +25,10 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     private readonly ICommunicationManager _communicationManager;
     private readonly IDataSerializer _dataSerializer;
 
+    // The protocol version negotiated with the datacollector.
+    // Set after SendBeforeTestRunStartAndGetResult reads the response version.
+    private int _protocolVersion = 1;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="DataCollectionRequestSender"/> class.
     /// </summary>
@@ -94,7 +98,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
     /// <inheritdoc/>
     public void SendTestHostLaunched(TestHostLaunchedPayload testHostLaunchedPayload)
     {
-        _communicationManager.SendMessage(MessageType.TestHostLaunched, testHostLaunchedPayload);
+        _communicationManager.SendMessage(MessageType.TestHostLaunched, testHostLaunchedPayload, _protocolVersion);
     }
 
     /// <inheritdoc/>
@@ -112,7 +116,10 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             IsTelemetryOptedIn = isTelemetryOptedIn
         };
 
-        _communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload);
+        // Send at the highest version this side supports; the datacollector echoes back the
+        // highest version it supports in the BeforeTestRunStartResult response, which then
+        // becomes the negotiated version for all subsequent messages on this channel.
+        _communicationManager.SendMessage(MessageType.BeforeTestRunStart, payload, ProtocolVersioning.HighestSupportedVersion);
 
         while (!isDataCollectionStarted)
         {
@@ -133,6 +140,13 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
             else if (message.MessageType == MessageType.BeforeTestRunStartResult)
             {
                 isDataCollectionStarted = true;
+                // Adopt the version the datacollector used in the response as the negotiated
+                // protocol version for all subsequent messages on this channel.
+                if (message.Version > 0)
+                {
+                    _protocolVersion = message.Version;
+                }
+
                 result = _dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
             }
             else if (message.MessageType == MessageType.TelemetryEventMessage)
@@ -152,7 +166,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
 
         EqtTrace.Verbose("DataCollectionRequestSender.SendAfterTestRunStartAndGetResult: Send AfterTestRunEnd message with isCancelled: {0}", isCancelled);
 
-        _communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled);
+        _communicationManager.SendMessage(MessageType.AfterTestRunEnd, isCancelled, _protocolVersion);
 
         // Cycle through the messages that the datacollector sends.
         // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.

@@ -127,13 +127,13 @@ public class DataCollectionRequestHandlerTests
 
         _requestHandler.SendDataCollectionMessage(message);
 
-        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionMessage, message), Times.Once);
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionMessage, message, It.IsAny<int>()), Times.Once);
     }
 
     [TestMethod]
     public void SendDataCollectionMessageShouldThrowExceptionIfThrownByCommunicationManager()
     {
-        _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionMessage, It.IsAny<DataCollectionMessageEventArgs>())).Throws<Exception>();
+        _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionMessage, It.IsAny<DataCollectionMessageEventArgs>(), It.IsAny<int>())).Throws<Exception>();
         var message = new DataCollectionMessageEventArgs(TestMessageLevel.Error, "message");
 
         Assert.ThrowsExactly<Exception>(() => _requestHandler.SendDataCollectionMessage(message));
@@ -189,14 +189,14 @@ public class DataCollectionRequestHandlerTests
 
         // Verify SessionStarted events
         _mockDataCollectionManager.Verify(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>()), Times.Once);
-        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>()), Times.Once);
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>(), It.IsAny<int>()), Times.Once);
 
         // Verify TestHostLaunched events
         _mockDataCollectionManager.Verify(x => x.TestHostLaunched(1234), Times.Once);
 
         // Verify AfterTestRun events.
         _mockDataCollectionManager.Verify(x => x.SessionEnded(It.IsAny<bool>()), Times.Once);
-        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<AfterTestRunEndResult>()), Times.Once);
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<AfterTestRunEndResult>(), It.IsAny<int>()), Times.Once);
     }
 
     [TestMethod]

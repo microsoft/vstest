@@ -86,7 +86,7 @@ public class DataCollectionTestCaseEventSenderTests
         var testcaseStartEventArgs = new TestCaseStartEventArgs(_testCase);
         _dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs);
 
-        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs), Times.Once);
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs, ProtocolVersioning.HighestSupportedVersion), Times.Once);
         _mockCommunicationManager.Verify(x => x.ReceiveMessage(), Times.Once);
     }
 
@@ -94,7 +94,7 @@ public class DataCollectionTestCaseEventSenderTests
     public void SendTestCaseStartShouldThrowExceptionIfThrownByCommunicationManager()
     {
         var testcaseStartEventArgs = new TestCaseStartEventArgs(_testCase);
-        _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs)).Throws<Exception>();
+        _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestStart, testcaseStartEventArgs, It.IsAny<int>())).Throws<Exception>();
 
         Assert.ThrowsExactly<Exception>(() => _dataCollectionTestCaseEventSender.SendTestCaseStart(testcaseStartEventArgs));
     }
@@ -117,7 +117,7 @@ public class DataCollectionTestCaseEventSenderTests
     {
         var testCaseEndEventArgs = new TestCaseEndEventArgs();
 
-        _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>())).Throws<Exception>();
+        _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionTestEnd, It.IsAny<TestCaseEndEventArgs>(), It.IsAny<int>())).Throws<Exception>();
 
         Assert.ThrowsExactly<Exception>(() => _dataCollectionTestCaseEventSender.SendTestCaseEnd(testCaseEndEventArgs));
     }
