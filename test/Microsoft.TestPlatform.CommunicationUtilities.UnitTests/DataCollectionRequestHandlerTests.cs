@@ -164,6 +164,30 @@ public class DataCollectionRequestHandlerTests
     }
 
     [TestMethod]
+    public void ProcessRequestsShouldNegotiateProtocolVersionToMinOfRequestAndHighest()
+    {
+        // Simulate a sender that supports only version 4 (less than HighestSupportedVersion = 7).
+        var beforeTestRunStartAtV4 = new Message()
+        {
+            MessageType = MessageType.BeforeTestRunStart,
+            Version = 4,
+            RawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.BeforeTestRunStart, new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } }, 4)
+        };
+
+        _mockCommunicationManager.SetupSequence(x => x.ReceiveMessage()).Returns(beforeTestRunStartAtV4).Returns(_afterTestRunEnd);
+        _mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(true);
+        var payload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+        _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+            .Returns(payload);
+
+        _requestHandler.ProcessRequests();
+
+        // Negotiated version = Math.Min(4, HighestSupportedVersion=7) = 4; all responses must use it.
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>(), 4), Times.Once);
+        _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<AfterTestRunEndResult>(), 4), Times.Once);
+    }
+
+    [TestMethod]
     public void ProcessRequestsShouldProcessRequests()
     {
         var testHostLaunchedPayload = new TestHostLaunchedPayload();

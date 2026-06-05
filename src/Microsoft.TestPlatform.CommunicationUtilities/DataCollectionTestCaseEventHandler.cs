@@ -97,7 +97,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                         EqtTrace.Error($"DataCollectionTestCaseEventHandler.ProcessRequests: Error occurred during TestCaseStarted event handling: {ex}");
                     }
 
-                    _communicationManager.SendMessage(MessageType.DataCollectionTestStartAck);
+                    _communicationManager.SendMessage(MessageType.DataCollectionTestStartAck, string.Empty, Math.Min(message.Version, ProtocolVersioning.HighestSupportedVersion));
 
                     EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' started.", testCaseStartEventArgs?.TestCaseName, testCaseStartEventArgs?.TestCaseId);
 
