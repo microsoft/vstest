@@ -1,6 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.ObjectModel;
 using System.Net;
 
@@ -98,7 +99,7 @@ public class DataCollectionTestCaseEventSender : IDataCollectionTestCaseEventSen
         // subsequent sends on this sub-channel.
         if (message?.Version > 0)
         {
-            _protocolVersion = message.Version;
+            _protocolVersion = Math.Min(message.Version, ProtocolVersioning.HighestSupportedVersion);
         }
     }
 

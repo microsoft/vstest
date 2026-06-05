@@ -122,7 +122,7 @@ internal class DataCollectionTestCaseEventHandler : IDataCollectionTestCaseEvent
                         attachmentSets = new Collection<AttachmentSet>();
                     }
 
-                    _communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets, message.Version);
+                    _communicationManager.SendMessage(MessageType.DataCollectionTestEndResult, attachmentSets, Math.Min(message.Version, ProtocolVersioning.HighestSupportedVersion));
 
                     EqtTrace.Info("DataCollectionTestCaseEventHandler: Test case '{0} - {1}' completed", testCaseEndEventArgs?.TestCaseName, testCaseEndEventArgs?.TestCaseId);
                     break;

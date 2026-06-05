@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Net;
@@ -144,7 +145,7 @@ public sealed class DataCollectionRequestSender : IDataCollectionRequestSender
                 // protocol version for all subsequent messages on this channel.
                 if (message.Version > 0)
                 {
-                    _protocolVersion = message.Version;
+                    _protocolVersion = Math.Min(message.Version, ProtocolVersioning.HighestSupportedVersion);
                 }
 
                 result = _dataSerializer.DeserializePayload<BeforeTestRunStartResult>(message);
