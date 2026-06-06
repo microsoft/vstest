@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
@@ -62,9 +64,9 @@ internal class NetClientHangDumper : IHangDumper
             tasks.Add(Task.Run(
                 () =>
                 {
+                    var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
                     try
                     {
-                        var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
                         EqtTrace.Verbose($"NetClientHangDumper.CollectDump: Selected dump type {type}. Dumping {p.Id} - {p.ProcessName} in {outputFile}. ");
 
                         var client = new DiagnosticsClient(p.Id);
@@ -75,7 +77,23 @@ internal class NetClientHangDumper : IHangDumper
                     }
                     catch (Exception ex)
                     {
-                        EqtTrace.Error($"NetClientHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName}: {ex}.");
+                        EqtTrace.Error($"NetClientHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName} via DiagnosticsClient: {ex}.");
+
+                        // DiagnosticsClient can only connect to .NET Core/5+ processes. For .NET Framework or native
+                        // child processes there is no diagnostics socket, so WriteDump throws. On Windows, fall back
+                        // to MiniDumpWriteDump which works for any Windows process.
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            EqtTrace.Verbose($"NetClientHangDumper.Dump: Falling back to MiniDumpWriteDump for process {p.Id} - {p.ProcessName}.");
+                            try
+                            {
+                                WindowsHangDumper.CollectDump(new ProcessHelper(), p, outputFile, type);
+                            }
+                            catch (Exception fallbackEx)
+                            {
+                                EqtTrace.Error($"NetClientHangDumper.Dump: Fallback dump also failed for process {p.Id} - {p.ProcessName}: {fallbackEx}.");
+                            }
+                        }
                     }
                 }, timeout.Token));
         }
