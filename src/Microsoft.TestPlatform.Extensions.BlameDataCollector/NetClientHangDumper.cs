@@ -79,9 +79,10 @@ internal class NetClientHangDumper : IHangDumper
                     {
                         EqtTrace.Error($"NetClientHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName} via DiagnosticsClient: {ex}.");
 
-                        // DiagnosticsClient can only connect to .NET Core/5+ processes. For .NET Framework or native
-                        // child processes there is no diagnostics socket, so WriteDump throws. On Windows, fall back
-                        // to MiniDumpWriteDump which works for any Windows process.
+                        // DiagnosticsClient can only connect to .NET Core/5+ processes. On Windows, fall back
+                        // to MiniDumpWriteDump for any DiagnosticsClient failure — this primarily covers .NET Framework
+                        // and native child processes with no diagnostics socket, but also acts as a last resort for
+                        // other transient failures. FileMode.Create in CollectDump ensures any partial output is replaced.
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                         {
                             EqtTrace.Verbose($"NetClientHangDumper.Dump: Falling back to MiniDumpWriteDump for process {p.Id} - {p.ProcessName}.");
