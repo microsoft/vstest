@@ -255,7 +255,7 @@ public class BlameDataCollectorTests : AcceptanceTestBase
         var originalContent = File.ReadAllText(runtimeConfigJson);
         try
         {
-            var updatedContent = Regex.Replace(originalContent, @"""version""\s*:\s*""[\d.]+""", @"""version"": ""9999.0.0""");
+            var updatedContent = Regex.Replace(originalContent, @"""version""\s*:\s*""[^""]+""", @"""version"": ""9999.0.0""");
             File.WriteAllText(runtimeConfigJson, updatedContent);
 
             var arguments = PrepareArguments(assemblyPath, GetTestAdapterPath(), string.Empty, string.Empty, runnerInfo.InIsolationValue);
