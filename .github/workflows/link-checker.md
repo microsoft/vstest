@@ -64,20 +64,22 @@ steps:
       
       # Helper: check if a markdown heading anchor exists in a file
       # Converts heading text to GitHub-style anchor (lowercase, spaces to hyphens, strip punctuation)
-      check_anchor() {
-        local file="$1"
-        local anchor="$2"
-        # Generate anchors from all headings in the file and compare
-        grep -oP '^#{1,6}\s+\K.*' "$file" 2>/dev/null | while IFS= read -r heading; do
-          # Convert to GitHub-style anchor: lowercase, replace spaces with hyphens, remove non-alphanumeric (except hyphens)
-          local generated
-          generated=$(echo "$heading" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9_-]//g')
-          if [[ "$generated" == "$anchor" ]]; then
-            echo "found"
-            return
-          fi
-        done
-      }
+check_anchor() {
+  local file="$1"
+  local anchor="$2"
+  local heading generated
+
+  while IFS= read -r heading; do
+    # Convert to GitHub-style anchor: lowercase, replace spaces with hyphens, remove non-alphanumeric (except hyphens)
+    generated=$(echo "$heading" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9_-]//g')
+    if [[ "$generated" == "$anchor" ]]; then
+      echo "found"
+      return 0
+    fi
+  done < <(grep -oP '^#{1,6}\s+\K.*' "$file" 2>/dev/null)
+
+  return 1
+}
       
       # Test each link
       echo "## Link Test Results" >> /tmp/link-check-results.md
