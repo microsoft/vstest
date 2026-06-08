@@ -21,6 +21,8 @@ steps:
     run: |
       echo "# Link Check Results" > /tmp/link-check-results.md
       echo "" >> /tmp/link-check-results.md
+      echo "# Broken Links" > /tmp/broken-links.md
+      echo "" >> /tmp/broken-links.md
       
       # Find all markdown files in docs directory and README
       echo "Finding all markdown files..."
@@ -100,6 +102,7 @@ steps:
           else
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             echo "❌ $url (HTTP $HTTP_CODE) in $source_file" >> /tmp/link-check-results.md
+            echo "❌ $url (HTTP $HTTP_CODE) in $source_file" >> /tmp/broken-links.md
           fi
         elif [[ "$url" == "#"* ]]; then
           # Same-file anchor link
@@ -110,6 +113,7 @@ steps:
           else
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             echo "❌ $url (anchor not found in $source_file)" >> /tmp/link-check-results.md
+            echo "❌ $url (anchor not found in $source_file)" >> /tmp/broken-links.md
           fi
         elif [[ ! "$url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
           # Relative file link, possibly with anchor
@@ -132,6 +136,7 @@ steps:
           elif [[ ! -f "$TARGET_PATH" ]]; then
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             echo "❌ $url (file not found: $TARGET_PATH) in $source_file" >> /tmp/link-check-results.md
+            echo "❌ $url (file not found: $TARGET_PATH) in $source_file" >> /tmp/broken-links.md
           elif [[ -n "$ANCHOR" ]]; then
             # File exists, check the anchor
             if [[ -n $(check_anchor "$TARGET_PATH" "$ANCHOR") ]]; then
@@ -140,6 +145,7 @@ steps:
             else
               BROKEN_COUNT=$((BROKEN_COUNT + 1))
               echo "❌ $url (file exists but anchor '#$ANCHOR' not found in $TARGET_PATH) in $source_file" >> /tmp/link-check-results.md
+              echo "❌ $url (file exists but anchor '#$ANCHOR' not found in $TARGET_PATH) in $source_file" >> /tmp/broken-links.md
             fi
           else
             WORKING_COUNT=$((WORKING_COUNT + 1))
@@ -152,6 +158,8 @@ steps:
       
       echo "" >> /tmp/link-check-results.md
       echo "**Summary:** $WORKING_COUNT working, $BROKEN_COUNT broken" >> /tmp/link-check-results.md
+      echo "" >> /tmp/broken-links.md
+      echo "**Summary:** $BROKEN_COUNT broken links" >> /tmp/broken-links.md
       
       # Output results
       echo "broken_count=$BROKEN_COUNT" >> $GITHUB_OUTPUT
@@ -190,14 +198,13 @@ Your workflow has already collected and tested all links in the previous step. U
 
 ## Step 1: Review Link Check Results
 
-The link check step has already run and created a report at `/tmp/link-check-results.md`. Read this file to see:
-- All links found in the documentation
-- Which links are working (✅) and which are broken (❌)
-- HTTP status codes for each link
+The link check step has already run. Read `/tmp/broken-links.md` to see all broken links that need fixing:
+- Each line lists a broken URL and the source file where it appears
+- HTTP status codes are included for external links
 
 Use bash to read the file:
 ```bash
-cat /tmp/link-check-results.md
+cat /tmp/broken-links.md
 ```
 
 ## Step 2: Load Cache Memory
