@@ -171,7 +171,7 @@ safe-outputs:
     title-prefix: "[link-checker] "
     labels: ["Area: Documentation", "agentic-workflows"]
     draft: false
-    protected-files: allowed
+    protected-files: fallback-to-issue
     if-no-changes: "warn"
   noop:
     report-as-issue: false
@@ -297,5 +297,5 @@ Based on your work:
 ## Context
 
 - Repository: `${{ github.repository }}`
-- Run weekly on weekdays to catch broken links early
+- Run weekly on Fridays to catch broken links early
 - Link test results are available at `/tmp/link-check-results.md`
