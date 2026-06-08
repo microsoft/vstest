@@ -111,7 +111,7 @@ steps:
             BROKEN_COUNT=$((BROKEN_COUNT + 1))
             echo "❌ $url (anchor not found in $source_file)" >> /tmp/link-check-results.md
           fi
-        else
+        elif [[ ! "$url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
           # Relative file link, possibly with anchor
           # Split into file path and optional anchor
           REL_PATH="${url%%#*}"
@@ -145,6 +145,8 @@ steps:
             WORKING_COUNT=$((WORKING_COUNT + 1))
             echo "✅ $url (file exists: $TARGET_PATH)" >> /tmp/link-check-results.md
           fi
+        else
+          continue
         fi
       done < /tmp/unique-links.txt
       
