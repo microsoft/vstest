@@ -1,5 +1,5 @@
 ---
-description: Daily automated link checker that finds and fixes broken links in documentation files
+description: Weekly automated link checker that finds and fixes broken links in documentation files
 on:
   schedule: weekly
 permissions: read-all
@@ -37,12 +37,17 @@ steps:
       echo "" >> /tmp/link-check-results.md
       
       # Use grep to find markdown links and HTTP(S) URLs
+      # Format for relative links: "source_file|url" to allow path resolution
       for file in $MARKDOWN_FILES; do
         echo "Checking $file..."
         # Extract markdown links [text](url)
-        grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' >> /tmp/all-links.txt 2>/dev/null || true
-        # Extract plain HTTP(S) URLs
-        grep -oP 'https?://[^\s<>"]+' "$file" >> /tmp/all-links.txt 2>/dev/null || true
+        grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' | while IFS= read -r link; do
+          echo "$file|$link" >> /tmp/all-links.txt
+        done 2>/dev/null || true
+        # Extract plain HTTP(S) URLs (no source file needed for absolute URLs)
+        grep -oP 'https?://[^\s<>"]+' "$file" | while IFS= read -r link; do
+          echo "$file|$link" >> /tmp/all-links.txt
+        done 2>/dev/null || true
       done
       
       # Remove duplicates and sort
@@ -57,6 +62,23 @@ steps:
         exit 0
       fi
       
+      # Helper: check if a markdown heading anchor exists in a file
+      # Converts heading text to GitHub-style anchor (lowercase, spaces to hyphens, strip punctuation)
+      check_anchor() {
+        local file="$1"
+        local anchor="$2"
+        # Generate anchors from all headings in the file and compare
+        grep -oP '^#{1,6}\s+\K.*' "$file" 2>/dev/null | while IFS= read -r heading; do
+          # Convert to GitHub-style anchor: lowercase, replace spaces with hyphens, remove non-alphanumeric (except hyphens)
+          local generated
+          generated=$(echo "$heading" | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9_-]//g')
+          if [[ "$generated" == "$anchor" ]]; then
+            echo "found"
+            return
+          fi
+        done
+      }
+      
       # Test each link
       echo "## Link Test Results" >> /tmp/link-check-results.md
       echo "" >> /tmp/link-check-results.md
@@ -65,21 +87,62 @@ steps:
       BROKEN_COUNT=0
       WORKING_COUNT=0
       
-      while IFS= read -r url; do
-        # Skip relative links and anchors
-        if [[ "$url" == "#"* ]] || [[ "$url" != "http"* ]]; then
-          continue
-        fi
-        
-        # Test the link with curl
-        HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
-        
-        if [[ "$HTTP_CODE" =~ ^2 ]] || [[ "$HTTP_CODE" =~ ^3 ]]; then
-          WORKING_COUNT=$((WORKING_COUNT + 1))
-          echo "✅ $url (HTTP $HTTP_CODE)" >> /tmp/link-check-results.md
+      while IFS='|' read -r source_file url; do
+        if [[ "$url" == "http"* ]]; then
+          # Test HTTP(S) links with curl
+          HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
+          
+          if [[ "$HTTP_CODE" =~ ^2 ]] || [[ "$HTTP_CODE" =~ ^3 ]]; then
+            WORKING_COUNT=$((WORKING_COUNT + 1))
+            echo "✅ $url (HTTP $HTTP_CODE)" >> /tmp/link-check-results.md
+          else
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            echo "❌ $url (HTTP $HTTP_CODE) in $source_file" >> /tmp/link-check-results.md
+          fi
+        elif [[ "$url" == "#"* ]]; then
+          # Same-file anchor link
+          ANCHOR="${url#\#}"
+          if [[ -n $(check_anchor "$source_file" "$ANCHOR") ]]; then
+            WORKING_COUNT=$((WORKING_COUNT + 1))
+            echo "✅ $url (anchor in $source_file)" >> /tmp/link-check-results.md
+          else
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            echo "❌ $url (anchor not found in $source_file)" >> /tmp/link-check-results.md
+          fi
         else
-          BROKEN_COUNT=$((BROKEN_COUNT + 1))
-          echo "❌ $url (HTTP $HTTP_CODE)" >> /tmp/link-check-results.md
+          # Relative file link, possibly with anchor
+          # Split into file path and optional anchor
+          REL_PATH="${url%%#*}"
+          ANCHOR=""
+          if [[ "$url" == *"#"* ]]; then
+            ANCHOR="${url#*#}"
+          fi
+          
+          # Resolve relative to the source file's directory
+          SOURCE_DIR=$(dirname "$source_file")
+          TARGET_PATH="$SOURCE_DIR/$REL_PATH"
+          # Normalize the path
+          TARGET_PATH=$(realpath --relative-to=. "$TARGET_PATH" 2>/dev/null || echo "$TARGET_PATH")
+          
+          if [[ -z "$REL_PATH" ]] && [[ -n "$ANCHOR" ]]; then
+            # Link is just "#anchor" handled above, but in case of edge cases
+            WORKING_COUNT=$((WORKING_COUNT + 1))
+          elif [[ ! -f "$TARGET_PATH" ]]; then
+            BROKEN_COUNT=$((BROKEN_COUNT + 1))
+            echo "❌ $url (file not found: $TARGET_PATH) in $source_file" >> /tmp/link-check-results.md
+          elif [[ -n "$ANCHOR" ]]; then
+            # File exists, check the anchor
+            if [[ -n $(check_anchor "$TARGET_PATH" "$ANCHOR") ]]; then
+              WORKING_COUNT=$((WORKING_COUNT + 1))
+              echo "✅ $url (file + anchor OK) in $source_file" >> /tmp/link-check-results.md
+            else
+              BROKEN_COUNT=$((BROKEN_COUNT + 1))
+              echo "❌ $url (file exists but anchor '#$ANCHOR' not found in $TARGET_PATH) in $source_file" >> /tmp/link-check-results.md
+            fi
+          else
+            WORKING_COUNT=$((WORKING_COUNT + 1))
+            echo "✅ $url (file exists: $TARGET_PATH)" >> /tmp/link-check-results.md
+          fi
         fi
       done < /tmp/unique-links.txt
       
@@ -98,19 +161,22 @@ tools:
     toolsets: [default]
   cache-memory: true
   web-fetch:
+  bash: true
+  edit:
 
 safe-outputs:
   create-pull-request:
     title-prefix: "[link-checker] "
-    labels: [documentation, automated]
+    labels: ["Area: Documentation", "agentic-workflows"]
     draft: false
-    protected-files: fallback-to-issue
+    protected-files: allowed
     if-no-changes: "warn"
   noop:
+    report-as-issue: false
 source: githubnext/agentics/workflows/link-checker.md@c02eadfca420f2b351f9fcaee883c507a63ca316
 ---
 
-# Daily Link Checker & Fixer
+# Weekly Link Checker & Fixer
 
 You are an automated link checker and fixer agent. Your job is to find and fix broken links in the documentation files of this repository.
 
@@ -209,7 +275,7 @@ Based on your work:
 - **Document everything:** Keep the cache memory up to date with unfixable links
 - **Be selective:** Only add links to the unfixable list if you've genuinely tried to find alternatives
 - **Use web-fetch wisely:** Try to fetch the broken URL and check for redirects or alternatives
-- **Relative links:** Focus only on HTTP(S) links. Skip relative links and anchors (they're tested differently)
+- **Relative links:** The link checker validates relative file links and anchors too. For broken relative links, check if the target file was renamed or moved and update the path accordingly. For broken anchors, check if the heading was renamed and update the anchor to match.
 
 ## Example Cache Memory Update
 
@@ -229,5 +295,5 @@ Based on your work:
 ## Context
 
 - Repository: `${{ github.repository }}`
-- Run daily on weekdays to catch broken links early
+- Run weekly on weekdays to catch broken links early
 - Link test results are available at `/tmp/link-check-results.md`
