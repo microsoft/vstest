@@ -46,8 +46,8 @@ steps:
         grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' | while IFS= read -r link; do
           echo "$file|$link" >> /tmp/all-links.txt
         done 2>/dev/null || true
-        # Extract plain HTTP(S) URLs
-        grep -oP 'https?://[^\s<>"]+' "$file" | while IFS= read -r link; do
+        # Extract plain HTTP(S) URLs (strip trailing parens to avoid duplicates from markdown syntax)
+        grep -oP 'https?://[^\s<>"]+' "$file" | sed 's/)$//' | while IFS= read -r link; do
           echo "$file|$link" >> /tmp/all-links.txt
         done 2>/dev/null || true
       done
@@ -92,10 +92,24 @@ steps:
 
       BROKEN_COUNT=0
       WORKING_COUNT=0
+      SKIPPED_COUNT=0
+      declare -A RATE_LIMITED_DOMAINS
       while IFS='|' read -r source_file url; do
         if [[ "$url" == "http"* ]]; then
+          # Extract domain and skip if already rate-limited
+          domain=$(echo "$url" | sed -E 's|https?://([^/]+).*|\1|')
+          if [[ -n "${RATE_LIMITED_DOMAINS[$domain]:-}" ]]; then
+            SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+            continue
+          fi
           # Test HTTP(S) links with curl
           HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
+          if [[ "$HTTP_CODE" == "429" ]]; then
+            RATE_LIMITED_DOMAINS[$domain]=1
+            SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
+            echo "⚠️ $domain rate-limited (HTTP 429), skipping remaining links for this domain" >> /tmp/link-check-results.md
+            continue
+          fi
           if [[ "$HTTP_CODE" =~ ^2 ]] || [[ "$HTTP_CODE" =~ ^3 ]]; then
             WORKING_COUNT=$((WORKING_COUNT + 1))
             echo "✅ $url (HTTP $HTTP_CODE)" >> /tmp/link-check-results.md
@@ -155,12 +169,13 @@ steps:
       done < /tmp/unique-links.txt
 
       echo "" >> /tmp/link-check-results.md
-      echo "**Summary:** $WORKING_COUNT working, $BROKEN_COUNT broken" >> /tmp/link-check-results.md
+      echo "**Summary:** $WORKING_COUNT working, $BROKEN_COUNT broken, $SKIPPED_COUNT skipped (rate-limited)" >> /tmp/link-check-results.md
       echo "" >> /tmp/broken-links.md
       echo "**Summary:** $BROKEN_COUNT broken links" >> /tmp/broken-links.md
       # Output results
       echo "broken_count=$BROKEN_COUNT" >> $GITHUB_OUTPUT
       echo "working_count=$WORKING_COUNT" >> $GITHUB_OUTPUT
+      echo "skipped_count=$SKIPPED_COUNT" >> $GITHUB_OUTPUT
 
       cat /tmp/link-check-results.md
     shell: bash
