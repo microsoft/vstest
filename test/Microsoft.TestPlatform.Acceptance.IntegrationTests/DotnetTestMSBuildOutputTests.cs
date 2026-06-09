@@ -66,9 +66,12 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 
         // Check that we see the summary that is printed from the console logger, meaning the new output is disabled.
         StdOutputContains("Failed! - Failed: 2, Passed: 1, Skipped: 1, Total: 4, Duration:");
-
+        // We are sending those as low prio messages, they won't show up on screen but will be in binlog.
+        //StdOutputContains("passed PassingTest");
+        //StdOutputContains("skipped SkippingTest");
         ExitCodeEquals(1);
     }
+
 
     [TestMethod]
     // patched dotnet is not published on non-windows systems
