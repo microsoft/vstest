@@ -195,6 +195,10 @@ safe-outputs:
     draft: false
     protected-files: fallback-to-issue
     if-no-changes: "warn"
+  create-issue:
+    max: 1
+    title-prefix: "[link-checker] "
+    labels: ["Area: Documentation", "agentic-workflows"]
   noop:
     report-as-issue: false
 source: githubnext/agentics/workflows/link-checker.md@c02eadfca420f2b351f9fcaee883c507a63ca316
@@ -244,6 +248,21 @@ The cache memory should store a JSON object with this structure:
 
 For each broken link found in the test results (but NOT in the unfixable list):
 
+If it's a broken relative link (file not found):
+1. Use `find` or `bash` to search for a file with the same basename elsewhere in the repo.
+2. If found, update the path in the source markdown file.
+3. If not found, mark as unfixable and move on.
+
+If it's a broken anchor (file exists but heading anchor not found):
+1. **Do NOT read the target file.** The bash step already confirmed the file exists and the anchor is missing.
+2. Use `bash` to extract only the headings: `grep -oP '^#{1,6}\s+\K.*' <file>`
+3. Compare the broken anchor against the extracted headings to find a close match (typo, renamed heading, changed casing).
+4. If a match is found, update the anchor in the source markdown file.
+5. If no match is found, mark as unfixable — do not fetch or read the file further.
+
+**Token budget rule for anchors:** spend at most two `grep` calls per broken anchor. Never read entire files to fix anchors.
+
+If it's an HTTP link:
 1. **Investigate the link:**
    - Determine what the link was supposed to point to based on:
      - The link text in the markdown
@@ -285,6 +304,13 @@ Based on your work:
   - A list of the broken links and their replacements
   - Any links that were added to the unfixable list
 - Title format: "Fix broken documentation links"
+
+**If you could not fix anchors**
+- Use the `create-issue` safe output to create an issue with broken links
+- In the issue description, include:
+   - A summary of how many links could not be fixed
+   - Alist of the broken anchors
+- Title format: "Invalid markdown links"
 
 **If no links needed fixing:**
 - Use the `noop` safe output with a clear message like:
