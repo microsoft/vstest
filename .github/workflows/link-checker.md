@@ -46,7 +46,7 @@ steps:
         grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' | while IFS= read -r link; do
           echo "$file|$link" >> /tmp/all-links.txt
         done 2>/dev/null || true
-        # Extract plain HTTP(S) URLs (no source file needed for absolute URLs)
+        # Extract plain HTTP(S) URLs
         grep -oP 'https?://[^\s<>"]+' "$file" | while IFS= read -r link; do
           echo "$file|$link" >> /tmp/all-links.txt
         done 2>/dev/null || true
