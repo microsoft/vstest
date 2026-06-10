@@ -149,8 +149,8 @@ public class TrxLogger : ITestLoggerWithParameters
         _treatErrorMessagesAsWarnings = parameters.TryGetValue(TrxLoggerConstants.TreatErrorMessagesAsWarnings, out string? treatErrorMessagesAsWarningsString)
             ? bool.TryParse(treatErrorMessagesAsWarningsString, out bool treatErrorMessagesAsWarningsValue)
                 ? treatErrorMessagesAsWarningsValue
-                // We found the option but could not parse the value, default to true.
-                : true
+                // We found the option but could not parse the value; preserve existing behavior.
+                : false
             // We did not find the option, default to false to preserve existing behavior.
             : false;
 
