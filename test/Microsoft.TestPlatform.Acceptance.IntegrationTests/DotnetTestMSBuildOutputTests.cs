@@ -99,7 +99,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj", runnerInfo.TargetFramework);
-        // Invoke via dotnet msbuild /t:Build;VSTest with VsTestUseMSBuildOutput=true to force the MSBuild output path.
+        // Invoke via dotnet msbuild -t:Build;VSTest with VsTestUseMSBuildOutput=true to force the MSBuild output path.
         // VSTestTask2 routes test failure output through MSBuild error/warning messages rather than writing directly
         // to stdout, so errors appear as "error TESTERROR: ..." in the MSBuild output.
         // In real usage, VsTestUseMSBuildOutput is auto-detected from _MSBUILDTLENABLED when the terminal logger is
