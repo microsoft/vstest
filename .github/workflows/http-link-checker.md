@@ -1,7 +1,7 @@
 ---
 description: Weekly automated link checker that finds and fixes broken links in documentation files
 on:
-  schedule: weekly 
+  schedule: weekly on Friday
 permissions: read-all
 timeout-minutes: 60
 network:
