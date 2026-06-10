@@ -6,8 +6,6 @@ permissions: read-all
 timeout-minutes: 60
 network:
   allowed:
-    - node
-    - python
     - github
 steps:
   - name: Checkout repository
@@ -38,16 +36,12 @@ steps:
       echo "## Links Found" >> /tmp/link-check-results.md
       echo "" >> /tmp/link-check-results.md
 
-      # Use grep to find markdown links and HTTP(S) URLs
+      # Use grep to find markdown links
       # Format for relative links: "source_file|url" to allow path resolution
       for file in $MARKDOWN_FILES; do
         echo "Checking $file..."
         # Extract markdown links [text](url)
         grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' | while IFS= read -r link; do
-          echo "$file|$link" >> /tmp/all-links.txt
-        done 2>/dev/null || true
-        # Extract plain HTTP(S) URLs (strip trailing parens to avoid duplicates from markdown syntax)
-        grep -oP 'https?://[^\s<>"]+' "$file" | sed 's/)$//' | while IFS= read -r link; do
           echo "$file|$link" >> /tmp/all-links.txt
         done 2>/dev/null || true
       done
@@ -92,33 +86,8 @@ steps:
 
       BROKEN_COUNT=0
       WORKING_COUNT=0
-      SKIPPED_COUNT=0
-      declare -A RATE_LIMITED_DOMAINS
       while IFS='|' read -r source_file url; do
-        if [[ "$url" == "http"* ]]; then
-          # Extract domain and skip if already rate-limited
-          domain=$(echo "$url" | sed -E 's|https?://([^/]+).*|\1|')
-          if [[ -n "${RATE_LIMITED_DOMAINS[$domain]:-}" ]]; then
-            SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
-            continue
-          fi
-          # Test HTTP(S) links with curl
-          HTTP_CODE=$(curl -L -s -o /dev/null -w "%{http_code}" --max-time 10 "$url" 2>/dev/null || echo "000")
-          if [[ "$HTTP_CODE" == "429" ]]; then
-            RATE_LIMITED_DOMAINS[$domain]=1
-            SKIPPED_COUNT=$((SKIPPED_COUNT + 1))
-            echo "⚠️ $domain rate-limited (HTTP 429), skipping remaining links for this domain" >> /tmp/link-check-results.md
-            continue
-          fi
-          if [[ "$HTTP_CODE" =~ ^2 ]] || [[ "$HTTP_CODE" =~ ^3 ]]; then
-            WORKING_COUNT=$((WORKING_COUNT + 1))
-            echo "✅ $url (HTTP $HTTP_CODE)" >> /tmp/link-check-results.md
-          else
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            echo "❌ $url (HTTP $HTTP_CODE) in $source_file" >> /tmp/link-check-results.md
-            echo "❌ $url (HTTP $HTTP_CODE) in $source_file" >> /tmp/broken-links.md
-          fi
-        elif [[ "$url" == "#"* ]]; then
+        if [[ "$url" == "#"* ]]; then
           # Same-file anchor link
           ANCHOR="${url#\#}"
           if check_anchor "$source_file" "$ANCHOR"; then
@@ -129,7 +98,10 @@ steps:
             echo "❌ $url (anchor not found in $source_file)" >> /tmp/link-check-results.md
             echo "❌ $url (anchor not found in $source_file)" >> /tmp/broken-links.md
           fi
-        elif [[ ! "$url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
+        elif [[ "$url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
+          # Skip absolute URLs (http, https, mailto, etc.) — we only check links to other .md files and anchors
+          continue
+        else
           # Relative file link, possibly with anchor
           # Split into file path and optional anchor
           REL_PATH="${url%%#*}"
@@ -163,19 +135,16 @@ steps:
             WORKING_COUNT=$((WORKING_COUNT + 1))
             echo "✅ $url (file exists: $TARGET_PATH)" >> /tmp/link-check-results.md
           fi
-        else
-          continue
         fi
       done < /tmp/unique-links.txt
 
       echo "" >> /tmp/link-check-results.md
-      echo "**Summary:** $WORKING_COUNT working, $BROKEN_COUNT broken, $SKIPPED_COUNT skipped (rate-limited)" >> /tmp/link-check-results.md
+      echo "**Summary:** $WORKING_COUNT working, $BROKEN_COUNT broken" >> /tmp/link-check-results.md
       echo "" >> /tmp/broken-links.md
       echo "**Summary:** $BROKEN_COUNT broken links" >> /tmp/broken-links.md
       # Output results
       echo "broken_count=$BROKEN_COUNT" >> $GITHUB_OUTPUT
       echo "working_count=$WORKING_COUNT" >> $GITHUB_OUTPUT
-      echo "skipped_count=$SKIPPED_COUNT" >> $GITHUB_OUTPUT
 
       cat /tmp/link-check-results.md
     shell: bash
@@ -184,7 +153,6 @@ tools:
   github:
     toolsets: [default]
   cache-memory: true
-  web-fetch:
   bash: true
   edit:
 
@@ -206,17 +174,16 @@ source: githubnext/agentics/workflows/link-checker.md@c02eadfca420f2b351f9fcaee8
 
 # Weekly Link Checker & Fixer
 
-You are an automated link checker and fixer agent. Your job is to find and fix broken links in the documentation files of this repository.
+You are an automated link checker and fixer agent. Your job is to find and fix broken links between documentation files in this repository. Only links to other `.md` files and in-file/cross-file heading anchors are checked. Absolute URLs (http/https/mailto/etc.) are intentionally ignored.
 
 ## Your Mission
 
-Your workflow has already collected and tested all links in the previous step. Use the test results to identify broken links and fix them where possible.
+Your workflow has already collected and tested all relative documentation links in the previous step. Use the test results to identify broken links and fix them where possible.
 
 ## Step 1: Review Link Check Results
 
 The link check step has already run. Read `/tmp/broken-links.md` to see all broken links that need fixing:
-- Each line lists a broken URL and the source file where it appears
-- HTTP status codes are included for external links
+- Each line lists a broken relative link or anchor and the source file where it appears
 
 Use bash to read the file:
 ```bash
@@ -227,7 +194,7 @@ cat /tmp/broken-links.md
 
 Check cache memory for previously identified unfixable broken links:
 - Load the cache memory to see if there are any broken links we've tried to fix before but couldn't
-- These are links that are permanently broken or removed from the internet
+- These are links whose target file or anchor no longer exists and has no obvious replacement
 - Skip these links to avoid repeated attempts
 
 The cache memory should store a JSON object with this structure:
@@ -235,8 +202,9 @@ The cache memory should store a JSON object with this structure:
 {
   "unfixable_links": [
     {
-      "url": "https://example.com/removed-page",
-      "reason": "404 Not Found - content removed",
+      "url": "../old/removed-page.md",
+      "source_file": "docs/index.md",
+      "reason": "Target file removed and no replacement found",
       "first_seen": "2026-02-17"
     }
   ],
@@ -262,29 +230,10 @@ If it's a broken anchor (file exists but heading anchor not found):
 
 **Token budget rule for anchors:** spend at most two `grep` calls per broken anchor. Never read entire files to fix anchors.
 
-If it's an HTTP link:
-1. **Investigate the link:**
-   - Determine what the link was supposed to point to based on:
-     - The link text in the markdown
-     - The context around the link
-     - The surrounding documentation
-
-2. **Search for alternatives:**
-   - Use web-fetch to search for if the content has moved to a new URL
-   - Try common alternatives (www vs non-www, http vs https, with/without trailing slash)
-   - Look for redirects or updated documentation
-   - Check if there's an official replacement
-
-3. **Fix the link:**
-   - If you find a working replacement URL, use the `edit` tool to update the markdown file
-   - Replace the broken URL with the working one
-   - Make sure to preserve the link text and formatting
-
-4. **Document unfixable links:**
-   - If a link truly cannot be fixed (content permanently removed, no alternatives found):
-     - Add it to the unfixable_links list in cache memory
-     - Include the URL, reason, and date
-     - This prevents future runs from wasting time on the same broken link
+If the link cannot be fixed:
+- Add it to the `unfixable_links` list in cache memory
+- Include the URL, source file, reason, and date
+- This prevents future runs from wasting time on the same broken link
 
 ## Step 4: Update Cache Memory
 
@@ -320,11 +269,10 @@ Based on your work:
 ## Important Guidelines
 
 - **Be thorough:** Check every broken link carefully
-- **Preserve context:** When replacing links, make sure the new URL points to equivalent or better content
+- **Preserve context:** When replacing links, make sure the new path/anchor points to equivalent content
 - **Document everything:** Keep the cache memory up to date with unfixable links
 - **Be selective:** Only add links to the unfixable list if you've genuinely tried to find alternatives
-- **Use web-fetch wisely:** Try to fetch the broken URL and check for redirects or alternatives
-- **Relative links:** The link checker validates relative file links and anchors too. For broken relative links, check if the target file was renamed or moved and update the path accordingly. For broken anchors, check if the heading was renamed and update the anchor to match.
+- **Scope:** Only relative `.md` file links and heading anchors are in scope. Absolute URLs (http/https/mailto/etc.) are ignored by the checker — do not attempt to validate or fix them.
 
 ## Example Cache Memory Update
 
@@ -332,8 +280,9 @@ Based on your work:
 {
   "unfixable_links": [
     {
-      "url": "https://old-docs.example.com/api/v1",
-      "reason": "Documentation site shut down, no replacement found despite searching",
+      "url": "../old/removed-page.md",
+      "source_file": "docs/index.md",
+      "reason": "Target file removed and no replacement found in the repo",
       "first_seen": "2026-02-17"
     }
   ],
