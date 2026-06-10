@@ -110,7 +110,7 @@ safe-outputs:
   noop:
 ---
 
-# Weekly Link Checker & Fixer
+# Weekly HTTP Link Checker & Fixer
 
 You are an automated link checker and fixer agent. Your job is to find and fix broken links in the documentation files of this repository.
 

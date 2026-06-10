@@ -172,7 +172,7 @@ safe-outputs:
 source: githubnext/agentics/workflows/link-checker.md@c02eadfca420f2b351f9fcaee883c507a63ca316
 ---
 
-# Weekly Link Checker & Fixer
+# Weekly Relative Link Checker & Fixer
 
 You are an automated link checker and fixer agent. Your job is to find and fix broken links between documentation files in this repository. Only links to other `.md` files and in-file/cross-file heading anchors are checked. Absolute URLs (http/https/mailto/etc.) are intentionally ignored.
 
