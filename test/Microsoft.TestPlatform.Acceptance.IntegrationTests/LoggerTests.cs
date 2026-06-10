@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -185,6 +186,64 @@ public class LoggerTests : AcceptanceTestBase
         arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
 
         InvokeVsTest(arguments);
+
+        string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
+
+        Assert.AreEqual("Completed", outcomeValue);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedWhenDataCollectorLogsError(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPath = GetSampleTestAssembly();
+        var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
+        var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
+
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /TestCaseFilter:PassingTest");
+        arguments = string.Concat(arguments, $" /Collect:SampleDataCollector");
+        arguments = string.Concat(arguments, $" /TestAdapterPath:{extensionsPath}");
+        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");
+
+        var env = new Dictionary<string, string?>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+        };
+
+        InvokeVsTest(arguments, env);
+
+        string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
+
+        Assert.AreEqual("Failed", outcomeValue);
+    }
+
+    [TestMethod]
+    [NetFullTargetFrameworkDataSource]
+    [NetCoreTargetFrameworkDataSource]
+    public void TrxLoggerResultSummaryOutcomeValueShouldBeCompletedWhenDataCollectorLogsErrorAndTreatErrorMessagesAsWarningsIsTrue(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPath = GetSampleTestAssembly();
+        var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
+        var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
+
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /TestCaseFilter:PassingTest");
+        arguments = string.Concat(arguments, $" /Collect:SampleDataCollector");
+        arguments = string.Concat(arguments, $" /TestAdapterPath:{extensionsPath}");
+        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath};TreatErrorMessagesAsWarnings=true\"");
+
+        var env = new Dictionary<string, string?>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+        };
+
+        InvokeVsTest(arguments, env);
 
         string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
 
