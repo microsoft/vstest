@@ -467,10 +467,10 @@ to listen to `TestExecution.StatsChange` messages until a
 | Stats           | object | Map for count of tests for each outcome |
 
 Details of a `TestResult` object is available in
-[appendix](#DataStructure.TestResult).
+[appendix](#4-testresult).
 
 Details of a `TestCase` object is available in
-[appendix](#DataStructure.TestCase).
+[appendix](#3-testcase).
 
 #### Example
 ```json
