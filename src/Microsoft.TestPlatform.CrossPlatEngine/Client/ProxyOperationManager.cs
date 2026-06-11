@@ -553,11 +553,16 @@ public class ProxyOperationManager
             }
         }
 
-        // After testhost process launched failed with error.
-        if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError) || !StringUtils.IsNullOrWhiteSpace(_testHostProcessFileName))
+        // After testhost process crashed (stderr present), replace the message with a diagnostic one.
+        if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
             // Testhost failed with error.
             errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), BuildCrashErrorContext(_testHostProcessFileName, _testHostProcessStdError));
+        }
+        else if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessFileName))
+        {
+            // Process launched but no stderr — append path as a diagnostic addendum without overwriting the timeout message.
+            errorMsg += $" Process path: {_testHostProcessFileName}";
         }
 
         throw new TestPlatformException(errorMsg);
