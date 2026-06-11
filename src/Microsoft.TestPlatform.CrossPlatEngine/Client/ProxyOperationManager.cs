@@ -556,7 +556,6 @@ public class ProxyOperationManager
         // After testhost process crashed (stderr present), replace the message with a diagnostic one.
         if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessStdError))
         {
-            // Testhost failed with error.
             errorMsg = string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.TestHostExitedWithError, string.Join("', '", sources), BuildCrashErrorContext(_testHostProcessFileName, _testHostProcessStdError));
         }
         else if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessFileName))
