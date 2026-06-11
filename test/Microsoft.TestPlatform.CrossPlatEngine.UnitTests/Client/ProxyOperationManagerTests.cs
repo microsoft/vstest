@@ -498,7 +498,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         var ex = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel(["test.dll"], DefaultRunSettings));
         Assert.Contains(stdError, ex.Message);
-        Assert.DoesNotContain(ex.Message, "Process path:");
+        Assert.DoesNotContain("Process path:", ex.Message);
     }
 
     [TestMethod]
