@@ -337,7 +337,8 @@ public class IntegrationTestBase
         var consolePathParameter = $@" -p:VsTestConsolePath=""{vstestConsolePath}""";
         arguments += consolePathParameter;
 
-        IntegrationTestBase.ExecutePatchedDotnet("msbuild", arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
+        // -restore ensures packages are restored before building, since dotnet msbuild does not restore implicitly.
+        IntegrationTestBase.ExecutePatchedDotnet("msbuild", "-restore " + arguments, out _standardTestOutput, out _standardTestError, out _runnerExitCode, debugEnvironmentVariables, workingDirectory);
         FormatStandardOutCome();
     }
 
