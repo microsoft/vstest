@@ -561,7 +561,7 @@ public class ProxyOperationManager
         else if (!StringUtils.IsNullOrWhiteSpace(_testHostProcessFileName))
         {
             // Process launched but no stderr — append path as a diagnostic addendum without overwriting the timeout message.
-            errorMsg += $" Process path: {_testHostProcessFileName}";
+            errorMsg += BuildCrashErrorContext(_testHostProcessFileName, null);
         }
 
         throw new TestPlatformException(errorMsg);
