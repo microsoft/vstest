@@ -84,7 +84,7 @@ internal static class Constants
     /// Treat error-level run messages (e.g. from data collectors) as warnings,
     /// preventing them from marking the TRX result summary as Failed.
     /// </summary>
-    public static string TreatErrorMessagesAsWarnings = "TreatErrorMessagesAsWarnings";
+    public const string TreatErrorMessagesAsWarnings = "TreatErrorMessagesAsWarnings";
 
     /// <summary>
     /// Mstest adapter string
