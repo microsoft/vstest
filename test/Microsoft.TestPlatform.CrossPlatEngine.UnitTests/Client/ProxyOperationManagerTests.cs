@@ -522,7 +522,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
         var ex = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel(["test.dll"], DefaultRunSettings));
-        Assert.Contains($"Process path: {processPath}", ex.Message);
+        Assert.Contains($" Process path: {processPath}", ex.Message);
     }
 
     [TestMethod]
