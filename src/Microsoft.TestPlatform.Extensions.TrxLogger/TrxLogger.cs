@@ -89,6 +89,7 @@ public class TrxLogger : ITestLoggerWithParameters
     /// </summary>
     private string? _testResultsDirPath;
     private bool _warnOnFileOverwrite;
+    private bool _treatErrorMessagesAsWarnings;
 
 
     #region ITestLogger
@@ -144,6 +145,14 @@ public class TrxLogger : ITestLoggerWithParameters
                 : true
             // We did not find the option and want to fallback to warning on write, because that was the default before.
             : true;
+
+        _treatErrorMessagesAsWarnings = parameters.TryGetValue(TrxLoggerConstants.TreatErrorMessagesAsWarnings, out string? treatErrorMessagesAsWarningsString)
+            ? bool.TryParse(treatErrorMessagesAsWarningsString, out bool treatErrorMessagesAsWarningsValue)
+                ? treatErrorMessagesAsWarningsValue
+                // We found the option but could not parse the value; preserve existing behavior.
+                : false
+            // We did not find the option, default to false to preserve existing behavior.
+            : false;
 
         if (isLogFilePrefixParameterExists && isLogFileNameParameterExists)
         {
@@ -261,7 +270,11 @@ public class TrxLogger : ITestLoggerWithParameters
                 _runLevelErrorsAndWarnings.Add(runMessage);
                 break;
             case TestMessageLevel.Error:
-                TestResultOutcome = TrxLoggerObjectModel.TestOutcome.Failed;
+                if (!_treatErrorMessagesAsWarnings)
+                {
+                    TestResultOutcome = TrxLoggerObjectModel.TestOutcome.Failed;
+                }
+
                 runMessage = new RunInfo(e.Message, null, Environment.MachineName, TrxLoggerObjectModel.TestOutcome.Error);
                 _runLevelErrorsAndWarnings.Add(runMessage);
                 break;

@@ -146,6 +146,56 @@ public class TrxLoggerTests
     }
 
     [TestMethod]
+    public void TestMessageHandlerShouldSetOutcomeToFailedWhenErrorMessageIsReceived()
+    {
+        string message = "An error message";
+        TestRunMessageEventArgs trme = new(TestMessageLevel.Error, message);
+        _testableTrxLogger.TestMessageHandler(new object(), trme);
+
+        Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Failed, _testableTrxLogger.TestResultOutcome);
+    }
+
+    [TestMethod]
+    public void TestMessageHandlerShouldNotSetOutcomeToFailedWhenTreatErrorMessagesAsWarningsIsEnabled()
+    {
+        var events = new Mock<TestLoggerEvents>();
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = DefaultTestRunDirectory,
+            [TrxLoggerConstants.LogFileNameKey] = "test.trx",
+            [TrxLoggerConstants.TreatErrorMessagesAsWarnings] = "true",
+        };
+        var logger = new TestableTrxLogger();
+        logger.Initialize(events.Object, parameters);
+
+        string message = "A data collector error message";
+        TestRunMessageEventArgs trme = new(TestMessageLevel.Error, message);
+        logger.TestMessageHandler(new object(), trme);
+
+        Assert.AreEqual(TrxLoggerObjectModel.TestOutcome.Passed, logger.TestResultOutcome);
+    }
+
+    [TestMethod]
+    public void TestMessageHandlerShouldStillRecordErrorMessageWhenTreatErrorMessagesAsWarningsIsEnabled()
+    {
+        var events = new Mock<TestLoggerEvents>();
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = DefaultTestRunDirectory,
+            [TrxLoggerConstants.LogFileNameKey] = "test.trx",
+            [TrxLoggerConstants.TreatErrorMessagesAsWarnings] = "true",
+        };
+        var logger = new TestableTrxLogger();
+        logger.Initialize(events.Object, parameters);
+
+        string message = "A data collector error message";
+        TestRunMessageEventArgs trme = new(TestMessageLevel.Error, message);
+        logger.TestMessageHandler(new object(), trme);
+
+        Assert.HasCount(1, logger.GetRunLevelErrorsAndWarnings());
+    }
+
+    [TestMethod]
     public void TestResultHandlerShouldCaptureStartTimeInSummaryWithTimeStampDuringIntialize()
     {
         TestCase testCase = CreateTestCase("dummy string");
