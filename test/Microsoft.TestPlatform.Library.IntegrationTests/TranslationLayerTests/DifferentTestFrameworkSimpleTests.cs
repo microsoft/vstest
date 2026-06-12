@@ -68,8 +68,6 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // there are logs in the diagnostic log, it is failing with NullReferenceException because path is null
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
     {
@@ -104,7 +102,6 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     // TODO: this does not work with netcore testhost, why?
     [NetFullTargetFrameworkDataSource]
     public void RunTestsWithNonDllAdapter(RunnerInfo runnerInfo)

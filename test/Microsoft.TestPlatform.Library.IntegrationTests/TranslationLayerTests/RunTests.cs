@@ -46,7 +46,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
@@ -83,7 +82,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource()]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
@@ -195,7 +193,6 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)

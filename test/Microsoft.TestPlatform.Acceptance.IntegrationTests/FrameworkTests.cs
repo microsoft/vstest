@@ -41,8 +41,6 @@ public class FrameworkTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // framework runner not available on Linux
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
     //[NetCoreTargetFrameworkDataSource]
     public void OnWrongFrameworkPassedTestRunShouldNotRun(RunnerInfo runnerInfo)
@@ -69,7 +67,6 @@ public class FrameworkTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
-    [TestCategory("Windows-Review")]
     public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

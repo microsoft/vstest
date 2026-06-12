@@ -16,9 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class ExecutionTests : AcceptanceTestBase
 {
-    //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [MSTestCompatibilityDataSource]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
@@ -35,7 +33,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [TestHostCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
     {
@@ -52,7 +49,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations2(RunnerInfo runnerInfo)
     {
@@ -67,7 +63,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [TestCategory("Smoke")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useVsixRunner: true)]
     [NetCoreTargetFrameworkDataSource]
@@ -292,7 +287,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void ExitCodeShouldReturnOneWhenTreatNoTestsAsErrorParameterSetToTrueAndNoTestMatchesFilter(RunnerInfo runnerInfo)
     {
@@ -312,7 +306,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void ExitCodeShouldReturnZeroWhenTreatNoTestsAsErrorParameterSetToFalseAndNoTestMatchesFilter(RunnerInfo runnerInfo)
     {
@@ -366,7 +359,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void ExecuteTestsShouldSucceedWhenAtLeastOneDllFindsRuntimeProvider(RunnerInfo runnerInfo)
     {

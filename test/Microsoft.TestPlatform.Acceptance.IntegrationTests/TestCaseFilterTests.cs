@@ -155,7 +155,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// Discover tests using mstest v1 adapter with test case filters.
     /// </summary>
     [TestMethod]
-    [TestCategory("Windows-Review")]
     // MSTest v1 tests from dlls are only supported in .NET Framework runner, in and outside of VS
     // via Microsoft.VisualStudio.TestPlatform.Extensions.VSTestIntegration.dll
     [NetFullTargetFrameworkDataSource(useCoreRunner: false)]

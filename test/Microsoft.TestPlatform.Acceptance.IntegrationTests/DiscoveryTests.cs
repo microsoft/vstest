@@ -55,7 +55,6 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
     {
@@ -119,7 +118,6 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void DiscoverTestsShouldSucceedWhenAtLeastOneDllFindsRuntimeProvider(RunnerInfo runnerInfo)
     {

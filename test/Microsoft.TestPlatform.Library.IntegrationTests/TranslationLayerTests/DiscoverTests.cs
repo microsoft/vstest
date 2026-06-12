@@ -44,7 +44,6 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
@@ -62,7 +61,6 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {

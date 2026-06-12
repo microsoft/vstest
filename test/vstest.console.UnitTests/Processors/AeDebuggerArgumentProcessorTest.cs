@@ -18,7 +18,6 @@ using Moq;
 namespace vstest.console.UnitTests.Processors;
 
 [TestClass]
-[TestCategory("Windows-Review")]
 public class AeDebuggerArgumentProcessorTest
 {
     private readonly Mock<IEnvironment> _environment = new();
