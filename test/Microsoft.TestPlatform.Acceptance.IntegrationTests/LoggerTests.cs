@@ -16,7 +16,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class LoggerTests : AcceptanceTestBase
 {
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void TrxLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
@@ -37,7 +36,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void HtmlLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
@@ -58,7 +56,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void HtmlLoggerWithFriendlyNameContainsExpectedContent(RunnerInfo runnerInfo)
     {
@@ -106,7 +103,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
     {
@@ -147,7 +143,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedIfNoTestsExecutedAndTreatNoTestsAsErrorIsTrue(RunnerInfo runnerInfo)
     {
@@ -170,7 +165,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
     {

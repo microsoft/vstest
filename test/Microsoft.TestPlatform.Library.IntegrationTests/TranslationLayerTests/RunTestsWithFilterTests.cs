@@ -37,7 +37,6 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {

@@ -16,8 +16,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 [TestClass]
-// We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
-[TestCategory("Windows-Review")]
 public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;

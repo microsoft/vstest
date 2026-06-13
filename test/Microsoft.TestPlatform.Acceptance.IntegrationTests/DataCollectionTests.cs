@@ -80,7 +80,6 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
     {

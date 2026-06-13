@@ -17,8 +17,6 @@ namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 [TestClass]
 // TODO: this comment seems inaccurate and would mean all our linux and macos tests are broken?
-// We need to dogfood the package built in this repo *-dev and we pack tha tp only on windows
-[TestCategory("Windows-Review")]
 public class SerialTestRunDecoratorTests : AcceptanceTestBase
 {
     private IVsTestConsoleWrapper? _vstestConsoleWrapper;

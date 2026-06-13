@@ -22,7 +22,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.Library.IntegrationTests.TranslationLayerTests;
 
 [TestClass]
-[TestCategory("Windows-Review")]
 public class DataCollectorAttachmentProcessor : AcceptanceTestBase
 {
     private readonly IVsTestConsoleWrapper _vstestConsoleWrapper;

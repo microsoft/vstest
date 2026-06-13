@@ -38,7 +38,6 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
     /// Verifies that discovery request/response messages serialize correctly across the version boundary.
     /// </summary>
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource()]
     public void DiscoverTests_LatestRunner_WithOlderTesthosts(RunnerInfo runnerInfo)
     {
@@ -73,7 +72,6 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
     /// Verifies that older runners can understand discovery responses from the new STJ-based testhost.
     /// </summary>
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [TestHostCompatibilityDataSource]
     public void DiscoverTests_OlderRunners_WithLatestTesthost(RunnerInfo runnerInfo)
     {
@@ -109,7 +107,6 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
     /// Verifies that test run messages (start, result, complete) serialize correctly across versions.
     /// </summary>
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
     public void RunTests_LatestRunner_WithOlderTesthosts(RunnerInfo runnerInfo)
     {
@@ -148,7 +145,6 @@ public class SerializationCompatibilityTests : AcceptanceTestBase
     /// Verifies that older runners can process execution results from the new STJ-based testhost.
     /// </summary>
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [TestHostCompatibilityDataSource]
     public void RunTests_OlderRunners_WithLatestTesthost(RunnerInfo runnerInfo)
     {
