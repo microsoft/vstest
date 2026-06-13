@@ -227,12 +227,19 @@ internal static class TestTaskUtils
         builder.AppendSwitchIfNotNull("--testSessionCorrelationId:", task.VSTestSessionCorrelationId);
 
         // VSTestCLIRunSettings should be last argument as vstest.console ignore options after "--" (CLIRunSettings option).
+        // The type is string (not string[]) to prevent MSBuild's ITaskItem path normalization from converting
+        // backslashes to forward slashes on Unix (e.g. in regex patterns like "namespace =~ /Abc\.Space1/").
+        // Multiple settings are separated by newlines or semicolons.
         if (task.VSTestCLIRunSettings != null)
         {
             builder.AppendSwitch("--");
-            foreach (var arg in task.VSTestCLIRunSettings)
+            foreach (var arg in task.VSTestCLIRunSettings.Split(['\n', ';'], StringSplitOptions.RemoveEmptyEntries))
             {
-                builder.AppendSwitchIfNotNull(string.Empty, arg);
+                var trimmed = arg.Trim();
+                if (!StringUtils.IsNullOrEmpty(trimmed))
+                {
+                    builder.AppendSwitchIfNotNull(string.Empty, trimmed);
+                }
             }
         }
 
