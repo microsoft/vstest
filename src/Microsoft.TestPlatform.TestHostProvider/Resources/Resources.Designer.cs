@@ -83,6 +83,17 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
         }
 
         /// <summary>
+        ///   Looks up a localized string for a warning when testhost.dll is not found in the project's deps.json, suggesting a missing Microsoft.NET.Test.Sdk reference.
+        /// </summary>
+        internal static string MissingTestSdkWarning
+        {
+            get
+            {
+                return ResourceManager.GetString("MissingTestSdkWarning", resourceCulture)!;
+            }
+        }
+
+        /// <summary>
         ///   Looks up a localized string similar to Unable to find {0}. Make sure test project has a nuget reference of package &quot;Microsoft.NET.Test.Sdk&quot;..
         /// </summary>
         internal static string UnableToFindDepsFile {
