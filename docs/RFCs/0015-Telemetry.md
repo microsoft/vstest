@@ -107,7 +107,7 @@ For Execution using sources: Users have to use this API to pass TestPlatform Opt
 Similarly, while running tests using TestCases, there are API's available to send TestPlatformOptions along with them.
 
 ## Consuming Metrics in Design Mode Scenarios from Test Platform
-The whole aggregated metrics will be appended in vstest.console process in the final Execution/Disocvery Complete message and it will be send back to the consumers. When users use API's that are available in [IVSTestConsoleWrapper](../../src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Interfaces/IVsTestConsoleWrapper.cs), they have to pass the event handler which will contain metrics from TestPlatform.
+The whole aggregated metrics will be appended in vstest.console process in the final Execution/Discovery Complete message and it will be sent back to the consumers. When users use API's that are available in [IVSTestConsoleWrapper](../../src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Interfaces/IVsTestConsoleWrapper.cs), they have to pass the event handler which will contain metrics from TestPlatform.
 
 In Case of Execution, users will pass [ITestRunEventsHandler](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/ITestRunEventsHandler.cs), which contains [TestRunCompleteEventArgs](../../src/Microsoft.TestPlatform.ObjectModel/Client/Events/TestRunCompleteEventArgs.cs) which will have Metrics in it which users can consume.
 
@@ -129,7 +129,7 @@ We have to collect Total Discovery Time taken, Total Tests Run in case of parall
 * It may happen that TestHost is on a newer version whereas vstest.console is on older version. So, TestHost process should not collect Metrics by default. So, it should only collect Metrics when users give consent to collect Metrics.
 So, for sending consent from Vstest.console process to Test Host, Command line argument i.e. boolean **TelemetryOptedIn** is sent to TestHost Process from Vstest.console process.
 
-The interface [IRequestData](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/IRequestData.cs) has been has been exposed to TestHost process which contains [IMetricCollection](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/IMetricsCollection.cs) which will collect the Metrics in a dictionary.
+The interface [IRequestData](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/IRequestData.cs) has been exposed to TestHost process which contains [IMetricsCollection](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/IMetricsCollection.cs) which will collect the Metrics in a dictionary.
 
 #### Sending Metrics from TestHost process to vstest.console process
 Currently, At the end of Discovery Complete, we are sending **TestDiscovery.Complete** message event along with DiscoveryCompletePayload, so we will add our collected Metrics along with [DiscoveryCompletePayload](../../src/Microsoft.TestPlatform.CommunicationUtilities/Messages/DiscoveryCompletePayload.cs). Similar will be done at end of **TestExecution.Complete** event where we will add the Metrics in [TestRunCompleteEventArgs](../../src/Microsoft.TestPlatform.ObjectModel/Client/Events/TestRunCompleteEventArgs.cs). This helps us in sending whole metrics in one go and helps us to decrease performance overhead of sending messages from test host process to vstest.console process.

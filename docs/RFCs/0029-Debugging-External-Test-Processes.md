@@ -83,7 +83,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter
 }
 ```
 
-3. Introduce a new `ITestHostLauncher2` interface that inherits [`ITestHostLauncher`](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/ITestHostLauncher.cs#L11) and adds the following `AttachToProcess()` API. Visual Studio's Test Explorer will supply an implementation of this interface via [`IVsTestConsoleWrapper.RunTestsWithCustomTestHost()`](../../src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Interfaces/IVsTestConsoleWrapper.cs#L120) and `ITestHostLauncher2.AttachToProcess()` will be called when  `IFrameworkHandle2.AttachDebuggerToProcess()` is called within an adapter.
+3. Introduce a new `ITestHostLauncher2` interface that inherits [`ITestHostLauncher`](../../src/Microsoft.TestPlatform.ObjectModel/Client/Interfaces/ITestHostLauncher.cs#L11) and adds the following `AttachToProcess()` API. Visual Studio's Test Explorer will supply an implementation of this interface via [`IVsTestConsoleWrapper.RunTestsWithCustomTestHost()`](../../src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Interfaces/IVsTestConsoleWrapper.cs#L286) and `ITestHostLauncher2.AttachToProcess()` will be called when  `IFrameworkHandle2.AttachDebuggerToProcess()` is called within an adapter.
 
 ```
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces
