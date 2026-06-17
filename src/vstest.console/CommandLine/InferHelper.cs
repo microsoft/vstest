@@ -272,8 +272,13 @@ internal class InferHelper
             ExecutionPreference preference;
             if (IsDllOrExe(source))
             {
-                preference = _assemblyMetadataProvider.HasRunAsExe(source) ? ExecutionPreference.RunAsExe
-                    : ExecutionPreference.Default;
+                // A test framework opts into running the test project as its own executable by adding the
+                // [RunAsExe] assembly attribute to the test assembly. When present we prefer running the exe
+                // that the project built next to its assembly instead of spawning the built-in testhost.
+                // When the attribute is absent we keep the default behavior (built-in testhost).
+                var optedIn = _assemblyMetadataProvider.HasRunAsExe(source);
+                preference = optedIn ? ExecutionPreference.RunAsExe : ExecutionPreference.Default;
+                EqtTrace.Info("InferHelper.DetermineRunAsExe: source '{0}' [RunAsExe] opt-in={1}, execution preference={2}.", source, optedIn, preference);
             }
             else
             {

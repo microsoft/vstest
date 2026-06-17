@@ -607,7 +607,7 @@ public class TestEngine : ITestEngine
             return false;
         }
 
-        if (sourceToSourceDetailMap.Any(s => s.Value.ExecutionPreference != ExecutionPreference.Default))
+        if (sourceToSourceDetailMap.Any(s => (s.Value.ExecutionPreference ?? ExecutionPreference.Default) != ExecutionPreference.Default))
         {
             EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: At least one source has non-default execution preference, running in isolation (in a separate testhost process).");
             return false;
@@ -633,21 +633,6 @@ public class TestEngine : ITestEngine
         // If running with the dotnet executable, then don't run in in process.
         if (currentProcessPath.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
             || currentProcessPath.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-        {
-            return false;
-        }
-
-        // TODO: this disables in-process so we can see testhost next to runner used from console, but in reality we should somehow opt-into this,
-        // possibly by depracating multiple test frameworks in a process, and adding a static preference (assembly level attribute) of the test framework
-        // or something similar. This would also allow us to distingush c++ tests mstestv1 tests etc.
-        //
-        // also is there impact on dotnet test? we don't run in-proc when we are in design mode (so we never run in-proc under VS), and under dotnet test we might run in-proc, but there is 1 proc per project
-        // so no impact on perf as we are not saving anything assuming that "testhost" would replace vstest.console, and we would still have 1 process per project.
-        //
-        // So the only impact here is on vstest.console.exe runs in console, where there is a chance that we will run multiple projects, we are not in design mode, and there is common process for all projects.
-        // so there we just need to keep working as is.
-        var a = true;
-        if (a)
         {
             return false;
         }

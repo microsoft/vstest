@@ -10,16 +10,40 @@
  ***********************************************************************************************
 -->
 
-<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project InitialTargets="GenerateProgramFile" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!--
-     Generate config file for test project targeting .NET Framework. This config file has binding redirect which is needed at time of running tests.
-     Added below two lines because msbuild has following check:
-     https://github.com/Microsoft/msbuild/blob/dd5e8bc3f86ac98bd77d8971b00a6ad14f122f1a/src/XMakeTasks/Microsoft.Common.CurrentVersion.targets#L2027 
+     3. In run-as-exe mode the test assembly runs as its own executable with its own app.config. We let the
+     SDK auto-generate binding redirects so version conflicts between the test project's own references and
+     the testhost's dependencies (e.g. System.Collections.Immutable 8 vs 10) are unified to the highest
+     version. The testplatform custom assembly resolver stays disabled in exe mode.
    -->
   <PropertyGroup>
     <AutoGenerateBindingRedirects Condition="'$(AutoGenerateBindingRedirects)' == ''">true</AutoGenerateBindingRedirects>
     <GenerateBindingRedirectsOutputType Condition="'$(GenerateBindingRedirectsOutputType)' == ''">true</GenerateBindingRedirectsOutputType>
   </PropertyGroup>
+
+  <!--
+    2. Generate the entry point (Main) for the test exe, but ONLY when the project opted into running as its own
+    executable by declaring <OutputType>Exe</OutputType>. Normal (Library) .NET Framework test projects are
+    unaffected and keep being hosted by testhost.exe. The generated Main references testhost.dll and invokes the
+    testhost engine on the current assembly.
+  -->
+  <PropertyGroup>
+    <GeneratedProgramFile Condition="'$(GeneratedProgramFile)' == ''">$(MSBuildThisFileDirectory)Microsoft.NET.Test.Sdk.Program$(DefaultLanguageSourceExtension)</GeneratedProgramFile>
+    <GenerateProgramFile Condition="'$(GenerateProgramFile)' == '' AND ('$(OutputType)' != 'Exe' OR '$(UseWinUI)' == 'true' OR '$(UseUwpTools)' == 'true')">false</GenerateProgramFile>
+    <GenerateProgramFile Condition="'$(GenerateProgramFile)' == ''">true</GenerateProgramFile>
+  </PropertyGroup>
+
+  <Target Name="GenerateProgramFile"
+          Condition="'$(GenerateProgramFile)' == 'true' AND '$(OutputType)' == 'Exe' AND '$(UseWinUI)' != 'true' AND '$(UseUwpTools)' != 'true'">
+
+    <ItemGroup Condition="'$(Language)' == 'VB' or '$(Language)' == 'C#'">
+      <RemoveExistingMicrosoftNETTestSdkProgram Include="@(Compile)" Condition="'%(FileName)' == 'Microsoft.NET.Test.Sdk.Program'" />
+      <Compile Remove="@(RemoveExistingMicrosoftNETTestSdkProgram)" />
+      <Compile Include="$(GeneratedProgramFile)"/>
+    </ItemGroup>
+
+  </Target>
 
 </Project>

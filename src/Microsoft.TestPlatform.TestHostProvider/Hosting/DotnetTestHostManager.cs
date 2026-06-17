@@ -77,6 +77,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private string _hostPackageVersion = "15.0.0";
     private Architecture _architecture;
     private Framework? _targetFramework;
+    private bool _runAsExe;
     private bool _isVersionCheckRequired = true;
     private string? _dotnetHostPath;
     private bool _captureOutput;
@@ -205,6 +206,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
         _dotnetHostPath = runConfiguration.DotnetHostPath;
+        _runAsExe = runConfiguration.ExecutionPreference == ExecutionPreference.RunAsExe;
     }
 
     /// <inheritdoc/>
@@ -268,8 +270,23 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         var sourcePath = sources.Single();
         var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
 
-        // use the exe as host
-        _dotnetHostPath = TryGetExePathFromDll(sourcePath);
+        // When the test project opted into running as its own executable (RunAsExe), use the apphost/executable
+        // that the SDK built next to the test assembly as the host instead of spawning dotnet on testhost.dll.
+        // If no executable is found we keep the default behavior (dotnet muxer / custom host path).
+        if (_runAsExe)
+        {
+            var exePath = TryGetExePathFromDll(sourcePath);
+            if (exePath != null)
+            {
+                EqtTrace.Verbose("DotnetTestHostmanager: Using executable next to source as host: {0}", exePath);
+                _dotnetHostPath = exePath;
+            }
+            else
+            {
+                EqtTrace.Verbose("DotnetTestHostmanager: RunAsExe was requested but no executable was found next to {0}, falling back to the default dotnet host.", sourcePath);
+            }
+        }
+
         var sourceDirectory = Path.GetDirectoryName(sourcePath)!;
 
         // Probe for runtime config and deps file for the test source
@@ -1040,16 +1057,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     {
         if (Path.GetExtension(sourcePath) != ".dll")
         {
-            throw new ArgumentException("Source path must be a .dll file", nameof(sourcePath));
+            return null;
         }
 
         var exe = Path.ChangeExtension(sourcePath, ".exe"); // todo: linux macos
-        if (File.Exists(exe))
-        {
-            return exe;
-        }
-
-        throw new ArgumentException("Could not find corresponding .exe for the given .dll", nameof(sourcePath));
-
+        return File.Exists(exe) ? exe : null;
     }
 }

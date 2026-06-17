@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- run-as-exe opt-in: declare OutputType=Exe so the Microsoft.NET.Test.Sdk targets generate the entry point
+       and reference testhost.dll. Combined with the [assembly: RunAsExe] attribute (see UnitTest1.cs) the test
+       project builds and runs as its own executable instead of being hosted by testhost.exe. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>RunAsExeTestProject</AssemblyName>
+    <TargetFrameworks>$(NetFrameworkMinimum)</TargetFrameworks>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MSTest.TestFramework">
+      <Version>$(MSTestTestFrameworkVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="MSTest.TestAdapter">
+      <Version>$(MSTestTestAdapterVersion)</Version>
+    </PackageReference>
+    <PackageReference Include="Microsoft.NET.Test.Sdk">
+      <Version>$(PackageVersion)</Version>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>

@@ -17,6 +17,14 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
+  <!--
+    run-as-exe: .NET Framework test projects must declare <OutputType>Exe</OutputType> in the PROJECT itself
+    (csproj / Directory.Build.props), NOT here. NuGet package build props are not imported during 'dotnet
+    restore' (restore is what generates them), so an OutputType set here is invisible to restore: restore would
+    lay down a Library (no-RID) assets graph while the build sees an exe and demands a net4xx/win-x86 RID graph
+    that restore never produced -> NETSDK1047. (Same reason MTP requires the test project to be an exe.)
+  -->
+
   <ItemGroup>
     <ProjectCapability Include="TestContainer" />
   </ItemGroup>  

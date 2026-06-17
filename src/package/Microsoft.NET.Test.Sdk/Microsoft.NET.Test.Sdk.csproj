@@ -16,10 +16,12 @@
 
   <ItemGroup>
     <Compile Remove="netcoreapp\Microsoft.NET.Test.Sdk.Program.cs" />
+    <Compile Remove="netfx\Microsoft.NET.Test.Sdk.Program.cs" />
   </ItemGroup>
 
   <ItemGroup>
     <None Include="netcoreapp\Microsoft.NET.Test.Sdk.Program.cs" />
+    <None Include="netfx\Microsoft.NET.Test.Sdk.Program.cs" />
   </ItemGroup>
 
   <ItemGroup>

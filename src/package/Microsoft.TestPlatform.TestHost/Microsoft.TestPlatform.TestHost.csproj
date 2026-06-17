@@ -21,6 +21,8 @@
   <ItemGroup Label="NuGet">
     <NuspecProperty Include="NewtonsoftJsonVersion=$(NewtonsoftJsonVersion)" />
     <NuspecProperty Include="SrcPackageFolder=$(SrcPackageFolder)" />
+    <!-- Referenceable .NET Framework testhost library (testhost.dll) for run-as-exe. -->
+    <NuspecProperty Include="TestHostLibraryNet462Dll=$(ArtifactsBinDir)testhost.library\$(Configuration)\net462\testhost.dll" />
   </ItemGroup>
 
   <ItemGroup>

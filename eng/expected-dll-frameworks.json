@@ -404,6 +404,14 @@
       "tools/net8.0/zh-Hant/Microsoft.CodeCoverage.IO.dll": "none"
     },
     "Microsoft.TestPlatform.TestHost": {
+      "build/net462/runAsExe/Microsoft.TestPlatform.CommunicationUtilities.dll": "netframework",
+      "build/net462/runAsExe/Microsoft.TestPlatform.CoreUtilities.dll": "netframework",
+      "build/net462/runAsExe/Microsoft.TestPlatform.CrossPlatEngine.dll": "netframework",
+      "build/net462/runAsExe/Microsoft.TestPlatform.PlatformAbstractions.dll": "netframework",
+      "build/net462/runAsExe/Microsoft.TestPlatform.Utilities.dll": "netframework",
+      "build/net462/runAsExe/Microsoft.VisualStudio.TestPlatform.Common.dll": "netframework",
+      "build/net462/runAsExe/Microsoft.VisualStudio.TestPlatform.ObjectModel.dll": "netframework",
+      "build/net462/runAsExe/testhost.dll": "netframework",
       "build/net8.0/x64/testhost.dll": "net",
       "build/net8.0/x86/testhost.x86.dll": "net",
       "lib/net8.0/Microsoft.TestPlatform.CommunicationUtilities.dll": "net",
