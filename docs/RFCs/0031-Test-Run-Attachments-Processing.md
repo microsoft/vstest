@@ -62,7 +62,7 @@ If `SupportsIncrementalProcessing` is `False` then Test Platform will wait for a
 
 
 
-2. Introduce a new `ProcessTestRunAttachmentsAsync` method in [IVsTestConsoleWrapper](./src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Interfaces/IVsTestConsoleWrapper.cs) interface:
+2. Introduce a new `ProcessTestRunAttachmentsAsync` method in [IVsTestConsoleWrapper](../../src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Interfaces/IVsTestConsoleWrapper.cs) interface:
 
 ```cs
 /// <summary>
