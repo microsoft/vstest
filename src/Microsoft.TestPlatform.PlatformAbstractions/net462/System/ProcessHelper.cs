@@ -36,6 +36,16 @@ public partial class ProcessHelper : IProcessHelper
             return _currentProcessArchitecture.Value;
         }
 
+#if NETSTANDARD2_0_OR_GREATER
+        _currentProcessArchitecture = RuntimeInformation.ProcessArchitecture switch
+        {
+            Architecture.X86 => PlatformArchitecture.X86,
+            Architecture.X64 => PlatformArchitecture.X64,
+            Architecture.Arm64 => PlatformArchitecture.ARM64,
+            Architecture.Arm => PlatformArchitecture.ARM,
+            _ => PlatformArchitecture.X64,
+        };
+#else
         // When this is current process, we can just check if IntPointer size to get if we are 64-bit or 32-bit.
         // When it is 32-bit we can just return, if it is 64-bit we need to clarify if x64 or arm64.
         if (IntPtr.Size == 4)
@@ -45,6 +55,7 @@ public partial class ProcessHelper : IProcessHelper
         }
 
         _currentProcessArchitecture ??= GetProcessArchitecture(_currentProcess.Id);
+#endif
         return _currentProcessArchitecture.Value;
     }
 #endif

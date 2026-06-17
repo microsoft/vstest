@@ -6,6 +6,9 @@
 using System;
 using System.ComponentModel;
 using System.Diagnostics;
+#if NETSTANDARD2_0_OR_GREATER
+using System.Runtime.InteropServices;
+#endif
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -31,6 +34,9 @@ public class PlatformEnvironment : IEnvironment
 
     private static bool IsArm64()
     {
+#if NETSTANDARD2_0_OR_GREATER
+        return RuntimeInformation.OSArchitecture == System.Runtime.InteropServices.Architecture.Arm64;
+#else
         try
         {
             var currentProcess = Process.GetCurrentProcess();
@@ -53,6 +59,7 @@ public class PlatformEnvironment : IEnvironment
         }
 
         return false;
+#endif
     }
 
     /// <inheritdoc />
