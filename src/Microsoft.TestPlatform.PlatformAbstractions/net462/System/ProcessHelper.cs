@@ -41,9 +41,13 @@ public partial class ProcessHelper : IProcessHelper
         {
             Architecture.X86 => PlatformArchitecture.X86,
             Architecture.X64 => PlatformArchitecture.X64,
-            Architecture.Arm64 => PlatformArchitecture.ARM64,
             Architecture.Arm => PlatformArchitecture.ARM,
-            _ => PlatformArchitecture.X64,
+            Architecture.Arm64 => PlatformArchitecture.ARM64,
+            (Architecture)5 => PlatformArchitecture.S390x,
+            (Architecture)6 => PlatformArchitecture.LoongArch64,
+            (Architecture)8 => PlatformArchitecture.Ppc64le,
+            (Architecture)9 => PlatformArchitecture.RiscV64,
+            _ => throw new NotSupportedException(),
         };
 #else
         // When this is current process, we can just check if IntPointer size to get if we are 64-bit or 32-bit.
