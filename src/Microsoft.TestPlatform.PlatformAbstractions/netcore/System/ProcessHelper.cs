@@ -1,7 +1,7 @@
 ﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETCOREAPP
+#if NET
 
 using System;
 using System.Diagnostics;
@@ -46,12 +46,6 @@ public partial class ProcessHelper : IProcessHelper
             (Architecture)9 => PlatformArchitecture.RiscV64,
             _ => throw new NotSupportedException(),
         };
-    }
-
-    public PlatformArchitecture GetProcessArchitecture(int processId)
-    {
-        // Return the same as the current process.
-        return GetCurrentProcessArchitecture();
     }
 }
 

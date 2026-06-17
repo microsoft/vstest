@@ -21,7 +21,6 @@ namespace TerminalLoggerUnitTests
         [TestMethod]
         public void PassingTest()
         {
-            Assert.AreEqual(2, 2);
         }
 
         /// <summary>
@@ -31,7 +30,23 @@ namespace TerminalLoggerUnitTests
         public void FailingTest()
         {
             // test characters taken from https://pages.ucsd.edu/~dkjordan/chin/unitestuni.html
+#pragma warning disable MSTEST0025 // Use 'Assert.Fail' instead of an always-failing assert
             Assert.AreEqual("ğğğ𦮙我們剛才從𓋴𓅓𓏏𓇏𓇌𓀀", "not the same");
+#pragma warning restore MSTEST0025 // Use 'Assert.Fail' instead of an always-failing assert
+        }
+
+        /// <summary>
+        /// Validates that ~, !, |, and % in assertion messages are not corrupted
+        /// by the MSBuildLogger encoding used by the TerminalLogger.
+        /// </summary>
+        [TestMethod]
+        public void FailingTestWithSpecialChars()
+        {
+            // These characters were corrupted by the old ~~~~, !!!!, |||| encoding.
+            // 5 tildes, 4 bangs, 4 pipes, and percent-n which could be confused with a newline escape.
+#pragma warning disable MSTEST0025 // Use 'Assert.Fail' instead of an always-failing assert
+            Assert.AreEqual("~~~~~!!!!||||%n", "not the same");
+#pragma warning restore MSTEST0025 // Use 'Assert.Fail' instead of an always-failing assert
         }
 
         /// <summary>

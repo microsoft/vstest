@@ -6,11 +6,13 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.Diagnostics.NETCore.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.TestPlatform.Extensions.BlameDataCollector;
@@ -20,7 +22,10 @@ internal class NetClientHangDumper : IHangDumper
     public void Dump(int processId, string outputDirectory, DumpTypeOption type)
     {
         var process = Process.GetProcessById(processId);
-        var processTree = process.GetProcessTree();
+        // There is 30s timeout hardcoded for the NetClient, so if we try to connect to a non-net process it will take 30s to timeout.
+        // https://github.com/dotnet/diagnostics/blob/main/src/Microsoft.Diagnostics.NETCore.Client/DiagnosticsIpc/IpcClient.cs#L15
+        // We run this in parallel so it okay, but we are never interested in dumping the native helper processes of Windows, nor we can dump them.
+        var processTree = process.GetProcessTree().Where(p => p.Process?.ProcessName is not null and not "conhost" and not "WerFault" and not "createdump").ToList();
 
         if (EqtTrace.IsVerboseEnabled)
         {
@@ -59,10 +64,10 @@ internal class NetClientHangDumper : IHangDumper
             tasks.Add(Task.Run(
                 () =>
                 {
+                    var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
                     try
                     {
-                        var outputFile = Path.Combine(outputDirectory, $"{p.ProcessName}_{p.Id}_{DateTime.Now:yyyyMMddTHHmmss}_hangdump.dmp");
-                        EqtTrace.Verbose($"NetClientHangDumper.CollectDump: Selected dump type {type}. Dumping {process.Id} - {process.ProcessName} in {outputFile}. ");
+                        EqtTrace.Verbose($"NetClientHangDumper.CollectDump: Selected dump type {type}. Dumping {p.Id} - {p.ProcessName} in {outputFile}. ");
 
                         var client = new DiagnosticsClient(p.Id);
 
@@ -72,7 +77,24 @@ internal class NetClientHangDumper : IHangDumper
                     }
                     catch (Exception ex)
                     {
-                        EqtTrace.Error($"NetClientHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName}: {ex}.");
+                        EqtTrace.Error($"NetClientHangDumper.Dump: Error dumping process {p.Id} - {p.ProcessName} via DiagnosticsClient: {ex}.");
+
+                        // DiagnosticsClient can only connect to .NET Core/5+ processes. On Windows, fall back
+                        // to MiniDumpWriteDump for any DiagnosticsClient failure — this primarily covers .NET Framework
+                        // and native child processes with no diagnostics socket, but also acts as a last resort for
+                        // other transient failures. FileMode.Create in CollectDump ensures any partial output is replaced.
+                        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            EqtTrace.Verbose($"NetClientHangDumper.Dump: Falling back to MiniDumpWriteDump for process {p.Id} - {p.ProcessName}.");
+                            try
+                            {
+                                WindowsHangDumper.CollectDump(new ProcessHelper(), p, outputFile, type);
+                            }
+                            catch (Exception fallbackEx)
+                            {
+                                EqtTrace.Error($"NetClientHangDumper.Dump: Fallback dump also failed for process {p.Id} - {p.ProcessName}: {fallbackEx}.");
+                            }
+                        }
                     }
                 }, timeout.Token));
         }

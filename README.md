@@ -16,7 +16,7 @@ There are many ways to contribute to VSTest
 
 - [Submit issues](https://github.com/Microsoft/vstest/issues) and help verify fixes as they are checked in.
 - Review the [open PRs](https://github.com/Microsoft/vstest/pulls).
-- [Contribute features and fixes](./docs/contribute.md).
+- [Contribute features and fixes](./CONTRIBUTING.md).
 - Contribute to the documentation.
 
 NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shipped.txt` file. This helps us ensure we are always considering potential breaking changes (even between successive commits of un-released version) and avoids the burden of the unshipped to shipped commit.
@@ -60,8 +60,7 @@ NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shi
 
 VSTest can be built from within Visual Studio or from the CLI.
 
-- [Building with Visual Studio](./docs/contribute.md#building-with-visual-studio)
-- [Building with CLI, CI, Editors](./docs/contribute.md#building-with-cli-ci-editors)
+- [Building with Visual Studio](./CONTRIBUTING.md#building-with-visual-studio)
 
 ## Microsoft Open Source Code of Conduct
 
@@ -73,7 +72,7 @@ VSTest platform is licensed under the [MIT license](./LICENSE)
 
 ## Issue Tracking
 
-Please see [issue tracking](./issuetracking.md) for a description of the workflow we use to process issues.
+Please see [issue tracking](./docs/issuetracking.md) for a description of the workflow we use to process issues.
 
 ## Roadmap
 

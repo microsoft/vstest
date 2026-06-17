@@ -257,11 +257,9 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.PublishDirectory,
             $"Microsoft.CodeCoverage.{IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}.nupkg", "build", "netstandard2.0");
 
-        string diagFileName = Path.Combine(tempDirectory.Path, "diaglog.txt");
         var arguments = PrepareArguments(assemblyPaths, GetTestAdapterPath(), string.Empty,
             FrameworkArgValue, runnerInfo.InIsolationValue, tempDirectory.Path);
-        arguments = string.Concat(arguments, $" /Diag:{diagFileName}",
-            $" /TestAdapterPath:{traceDataCollectorDir}");
+        arguments = string.Concat(arguments, $" /TestAdapterPath:{traceDataCollectorDir}");
         arguments = string.Concat(arguments, $" /Platform:{testParameters.TargetPlatform}");
 
         trxFilePath = Path.Combine(tempDirectory.Path, Guid.NewGuid() + ".trx");
@@ -310,7 +308,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
         Assert.IsNotNull(module);
 
         var coverage = double.Parse(module.BlockCoverage, CultureInfo.InvariantCulture);
-        Assert.IsTrue(coverage > ExpectedMinimalModuleCoverage);
+        Assert.IsGreaterThan(ExpectedMinimalModuleCoverage, coverage);
 
         var testSignFunction = module.SkippedFunctions.FirstOrDefault(f => f.Name.Equals("TestSign()"));
         Assert.IsNotNull(testSignFunction);

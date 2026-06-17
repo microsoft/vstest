@@ -7,6 +7,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
+using System.Threading.Tasks;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -39,6 +40,8 @@ public class BlameCollectorTests
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly XmlElement? _configurationElement;
     private readonly string _filepath;
+
+    public TestContext TestContext { get; set; } = null!;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="BlameCollectorTests"/> class.
@@ -78,7 +81,7 @@ public class BlameCollectorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfDataCollectionLoggerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _blameDataCollector.Initialize(
+        Assert.ThrowsExactly<ArgumentNullException>(() => _blameDataCollector.Initialize(
             _configurationElement,
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
@@ -108,7 +111,7 @@ public class BlameCollectorTests
 
     /// <summary>
     /// Initializing with collect dump for hang should configure the timer with the right values and should
-    /// not call the reset method if no events are received.
+    /// start the timer when testhost launches (not during Initialize).
     /// </summary>
     [TestMethod]
     public void InitializeWithDumpForHangShouldInitializeInactivityTimerAndCallResetOnce()
@@ -124,12 +127,17 @@ public class BlameCollectorTests
             _mockLogger.Object,
             _context);
 
-        Assert.AreEqual(1, resetCalledCount, "Should have called InactivityTimer.Reset exactly once since no events were received");
+        Assert.AreEqual(0, resetCalledCount, "Should not have called InactivityTimer.Reset during Initialize — timer starts on TestHostLaunched");
+
+        // Simulate testhost launching — this should start the timer.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        Assert.AreEqual(1, resetCalledCount, "Should have called InactivityTimer.Reset exactly once after TestHostLaunched");
     }
 
     /// <summary>
     /// Initializing with collect dump for hang should configure the timer with the right values and should
-    /// reset for each event received
+    /// reset for each event received (including TestHostLaunched which starts the timer).
     /// </summary>
     [TestMethod]
     public void InitializeWithDumpForHangShouldInitializeInactivityTimerAndResetForEachEventReceived()
@@ -147,6 +155,9 @@ public class BlameCollectorTests
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
+
+        // Simulate testhost launching — this starts the timer (1st reset).
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
 
         TestCase testcase = new("TestProject.UnitTest.TestMethod", new Uri("test:/abc"), "abc.dll");
 
@@ -179,13 +190,16 @@ public class BlameCollectorTests
         _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set());
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            GetDumpConfigurationElement(false, false, true, 50),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000);
+        // Simulate testhost launching before the timer fires.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
         _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
@@ -213,13 +227,16 @@ public class BlameCollectorTests
         _mockProcessDumpUtility.Setup(x => x.GetDumpFiles(true, It.IsAny<bool>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some exception"));
 
         _blameDataCollector.Initialize(
-            GetDumpConfigurationElement(false, false, true, 0),
+            GetDumpConfigurationElement(false, false, true, 50),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000);
+        // Simulate testhost launching before the timer fires.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
         _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
         _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
     }
@@ -248,16 +265,50 @@ public class BlameCollectorTests
         _mockDataCollectionSink.Setup(x => x.SendFileAsync(It.IsAny<FileTransferInformation>())).Callback(() => hangBasedDumpcollected.Set()).Throws(new Exception("Some other exception"));
 
         _blameDataCollector.Initialize(
+            GetDumpConfigurationElement(false, false, true, 50),
+            _mockDataColectionEvents.Object,
+            _mockDataCollectionSink.Object,
+            _mockLogger.Object,
+            _context);
+
+        // Simulate testhost launching before the timer fires.
+        _mockDataColectionEvents.Raise(x => x.TestHostLaunched += null, new TestHostLaunchedEventArgs(_dataCollectionContext, 1234));
+
+        hangBasedDumpcollected.Wait(2000, TestContext.CancellationToken);
+        _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
+        _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
+        _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
+    }
+
+    /// <summary>
+    /// If testhost has not launched, the inactivity timer should not be started, so no hang dump
+    /// should be attempted even after the configured timeout elapses.
+    /// </summary>
+    [TestMethod]
+    public void InitializeWithDumpForHangShouldNotStartTimerIfTestHostHasNotLaunchedYet()
+    {
+        _blameDataCollector = new TestableBlameCollector(
+            _mockBlameReaderWriter.Object,
+            _mockProcessDumpUtility.Object,
+            null,
+            _mockFileHelper.Object,
+            _mockProcessHelper.Object);
+
+        _blameDataCollector.Initialize(
             GetDumpConfigurationElement(false, false, true, 0),
             _mockDataColectionEvents.Object,
             _mockDataCollectionSink.Object,
             _mockLogger.Object,
             _context);
 
-        hangBasedDumpcollected.Wait(1000);
-        _mockProcessDumpUtility.Verify(x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()), Times.Once);
-        _mockProcessDumpUtility.Verify(x => x.GetDumpFiles(true, It.IsAny<bool>()), Times.Once);
-        _mockDataCollectionSink.Verify(x => x.SendFileAsync(It.Is<FileTransferInformation>(y => y.Path == dumpFile)), Times.Once);
+        // Do NOT raise TestHostLaunched — timer should never start.
+        // Wait long enough that a started timer with timeout 0 would have fired.
+        Thread.Sleep(100);
+
+        // The hang dump must not have been attempted.
+        _mockProcessDumpUtility.Verify(
+            x => x.StartHangBasedProcessDump(It.IsAny<int>(), It.IsAny<string>(), It.IsAny<bool>(), It.IsAny<string>(), It.IsAny<Action<string>>()),
+            Times.Never);
     }
 
     /// <summary>
@@ -352,8 +403,7 @@ public class BlameCollectorTests
                          y[blameTestObject1.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod1" && y[blameTestObject2.Id].FullyQualifiedName == "TestProject.UnitTest.TestMethod2" &&
                          y[blameTestObject1.Id].Source == "abc.dll" && y[blameTestObject2.Id].Source == "abc.dll" &&
                          y[blameTestObject1.Id].DisplayName == "TestMethod1" && y[blameTestObject2.Id].DisplayName == "TestMethod2"),
-                It.IsAny<string>()),
-            Times.Once);
+                It.IsAny<string>()), Times.Once);
     }
 
     /// <summary>
@@ -739,6 +789,56 @@ public class BlameCollectorTests
         }
 
         return outernode;
+    }
+
+    /// <summary>
+    /// Concurrent test case start and end events should not corrupt internal state
+    /// </summary>
+    [TestMethod]
+    public void ConcurrentTestCaseStartAndEndEventsShouldNotCorruptState()
+    {
+        // Initializing Blame Data Collector
+        _blameDataCollector.Initialize(
+            _configurationElement,
+            _mockDataColectionEvents.Object,
+            _mockDataCollectionSink.Object,
+            _mockLogger.Object,
+            _context);
+
+        const int threadCount = 10;
+        var barrier = new Barrier(threadCount);
+        var tasks = new List<Task>();
+        var allTestCases = new List<TestCase>();
+
+        for (int t = 0; t < threadCount; t++)
+        {
+            var task = Task.Run(() =>
+            {
+                barrier.SignalAndWait(TestContext.CancellationToken);
+                for (int i = 0; i < 50; i++)
+                {
+                    var testcase = new TestCase($"TestProject.UnitTest.TestMethod{Guid.NewGuid()}", new Uri("test:/abc"), "abc.dll");
+                    lock (allTestCases)
+                    {
+                        allTestCases.Add(testcase);
+                    }
+
+                    _mockDataColectionEvents.Raise(x => x.TestCaseStart += null, new TestCaseStartEventArgs(testcase));
+                    _mockDataColectionEvents.Raise(x => x.TestCaseEnd += null, new TestCaseEndEventArgs(testcase, TestOutcome.Passed));
+                }
+            }, TestContext.CancellationToken);
+            tasks.Add(task);
+        }
+
+        // This must not throw due to concurrent collection modifications
+        Task.WaitAll(tasks.ToArray(), TestContext.CancellationToken);
+
+        // Raise session end - all tests completed so no sequence file should be written
+        _mockDataColectionEvents.Raise(x => x.SessionEnd += null, new SessionEndEventArgs(_dataCollectionContext));
+        _mockBlameReaderWriter.Verify(
+            x => x.WriteTestSequence(It.IsAny<List<Guid>>(), It.IsAny<Dictionary<Guid, BlameTestObject>>(), It.IsAny<string>()),
+            Times.Never,
+            "No sequence file should be written when all tests complete");
     }
 
     /// <summary>

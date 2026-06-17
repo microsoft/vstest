@@ -13,12 +13,21 @@ using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Res
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors;
 
 [TestClass]
+// Because runsettings tests use the instance of RunSettingsManager which is static.
+[DoNotParallelize]
 public class EnableLoggersArgumentProcessorTests
 {
     [TestInitialize]
     public void Initialize()
     {
+        RunSettingsManager.Instance = null;
         RunTestsArgumentProcessorTests.SetupMockExtensions();
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        RunSettingsManager.Instance = null;
     }
 
     [TestMethod]
@@ -62,16 +71,10 @@ public class EnableLoggersArgumentProcessorTests
     public void ExectorInitializeShouldThrowExceptionIfInvalidArgumentIsPassed(string argument)
     {
         var executor = new EnableLoggerArgumentExecutor(RunSettingsManager.Instance);
-        try
-        {
-            executor.Initialize(argument);
-        }
-        catch (Exception e)
-        {
-            string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.LoggerUriInvalid, argument);
-            Assert.IsTrue(e.GetType().Equals(typeof(CommandLineException)));
-            Assert.IsTrue(e.Message.Contains(exceptionMessage));
-        }
+        var e = Assert.ThrowsExactly<CommandLineException>(() => executor.Initialize(argument));
+        string exceptionMessage = string.Format(CultureInfo.CurrentCulture, CommandLineResources.LoggerUriInvalid, argument);
+        Assert.IsInstanceOfType<CommandLineException>(e);
+        Assert.Contains(exceptionMessage, e.Message);
     }
 
     [TestMethod]
@@ -241,7 +244,7 @@ public class EnableLoggersArgumentProcessorTests
       </Logger>
     </Loggers>
   </LoggerRunSettings>";
-        Assert.IsTrue(RunSettingsManager.Instance.ActiveRunSettings!.SettingsXml!.Contains(expectedSettingsXml));
+        Assert.Contains(expectedSettingsXml, RunSettingsManager.Instance.ActiveRunSettings!.SettingsXml!);
     }
 
     [TestMethod]

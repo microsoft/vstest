@@ -36,6 +36,8 @@ internal class Program
         var thisAssemblyPath = Assembly.GetEntryAssembly()!.Location;
         var here = Path.GetDirectoryName(thisAssemblyPath)!;
 
+        Environment.SetEnvironmentVariable("VSTEST_DEBUG_ATTACHVS_PATH", Path.Combine(here, "AttachVS.exe"));
+
         var console = Path.Combine(here, "vstest.console", "netfx", "vstest.console.exe");
 
         var sourceSettings = $$$"""

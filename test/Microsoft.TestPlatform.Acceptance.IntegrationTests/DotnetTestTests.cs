@@ -18,14 +18,13 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestCategory("Smoke")]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
+        var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj", runnerInfo.TargetFramework);
         InvokeDotnetTest($@"{projectPath} -tl:off /p:VSTestNoLogo=false --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", workingDirectory: Path.GetDirectoryName(projectPath));
 
         // ensure our dev version is used
@@ -35,8 +34,6 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
     {
@@ -52,14 +49,12 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithCsprojPassInlineSettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
-        var projectPath = GetIsolatedTestAsset("ParametrizedTestProject.csproj");
+        var projectPath = GetIsolatedTestAsset("ParametrizedTestProject.csproj", runnerInfo.TargetFramework);
         InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -tl:off /p:VSTestNoLogo=false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")", workingDirectory: Path.GetDirectoryName(projectPath));
 
         // ensure our dev version is used
@@ -69,8 +64,6 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithDllPassInlineSettings(RunnerInfo runnerInfo)
     {
@@ -84,8 +77,6 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     [Ignore("TODO: This scenario is broken in real environment as well (running with shipped `dotnet test`. Old tests (before arcade) use location of vstest.console that have more dlls in place than what we ship, and they make it work.")]
     public void RunDotnetTestWithNativeDll(RunnerInfo runnerInfo)
@@ -93,17 +84,15 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         string assemblyRelativePath = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\x64\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.PackageDirectory, assemblyRelativePath);
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.GlobalPackageDirectory, assemblyRelativePath);
 
-        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal"" --diag:c:\temp\logscpp\", workingDirectory: Path.GetDirectoryName(assemblyAbsolutePath));
+        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(assemblyAbsolutePath));
 
         ValidateSummaryStatus(1, 1, 0);
         ExitCodeEquals(1);
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestAndSeeOutputFromConsoleWriteLine(RunnerInfo runnerInfo)
     {

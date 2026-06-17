@@ -1,6 +1,11 @@
 ﻿#nullable enable
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITelemetryEventsHandler
 Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITelemetryEventsHandler.HandleTelemetryEvent(Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent! telemetryEvent) -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestCaseEndEventArgs.TestOutcome.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestCaseEventArgs.IsChildTestCase.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestCaseEventArgs.TestCaseId.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestCaseEventArgs.TestCaseName.set -> void
+Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestCaseEventArgs.TestElement.set -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference.Default = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ITelemetryInitializer
@@ -14,6 +19,6 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Name.get -> strin
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Properties.get -> System.Collections.Generic.IDictionary<string!, object!>!
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.TelemetryEvent(string! name, System.Collections.Generic.IDictionary<string!, object!>! properties) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference.RunAsExe = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
-Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.ExecutionPreference.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference?
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.CreateNoNewWindow.get -> bool
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.ExecutionPreference.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
-
+Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.ExecutionPreference.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference?

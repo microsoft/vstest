@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -266,13 +265,48 @@ public class VSTestTask2 : ToolTask, ITestTask
         {
             var parts = singleLine.Split(_messageSplitterArray, StringSplitOptions.None);
             name = parts[1];
-            data = parts.Skip(2).Take(parts.Length).Select(p => p?.Replace("~~~~", "\r").Replace("!!!!", "\n")).ToArray();
+            data = parts.Skip(2).Take(parts.Length).Select(Unescape).ToArray();
             return true;
         }
 
         name = string.Empty;
         data = [];
         return false;
+    }
+
+    /// <summary>
+    /// Reverses MSBuildLogger.Escape. Single-pass scanner to correctly handle
+    /// sequences like <c>%%n</c> (literal <c>%n</c>, not <c>%</c> + newline).
+    /// </summary>
+    private static string? Unescape(string? input)
+    {
+        if (input == null)
+        {
+            return null;
+        }
+
+        var sb = new StringBuilder(input.Length);
+        for (int i = 0; i < input.Length; i++)
+        {
+            if (input[i] == '%' && i + 1 < input.Length)
+            {
+                char next = input[++i];
+                switch (next)
+                {
+                    case '%': sb.Append('%'); break;
+                    case 'p': sb.Append('|'); break;
+                    case 'r': sb.Append('\r'); break;
+                    case 'n': sb.Append('\n'); break;
+                    default: sb.Append('%'); sb.Append(next); break;
+                }
+            }
+            else
+            {
+                sb.Append(input[i]);
+            }
+        }
+
+        return sb.ToString();
     }
 
     protected override string? GenerateCommandLineCommands()
@@ -282,37 +316,7 @@ public class VSTestTask2 : ToolTask, ITestTask
 
     protected override string? GenerateFullPathToTool()
     {
-        if (!ToolPath.IsNullOrEmpty())
-        {
-            return Path.Combine(Path.GetDirectoryName(Path.GetFullPath(ToolPath))!, ToolExe);
-        }
-
-        //TODO: https://github.com/dotnet/sdk/issues/20 Need to get the dotnet path from MSBuild?
-
-        var dhp = Environment.GetEnvironmentVariable("DOTNET_HOST_PATH");
-        if (!dhp.IsNullOrEmpty())
-        {
-            var path = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(dhp))!, ToolExe);
-            if (File.Exists(path))
-            {
-                return path;
-            }
-        }
-
-        if (File.Exists(ToolExe))
-        {
-            return Path.GetFullPath(ToolExe);
-        }
-
-        var values = Environment.GetEnvironmentVariable("PATH");
-        foreach (var p in values!.Split(Path.PathSeparator))
-        {
-            var fullPath = Path.Combine(p, ToolExe);
-            if (File.Exists(fullPath))
-                return fullPath;
-        }
-
-        return null;
+        return TestTaskUtils.ResolveDotnetPath();
     }
 
     /// <summary>
