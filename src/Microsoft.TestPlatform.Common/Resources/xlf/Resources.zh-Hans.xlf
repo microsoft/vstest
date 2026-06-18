@@ -124,17 +124,17 @@
       </trans-unit>
       <trans-unit id="DataCollectionContextNotInitialized">
         <source>The data collection environment context has not been initialized. Ensure that session started before processing test case events.</source>
-        <target state="new">The data collection environment context has not been initialized. Ensure that session started before processing test case events.</target>
+        <target state="translated">尚未初始化数据收集环境上下文。确保会话在处理测试用例事件之前启动。</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectionTestCaseEndMissingTestElement">
         <source>TestCaseEndEventArgs.TestElement is null. The data collector cannot end a test case without a test element.</source>
-        <target state="new">TestCaseEndEventArgs.TestElement is null. The data collector cannot end a test case without a test element.</target>
+        <target state="translated">TestCaseEndEventArgs.TestElement 为 null。如果没有测试元素，数据收集器无法结束测试用例。</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectionTestCaseStartMissingTestElement">
         <source>TestCaseStartEventArgs.TestElement is null. The data collector cannot start a test case without a test element.</source>
-        <target state="new">TestCaseStartEventArgs.TestElement is null. The data collector cannot start a test case without a test element.</target>
+        <target state="translated">TestCaseStartEventArgs.TestElement 为 null。如果没有测试元素，数据收集器无法启动测试用例。</target>
         <note />
       </trans-unit>
       <trans-unit id="DataCollectorRequestedDuplicateEnvironmentVariable">
