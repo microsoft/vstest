@@ -32,7 +32,6 @@ internal class AssemblyResolver : IDisposable
     /// </summary>
     private bool _isDisposed;
     private Stack<string>? _currentlyResolvingResources;
-    private readonly bool _isTestHost;
 
     /// <summary>
     /// Assembly resolver for platform
@@ -58,9 +57,6 @@ internal class AssemblyResolver : IDisposable
         _platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
 
         _platformAssemblyResolver.AssemblyResolve += OnResolve;
-
-        _isTestHost = Process.GetCurrentProcess().ProcessName.StartsWith("testhost", StringComparison.OrdinalIgnoreCase)
-            || Process.GetCurrentProcess().ProcessName.StartsWith("Test", StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -86,13 +82,6 @@ internal class AssemblyResolver : IDisposable
     /// </returns>
     private Assembly? OnResolve(object? sender, AssemblyResolveEventArgs? args)
     {
-
-        if (_isTestHost)
-        {
-            Debug.WriteLine($"Skipping custom resolve for dll {args?.Name}");
-            return null;
-        }
-
         if (StringUtils.IsNullOrEmpty(args?.Name))
         {
             Debug.Fail("AssemblyResolver.OnResolve: args.Name is null or empty.");
