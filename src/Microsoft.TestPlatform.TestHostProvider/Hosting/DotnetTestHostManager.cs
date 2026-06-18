@@ -280,6 +280,11 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             {
                 EqtTrace.Verbose("DotnetTestHostmanager: Using executable next to source as host: {0}", exePath);
                 _dotnetHostPath = exePath;
+
+                // Tell the host process it runs as its own executable so it disables the custom assembly resolver
+                // (dependencies are next to the exe). See DefaultTestHostManager.RunAsExeEnvironmentVariableName.
+                startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
+                startInfo.EnvironmentVariables[DefaultTestHostManager.RunAsExeEnvironmentVariableName] = "1";
             }
             else
             {

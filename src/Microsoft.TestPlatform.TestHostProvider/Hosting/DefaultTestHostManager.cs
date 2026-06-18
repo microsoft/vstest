@@ -64,6 +64,13 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private ITestHostLauncher? _customTestHostLauncher;
     private Process? _testHostProcess;
     private bool _runAsExe;
+
+    /// <summary>
+    /// Environment variable used to tell the host process that it is running as its own executable (run-as-exe),
+    /// so it disables the custom assembly resolver (all dependencies are next to the exe). Kept in sync with the
+    /// reader in <c>Microsoft.VisualStudio.TestPlatform.Common.Utilities.AssemblyResolver</c>.
+    /// </summary>
+    internal const string RunAsExeEnvironmentVariableName = "VSTEST_RUNASEXE";
     private StringBuilder? _testHostProcessStdError;
     private StringBuilder? _testHostProcessStdOut;
     private IMessageLogger? _messageLogger;
@@ -220,6 +227,13 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             originalTestHostProcessName = Path.GetFileName(exeNextToSource);
             testHostProcessPath = exeNextToSource;
             currentWorkingDirectory = Path.GetDirectoryName(exeNextToSource);
+
+            // The test project runs as its own executable (run-as-exe). Tell the host process to disable the
+            // custom assembly resolver: in this mode every dependency lives next to the exe (the app base) and is
+            // resolved by the runtime + app.config binding redirects, so we must not resolve dependencies from
+            // other locations/versions (which would mix dependencies). The host reads this via AssemblyResolver.
+            environmentVariables ??= new Dictionary<string, string?>();
+            environmentVariables[RunAsExeEnvironmentVariableName] = "1";
         }
         else
         {

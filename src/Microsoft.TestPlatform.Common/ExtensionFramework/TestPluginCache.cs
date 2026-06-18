@@ -286,8 +286,33 @@ public class TestPluginCache
         {
             if (value != null)
             {
-                _defaultExtensionPaths.AddRange(value);
+                var paths = value;
+                if (RunAsExeHelper.IsRunningAsExe)
+                {
+                    // Run-as-exe: the test executable is self-contained. Only keep extensions that ship next to it
+                    // (the app base) and drop the ones the runner passes from its own folder (loggers, data
+                    // collectors, built-in adapters, ...). This preserves the test project's own adapters while not
+                    // loading or mixing dependencies from the runner's location.
+                    var appBase = AppContext.BaseDirectory;
+                    paths = value.Where(p => IsUnderDirectory(p, appBase)).ToList();
+                    EqtTrace.Info("TestPluginCache.DefaultExtensionPaths: Running as exe, restricted default extensions to the app base '{0}'.", appBase);
+                }
+
+                _defaultExtensionPaths.AddRange(paths);
             }
+        }
+    }
+
+    private static bool IsUnderDirectory(string path, string directory)
+    {
+        try
+        {
+            return Path.GetFullPath(path).StartsWith(directory, StringComparison.OrdinalIgnoreCase);
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Verbose("TestPluginCache.IsUnderDirectory: Could not normalize path '{0}': {1}", path, ex);
+            return false;
         }
     }
 
