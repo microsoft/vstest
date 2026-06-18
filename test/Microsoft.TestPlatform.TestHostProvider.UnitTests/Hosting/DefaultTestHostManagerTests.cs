@@ -211,6 +211,21 @@ public class DefaultTestHostManagerTests
     }
 
     [TestMethod]
+    public void GetTestHostProcessStartInfoShouldNotThrowWhenNetFrameworkTestHostNotFoundOnOSX()
+    {
+        // On macOS (OSX) the existence check is skipped — only Linux (Unix) applies.
+        _mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/dotnet");
+        _mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.OSX);
+        _mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
+        // All paths are reported as absent — should NOT throw on macOS.
+        _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
+
+        var info = _testHostManager.GetTestHostProcessStartInfo([], null, default);
+
+        Assert.AreEqual("/usr/bin/mono", info.FileName);
+    }
+
+    [TestMethod]
     public void GetTestHostProcessStartInfoShouldNotUseMonoAsHostOnNonWindowsIfStartedWithMono()
     {
         _mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/mono");

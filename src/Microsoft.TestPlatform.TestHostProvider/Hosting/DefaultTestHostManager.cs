@@ -217,12 +217,12 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
                 && !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
             {
-                // On non-Windows, we use Mono to run the .NET Framework testhost. Validate that the
-                // testhost executable actually exists before handing control to Mono, so we can emit
+                // On Linux, source-built SDK packages (apt, dnf, rpm) may omit the TestHostNetFramework
+                // directory entirely. Validate existence before handing control to Mono so we can emit
                 // a clear diagnostic instead of an opaque "Cannot open assembly" error from Mono.
-                // Source-built SDK packages (e.g. from apt/dnf/rpm) may omit the TestHostNetFramework
-                // directory entirely, while the official .tar.gz installer from dot.net includes it.
-                if (!_fileHelper.Exists(testhostProcessPath))
+                // The check is scoped to Linux (Unix) only; on macOS the full SDK is typically present.
+                if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Unix)
+                    && !_fileHelper.Exists(testhostProcessPath))
                 {
                     throw new TestPlatformException(
                         string.Format(CultureInfo.CurrentCulture, Resources.NetFrameworkTestHostNotFoundOnLinux, testhostProcessPath));
