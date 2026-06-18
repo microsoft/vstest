@@ -102,7 +102,7 @@ don't silence an error by pointing at unrelated content.
    ```
 3. **Fix** the links named in `broken-links.md` using the fixing rules above, editing the
    source `.md` files directly in the working tree. For broken anchors, extract the
-   target's headings (respecting the two-`grep` token budget) to find a close match.
+   target's headings (respecting the two-extraction token budget) to find a close match.
 4. **Report** to the console — do **not** open PRs, issues, branches, or commits:
    - **Checked:** N files, M links/anchors (from the script's summary line).
    - **Fixed:** each broken link, old → new value, with source `file:line`.
