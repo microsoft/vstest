@@ -14,11 +14,6 @@ steps:
       fetch-depth: 0
       persist-credentials: false
 
-  - name: Setup Python
-    uses: actions/setup-python@v6
-    with:
-      python-version: '3.12'
-
   - name: Check and test all documentation links
     id: link-check
     run: python3 .github/workflows/scripts/check-md-links.py
