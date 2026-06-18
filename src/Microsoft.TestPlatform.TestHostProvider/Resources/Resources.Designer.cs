@@ -111,5 +111,16 @@ namespace Microsoft.TestPlatform.TestHostProvider.Resources {
             }
         }
 
+        /// <summary>
+        ///   Looks up a localized string for when the .NET Framework testhost is not found on Linux (e.g. source-built SDK).
+        /// </summary>
+        internal static string NetFrameworkTestHostNotFoundOnLinux
+        {
+            get
+            {
+                return ResourceManager.GetString("NetFrameworkTestHostNotFoundOnLinux", resourceCulture);
+            }
+        }
+
     }
 }
