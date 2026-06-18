@@ -43,7 +43,7 @@ safe-outputs:
 
 # Weekly Relative Link Checker & Fixer
 
-You are an automated link checker and fixer agent. Your job is to find and fix broken links between documentation files in this repository. The checking and fixing rules — scope, anchor matching, and how to repair a broken link — are defined once in the `@md-link-checker` agent (`.github/agents/md-link-checker.md`); this workflow reuses them rather than restating them. In short: only links to other `.md` files and in-file/cross-file heading anchors are in scope, and absolute URLs (http/https/mailto/etc.) are intentionally ignored.
+You are an automated link checker and fixer agent. Your job is to fix broken links between documentation files in this repository. Link extraction and testing are done by the shared script `.github/workflows/scripts/check-md-links.py`, which already ran in the previous step and wrote the results. The rules for *fixing* a broken link — scope, anchor matching, and how to repair it — live once in the `@md-link-checker` agent (`.github/agents/md-link-checker.md`), which this workflow delegates to rather than restating them. In short: only links to other `.md` files and in-file/cross-file heading anchors are in scope, and absolute URLs (http/https/mailto/etc.) are intentionally ignored.
 
 ## Your Mission
 

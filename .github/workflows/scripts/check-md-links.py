@@ -58,6 +58,15 @@ _WS_RE = re.compile(r"\s+")
 _SLUG_DROP_RE = re.compile(r"[^a-z0-9_-]")
 
 
+def write_github_output(broken_count, working_count):
+    """Emit step outputs when running inside GitHub Actions (no-op locally)."""
+    github_output = os.environ.get("GITHUB_OUTPUT")
+    if github_output:
+        with open(github_output, "a", encoding="utf-8") as fh:
+            fh.write("broken_count={}\n".format(broken_count))
+            fh.write("working_count={}\n".format(working_count))
+
+
 def read_lines(path):
     """Read a file as text lines without trailing newlines, tolerant of bad bytes."""
     try:
@@ -148,6 +157,14 @@ def main(argv):
     all_links_path = os.path.join(out_dir, "all-links.txt")
     unique_links_path = os.path.join(out_dir, "unique-links.txt")
 
+    # Clear intermediate files from any previous run sharing this OUT_DIR so stale
+    # artifacts can't be mistaken for the current run's output.
+    for stale in (all_links_path, unique_links_path):
+        try:
+            os.remove(stale)
+        except OSError:
+            pass
+
     results = ["# Link Check Results", ""]
     broken = ["# Broken Links", ""]
 
@@ -165,6 +182,7 @@ def main(argv):
             fh.write("\n".join(results) + "\n")
         with open(broken_path, "w", encoding="utf-8") as fh:
             fh.write("\n".join(broken) + "\n")
+        write_github_output(0, 0)
         return 0
 
     results.append("## Links Found")
@@ -190,6 +208,7 @@ def main(argv):
             fh.write("\n".join(results) + "\n")
         with open(broken_path, "w", encoding="utf-8") as fh:
             fh.write("\n".join(broken) + "\n")
+        write_github_output(0, 0)
         return 0
 
     results.append("## Link Test Results")
@@ -216,13 +235,16 @@ def main(argv):
         else:
             rel_path = url.split("#", 1)[0]
             anchor = url.split("#", 1)[1] if "#" in url else ""
+            # Scope: only links to other .md files are checked. Skip relative links
+            # whose target is not a .md file (images, source files, etc.). Same-file
+            # "#anchor" links are handled above; absolute URLs were skipped earlier.
+            if not rel_path.lower().endswith(".md"):
+                continue
             source_dir = os.path.dirname(source_file)
             if source_dir == "":
                 source_dir = "."
             target_path = normalize_target("{}/{}".format(source_dir, rel_path))
-            if rel_path == "" and anchor != "":
-                working_count += 1
-            elif not os.path.isfile(target_path):
+            if not os.path.isfile(target_path):
                 broken_count += 1
                 msg = "\u274c {} (file not found: {}) in {}".format(url, target_path, source_file)
                 results.append(msg)
@@ -252,11 +274,7 @@ def main(argv):
     with open(broken_path, "w", encoding="utf-8") as fh:
         fh.write("\n".join(broken) + "\n")
 
-    github_output = os.environ.get("GITHUB_OUTPUT")
-    if github_output:
-        with open(github_output, "a", encoding="utf-8") as fh:
-            fh.write("broken_count={}\n".format(broken_count))
-            fh.write("working_count={}\n".format(working_count))
+    write_github_output(broken_count, working_count)
 
     with open(results_path, "r", encoding="utf-8") as fh:
         sys.stdout.write(fh.read())

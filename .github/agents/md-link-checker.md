@@ -122,6 +122,12 @@ script (`.github/workflows/scripts/check-md-links.py`) and written the broken li
 `/tmp/gh-aw/agent/broken-links.md`. In that case:
 
 - Skip discovery and the script run — use the provided `broken-links.md` as your input.
+- **Expected format of `broken-links.md`:** it starts with a `# Broken Links` header
+  followed by a blank line, then lists one broken link per line prefixed with `❌`
+  (the same human-readable messages shown in the report — e.g.
+  `❌ sub/page.md#anchor (file exists but anchor '#anchor' not found in sub/page.md) in src.md`),
+  and ends with a blank line and a `**Summary:** <N> broken links` line. Parse the
+  `❌`-prefixed lines as your work items; ignore the header and the summary line.
 - Apply the **fixing rules** above to each broken link.
 - Defer **reporting** and any cache-memory bookkeeping to the workflow's own
   instructions (it creates a pull request or issue via safe-outputs); do not report to
