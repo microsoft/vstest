@@ -200,14 +200,14 @@ public class DefaultTestHostManagerTests
         _mockProcessHelper.Setup(p => p.GetCurrentProcessFileName()).Returns("/usr/bin/dotnet");
         _mockEnvironment.Setup(e => e.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
         _mockDotnetHostHelper.Setup(d => d.GetMonoPath()).Returns("/usr/bin/mono");
-        // File helper returns false for all paths — simulates source-built SDK where TestHostNetFramework is absent.
+        // File helper returns false for all paths — simulates an SDK where TestHostNetFramework is absent.
         _mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
 
         var ex = Assert.ThrowsExactly<TestPlatformException>(() =>
             _testHostManager.GetTestHostProcessStartInfo([], null, default));
 
         Assert.Contains("TestHostNetFramework", ex.Message);
-        Assert.Contains("https://dot.net/download", ex.Message);
+        Assert.Contains("does not include", ex.Message);
     }
 
     [TestMethod]

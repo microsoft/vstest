@@ -150,11 +150,9 @@ The specified framework can be found at:
   <data name="NetFrameworkTestHostNotFoundOnLinux" xml:space="preserve">
     <value>Could not find the .NET Framework test host at '{0}'.
 
-Source-built .NET SDK packages installed via a Linux package manager (apt, dnf, rpm) may not include the .NET Framework test host components needed to run .NET Framework tests with Mono.
+This .NET SDK does not include the .NET Framework test host needed to run .NET Framework tests with Mono.
 
-To resolve this issue, choose one of the following options:
-  - Install the complete .NET SDK from the official installer: https://dot.net/download
-  - Migrate your tests to target .NET instead of .NET Framework.
+To fix this, migrate your tests to target .NET instead of .NET Framework.
 </value>
     <comment>'{0}' is the full path where testhost.exe was expected to be found.</comment>
   </data>
