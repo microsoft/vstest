@@ -23,7 +23,28 @@ anchors. These rules are used in two places, so they are never duplicated:
 
 ## Checking rules (authoritative)
 
-Extract every `[text](url)` link from each in-scope file and classify the `url`:
+You do **not** extract and test links by hand. The extraction-and-testing logic is
+implemented once as a shared bash script — `.github/workflows/scripts/check-md-links.sh`
+— which both you and the pipeline workflow run. Always invoke that script to produce the
+broken-links list; the rules below document exactly what it does so they stay the single
+source of truth.
+
+How to run it:
+
+```bash
+# Scan an explicit list of files (e.g. the changed docs) into a local output dir:
+OUT_DIR=./.md-link-check bash .github/workflows/scripts/check-md-links.sh path/to/a.md path/to/b.md
+# Or scan the default scope (every *.md under docs/ plus README.md) by passing no files:
+OUT_DIR=./.md-link-check bash .github/workflows/scripts/check-md-links.sh
+```
+
+It writes `$OUT_DIR/broken-links.md` (the broken links to fix) and
+`$OUT_DIR/link-check-results.md` (the full report), and prints a
+`**Summary:** <working> working, <broken> broken` line. Read `broken-links.md` to drive
+your fixes. `OUT_DIR` defaults to `/tmp/gh-aw/agent` (the path the pipeline uses); set it
+to a repo-local or temp directory when running locally on Windows.
+
+The script applies these rules. Each `[text](url)` link is classified by its `url`:
 
 1. **Same-file anchor** (`#anchor`): the anchor must exist **in the same file**.
 2. **Absolute URL** (matches `^[a-zA-Z][a-zA-Z0-9+.-]*:`): **skip** — out of scope.
@@ -71,26 +92,32 @@ don't silence an error by pointing at unrelated content.
    git ls-files --others --exclude-standard -- '*.md'
    ```
    Union the lists. If the user asks for a full check, or nothing changed, fall back to
-   the pipeline's default scope: every `*.md` under `docs/` plus the root `README.md`.
+   the pipeline's default scope (pass no files to the script).
    If no markdown files are in scope, report that and stop.
-2. **Check** every link using the checking rules above.
-3. **Fix** broken links using the fixing rules above, editing files directly in the
-   working tree.
+2. **Check** — run the shared script over the chosen files to produce the broken-links
+   list, then read it:
+   ```bash
+   OUT_DIR=./.md-link-check bash .github/workflows/scripts/check-md-links.sh <chosen files...>
+   cat ./.md-link-check/broken-links.md
+   ```
+3. **Fix** the links named in `broken-links.md` using the fixing rules above, editing the
+   source `.md` files directly in the working tree. For broken anchors, extract the
+   target's headings (respecting the two-`grep` token budget) to find a close match.
 4. **Report** to the console — do **not** open PRs, issues, branches, or commits:
-   - **Checked:** N files, M links/anchors.
+   - **Checked:** N files, M links/anchors (from the script's summary line).
    - **Fixed:** each broken link, old → new value, with source `file:line`.
    - **Unfixable:** each remaining broken link with a reason. These are exactly what
      would fail CI, so the developer can fix them before pushing.
    - **Result:** "All links OK", or the counts of fixed vs. still-broken.
-   Only commit if the user explicitly asks.
+   Clean up the temporary `./.md-link-check` directory. Only commit if the user explicitly asks.
 
 ### Delegated (from the pipeline workflow)
 
-When the `md-link-checker` workflow delegates to you, it has already extracted and
-tested links and written the broken ones to a results file (e.g.
-`/tmp/gh-aw/agent/broken-links.md`). In that case:
+When the `md-link-checker` workflow delegates to you, it has already run the same shared
+script (`.github/workflows/scripts/check-md-links.sh`) and written the broken links to
+`/tmp/gh-aw/agent/broken-links.md`. In that case:
 
-- Skip discovery (Step 1) — use the provided broken-links list as your input.
+- Skip discovery and the script run — use the provided `broken-links.md` as your input.
 - Apply the **fixing rules** above to each broken link.
 - Defer **reporting** and any cache-memory bookkeeping to the workflow's own
   instructions (it creates a pull request or issue via safe-outputs); do not report to
