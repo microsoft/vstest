@@ -61,7 +61,7 @@ An anchor is valid if **either**:
   and drop characters that are not `[a-z0-9_-]`.
 
 **Token budget:** to find candidate headings extract only the headings with
-`grep -oP '^#{1,6}\s+\K.*' <file>` — at most two `grep` calls per broken anchor.
+`sed -nE 's/^#{1,6}[[:space:]]+//p' <file>` — at most two such extraction calls per broken anchor.
 **Never read an entire target file** just to validate or fix an anchor.
 
 ## Fixing rules (authoritative)
