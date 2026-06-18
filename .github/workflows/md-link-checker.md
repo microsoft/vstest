@@ -16,7 +16,7 @@ steps:
 
   - name: Check and test all documentation links
     id: link-check
-    run: bash .github/workflows/scripts/check-md-links.sh
+    run: python3 .github/workflows/scripts/check-md-links.py
     shell: bash
 
 tools:

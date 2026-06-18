@@ -24,8 +24,9 @@ anchors. These rules are used in two places, so they are never duplicated:
 ## Checking rules (authoritative)
 
 You do **not** extract and test links by hand. The extraction-and-testing logic is
-implemented once as a shared bash script — `.github/workflows/scripts/check-md-links.sh`
-— which both you and the pipeline workflow run. Always invoke that script to produce the
+implemented once as a shared Python script — `.github/workflows/scripts/check-md-links.py`
+— which both you and the pipeline workflow run. It is plain Python (no bash), so it works
+the same on Windows, macOS, and Linux. Always invoke that script to produce the
 broken-links list; the rules below document exactly what it does so they stay the single
 source of truth.
 
@@ -33,10 +34,13 @@ How to run it:
 
 ```bash
 # Scan an explicit list of files (e.g. the changed docs) into a local output dir:
-OUT_DIR=./.md-link-check bash .github/workflows/scripts/check-md-links.sh path/to/a.md path/to/b.md
+OUT_DIR=./.md-link-check python3 .github/workflows/scripts/check-md-links.py path/to/a.md path/to/b.md
 # Or scan the default scope (every *.md under docs/ plus README.md) by passing no files:
-OUT_DIR=./.md-link-check bash .github/workflows/scripts/check-md-links.sh
+OUT_DIR=./.md-link-check python3 .github/workflows/scripts/check-md-links.py
 ```
+
+On Windows set the env var separately, e.g. PowerShell:
+`$env:OUT_DIR='./.md-link-check'; python3 .github/workflows/scripts/check-md-links.py path/to/a.md`
 
 It writes `$OUT_DIR/broken-links.md` (the broken links to fix) and
 `$OUT_DIR/link-check-results.md` (the full report), and prints a
@@ -97,7 +101,7 @@ don't silence an error by pointing at unrelated content.
 2. **Check** — run the shared script over the chosen files to produce the broken-links
    list, then read it:
    ```bash
-   OUT_DIR=./.md-link-check bash .github/workflows/scripts/check-md-links.sh <chosen files...>
+   OUT_DIR=./.md-link-check python3 .github/workflows/scripts/check-md-links.py <chosen files...>
    cat ./.md-link-check/broken-links.md
    ```
 3. **Fix** the links named in `broken-links.md` using the fixing rules above, editing the
@@ -114,7 +118,7 @@ don't silence an error by pointing at unrelated content.
 ### Delegated (from the pipeline workflow)
 
 When the `md-link-checker` workflow delegates to you, it has already run the same shared
-script (`.github/workflows/scripts/check-md-links.sh`) and written the broken links to
+script (`.github/workflows/scripts/check-md-links.py`) and written the broken links to
 `/tmp/gh-aw/agent/broken-links.md`. In that case:
 
 - Skip discovery and the script run — use the provided `broken-links.md` as your input.
