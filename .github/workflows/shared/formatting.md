@@ -1,4 +1,3 @@
-<!-- source: githubnext/agentics/workflows/shared/formatting.md@main -->
 ---
 # Shared content formatting fragment  -  imported by other fragments
 ---

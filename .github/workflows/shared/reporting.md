@@ -1,7 +1,6 @@
-<!-- source: githubnext/agentics/workflows/shared/reporting.md@main -->
 ## Report Formatting
 
-Follow the content structure and formatting guidelines from the imported formatting fragment above.
+If a formatting fragment was imported above, follow its content structure and formatting guidelines.
 
 ## Reporting Workflow Run Information
 

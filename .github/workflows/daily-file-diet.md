@@ -21,7 +21,6 @@ safe-outputs:
     expires: 2d
     title-prefix: "[file-diet] "
     labels: [agentic-workflows]
-    assignees: copilot
     max: 1
 
 tools:
