@@ -16,7 +16,9 @@ anchors. These rules are used in two places, so they are never duplicated:
 
 ## Scope (authoritative)
 
-- Only **links to other `.md` files** and **in-file / cross-file heading anchors** are in scope.
+- Every **relative link target is checked for existence** — broken `.md` links, images,
+  and other relative assets are all reported. Heading anchors (`#anchor`) are validated
+  for in-file links and for links pointing at another `.md` file.
 - **Absolute URLs are intentionally ignored** — anything matching a scheme like
   `http:`, `https:`, `mailto:`, etc. Do not validate or fix them.
 - Markdown links have the form `[text](url)`; the `url` is what you validate.
@@ -28,7 +30,8 @@ implemented once as a shared Python script — `.github/workflows/scripts/check-
 — which both you and the pipeline workflow run. It is plain Python (no bash), so it works
 the same on Windows, macOS, and Linux. Always invoke that script to produce the
 broken-links list; the rules below document exactly what it does so they stay the single
-source of truth.
+source of truth. On macOS/Linux the interpreter is `python3`; on Windows use `python`
+(or `py -3`) — substitute the right name for your platform in the commands below.
 
 How to run it:
 
@@ -39,8 +42,8 @@ OUT_DIR=./.md-link-check python3 .github/workflows/scripts/check-md-links.py pat
 OUT_DIR=./.md-link-check python3 .github/workflows/scripts/check-md-links.py
 ```
 
-On Windows set the env var separately, e.g. PowerShell:
-`$env:OUT_DIR='./.md-link-check'; python3 .github/workflows/scripts/check-md-links.py path/to/a.md`
+On Windows set the env var separately and use the Windows interpreter name, e.g. PowerShell:
+`$env:OUT_DIR='./.md-link-check'; python .github/workflows/scripts/check-md-links.py path/to/a.md`
 
 It writes `$OUT_DIR/broken-links.md` (the broken links to fix) and
 `$OUT_DIR/link-check-results.md` (the full report), and prints a
@@ -53,8 +56,9 @@ The script applies these rules. Each `[text](url)` link is classified by its `ur
 1. **Same-file anchor** (`#anchor`): the anchor must exist **in the same file**.
 2. **Absolute URL** (matches `^[a-zA-Z][a-zA-Z0-9+.-]*:`): **skip** — out of scope.
 3. **Relative link** (`path` or `path#anchor`): resolve `path` relative to the
-   **source file's directory**, then require that the target file exists on disk and,
-   if an `#anchor` is present, that the anchor exists in the target file.
+   **source file's directory** and require that the target exists on disk. If the
+   target is a `.md` file and an `#anchor` is present, the anchor must also exist in
+   the target file; anchors on non-`.md` targets are ignored.
 
 ### Anchor matching
 

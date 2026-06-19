@@ -5,8 +5,9 @@ This is the single, shared implementation of the link-checking logic used by bot
   - the `md-link-checker` agentic workflow (.github/workflows/md-link-checker.md), and
   - the local `@md-link-checker` agent (.github/agents/md-link-checker.md).
 
-Only links to other `.md` files and in-file/cross-file heading anchors are checked.
-Absolute URLs (http/https/mailto/etc.) are intentionally ignored.
+Every relative link's target is checked for existence on disk; heading anchors are
+validated for in-file links and for links that point at another `.md` file. Absolute
+URLs (http/https/mailto/etc.) are intentionally ignored.
 
 It is written in Python (no bash) so it runs unchanged on Windows, macOS, and Linux
 — including the GitHub-hosted `ubuntu-latest` pipeline runner, which ships python3.
@@ -235,11 +236,12 @@ def main(argv):
         else:
             rel_path = url.split("#", 1)[0]
             anchor = url.split("#", 1)[1] if "#" in url else ""
-            # Scope: only links to other .md files are checked. Skip relative links
-            # whose target is not a .md file (images, source files, etc.). Same-file
-            # "#anchor" links are handled above; absolute URLs were skipped earlier.
-            if not rel_path.lower().endswith(".md"):
-                continue
+            # Every relative link's target is checked for existence (matching the
+            # original bash, which had no extension filter): broken images,
+            # source/script links, and renamed assets are all flagged. Anchor
+            # validation only applies to .md targets; for non-.md targets the
+            # anchor (if any) is ignored. Same-file "#anchor" links are handled
+            # above; absolute URLs were skipped earlier.
             source_dir = os.path.dirname(source_file)
             if source_dir == "":
                 source_dir = "."
@@ -249,7 +251,7 @@ def main(argv):
                 msg = "\u274c {} (file not found: {}) in {}".format(url, target_path, source_file)
                 results.append(msg)
                 broken.append(msg)
-            elif anchor != "":
+            elif anchor != "" and rel_path.lower().endswith(".md"):
                 if check_anchor(target_path, anchor):
                     working_count += 1
                     results.append("\u2705 {} (file + anchor OK) in {}".format(url, source_file))
