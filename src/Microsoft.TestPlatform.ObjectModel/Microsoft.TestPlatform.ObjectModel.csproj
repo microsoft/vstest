@@ -28,9 +28,9 @@
     <ItemGroup>
       <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.CoreUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
       <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.PlatformAbstractions.dll" PackagePath="lib/$(TargetFramework)/" />
-      <!-- Satellite resources for bundled assemblies: use %(RecursiveDir) to preserve locale subdirectories (e.g. cs/, de/) -->
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/%(RecursiveDir)" />
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.PlatformAbstractions.resources.dll" PackagePath="lib/$(TargetFramework)/%(RecursiveDir)" />
+      <!-- Satellite resources for bundled assemblies -->
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.PlatformAbstractions.resources.dll" PackagePath="lib/$(TargetFramework)/" />
     </ItemGroup>
   </Target>
 
