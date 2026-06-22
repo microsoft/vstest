@@ -78,7 +78,7 @@
     <None Include="$(OutputPath)net10.0\Microsoft.Diagnostics.NETCore.Client\Microsoft.Diagnostics.NETCore.Client.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)net10.0\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)net10.0\Microsoft.TestPlatform.Extensions.EventLogCollector.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
-    <None Include="$(OutputPath)net10.0\Microsoft.TestPlatform.TesthostRuntimeProvider.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
+    <None Include="$(OutputPath)net10.0\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)net10.0\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)net10.0\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\net10.0\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)net48\Microsoft.Internal.Dia\x64\msdia140.dll" Pack="true" PackagePath="contentFiles\any\net10.0\TestHostNetFramework\x64\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
@@ -551,7 +551,7 @@
     <None Include="$(OutputPath)$(NetCurrent)\vstest.console.runtimeconfig.json" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(NetCurrent)\Microsoft.Diagnostics.NETCore.Client\Microsoft.Diagnostics.NETCore.Client.dll" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(NetCurrent)\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
-    <None Include="$(OutputPath)$(NetCurrent)\Microsoft.TestPlatform.TesthostRuntimeProvider.dll" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
+    <None Include="$(OutputPath)$(NetCurrent)\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(NetCurrent)\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(NetCurrent)\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\$(NetCurrent)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
   </ItemGroup>
@@ -640,8 +640,11 @@
        projects' resources have been copied into this project's output, so a clean build would match
        nothing. They are instead gathered at pack time: TargetsForTfmSpecificContentInPackage runs in
        the inner (per-TFM) build where $(OutputPath) is already populated. The target is gated to
-       $(NetCurrent) so the content is added exactly once. %(RecursiveDir) preserves the language
-       sub-folders (cs, de, ...). -->
+       $(NetCurrent) so the content is added exactly once.
+       Note: in the inner build $(OutputPath) already points at the per-TFM output directory
+       (e.g. artifacts\bin\...\Release\net11.0\), so the '$(OutputPath)**' globs only ever span that
+       single TFM's sub-folders. %(RecursiveDir) is therefore just the language folder (cs, de, ...),
+       not a leading TFM directory, and the package layout stays contentFiles\any\$(NetCurrent)\<lang>\. -->
   <PropertyGroup Condition="'$(DotNetBuildSourceOnly)' == 'true' or '$(OS)' != 'Windows_NT'">
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_IncludeCliSourceBuildResources</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
