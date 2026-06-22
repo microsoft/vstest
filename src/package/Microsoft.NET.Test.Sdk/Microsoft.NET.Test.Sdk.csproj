@@ -26,12 +26,17 @@
 
   <!-- Package dependencies, expressed per target framework via references to the sibling packable projects.
        net8.0 depends on TestHost and CodeCoverage; net462 depends on CodeCoverage only
-       (TestHost gets shipped with vstest.console on .NET Framework). -->
+       (TestHost gets shipped with vstest.console on .NET Framework).
+       PrivateAssets="none" so the generated nuspec dependency does not exclude the Build (and Analyzers)
+       assets: consumers must import TestHost's and CodeCoverage's MSBuild props/targets (e.g. the
+       Microsoft.TestPlatform.TestHost.props that deploys the testhost.exe apphost). This matches the
+       hand-written nuspec, whose dependencies carried no exclude. By default pack emits
+       exclude="Build,Analyzers" for a ProjectReference, which would suppress those props. -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
-    <ProjectReference Include="..\Microsoft.TestPlatform.TestHost\Microsoft.TestPlatform.TestHost.csproj" />
+    <ProjectReference Include="..\Microsoft.TestPlatform.TestHost\Microsoft.TestPlatform.TestHost.csproj" PrivateAssets="none" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Microsoft.CodeCoverage\Microsoft.CodeCoverage.csproj" />
+    <ProjectReference Include="..\Microsoft.CodeCoverage\Microsoft.CodeCoverage.csproj" PrivateAssets="none" />
   </ItemGroup>
 
   <!-- README.md is referenced by PackageReadmeFile. -->

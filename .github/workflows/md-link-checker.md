@@ -16,136 +16,7 @@ steps:
 
   - name: Check and test all documentation links
     id: link-check
-    run: |
-      echo "# Link Check Results" > /tmp/gh-aw/agent/link-check-results.md
-      echo "" >> /tmp/gh-aw/agent/link-check-results.md
-      echo "# Broken Links" > /tmp/gh-aw/agent/broken-links.md
-      echo "" >> /tmp/gh-aw/agent/broken-links.md
-      
-      # Find all markdown files in docs directory and README
-      echo "Finding all markdown files..."
-
-      if ! find docs README.md -type f -name "*.md" -print0 2>/dev/null | grep -qz .; then
-        echo "No markdown files found"
-        echo "no_files=true" >> $GITHUB_OUTPUT
-        exit 0
-      fi
-
-      # Extract all links from markdown files
-      echo "## Links Found" >> /tmp/gh-aw/agent/link-check-results.md
-      echo "" >> /tmp/gh-aw/agent/link-check-results.md
-
-      # Use grep to find markdown links
-      # Format for relative links: "source_file|url" to allow path resolution
-      find docs README.md -type f -name "*.md" -print0 2>/dev/null | while IFS= read -r -d '' file; do
-        echo "Checking $file..."
-        # Extract markdown links [text](url)
-        grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' | while IFS= read -r link; do
-          echo "$file|$link" >> /tmp/gh-aw/agent/all-links.txt
-        done 2>/dev/null || true
-      done
-
-      # Remove duplicates and sort
-      if [ -f /tmp/gh-aw/agent/all-links.txt ]; then
-        sort -u /tmp/gh-aw/agent/all-links.txt > /tmp/gh-aw/agent/unique-links.txt
-        LINK_COUNT=$(wc -l < /tmp/gh-aw/agent/unique-links.txt)
-        echo "Found $LINK_COUNT unique links" >> /tmp/gh-aw/agent/link-check-results.md
-        echo "" >> /tmp/gh-aw/agent/link-check-results.md
-      else
-        echo "No links found" >> /tmp/gh-aw/agent/link-check-results.md
-        echo "no_links=true" >> $GITHUB_OUTPUT
-        exit 0
-      fi
-
-      # Helper: check if an explicit HTML anchor or markdown heading anchor exists in a file
-      check_anchor() {
-        local file="$1"
-        local anchor="$2"
-        local html_anchor heading generated
-
-        while IFS= read -r html_anchor; do
-          if [[ "$html_anchor" == "$anchor" ]]; then
-            return 0
-          fi
-        done < <(grep -oiP "<a\\b[^>]*\\b(?:name|id)\\s*=\\s*['\"]\\K[^'\"]+(?=['\"])" "$file" 2>/dev/null)
-
-        while IFS= read -r heading; do
-          generated=$(printf '%s' "$heading" | sed -E 's/<[^>]*>//g' | sed -E 's/[[:space:]]+/ /g; s/^ //; s/ $//' | tr '[:upper:]' '[:lower:]' | sed 's/ /-/g' | sed 's/[^a-z0-9_-]//g')
-          if [[ "$generated" == "$anchor" ]]; then
-            return 0
-          fi
-        done < <(grep -oP '^#{1,6}\s+\K.*' "$file" 2>/dev/null)
-
-        return 1
-      }
-      # Test each link
-      echo "## Link Test Results" >> /tmp/gh-aw/agent/link-check-results.md
-      echo "" >> /tmp/gh-aw/agent/link-check-results.md
-      echo "Testing links..." >> /tmp/gh-aw/agent/link-check-results.md
-
-      BROKEN_COUNT=0
-      WORKING_COUNT=0
-      while IFS='|' read -r source_file url; do
-        if [[ "$url" == "#"* ]]; then
-          # Same-file anchor link
-          ANCHOR="${url#\#}"
-          if check_anchor "$source_file" "$ANCHOR"; then
-            WORKING_COUNT=$((WORKING_COUNT + 1))
-            echo "✅ $url (anchor in $source_file)" >> /tmp/gh-aw/agent/link-check-results.md
-          else
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            echo "❌ $url (anchor not found in $source_file)" >> /tmp/gh-aw/agent/link-check-results.md
-            echo "❌ $url (anchor not found in $source_file)" >> /tmp/gh-aw/agent/broken-links.md
-          fi
-        elif [[ "$url" =~ ^[a-zA-Z][a-zA-Z0-9+.-]*: ]]; then
-          # Skip absolute URLs (http, https, mailto, etc.) — we only check links to other .md files and anchors
-          continue
-        else
-          # Relative file link, possibly with anchor
-          # Split into file path and optional anchor
-          REL_PATH="${url%%#*}"
-          ANCHOR=""
-          if [[ "$url" == *"#"* ]]; then
-            ANCHOR="${url#*#}"
-          fi
-          # Resolve relative to the source file's directory
-          SOURCE_DIR=$(dirname "$source_file")
-          TARGET_PATH="$SOURCE_DIR/$REL_PATH"
-          # Normalize the path
-          TARGET_PATH=$(realpath --relative-to=. "$TARGET_PATH" 2>/dev/null || echo "$TARGET_PATH")
-          if [[ -z "$REL_PATH" ]] && [[ -n "$ANCHOR" ]]; then
-            # Link is just "#anchor" handled above, but in case of edge cases
-            WORKING_COUNT=$((WORKING_COUNT + 1))
-          elif [[ ! -f "$TARGET_PATH" ]]; then
-            BROKEN_COUNT=$((BROKEN_COUNT + 1))
-            echo "❌ $url (file not found: $TARGET_PATH) in $source_file" >> /tmp/gh-aw/agent/link-check-results.md
-            echo "❌ $url (file not found: $TARGET_PATH) in $source_file" >> /tmp/gh-aw/agent/broken-links.md
-          elif [[ -n "$ANCHOR" ]]; then
-            # File exists, check the anchor
-            if check_anchor "$TARGET_PATH" "$ANCHOR"; then
-              WORKING_COUNT=$((WORKING_COUNT + 1))
-              echo "✅ $url (file + anchor OK) in $source_file" >> /tmp/gh-aw/agent/link-check-results.md
-            else
-              BROKEN_COUNT=$((BROKEN_COUNT + 1))
-              echo "❌ $url (file exists but anchor '#$ANCHOR' not found in $TARGET_PATH) in $source_file" >> /tmp/gh-aw/agent/link-check-results.md
-              echo "❌ $url (file exists but anchor '#$ANCHOR' not found in $TARGET_PATH) in $source_file" >> /tmp/gh-aw/agent/broken-links.md
-            fi
-          else
-            WORKING_COUNT=$((WORKING_COUNT + 1))
-            echo "✅ $url (file exists: $TARGET_PATH)" >> /tmp/gh-aw/agent/link-check-results.md
-          fi
-        fi
-      done < /tmp/gh-aw/agent/unique-links.txt
-
-      echo "" >> /tmp/gh-aw/agent/link-check-results.md
-      echo "**Summary:** $WORKING_COUNT working, $BROKEN_COUNT broken" >> /tmp/gh-aw/agent/link-check-results.md
-      echo "" >> /tmp/gh-aw/agent/broken-links.md
-      echo "**Summary:** $BROKEN_COUNT broken links" >> /tmp/gh-aw/agent/broken-links.md
-      # Output results
-      echo "broken_count=$BROKEN_COUNT" >> $GITHUB_OUTPUT
-      echo "working_count=$WORKING_COUNT" >> $GITHUB_OUTPUT
-
-      cat /tmp/gh-aw/agent/link-check-results.md
+    run: python3 .github/workflows/scripts/check-md-links.py
     shell: bash
 
 tools:
@@ -172,7 +43,7 @@ safe-outputs:
 
 # Weekly Relative Link Checker & Fixer
 
-You are an automated link checker and fixer agent. Your job is to find and fix broken links between documentation files in this repository. Only links to other `.md` files and in-file/cross-file heading anchors are checked. Absolute URLs (http/https/mailto/etc.) are intentionally ignored.
+You are an automated link checker and fixer agent. Your job is to fix broken links between documentation files in this repository. Link extraction and testing are done by the shared script `.github/workflows/scripts/check-md-links.py`, which already ran in the previous step and wrote the results. The rules for *fixing* a broken link — scope, anchor matching, and how to repair it — live once in the `@md-link-checker` agent (`.github/agents/md-link-checker.md`), which this workflow delegates to rather than restating them. In short: only links to other `.md` files and in-file/cross-file heading anchors are in scope, and absolute URLs (http/https/mailto/etc.) are intentionally ignored.
 
 ## Your Mission
 
@@ -210,25 +81,19 @@ The cache memory should store a JSON object with this structure:
 }
 ```
 
-## Step 3: Research and Fix Broken Links
+## Step 3: Fix Broken Links — delegate to `@md-link-checker`
 
-For each broken link found in the test results (but NOT in the unfixable list):
+For each broken link found in the test results (but NOT in the unfixable list),
+invoke `@md-link-checker` in its **delegated mode** and let it apply the repository's
+authoritative fixing rules. Pass it the broken-links list from `/tmp/gh-aw/agent/broken-links.md`.
 
-If it's a broken relative link (file not found):
-1. Use `find` or `bash` to search for a file with the same basename elsewhere in the repo.
-2. If found, update the path in the source markdown file.
-3. If not found, mark as unfixable and move on.
+The agent owns the fix logic so it is never duplicated here: searching for a renamed
+target file by basename for broken relative links, and matching a broken anchor against
+the target's heading slugs (under a strict two-`grep`-per-anchor token budget, never
+reading whole files). It edits the source markdown files directly and tells you which
+links it fixed and which remain unfixable.
 
-If it's a broken anchor (file exists but heading anchor not found):
-1. **Do NOT read the target file.** The bash step already confirmed the file exists and the anchor is missing.
-2. Use `bash` to extract only the headings: `grep -oP '^#{1,6}\s+\K.*' <file>`
-3. Compare the broken anchor against the extracted headings to find a close match (typo, renamed heading, changed casing).
-4. If a match is found, update the anchor in the source markdown file.
-5. If no match is found, mark as unfixable — do not fetch or read the file further.
-
-**Token budget rule for anchors:** spend at most two `grep` calls per broken anchor. Never read entire files to fix anchors.
-
-If the link cannot be fixed:
+If the agent reports a link as unfixable:
 - Add it to the `unfixable_links` list in cache memory
 - Include the URL, source file, reason, and date
 - This prevents future runs from wasting time on the same broken link
@@ -266,11 +131,13 @@ Based on your work:
 
 ## Important Guidelines
 
-- **Be thorough:** Check every broken link carefully
-- **Preserve context:** When replacing links, make sure the new path/anchor points to equivalent content
+The checking, fixing, scope, and "preserve equivalent content" rules are owned by
+`@md-link-checker` — follow them there. This workflow adds only the cache-memory
+discipline on top:
+
 - **Document everything:** Keep the cache memory up to date with unfixable links
-- **Be selective:** Only add links to the unfixable list if you've genuinely tried to find alternatives
-- **Scope:** Only relative `.md` file links and heading anchors are in scope. Absolute URLs (http/https/mailto/etc.) are ignored by the checker — do not attempt to validate or fix them.
+- **Be selective:** Only add links to the unfixable list once `@md-link-checker` has
+  genuinely tried and failed to find an alternative
 
 ## Example Cache Memory Update
 
