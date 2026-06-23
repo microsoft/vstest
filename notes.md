@@ -14,8 +14,9 @@
 - `ImmutableDictionary` (used for `FilterProperties`) does NOT have `Deconstruct` on net462/netstandard2.0; use `kvp.Key` / `kvp.Value` pattern.
 - `TestRunCache.CheckForCacheHit` called on every `OnTestStarted` and `OnNewTestResult` — the execution hot path.
 - `DiscoveryResultCache.AddTest` called on every discovered test case — the discovery hot path.
-- `LengthPrefixCommunicationChannel.Send` and `NotifyDataAvailable` — fixed in PR #16147: `Task.CompletedTask` instead of `Task.FromResult(0)`.
-- `JobQueue` in `CoreUtilities` — fixed in PR (efficiency/job-queue-mre-slim): `ManualResetEventSlim` instead of `ManualResetEvent` for `_jobAdded`, `_queueProcessing`, and `Flush()` wait event.
+- `LengthPrefixCommunicationChannel.Send` and `NotifyDataAvailable` — fixed in PR #16147 (MERGED 2026-06-23): `Task.CompletedTask` instead of `Task.FromResult(0)`.
+- `JobQueue` in `CoreUtilities` — fixed in PR #16150 (MERGED 2026-06-23): `ManualResetEventSlim` instead of `ManualResetEvent` for `_jobAdded`, `_queueProcessing`, and `Flush()` wait event.
+- `FastFilter.Evaluate`: PR #16139 closed by maintainer (nohwnd comment: "not worth it with the other allocations it introduces") — the `ValidForProperties` ToArray change introduced an allocation in the success path. New PR (efficiency/fastfilter-no-closure-no-double-lookup) targets ONLY Evaluate: kvp iteration + foreach instead of Any(lambda), avoids ToArray change entirely.
 - Filter source files (`src/Microsoft.TestPlatform.Filter.Source/`) compiled into `Microsoft.TestPlatform.Common` via explicit `<Compile Include=...>` references.
 - Tests live in `test/Microsoft.TestPlatform.Common.UnitTests/` and `test/Microsoft.TestPlatform.Filter.Source.UnitTests/`.
 - CrossPlatEngine tests: `test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/` — TFMs: `net11.0;net481`.
@@ -32,16 +33,17 @@
 
 | Date | PR | Description |
 |------|-----|-------------|
-| 2026-06-19 | #16139 | FastFilter: avoid redundant dictionary lookups in Evaluate + single-pass ValidForProperties scan |
-| 2026-06-20 | #16144 | Replace DateTime.Now with DateTime.UtcNow in TestRunCache + DiscoveryResultCache hot paths |
-| 2026-06-21 | #16147 | Replace Task.FromResult(0) with Task.CompletedTask in IPC channel (LengthPrefixCommunicationChannel + TcpClientExtensions) |
-| 2026-06-22 | TBD (efficiency/job-queue-mre-slim) | Replace ManualResetEvent with ManualResetEventSlim in JobQueue (BackgroundJobProcessor + Flush) |
+| 2026-06-19 | #16139 (closed, not merged) | FastFilter: redundant dict lookups + ValidForProperties — CLOSED by maintainer (ToArray allocation concern) |
+| 2026-06-20 | #16144 (MERGED) | Replace DateTime.Now with DateTime.UtcNow in TestRunCache + DiscoveryResultCache hot paths |
+| 2026-06-21 | #16147 (MERGED) | Replace Task.FromResult(0) with Task.CompletedTask in IPC channel |
+| 2026-06-22 | #16150 (MERGED) | Replace ManualResetEvent with ManualResetEventSlim in JobQueue |
+| 2026-06-23 | efficiency/fastfilter-no-closure-no-double-lookup (PR pending) | FastFilter.Evaluate: foreach kvp + foreach instead of Any(lambda); NO ValidForProperties change |
 
 ## Backlog Cursor
 
-- Last scanned: `src/Microsoft.TestPlatform.Filter.Source/`, `src/Microsoft.TestPlatform.CrossPlatEngine/`, `src/Microsoft.TestPlatform.CommunicationUtilities/`, `src/Microsoft.TestPlatform.CoreUtilities/`, `src/Microsoft.TestPlatform.Client/` (partial — ManualResetEvent usage checked)
-- Next to scan: `src/Microsoft.TestPlatform.Common/` (deeper scan beyond filter), `src/vstest.console/` orchestration paths
+- Last scanned: `src/Microsoft.TestPlatform.Filter.Source/`, `src/Microsoft.TestPlatform.CrossPlatEngine/`, `src/Microsoft.TestPlatform.CommunicationUtilities/`, `src/Microsoft.TestPlatform.CoreUtilities/`, `src/Microsoft.TestPlatform.Client/` (partial — ManualResetEvent usage checked), `src/Microsoft.TestPlatform.Common/` (partial: InternalTestLoggerEvents scanned — queue-based, no new hot paths)
+- Next to scan: `src/vstest.console/` orchestration paths, deeper scan of `src/Microsoft.TestPlatform.Common/ExtensionFramework/` plugin discovery paths
 
 ## Last Run
 
-- 2026-06-22: Task 3 (ManualResetEventSlim JobQueue PR), Task 4 (checked PRs #16139, #16144, #16147 — all CI green), Task 2 (scanned Client — no new hot-path opportunities), Task 7 (monthly summary updated)
+- 2026-06-23: Task 2 (scanned Common/CrossPlatEngine/vstest.console partial), Task 3 (new FastFilter PR: efficiency/fastfilter-no-closure-no-double-lookup — kvp iteration + foreach eliminates closure allocations; tests 108+45 pass), Task 4 (confirmed PRs #16144, #16147, #16150 all MERGED; PR #16139 closed by maintainer), Task 7 (monthly summary updated)
