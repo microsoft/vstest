@@ -760,24 +760,44 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             return;
         }
 
+        // Determine the architecture of the testhost apphost we are about to launch. testhost.exe (the default, no
+        // suffix) is 64-bit; the other variants carry an architecture suffix.
+        PlatformArchitecture testHostArchitecture = _architecture switch
+        {
+            Architecture.X86 => PlatformArchitecture.X86,
+            Architecture.ARM => PlatformArchitecture.ARM,
+            Architecture.ARM64 => PlatformArchitecture.ARM64,
+            _ => PlatformArchitecture.X64,
+        };
+
+        // Only intervene when DOTNET_ROOT points at a different architecture than the testhost. When they match, the
+        // architecture-less DOTNET_ROOT resolves to a compatible runtime, so we honor the user's explicit DOTNET_ROOT
+        // as-is (including custom installation directories) and don't touch the environment.
+        if (dotnetRootArchitecture == testHostArchitecture)
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.PromoteArchitectureLessDotnetRoot: DOTNET_ROOT='{dotnetRoot}' matches the testhost architecture '{testHostArchitecture}', leaving it untouched.");
+            return;
+        }
+
         var dotnetRootArchVariable = $"DOTNET_ROOT_{dotnetRootArchitecture.ToString()!.ToUpperInvariant()}";
 
         startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
 
-        // Promote the architecture-less DOTNET_ROOT to the architecture specific variable for the architecture it
-        // actually points at, unless the user already provided that architecture specific variable (then we trust
-        // their value). This keeps the (possibly private) installation reachable for the matching-architecture
-        // apphost.
+        // The architecture-less DOTNET_ROOT points at a different architecture than the testhost; left as-is the
+        // testhost apphost would pick it up and load a mismatched hostfxr. Promote it to the architecture specific
+        // variable for the architecture it actually points at (unless the user already provided that variable, then
+        // we trust their value). This keeps the (possibly private) installation reachable for processes of that
+        // architecture (e.g. children the testhost spawns).
         if (StringUtilities.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable(dotnetRootArchVariable)))
         {
             startInfo.EnvironmentVariables[dotnetRootArchVariable] = dotnetRoot;
             EqtTrace.Verbose($"DotnetTestHostManager.PromoteArchitectureLessDotnetRoot: Promoting architecture-less DOTNET_ROOT to {dotnetRootArchVariable}={dotnetRoot}.");
         }
 
-        // Hide the architecture-less DOTNET_ROOT from the testhost so that a different-architecture apphost does not
-        // pick it up and load a mismatched hostfxr. The matching-architecture apphost now finds DOTNET_ROOT_<ARCH>;
-        // a different-architecture apphost falls back to its own default (registry / default install location)
-        // resolution. We clear it by setting it to empty, which the host treats as not set.
+        // Hide the architecture-less DOTNET_ROOT from the testhost so that the testhost apphost does not pick it up
+        // and load a mismatched hostfxr. It now falls back to its own default (registry / default install location)
+        // resolution and loads the correct-architecture runtime. We clear it by setting it to empty, which the host
+        // treats as not set.
         startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
         EqtTrace.Verbose("DotnetTestHostManager.PromoteArchitectureLessDotnetRoot: Clearing architecture-less DOTNET_ROOT for the testhost to avoid an architecture mismatch.");
     }
