@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
@@ -955,6 +956,70 @@ public class DotnetTestHostManagerTests
         var envVar = $"DOTNET_ROOT_{architecture.ToUpperInvariant()}";
         Assert.IsNotNull(startInfo.EnvironmentVariables![envVar]);
         Assert.AreEqual(startInfo.EnvironmentVariables![envVar], path);
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldSetArchitectureSpecificDotnetRootForX86ApphostWhenInvokedDirectlyWithMismatchedDotnetRoot()
+    {
+        // Simulates running an x86 testhost directly via vstest.console (no VSTEST_DOTNET_ROOT_PATH from the SDK)
+        // while an architecture-less DOTNET_ROOT points at an x64 install. See https://github.com/microsoft/vstest/issues/16151.
+        var mockDotnetHostHelper = new Mock<IDotnetHostHelper>();
+        string? resolvedX86Muxer = @"C:\Program Files (x86)\dotnet\dotnet.exe";
+        mockDotnetHostHelper
+            .Setup(h => h.TryGetDotnetPathByArchitecture(PlatformArchitecture.X86, It.IsAny<DotnetMuxerResolutionStrategy>(), out resolvedX86Muxer))
+            .Returns(true);
+
+        var manager = new TestableDotnetTestHostManager(
+            _mockProcessHelper.Object,
+            _mockFileHelper.Object,
+            mockDotnetHostHelper.Object,
+            _mockEnvironment.Object,
+            _mockRunsettingHelper.Object,
+            _mockWindowsRegistry.Object,
+            _mockEnvironmentVariable.Object);
+        manager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT")).Returns(@"C:\Program Files\dotnet");
+
+        var startInfo = manager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.AreEqual(@"C:\Program Files (x86)\dotnet", startInfo.EnvironmentVariables!["DOTNET_ROOT_X86"]);
+        Assert.AreEqual(@"C:\Program Files (x86)\dotnet", startInfo.EnvironmentVariables!["DOTNET_ROOT(x86)"]);
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldNotSetDotnetRootForX86ApphostWhenNoAmbientDotnetRoot()
+    {
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT_X86"));
+        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT(x86)"));
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldNotOverrideDotnetRootX86WhenAlreadySetInEnvironment()
+    {
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT")).Returns(@"C:\Program Files\dotnet");
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT(x86)")).Returns(@"D:\custom-x86-dotnet");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT_X86"));
     }
 
     [TestMethod]

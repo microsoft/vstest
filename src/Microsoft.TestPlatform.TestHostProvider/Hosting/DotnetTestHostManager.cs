@@ -611,6 +611,23 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     }
                 }
             }
+            else
+            {
+                // The SDK did not provide VSTEST_DOTNET_ROOT_PATH. This happens when vstest.console is invoked
+                // directly (e.g. vstest.console.exe under Visual Studio or called by hand) instead of through
+                // `dotnet test`, which is the layer that computes and passes those variables.
+                //
+                // We still launched an architecture specific apphost (e.g. testhost.x86.exe). The apphost resolves
+                // the runtime from the DOTNET_ROOT* environment variables, and if the surrounding environment only
+                // has an architecture-less DOTNET_ROOT that points at a different architecture (commonly an x64
+                // install), the x86 apphost picks it up and tries to load the x64 hostfxr.dll into the 32-bit
+                // process, failing with 0x800700C1 (ERROR_BAD_EXE_FORMAT). See https://github.com/microsoft/vstest/issues/16151.
+                //
+                // To protect against that, resolve the dotnet installation that matches the testhost architecture
+                // (ignoring the architecture-less DOTNET_ROOT) and set the architecture specific DOTNET_ROOT_<ARCH>
+                // so the apphost prefers the correct runtime.
+                SetArchitectureSpecificDotnetRootForApphost(startInfo);
+            }
         }
 
         startInfo.WorkingDirectory = sourceDirectory;
@@ -716,6 +733,91 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             }
 
             return false;
+        }
+    }
+
+    private void SetArchitectureSpecificDotnetRootForApphost(TestProcessStartInfo startInfo)
+    {
+        // For the default architecture the architecture-less DOTNET_ROOT is correct, so there is nothing to fix.
+        if (_architecture is Architecture.Default or Architecture.AnyCPU)
+        {
+            return;
+        }
+
+        PlatformArchitecture? targetArchitecture = _architecture switch
+        {
+            Architecture.X86 => PlatformArchitecture.X86,
+            Architecture.X64 => PlatformArchitecture.X64,
+            Architecture.ARM => PlatformArchitecture.ARM,
+            Architecture.ARM64 => PlatformArchitecture.ARM64,
+            // Other architectures don't ship a Windows apphost we would resolve here.
+            _ => null,
+        };
+
+        if (targetArchitecture is null)
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.SetArchitectureSpecificDotnetRootForApphost: Architecture '{_architecture}' is not handled, leaving runtime resolution to the apphost.");
+            return;
+        }
+
+        var architectureName = _architecture.ToString().ToUpperInvariant();
+        var dotnetRootArchVariable = $"DOTNET_ROOT_{architectureName}";
+
+        // If the architecture specific variable is already set in the surrounding environment, trust it and don't
+        // override what the user provided externally.
+        if (!StringUtilities.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable(dotnetRootArchVariable)))
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.SetArchitectureSpecificDotnetRootForApphost: {dotnetRootArchVariable} is already set in the surrounding environment, leaving it untouched.");
+            return;
+        }
+
+        // For x86 the legacy DOTNET_ROOT(x86) is also honored by apphosts and takes precedence over the
+        // architecture-less DOTNET_ROOT, so if the user already provided it there is nothing to fix.
+        const string dotnetRootX86 = "DOTNET_ROOT(x86)";
+        if (_architecture == Architecture.X86
+            && !StringUtilities.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable(dotnetRootX86)))
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.SetArchitectureSpecificDotnetRootForApphost: {dotnetRootX86} is already set in the surrounding environment, leaving it untouched.");
+            return;
+        }
+
+        // Only intervene when there is an architecture-less DOTNET_ROOT that the apphost could pick up and that
+        // could point it at a wrong-architecture runtime. When nothing points the apphost at a specific root we let
+        // it resolve the runtime on its own (registry / default install location).
+        if (StringUtilities.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable("DOTNET_ROOT")))
+        {
+            return;
+        }
+
+        // Resolve the dotnet installation matching the testhost architecture, ignoring the architecture-less
+        // DOTNET_ROOT (which may point to a different architecture).
+        var resolutionStrategy = DotnetMuxerResolutionStrategy.GlobalInstallationLocation | DotnetMuxerResolutionStrategy.DefaultInstallationLocation;
+        if (!_dotnetHostHelper.TryGetDotnetPathByArchitecture(targetArchitecture.Value, resolutionStrategy, out string? muxerPath)
+            || StringUtilities.IsNullOrWhiteSpace(muxerPath))
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.SetArchitectureSpecificDotnetRootForApphost: Could not resolve a '{targetArchitecture}' dotnet installation to set {dotnetRootArchVariable}; leaving runtime resolution to the apphost.");
+            return;
+        }
+
+        var resolvedDotnetRoot = Path.GetDirectoryName(muxerPath);
+        if (StringUtilities.IsNullOrWhiteSpace(resolvedDotnetRoot))
+        {
+            return;
+        }
+
+        startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
+
+        // net8+ apphosts (testhost 17.14+) prefer DOTNET_ROOT_<ARCH>.
+        startInfo.EnvironmentVariables[dotnetRootArchVariable] = resolvedDotnetRoot;
+        EqtTrace.Verbose($"DotnetTestHostManager.SetArchitectureSpecificDotnetRootForApphost: Setting {dotnetRootArchVariable}={resolvedDotnetRoot} to prevent the architecture specific apphost from picking up a mismatched DOTNET_ROOT.");
+
+        // Older apphosts (built against netcoreapp3.1, shipped with pre-17.14 testhost) do not understand
+        // DOTNET_ROOT_<ARCH>; for x86 they look at DOTNET_ROOT(x86), which also takes precedence over DOTNET_ROOT.
+        // Set it too so those hosts are protected as well.
+        if (_architecture == Architecture.X86)
+        {
+            startInfo.EnvironmentVariables[dotnetRootX86] = resolvedDotnetRoot;
+            EqtTrace.Verbose($"DotnetTestHostManager.SetArchitectureSpecificDotnetRootForApphost: Setting {dotnetRootX86}={resolvedDotnetRoot} for legacy apphosts.");
         }
     }
 
