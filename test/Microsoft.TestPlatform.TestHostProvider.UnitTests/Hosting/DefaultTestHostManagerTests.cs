@@ -190,7 +190,7 @@ public class DefaultTestHostManagerTests
         var exception = Assert.ThrowsExactly<TestPlatformException>(
             () => _testHostManager.GetTestHostProcessStartInfo(new List<string>() { source }, null, default));
 
-        Assert.Contains("Windows", exception.Message);
+        Assert.Contains("Running .NET Framework tests is supported on Windows only", exception.Message);
     }
 
     [TestMethod]

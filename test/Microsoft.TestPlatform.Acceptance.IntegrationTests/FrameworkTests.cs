@@ -127,7 +127,9 @@ public class FrameworkTests : AcceptanceTestBase
         }
         else
         {
+            // The run must fail fast with a clear message, not merely log a warning.
             StdErrorContains("Running .NET Framework tests is supported on Windows only");
+            ExitCodeEquals(1);
         }
     }
 }

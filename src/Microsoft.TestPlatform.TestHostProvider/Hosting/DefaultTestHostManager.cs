@@ -210,8 +210,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         // longer supported. Fail with a clear message instead of launching Mono.
         if (!_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows))
         {
-            throw new TestPlatformException(
-                string.Format(CultureInfo.CurrentCulture, Resources.NetFrameworkTestsNotSupportedOnNonWindows));
+            throw new TestPlatformException(Resources.NetFrameworkTestsNotSupportedOnNonWindows);
         }
 
         var launcherPath = testhostProcessPath;
