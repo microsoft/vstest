@@ -19,15 +19,20 @@ public static class Program
     /// </summary>
     /// <param name="args">Arguments provided on the command line.</param>
     /// <returns>0 if everything was successful and 1 otherwise.</returns>
-    public static int Main(string[]? args) => Run(args, new());
+    public static int Main(string[]? args) => Run(args, new(), new DotnetRootEnvironmentNormalizer());
 
-    internal static int Run(string[]? args, UiLanguageOverride uiLanguageOverride)
+    internal static int Run(string[]? args, UiLanguageOverride uiLanguageOverride, DotnetRootEnvironmentNormalizer dotnetRootEnvironmentNormalizer)
     {
         if (!FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_UTF8_CONSOLE_ENCODING))
         {
             Console.OutputEncoding = Encoding.UTF8;
         }
         uiLanguageOverride.SetCultureSpecifiedByUser();
+
+        // Normalize the architecture-less DOTNET_ROOT once, before any testhost is launched, so all testhost child
+        // processes inherit a value that is safe for their architecture. See https://github.com/microsoft/vstest/issues/16151.
+        dotnetRootEnvironmentNormalizer.NormalizeDotnetRootForChildProcesses();
+
         return new Executor(ConsoleOutput.Instance).Execute(args);
     }
 }
