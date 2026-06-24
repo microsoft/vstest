@@ -959,11 +959,11 @@ public class DotnetTestHostManagerTests
 
     [TestMethod]
     [TestCategory("Windows")]
-    public void GetTestHostProcessStartInfoShouldNotTouchDotnetRootWhenItMatchesTheTestHostArchitecture()
+    public void GetTestHostProcessStartInfoShouldPromoteAndClearDotnetRootEvenWhenItMatchesTheTestHostArchitecture()
     {
-        // x64 testhost with DOTNET_ROOT pointing at an x64 install: the architecture-less DOTNET_ROOT already
-        // resolves to a compatible runtime, so the user's explicit DOTNET_ROOT (e.g. a custom directory) must be
-        // honored as-is and left untouched.
+        // x64 testhost with DOTNET_ROOT pointing at an x64 install. Whenever we can resolve the architecture of the
+        // dotnet installation DOTNET_ROOT points at, we make it architecture specific (promote to DOTNET_ROOT_X64)
+        // and clear the ambiguous architecture-less DOTNET_ROOT, regardless of whether it matches the testhost.
         _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
         _dotnetHostManager.OverrideExecutableArchitecture = true;
         _dotnetHostManager.ExecutableArchitecture = PlatformArchitecture.X64;
@@ -974,8 +974,8 @@ public class DotnetTestHostManagerTests
 
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
 
-        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT_X64"));
-        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT"));
+        Assert.AreEqual(@"D:\my-custom-x64-dotnet", startInfo.EnvironmentVariables!["DOTNET_ROOT_X64"]);
+        Assert.AreEqual(string.Empty, startInfo.EnvironmentVariables!["DOTNET_ROOT"]);
     }
 
     [TestMethod]
