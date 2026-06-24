@@ -24,7 +24,7 @@ public class MainTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)), new(envVarMock.Object));
 
         // Assert
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
@@ -46,7 +46,7 @@ public class MainTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)), new(envVarMock.Object));
 
         // Assert
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
@@ -67,7 +67,7 @@ public class MainTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = true));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = true), new(envVarMock.Object));
 
         // Assert
         Assert.IsFalse(threadCultureWasSet, "DefaultThreadCurrentUICulture was set");
