@@ -611,6 +611,22 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     }
                 }
             }
+
+            // Issue 16151: An inherited DOTNET_ROOT / DOTNET_ROOT(x86) that points at a .NET installation of a
+            // different architecture than the testhost we are about to launch makes the net8+ apphost fall back
+            // to it (DOTNET_ROOT_<ARCH> -> DOTNET_ROOT since .NET 6) and load a mismatched hostfxr.dll into the
+            // testhost process, failing with 0x800700C1. We don't control the apphost resolution, so we read the
+            // architecture of the testhost exe and scrub any incompatible DOTNET_ROOT* from its environment,
+            // letting the apphost fall back to the global/default installation like the netcoreapp3.1 testhost
+            // did before 17.14. This path is not covered by the dotnet/sdk#49436 fix, which only governs what
+            // 'dotnet test' itself forwards.
+            var testHostArchitecture = StringUtils.IsNullOrWhiteSpace(startInfo.FileName)
+                ? null
+                : TryGetPeArchitecture(startInfo.FileName);
+            if (testHostArchitecture is not null)
+            {
+                SanitizeIncompatibleDotnetRoot(startInfo, testHostArchitecture.Value);
+            }
         }
 
         startInfo.WorkingDirectory = sourceDirectory;
@@ -736,6 +752,111 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             startInfo.EnvironmentVariables.Add(environmentVariableName, dotnetRootPath);
 
             EqtTrace.Verbose($"DotnetTestHostManager.SetDotnetRootForArchitecture: Adding {environmentVariableName}={dotnetRootPath} to testhost start info.");
+        }
+    }
+
+    /// <summary>
+    /// Clears any inherited <c>DOTNET_ROOT*</c> variable that points at a .NET installation whose architecture
+    /// does not match the testhost we are about to launch, so that the apphost does not load a mismatched
+    /// <c>hostfxr.dll</c> (<c>0x800700C1</c>).
+    /// </summary>
+    /// <remarks>
+    /// Since .NET 6 the apphost falls back from the architecture specific <c>DOTNET_ROOT_&lt;ARCH&gt;</c> to the
+    /// architecture-less <c>DOTNET_ROOT</c> (dotnet/runtime#53763). Combined with the net8 testhost apphost
+    /// shipped since 17.14, a <c>DOTNET_ROOT</c> pointing at e.g. an x64 install gets picked up by the x86
+    /// testhost, which then loads the x64 <c>hostfxr.dll</c> and aborts the run. We don't control the apphost
+    /// resolution, so we remove the offending variable from the testhost environment and let the apphost fall
+    /// back to the global/default installation, like the netcoreapp3.1 testhost did before 17.14.
+    /// See https://github.com/microsoft/vstest/issues/16151.
+    /// </remarks>
+    private void SanitizeIncompatibleDotnetRoot(TestProcessStartInfo startInfo, PlatformArchitecture testHostArchitecture)
+    {
+        // The DOTNET_ROOT* variables the apphost consults for this architecture, most specific first.
+        var candidateNames = new List<string>
+        {
+            $"DOTNET_ROOT_{testHostArchitecture.ToString().ToUpperInvariant()}",
+        };
+        if (testHostArchitecture == PlatformArchitecture.X86)
+        {
+            candidateNames.Add("DOTNET_ROOT(x86)");
+        }
+
+        candidateNames.Add("DOTNET_ROOT");
+
+        // Walk the candidates in the order the apphost consults them and stop at the first one that is usable.
+        // - If it is compatible (or we cannot read its architecture) the apphost will resolve the runtime from
+        //   there, so we leave it and every lower priority variable untouched. This is how an explicitly provided
+        //   DOTNET_ROOT_<ARCH> / DOTNET_ROOT(x86) keeps being used even when DOTNET_ROOT points elsewhere.
+        // - If it targets a different architecture, we blank it so the apphost moves on to the next candidate,
+        //   and ultimately to the global/default installation, instead of loading a mismatched hostfxr.dll.
+        foreach (var name in candidateNames)
+        {
+            // Prefer a value we are about to pass to the testhost, otherwise look at the inherited environment.
+            var value = startInfo.EnvironmentVariables is not null && startInfo.EnvironmentVariables.TryGetValue(name, out var explicitValue)
+                ? explicitValue
+                : _environmentVariableHelper.GetEnvironmentVariable(name);
+
+            if (StringUtils.IsNullOrWhiteSpace(value) || !_fileHelper.DirectoryExists(value))
+            {
+                // Not usable: the apphost skips it, so do we.
+                continue;
+            }
+
+            var dotnetRootArchitecture = TryGetDotnetRootArchitecture(value);
+            if (dotnetRootArchitecture is null || dotnetRootArchitecture == testHostArchitecture)
+            {
+                // The apphost will resolve the runtime from here (compatible, or we cannot tell and must not
+                // break a potentially valid private install). Leave this and every lower priority variable
+                // (including a possibly mismatched DOTNET_ROOT) untouched.
+                break;
+            }
+
+            // Incompatible: blank it out for the testhost so the apphost ignores it and moves on. An empty value
+            // is treated the same as 'not set' by the apphost runtime resolver.
+            startInfo.EnvironmentVariables ??= new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+            startInfo.EnvironmentVariables[name] = string.Empty;
+            EqtTrace.Warning(
+                $"DotnetTestHostManager.SanitizeIncompatibleDotnetRoot: '{name}' points at a '{dotnetRootArchitecture}' .NET installation ('{value}'), " +
+                $"but the testhost is '{testHostArchitecture}'. Clearing '{name}' for the testhost to avoid loading a mismatched hostfxr.dll " +
+                "(https://github.com/microsoft/vstest/issues/16151).");
+        }
+    }
+
+    /// <summary>
+    /// Gets the architecture of a .NET installation, which is the architecture of its <c>dotnet.exe</c> muxer,
+    /// or <see langword="null"/> when it cannot be determined.
+    /// </summary>
+    private PlatformArchitecture? TryGetDotnetRootArchitecture(string dotnetRoot)
+    {
+        // This is only reached on the Windows apphost path, so the muxer is always dotnet.exe.
+        var muxerPath = Path.Combine(dotnetRoot, "dotnet.exe");
+        return _fileHelper.Exists(muxerPath) ? TryGetPeArchitecture(muxerPath) : null;
+    }
+
+    /// <summary>
+    /// Reads the processor architecture from the PE header of a Windows executable, or <see langword="null"/>
+    /// when it cannot be determined.
+    /// </summary>
+    private PlatformArchitecture? TryGetPeArchitecture(string filePath)
+    {
+        try
+        {
+            using Stream stream = _fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
+            using PEReader peReader = new(stream);
+            return peReader.PEHeaders.CoffHeader.Machine switch
+            {
+                Machine.I386 => PlatformArchitecture.X86,
+                Machine.Amd64 => PlatformArchitecture.X64,
+                Machine.IA64 => PlatformArchitecture.X64,
+                Machine.Arm64 => PlatformArchitecture.ARM64,
+                Machine.Arm => PlatformArchitecture.ARM,
+                _ => (PlatformArchitecture?)null,
+            };
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.TryGetPeArchitecture: Failed to read PE architecture of '{filePath}'.\n{ex}");
+            return null;
         }
     }
 

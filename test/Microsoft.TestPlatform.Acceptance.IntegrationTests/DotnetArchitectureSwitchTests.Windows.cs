@@ -102,6 +102,59 @@ public class UnitTest1
         Assert.AreEqual(0, exitCode, stdOut);
     }
 
+    // Regression test for https://github.com/microsoft/vstest/issues/16151
+    //
+    // When the architecture specific roots (DOTNET_ROOT_X86 / DOTNET_ROOT(x86)) are not set and only the
+    // architecture-less DOTNET_ROOT is set, pointing at an x64 installation, the net8 testhost.x86.exe apphost
+    // falls back to DOTNET_ROOT (DOTNET_ROOT_X86 -> DOTNET_ROOT since .NET 6) and loads the x64 hostfxr.dll
+    // into the 32-bit process, aborting the run with HRESULT 0x800700C1 (ERROR_BAD_EXE_FORMAT). vstest.console
+    // must detect that DOTNET_ROOT points at a different architecture than the testhost and scrub it before
+    // launching the testhost, so the apphost never loads the mismatched hostfxr.dll.
+    [TestMethod]
+    public void X86Testhost_DoesNotLoadMismatchedHostfxr_WhenOnlyArchlessDotnetRootIsSetToX64()
+    {
+        SetTestEnvironment(_testEnvironment, new RunnerInfo { RunnerFramework = RUNNER_NET });
+        string dotnetX64 = GetDownloadedDotnetMuxerFromTools("X64");
+        var vstestConsolePath = GetDotnetRunnerPath();
+        var dotnetRunnerPath = TempDirectory.CreateDirectory("dotnetrunner");
+        TempDirectory.CopyDirectory(new DirectoryInfo(Path.GetDirectoryName(vstestConsolePath)!), dotnetRunnerPath);
+
+        // Patch the runner to run on the x64 runtime we resolved above.
+        string sdkVersion = GetLatestSdkVersion(dotnetX64);
+        string runtimeConfigFile = Path.Combine(dotnetRunnerPath.FullName, "vstest.console.runtimeconfig.json");
+        var patchRuntimeConfig = JsonNode.Parse(File.ReadAllText(runtimeConfigFile))!;
+        patchRuntimeConfig["runtimeOptions"]!["framework"]!["version"] = sdkVersion;
+        File.WriteAllText(runtimeConfigFile, patchRuntimeConfig.ToJsonString());
+
+        ExecuteApplication(dotnetX64, "new mstest", out _, out _, out _, new Dictionary<string, string?>(), TempDirectory.Path);
+
+        // Only the architecture-less DOTNET_ROOT is set, and it points at the x64 installation. The architecture
+        // specific overrides are cleared (the test runner sets DOTNET_ROOT(x86) in the surrounding environment),
+        // so without the fix the x86 testhost would fall back to the x64 DOTNET_ROOT and load the x64 hostfxr.dll.
+        var environmentVariables = new Dictionary<string, string?>
+        {
+            ["DOTNET_ROOT"] = Path.GetDirectoryName(dotnetX64),
+            ["DOTNET_ROOT(x86)"] = string.Empty,
+            ["DOTNET_ROOT_X86"] = string.Empty,
+        };
+
+        ExecuteApplication(
+            dotnetX64,
+            $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch x86 --diag:log.txt",
+            out string stdOut,
+            out string stdError,
+            out _,
+            environmentVariables,
+            TempDirectory.Path);
+
+        // The x86 testhost must not try to load the x64 hostfxr.dll. Per the issue, an honest "runtime not found"
+        // diagnostic is acceptable; loading the wrong-architecture hostfxr.dll (0x800700C1) is the bug.
+        Assert.DoesNotContain(
+            "0x800700C1",
+            stdOut + stdError,
+            $"x86 testhost loaded the x64 hostfxr.dll (issue 16151).\nStdOut:\n{stdOut}\nStdError:\n{stdError}");
+    }
+
     private static string GetLatestSdkVersion(string dotnetPath)
     {
         var folders = Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).Select(f => new
