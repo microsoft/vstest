@@ -9,7 +9,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -611,6 +613,21 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     }
                 }
             }
+            else
+            {
+                // Direct invocation: VSTEST_DOTNET_ROOT_PATH was not provided by the SDK (e.g. vstest.console.exe is
+                // run under Visual Studio or by hand instead of through `dotnet test`). In this case the vstest.console
+                // startup normalizer (DotnetRootEnvironmentNormalizer) has already, on Windows, promoted any
+                // architecture-less DOTNET_ROOT to DOTNET_ROOT_<ARCH> and cleared DOTNET_ROOT in the process
+                // environment that every testhost inherits.
+                //
+                // That is safe for .NET 6+ apphosts, but apphosts older than .NET 6 (e.g. a netcoreapp3.1
+                // testhost.exe) do not understand DOTNET_ROOT_<ARCH>; they only honor DOTNET_ROOT (and, for x86,
+                // DOTNET_ROOT(x86)). For such a legacy testhost the cleared DOTNET_ROOT would remove its only way to
+                // locate a private dotnet install. Restore DOTNET_ROOT for this specific testhost when it is safe to
+                // do so. See https://github.com/microsoft/vstest/issues/16151.
+                RestoreDotnetRootForLegacyTestHost(startInfo);
+            }
         }
 
         startInfo.WorkingDirectory = sourceDirectory;
@@ -717,6 +734,164 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
             return false;
         }
+    }
+
+    /// <summary>
+    /// In the direct-invocation path the vstest.console startup normalizer promotes the architecture-less DOTNET_ROOT
+    /// to DOTNET_ROOT_&lt;ARCH&gt; and clears DOTNET_ROOT. For a legacy (pre-.NET 6) testhost apphost that does not
+    /// understand DOTNET_ROOT_&lt;ARCH&gt;, restore DOTNET_ROOT for that specific testhost - but only from the
+    /// architecture specific value that matches the testhost architecture, so we never reintroduce the architecture
+    /// mismatch from issue #16151.
+    /// </summary>
+    private void RestoreDotnetRootForLegacyTestHost(TestProcessStartInfo startInfo)
+    {
+        // The DOTNET_ROOT promotion/clearing and the architecture specific apphosts only exist on Windows.
+        if (_platformEnvironment.OperatingSystem != PlatformOperatingSystem.Windows)
+        {
+            return;
+        }
+
+        // Resolve the target framework of the testhost apphost we are about to launch by reading testhost.dll next to
+        // it.
+        var testHostDllPath = Path.ChangeExtension(startInfo.FileName, ".dll");
+        var testHostFramework = GetTestHostTargetFramework(testHostDllPath);
+        if (testHostFramework is null)
+        {
+            // Can't tell which framework the apphost is; be conservative and leave the inherited environment as-is.
+            return;
+        }
+
+        // .NET 6+ apphosts understand DOTNET_ROOT_<ARCH>, which the startup normalizer already set, so there is
+        // nothing to restore. Non-.NET (Core) frameworks (e.g. .NET Framework apphosts) don't use DOTNET_ROOT at all.
+        if (!IsLegacyDotnetCoreFramework(testHostFramework))
+        {
+            return;
+        }
+
+        // Legacy (pre-.NET 6) .NET (Core) apphost; it only reads DOTNET_ROOT / DOTNET_ROOT(x86). Restore DOTNET_ROOT
+        // for this testhost from the architecture specific value that matches the testhost architecture, if it is set.
+        // When it is not set the architecture-less DOTNET_ROOT pointed at a *different* architecture, so restoring it
+        // would reintroduce the exact mismatch crash from issue #16151 - we deliberately leave it cleared and let the
+        // apphost fall back to its default install location.
+        var testHostArchitecture = _architecture switch
+        {
+            Architecture.X86 => "X86",
+            Architecture.ARM => "ARM",
+            Architecture.ARM64 => "ARM64",
+            _ => "X64",
+        };
+
+        var dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable($"DOTNET_ROOT_{testHostArchitecture}");
+        if (StringUtilities.IsNullOrWhiteSpace(dotnetRoot))
+        {
+            return;
+        }
+
+        startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
+
+        // Respect anything the caller (e.g. runsettings <EnvironmentVariables>) already set for the testhost.
+        if (!TestHostEnvironmentContainsKey(startInfo, "DOTNET_ROOT"))
+        {
+            startInfo.EnvironmentVariables["DOTNET_ROOT"] = dotnetRoot;
+            EqtTrace.Verbose($"DotnetTestHostManager.RestoreDotnetRootForLegacyTestHost: Restored DOTNET_ROOT={dotnetRoot} for legacy testhost targeting '{testHostFramework}'.");
+        }
+
+        // x86 apphosts also honor the legacy DOTNET_ROOT(x86) variable, set it too for maximum compatibility.
+        if (testHostArchitecture == "X86" && !TestHostEnvironmentContainsKey(startInfo, "DOTNET_ROOT(x86)"))
+        {
+            startInfo.EnvironmentVariables["DOTNET_ROOT(x86)"] = dotnetRoot;
+        }
+    }
+
+    // .NET 6 is the first runtime whose apphost understands the architecture specific DOTNET_ROOT_<ARCH> variables.
+    // Older apphosts only honor DOTNET_ROOT and DOTNET_ROOT(x86).
+    private static bool IsLegacyDotnetCoreFramework(FrameworkName framework)
+        => string.Equals(framework.Identifier, ".NETCoreApp", StringComparison.OrdinalIgnoreCase)
+            && framework.Version < new Version(6, 0);
+
+    private static bool TestHostEnvironmentContainsKey(TestProcessStartInfo startInfo, string name)
+    {
+        if (startInfo.EnvironmentVariables is null)
+        {
+            return false;
+        }
+
+        foreach (var key in startInfo.EnvironmentVariables.Keys)
+        {
+            if (string.Equals(key, name, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /// <summary>
+    /// Resolves the target framework of the testhost apphost by reading the <see cref="TargetFrameworkAttribute"/>
+    /// from <paramref name="testHostDllPath"/> (the managed testhost.dll next to the apphost), or
+    /// <see langword="null"/> when it cannot be determined.
+    /// </summary>
+    internal virtual FrameworkName? GetTestHostTargetFramework(string testHostDllPath)
+    {
+        if (!_fileHelper.Exists(testHostDllPath))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var stream = _fileHelper.GetStream(testHostDllPath, FileMode.Open, FileAccess.Read, FileShare.Read);
+            using var peReader = new PEReader(stream);
+            var metadataReader = peReader.GetMetadataReader();
+
+            foreach (var handle in metadataReader.GetAssemblyDefinition().GetCustomAttributes())
+            {
+                var attribute = metadataReader.GetCustomAttribute(handle);
+                if (!IsTargetFrameworkAttribute(metadataReader, attribute))
+                {
+                    continue;
+                }
+
+                // The custom attribute blob for TargetFrameworkAttribute(string) is: a 2-byte prolog (0x0001)
+                // followed by a SerString holding the framework name (e.g. ".NETCoreApp,Version=v8.0").
+                var blobReader = metadataReader.GetBlobReader(attribute.Value);
+                if (blobReader.Length < 2 || blobReader.ReadUInt16() != 1)
+                {
+                    continue;
+                }
+
+                var frameworkName = blobReader.ReadSerializedString();
+                if (!StringUtilities.IsNullOrWhiteSpace(frameworkName))
+                {
+                    return new FrameworkName(frameworkName);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.GetTestHostTargetFramework: Failed to read target framework from '{testHostDllPath}': {ex.Message}");
+        }
+
+        return null;
+    }
+
+    private static bool IsTargetFrameworkAttribute(MetadataReader metadataReader, CustomAttribute attribute)
+    {
+        if (attribute.Constructor.Kind != HandleKind.MemberReference)
+        {
+            return false;
+        }
+
+        var memberReference = metadataReader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
+        if (memberReference.Parent.Kind != HandleKind.TypeReference)
+        {
+            return false;
+        }
+
+        var typeReference = metadataReader.GetTypeReference((TypeReferenceHandle)memberReference.Parent);
+        return metadataReader.GetString(typeReference.Name) == nameof(TargetFrameworkAttribute)
+            && metadataReader.GetString(typeReference.Namespace) == typeof(TargetFrameworkAttribute).Namespace;
     }
 
     private void SetDotnetRootForArchitecture(TestProcessStartInfo startInfo, string dotnetRootPath, string dotnetRootArchitecture)
