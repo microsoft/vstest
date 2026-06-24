@@ -9,6 +9,7 @@ using System.Linq;
 #if NET
 using System.Reflection;
 #endif
+using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -958,6 +959,86 @@ public class DotnetTestHostManagerTests
     }
 
     [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldRestoreDotnetRootForLegacyX86TestHostWhenInvokedDirectly()
+    {
+        // Direct invocation (no VSTEST_DOTNET_ROOT_PATH). The startup normalizer promoted DOTNET_ROOT to
+        // DOTNET_ROOT_X86 and cleared DOTNET_ROOT. A legacy (netcoreapp3.1) x86 testhost does not understand
+        // DOTNET_ROOT_X86, so DOTNET_ROOT must be restored for it from the matching architecture specific value.
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+        _dotnetHostManager.OverrideTestHostTargetFramework = true;
+        _dotnetHostManager.TestHostTargetFramework = new FrameworkName(".NETCoreApp,Version=v3.1");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT_X86")).Returns(@"D:\dotnet-x86");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.AreEqual(@"D:\dotnet-x86", startInfo.EnvironmentVariables!["DOTNET_ROOT"]);
+        Assert.AreEqual(@"D:\dotnet-x86", startInfo.EnvironmentVariables!["DOTNET_ROOT(x86)"]);
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldNotRestoreDotnetRootForLegacyTestHostWhenArchitectureSpecificValueIsMissing()
+    {
+        // The architecture-less DOTNET_ROOT pointed at a different architecture (only DOTNET_ROOT_X64 was promoted),
+        // so there is no matching DOTNET_ROOT_X86 for this x86 testhost. Restoring would reintroduce the #16151
+        // mismatch crash, so DOTNET_ROOT must stay unset.
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+        _dotnetHostManager.OverrideTestHostTargetFramework = true;
+        _dotnetHostManager.TestHostTargetFramework = new FrameworkName(".NETCoreApp,Version=v3.1");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64")).Returns(@"D:\dotnet-x64");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT"));
+        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT(x86)"));
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldNotRestoreDotnetRootForModernTestHost()
+    {
+        // A net8 testhost understands DOTNET_ROOT_X64 that the normalizer set, so we must not restore the
+        // architecture-less DOTNET_ROOT.
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+        _dotnetHostManager.OverrideTestHostTargetFramework = true;
+        _dotnetHostManager.TestHostTargetFramework = new FrameworkName(".NETCoreApp,Version=v8.0");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT_X64")).Returns(@"D:\dotnet-x64");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.IsFalse(startInfo.EnvironmentVariables!.ContainsKey("DOTNET_ROOT"));
+    }
+
+    [TestMethod]
+    [TestCategory("Windows")]
+    public void GetTestHostProcessStartInfoShouldNotOverrideCallerProvidedDotnetRootForLegacyTestHost()
+    {
+        // The caller (runsettings) explicitly set DOTNET_ROOT for the testhost; we must honor it and not override.
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object, "<RunSettings><RunConfiguration><TargetPlatform>x86</TargetPlatform></RunConfiguration></RunSettings>");
+        _dotnetHostManager.OverrideTestHostTargetFramework = true;
+        _dotnetHostManager.TestHostTargetFramework = new FrameworkName(".NETCoreApp,Version=v3.1");
+        _mockFileHelper.Setup(ph => ph.Exists("testhost.x86.exe")).Returns(true);
+        _mockEnvironment.Setup(ev => ev.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(x => x.GetEnvironmentVariable("DOTNET_ROOT_X86")).Returns(@"D:\dotnet-x86");
+
+        var environmentVariables = new Dictionary<string, string?> { ["DOTNET_ROOT"] = @"E:\caller-dotnet" };
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, environmentVariables, _defaultConnectionInfo);
+
+        Assert.AreEqual(@"E:\caller-dotnet", startInfo.EnvironmentVariables!["DOTNET_ROOT"]);
+    }
+
+    [TestMethod]
     public async Task DotNetCoreErrorMessageShouldBeReadAsynchronouslyAsync()
     {
         var errorData = "Custom Error Strings";
@@ -1140,5 +1221,12 @@ public class DotnetTestHostManagerTests
             : base(processHelper, fileHelper, dotnetTestHostHelper, environment, runsettingsHelper, windowsRegistryHelper, environmentVariableHelper)
         {
         }
+
+        public bool OverrideTestHostTargetFramework { get; set; }
+
+        public FrameworkName? TestHostTargetFramework { get; set; }
+
+        internal override FrameworkName? GetTestHostTargetFramework(string testHostDllPath)
+            => OverrideTestHostTargetFramework ? TestHostTargetFramework : base.GetTestHostTargetFramework(testHostDllPath);
     }
 }
