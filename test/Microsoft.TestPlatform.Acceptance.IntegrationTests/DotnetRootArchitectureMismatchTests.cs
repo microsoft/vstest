@@ -10,35 +10,35 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// Regression test for https://github.com/microsoft/vstest/issues/16151.
+/// End-to-end coverage for the scenario behind https://github.com/microsoft/vstest/issues/16151.
 ///
 /// When <c>vstest.console.exe</c> (the .NET Framework console) is invoked directly - e.g. by
-/// Visual Studio or by hand - rather than through <c>dotnet test</c>, the SDK does not provide
-/// the <c>VSTEST_DOTNET_ROOT_PATH</c> hint that normally disambiguates the runtime location.
+/// Visual Studio or by hand - rather than through <c>dotnet test</c>, the SDK does not provide the
+/// <c>VSTEST_DOTNET_ROOT_PATH</c> hint that normally disambiguates the runtime location. If the
+/// surrounding environment also has an architecture-less <c>DOTNET_ROOT</c> pointing at an x64
+/// installation, launching an x86 testhost used to make the x86 apphost load the x64
+/// <c>hostfxr.dll</c> and fail with <c>0x800700C1</c> (<c>ERROR_BAD_EXE_FORMAT</c>).
 ///
-/// If the surrounding environment has an architecture-less <c>DOTNET_ROOT</c> pointing at an x64
-/// installation and an x86 test host is launched (<c>testhost.x86.exe</c>), the x86 apphost would,
-/// without the fix, pick up that architecture-less <c>DOTNET_ROOT</c> and try to load the x64
-/// <c>hostfxr.dll</c> into the 32-bit process, failing with <c>0x800700C1</c>
-/// (<c>ERROR_BAD_EXE_FORMAT</c>) before any test runs.
-///
-/// With the fix, <c>DotnetTestHostManager</c> promotes the architecture-less <c>DOTNET_ROOT</c> to
-/// the architecture specific <c>DOTNET_ROOT_X64</c> it actually points at and hides the ambiguous
-/// <c>DOTNET_ROOT</c> from the testhost, which then resolves the (globally installed) x86 runtime
-/// and runs the tests normally.
+/// This test runs an x86 .NET test through <c>vstest.console.exe</c> invoked directly while an
+/// ambiguous architecture-less <c>DOTNET_ROOT</c> (pointing at the x64 install) is set, and asserts
+/// the run completes normally. Because the CI machines do not expose an x86 .NET runtime at a default
+/// discoverable location (it lives next to the build under <c>.dotnet/dotnet-sdk-x86</c>), the x86
+/// runtime location is provided explicitly via <c>DOTNET_ROOT_X86</c> / <c>DOTNET_ROOT(x86)</c> - the
+/// same approach the existing architecture-switch acceptance tests use. The strict
+/// "fails without the fix" behavior is covered by the <c>DotnetTestHostManager</c> unit tests; this
+/// test guards the direct-invocation x86 flow end-to-end.
 /// </summary>
 [TestClass]
-// testhost.x86.exe and the apphost runtime resolution this test exercises only exist on Windows.
+// testhost.x86.exe and the apphost/muxer runtime resolution this test exercises only exist on Windows.
 [TestCategory("Windows-Review")]
 public class DotnetRootArchitectureMismatchTests : AcceptanceTestBase
 {
     [TestMethod]
-    public void RunningX86NetTestThroughVsTestConsoleExeWithX64DotnetRootResolvesX86Runtime()
+    public void RunningX86NetTestThroughVsTestConsoleExeWithX64DotnetRootRunsWithoutErrors()
     {
         // Desktop runner => vstest.console.exe (.NET Framework) is invoked directly, which is the
         // scenario where the SDK does not pass VSTEST_DOTNET_ROOT_PATH. Target net11.0 + /Platform:x86
-        // makes vstest launch testhost.x86.exe, an architecture specific apphost that resolves its
-        // runtime from the DOTNET_ROOT* environment variables.
+        // makes vstest launch an x86 testhost that resolves its runtime from the DOTNET_ROOT* variables.
         SetTestEnvironment(_testEnvironment, new RunnerInfo
         {
             RunnerFramework = DesktopRunnerFramework,
@@ -46,9 +46,10 @@ public class DotnetRootArchitectureMismatchTests : AcceptanceTestBase
             InIsolationValue = InIsolation,
         });
 
-        // The x64 installation we point the architecture-less DOTNET_ROOT at. ".dotnet/dotnet.exe"
-        // is the x64 muxer installed by the build, so its parent is a real x64 DOTNET_ROOT.
+        // ".dotnet/dotnet.exe" is the x64 muxer installed by the build, so its parent is a real x64
+        // DOTNET_ROOT. "dotnet-sdk-x86/dotnet.exe" is the matching x86 installation.
         var x64DotnetRoot = Path.GetDirectoryName(GetDownloadedDotnetMuxerFromTools("X64"))!;
+        var x86DotnetRoot = Path.GetDirectoryName(GetDownloadedDotnetMuxerFromTools("X86"))!;
 
         var arguments = PrepareArguments(
             GetTestDllForFramework("SimpleTestProject.dll", Core11TargetFramework, automaticallyResolveCompatibilityTestAsset: false),
@@ -61,26 +62,26 @@ public class DotnetRootArchitectureMismatchTests : AcceptanceTestBase
 
         var environmentVariables = new Dictionary<string, string?>
         {
-            // The only DOTNET_ROOT* variable that is set, and it points at an x64 install. This is
-            // exactly the ambiguous configuration from issue #16151.
+            // The ambiguous architecture-less DOTNET_ROOT from issue #16151: it points at an x64 install
+            // even though we are about to launch an x86 testhost.
             ["DOTNET_ROOT"] = x64DotnetRoot,
 
-            // Clear any architecture specific overrides that CI may have set so they cannot mask the
-            // bug. Without these cleared the x86 apphost would honor DOTNET_ROOT_X86 / DOTNET_ROOT(x86)
-            // and never fall through to the mismatched architecture-less DOTNET_ROOT.
-            ["DOTNET_ROOT_X86"] = null,
-            ["DOTNET_ROOT(x86)"] = null,
+            // Tell the x86 testhost where its (private) x86 runtime is. CI machines have no x86 runtime at
+            // a default discoverable location, so without this the run cannot find an x86 host at all. With
+            // the fix, the ambiguous architecture-less DOTNET_ROOT no longer interferes with this resolution.
+            ["DOTNET_ROOT_X86"] = x86DotnetRoot,
+            ["DOTNET_ROOT(x86)"] = x86DotnetRoot,
 
-            // Ensure we exercise the direct vstest.console.exe invocation path and not the SDK
-            // (dotnet test) path that already disambiguates the runtime for us.
+            // Ensure we exercise the direct vstest.console.exe invocation path and not the SDK (dotnet test)
+            // path that already disambiguates the runtime for us.
             ["VSTEST_DOTNET_ROOT_PATH"] = null,
         };
 
         InvokeVsTest(arguments, environmentVariables);
 
-        // SimpleTestProject has 1 passing, 1 failing and 1 skipped test. Getting a complete summary
-        // proves the x86 testhost resolved its runtime and actually executed the tests; before the
-        // fix the testhost crashed with 0x800700C1 and produced no summary at all.
+        // SimpleTestProject has 1 passing, 1 failing and 1 skipped test. Getting a complete summary proves
+        // the x86 testhost resolved its runtime and actually executed the tests despite the mismatched
+        // architecture-less DOTNET_ROOT; before the fix the apphost crashed with 0x800700C1 in this setup.
         ValidateSummaryStatus(1, 1, 1);
     }
 }
