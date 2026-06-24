@@ -205,16 +205,8 @@ internal class TestRunCache : ITestRunCache
             _testResults.Add(testResult);
             MsTestV1TelemetryHelper.AddTelemetry(testResult, AdapterTelemetry);
 
-            if (_runStats.TryGetValue(testResult.Outcome, out long count))
-            {
-                count++;
-            }
-            else
-            {
-                count = 1;
-            }
-
-            _runStats[testResult.Outcome] = count;
+            _runStats.TryGetValue(testResult.Outcome, out long count);
+            _runStats[testResult.Outcome] = count + 1;
 
             RemoveInProgress(testResult);
 
@@ -292,10 +284,7 @@ internal class TestRunCache : ITestRunCache
         // operations, as well as in your methods that use the resource.
         if (disposing && !_isDisposed)
         {
-            if (_timer != null)
-            {
-                _timer.Dispose();
-            }
+            _timer.Dispose();
 
             // Indicate that the instance has been disposed.
             _isDisposed = true;

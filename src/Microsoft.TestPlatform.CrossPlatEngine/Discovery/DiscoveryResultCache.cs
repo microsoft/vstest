@@ -61,7 +61,6 @@ internal class DiscoveryResultCache
         _cacheTimeout = discoveredTestEventTimeout;
 
         _tests = new List<TestCase>();
-        TotalDiscoveredTests = 0;
     }
 
     /// <summary>

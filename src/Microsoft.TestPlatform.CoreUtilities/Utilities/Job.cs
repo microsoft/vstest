@@ -33,7 +33,6 @@ internal class Job<TPayload>
     /// </summary>
     private Job()
     {
-        Size = 0;
     }
 
     /// <summary>

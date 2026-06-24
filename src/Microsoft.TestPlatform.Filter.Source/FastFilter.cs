@@ -177,7 +177,7 @@ internal sealed class FastFilter
     private static bool TryGetPropertyValue(string name, Func<string, object?> propertyValueProvider, out string? singleValue, out string[]? multiValues)
     {
         var propertyValue = propertyValueProvider(name);
-        if (null != propertyValue)
+        if (propertyValue is not null)
         {
             multiValues = propertyValue as string[];
             singleValue = multiValues == null ? propertyValue.ToString() : null;
