@@ -37,13 +37,14 @@
 | 2026-06-20 | #16144 (MERGED) | Replace DateTime.Now with DateTime.UtcNow in TestRunCache + DiscoveryResultCache hot paths |
 | 2026-06-21 | #16147 (MERGED) | Replace Task.FromResult(0) with Task.CompletedTask in IPC channel |
 | 2026-06-22 | #16150 (MERGED) | Replace ManualResetEvent with ManualResetEventSlim in JobQueue |
-| 2026-06-23 | efficiency/fastfilter-no-closure-no-double-lookup (PR pending) | FastFilter.Evaluate: foreach kvp + foreach instead of Any(lambda); NO ValidForProperties change |
+| 2026-06-23 | #16160 (MERGED) | FastFilter.Evaluate: foreach kvp + foreach instead of Any(lambda); NO ValidForProperties change |
+| 2026-06-24 | efficiency/preallocate-cache-lists (PR pending) | Pre-allocate List<T>(InitialCapacity) in DiscoveryResultCache+TestRunCache; remove Collection<T> virtual-method layer |
 
 ## Backlog Cursor
 
-- Last scanned: `src/Microsoft.TestPlatform.Filter.Source/`, `src/Microsoft.TestPlatform.CrossPlatEngine/`, `src/Microsoft.TestPlatform.CommunicationUtilities/`, `src/Microsoft.TestPlatform.CoreUtilities/`, `src/Microsoft.TestPlatform.Client/` (partial — ManualResetEvent usage checked), `src/Microsoft.TestPlatform.Common/` (partial: InternalTestLoggerEvents scanned — queue-based, no new hot paths)
-- Next to scan: `src/vstest.console/` orchestration paths, deeper scan of `src/Microsoft.TestPlatform.Common/ExtensionFramework/` plugin discovery paths
+- Last scanned: `src/Microsoft.TestPlatform.Filter.Source/`, `src/Microsoft.TestPlatform.CrossPlatEngine/`, `src/Microsoft.TestPlatform.CommunicationUtilities/`, `src/Microsoft.TestPlatform.CoreUtilities/`, `src/Microsoft.TestPlatform.Client/` (partial — ManualResetEvent usage checked), `src/Microsoft.TestPlatform.Common/` (partial: InternalTestLoggerEvents scanned — queue-based, no new hot paths), `src/vstest.console/` (orchestration — init-time only, not hot paths), `src/Microsoft.TestPlatform.Common/ExtensionFramework/TestPluginCache.cs` (EqtTrace without verbosity guard but not hot path)
+- Next to scan: plugin extension adapter paths, `src/Microsoft.TestPlatform.Common/Filtering/` deeper scan
 
 ## Last Run
 
-- 2026-06-23: Task 2 (scanned Common/CrossPlatEngine/vstest.console partial), Task 3 (new FastFilter PR: efficiency/fastfilter-no-closure-no-double-lookup — kvp iteration + foreach eliminates closure allocations; tests 108+45 pass), Task 4 (confirmed PRs #16144, #16147, #16150 all MERGED; PR #16139 closed by maintainer), Task 7 (monthly summary updated)
+- 2026-06-24: Task 2 (scanned TestRunCache/DiscoveryResultCache/vstest.console/Common/ExtensionFramework — identified Collection<T> pre-allocation opportunity), Task 3 (created PR efficiency/preallocate-cache-lists: List<T>(InitialCapacity) replaces Collection<T> in cache hot paths; ~9K transient array allocations saved per 10K-test run; build+tests pass), Task 7 (monthly summary updated: PR #16160 marked MERGED, new PR added)
