@@ -856,7 +856,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         try
         {
-            using var stream = _fileHelper.GetStream(executablePath, FileMode.Open, FileAccess.Read);
+            // Open with FileShare.Read so the probe is resilient when the muxer (dotnet.exe) is currently running,
+            // which is common on dev boxes and CI. The default FileShare.None overload would fail to open a file in
+            // use and silently skip normalization, leaving the original architecture mismatch in place.
+            using var stream = _fileHelper.GetStream(executablePath, FileMode.Open, FileAccess.Read, FileShare.Read);
             using var peReader = new PEReader(stream);
             return peReader.PEHeaders.CoffHeader.Machine switch
             {

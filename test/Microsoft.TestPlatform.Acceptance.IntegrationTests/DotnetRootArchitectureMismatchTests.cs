@@ -73,8 +73,11 @@ public class DotnetRootArchitectureMismatchTests : AcceptanceTestBase
             ["DOTNET_ROOT(x86)"] = x86DotnetRoot,
 
             // Ensure we exercise the direct vstest.console.exe invocation path and not the SDK (dotnet test)
-            // path that already disambiguates the runtime for us.
-            ["VSTEST_DOTNET_ROOT_PATH"] = null,
+            // path that already disambiguates the runtime for us. The production code treats an empty value as
+            // "not set"; use string.Empty rather than null because the test harness assigns these into
+            // ProcessStartInfo.EnvironmentVariables, where null can behave inconsistently.
+            ["VSTEST_DOTNET_ROOT_PATH"] = string.Empty,
+            ["VSTEST_DOTNET_ROOT_ARCHITECTURE"] = string.Empty,
         };
 
         InvokeVsTest(arguments, environmentVariables);
