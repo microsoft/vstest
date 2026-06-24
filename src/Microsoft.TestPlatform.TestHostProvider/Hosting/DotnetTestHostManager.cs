@@ -754,6 +754,11 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // Resolve the target framework of the testhost apphost we are about to launch by reading testhost.dll next to
         // it.
         var testHostDllPath = Path.ChangeExtension(startInfo.FileName, ".dll");
+        if (testHostDllPath.IsNullOrEmpty())
+        {
+            return;
+        }
+
         var testHostFramework = GetTestHostTargetFramework(testHostDllPath);
         if (testHostFramework is null)
         {
