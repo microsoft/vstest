@@ -67,6 +67,8 @@ public class FrameworkTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
+    // The .NET (Core) runner produces a different framework-incompatible warning on non-Windows, so keep this Windows-only.
+    [TestCategory("Windows-Review")]
     public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

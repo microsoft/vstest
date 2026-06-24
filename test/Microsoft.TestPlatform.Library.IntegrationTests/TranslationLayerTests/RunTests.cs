@@ -46,6 +46,8 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // WrapperCompatibilityDataSource includes the .NET Framework runner, which is not available on Linux/macOS.
+    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
@@ -82,6 +84,8 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // WrapperCompatibilityDataSource includes the .NET Framework runner, which is not available on Linux/macOS.
+    [TestCategory("Windows-Review")]
     [WrapperCompatibilityDataSource()]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {

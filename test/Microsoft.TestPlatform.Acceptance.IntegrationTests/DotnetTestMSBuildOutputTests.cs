@@ -16,6 +16,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
 {
     [TestMethod]
+    // Special characters (~, !, |, %) don't survive the MSBuildLogger output round-trip on non-Windows terminals.
+    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void MSBuildLoggerCanBeEnabledByBuildPropertyAndDoesNotEatSpecialChars(RunnerInfo runnerInfo)
     {

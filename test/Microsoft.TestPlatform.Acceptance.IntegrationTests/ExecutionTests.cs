@@ -17,6 +17,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class ExecutionTests : AcceptanceTestBase
 {
     [TestMethod]
+    // Compatibility matrix includes the .NET Framework runner/testhost, which is not available on Linux/macOS.
+    [TestCategory("Windows-Review")]
     [MSTestCompatibilityDataSource]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
@@ -33,6 +35,8 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Compatibility matrix includes the .NET Framework runner/testhost, which is not available on Linux/macOS.
+    [TestCategory("Windows-Review")]
     [TestHostCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
     {
@@ -49,6 +53,8 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Compatibility matrix includes the .NET Framework runner/testhost, which is not available on Linux/macOS.
+    [TestCategory("Windows-Review")]
     [RunnerCompatibilityDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations2(RunnerInfo runnerInfo)
     {
