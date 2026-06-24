@@ -68,6 +68,9 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // The xUnit adapter produces no results on Linux/macOS (diagnostic log shows a NullReferenceException because path is null),
+    // so the run returns an empty sequence and .First() throws. Keep this Windows-only.
+    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource]
     public void RunTestsWithXunitAdapter(RunnerInfo runnerInfo)
     {
