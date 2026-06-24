@@ -741,10 +741,19 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
     private void PromoteArchitectureLessDotnetRoot(TestProcessStartInfo startInfo)
     {
-        // Look at the location the architecture-less DOTNET_ROOT points at. If it is not set there is nothing
-        // ambiguous to normalize, so let the apphost resolve the runtime on its own (registry / default install
-        // location).
-        var dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable("DOTNET_ROOT");
+        startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
+
+        // Look at the location the architecture-less DOTNET_ROOT points at. The caller (e.g. runsettings
+        // <EnvironmentVariables>) may have explicitly set DOTNET_ROOT for the testhost itself; that value lives in
+        // startInfo.EnvironmentVariables and takes precedence over the surrounding process environment because it is
+        // what the testhost will actually see. If the caller provided it - including explicitly clearing it to an
+        // empty value - we normalize based on their value and never override their intent with the ambient one.
+        var dotnetRoot = TryGetTestHostEnvironmentVariable(startInfo, "DOTNET_ROOT", out var callerProvidedDotnetRoot)
+            ? callerProvidedDotnetRoot
+            : _environmentVariableHelper.GetEnvironmentVariable("DOTNET_ROOT");
+
+        // If it is not set (or the caller explicitly cleared it) there is nothing ambiguous to normalize, so let the
+        // apphost resolve the runtime on its own (registry / default install location).
         if (StringUtilities.IsNullOrWhiteSpace(dotnetRoot))
         {
             return;
@@ -781,14 +790,15 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
         var dotnetRootArchVariable = $"DOTNET_ROOT_{dotnetRootArchitecture.ToString()!.ToUpperInvariant()}";
 
-        startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
-
         // The architecture-less DOTNET_ROOT points at a different architecture than the testhost; left as-is the
         // testhost apphost would pick it up and load a mismatched hostfxr. Promote it to the architecture specific
-        // variable for the architecture it actually points at (unless the user already provided that variable, then
-        // we trust their value). This keeps the (possibly private) installation reachable for processes of that
-        // architecture (e.g. children the testhost spawns).
-        if (StringUtilities.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable(dotnetRootArchVariable)))
+        // variable for the architecture it actually points at (unless that variable is already provided - by the
+        // caller for the testhost via startInfo.EnvironmentVariables, or by the surrounding environment - in which
+        // case we trust the existing value). This keeps the (possibly private) installation reachable for processes
+        // of that architecture (e.g. children the testhost spawns).
+        var archVariableProvidedByCaller = TryGetTestHostEnvironmentVariable(startInfo, dotnetRootArchVariable, out _);
+        if (!archVariableProvidedByCaller
+            && StringUtilities.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable(dotnetRootArchVariable)))
         {
             startInfo.EnvironmentVariables[dotnetRootArchVariable] = dotnetRoot;
             EqtTrace.Verbose($"DotnetTestHostManager.PromoteArchitectureLessDotnetRoot: Promoting architecture-less DOTNET_ROOT to {dotnetRootArchVariable}={dotnetRoot}.");
@@ -800,6 +810,34 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // treats as not set.
         startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
         EqtTrace.Verbose("DotnetTestHostManager.PromoteArchitectureLessDotnetRoot: Clearing architecture-less DOTNET_ROOT for the testhost to avoid an architecture mismatch.");
+    }
+
+    /// <summary>
+    /// Looks up an environment variable that the caller explicitly set for the testhost (i.e. one present in
+    /// <paramref name="startInfo"/>'s <see cref="TestProcessStartInfo.EnvironmentVariables"/>, typically coming from
+    /// runsettings <c>&lt;EnvironmentVariables&gt;</c>). The lookup is case-insensitive to match how environment
+    /// variables are resolved on Windows, which is the only platform where the architecture specific apphosts handled
+    /// here exist. Returns <see langword="true"/> when the variable was provided (even when its value is
+    /// <see langword="null"/> or empty, i.e. explicitly cleared).
+    /// </summary>
+    private static bool TryGetTestHostEnvironmentVariable(TestProcessStartInfo startInfo, string name, out string? value)
+    {
+        value = null;
+        if (startInfo.EnvironmentVariables is null)
+        {
+            return false;
+        }
+
+        foreach (var environmentVariable in startInfo.EnvironmentVariables)
+        {
+            if (string.Equals(environmentVariable.Key, name, StringComparison.OrdinalIgnoreCase))
+            {
+                value = environmentVariable.Value;
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /// <summary>
