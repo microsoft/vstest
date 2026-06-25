@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Globalization;
@@ -24,7 +24,7 @@ public class MainTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)), new(envVarMock.Object));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
 
         // Assert
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
@@ -46,7 +46,7 @@ public class MainTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)), new(envVarMock.Object));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = lang.Equals(culture)));
 
         // Assert
         Assert.IsTrue(threadCultureWasSet, "DefaultThreadCurrentUICulture was not set");
@@ -67,7 +67,7 @@ public class MainTests
         bool threadCultureWasSet = false;
 
         // Act - We have an exception because we are not passing the right args but that's ok for our test
-        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = true), new(envVarMock.Object));
+        TestPlatform.CommandLine.Program.Run(null, new(envVarMock.Object, lang => threadCultureWasSet = true));
 
         // Assert
         Assert.IsFalse(threadCultureWasSet, "DefaultThreadCurrentUICulture was set");
