@@ -271,7 +271,10 @@ internal class TestRunCache : ITestRunCache
         {
             var lastChunk = _testResults;
 
-            _testResults = new List<TestResult>(InitialCapacity(_cacheSize));
+            // GetLastChunk() is the end-of-run drain; no further results are expected after this
+            // call, so avoid pre-allocating capacity here. The replacement list exists only to keep
+            // the field non-null and will be allocated lazily if results somehow arrive afterwards.
+            _testResults = new List<TestResult>();
 
             return lastChunk;
         }
