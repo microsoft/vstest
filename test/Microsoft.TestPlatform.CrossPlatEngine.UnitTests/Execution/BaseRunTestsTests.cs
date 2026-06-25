@@ -160,6 +160,37 @@ public class BaseRunTestsTests
     }
 
     [TestMethod]
+    public void RunTestsShouldPreserveOriginalExceptionAsInnerException()
+    {
+        TestRunCompleteEventArgs? receivedCompleteArgs = null;
+        var originalException = new NotImplementedException("original message");
+
+        // Setup mocks.
+        _runTestsInstance.GetExecutorUriExtensionMapCallback = (fh, rc) => throw originalException;
+        _mockTestRunEventsHandler.Setup(
+                treh =>
+                    treh.HandleTestRunComplete(
+                        It.IsAny<TestRunCompleteEventArgs>(),
+                        It.IsAny<TestRunChangedEventArgs>(),
+                        It.IsAny<ICollection<AttachmentSet>>(),
+                        It.IsAny<ICollection<string>>()))
+            .Callback(
+                (
+                    TestRunCompleteEventArgs complete,
+                    TestRunChangedEventArgs stats,
+                    ICollection<AttachmentSet> attachments,
+                    ICollection<string> executorUris) => receivedCompleteArgs = complete);
+
+        _runTestsInstance.RunTests();
+
+        Assert.IsNotNull(receivedCompleteArgs);
+        Assert.IsTrue(receivedCompleteArgs.IsAborted);
+        Assert.IsNotNull(receivedCompleteArgs.Error);
+        Assert.AreSame(originalException, receivedCompleteArgs.Error!.InnerException,
+            "The original exception should be preserved as the inner exception of the wrapper.");
+    }
+
+    [TestMethod]
     public void RunTestsShouldNotThrowIfExceptionIsAFileNotFoundException()
     {
         TestRunCompleteEventArgs? receivedCompleteArgs = null;

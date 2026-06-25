@@ -218,7 +218,7 @@ internal abstract class BaseRunTests
             {
                 EqtTrace.Error("BaseRunTests.RunTests: Failed to run the tests. Reason: {0}.", ex);
 
-                exception = new Exception(ex.Message, ex.InnerException);
+                exception = new Exception(ex.Message, ex);
                 isAborted = true;
             }
             finally
