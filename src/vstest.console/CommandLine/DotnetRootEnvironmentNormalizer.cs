@@ -134,7 +134,10 @@ internal class DotnetRootEnvironmentNormalizer
             using var peReader = new PEReader(stream);
             return peReader.PEHeaders.CoffHeader.Machine switch
             {
-                Machine.Amd64 or Machine.IA64 => "X64",
+                // Only map AMD64 to X64. IA64 (Itanium) is a distinct architecture, not x64, so returning null for it
+                // (and any other unknown machine) avoids setting an incorrect DOTNET_ROOT_X64 that would reintroduce
+                // an architecture mismatch.
+                Machine.Amd64 => "X64",
                 Machine.Arm64 => "ARM64",
                 Machine.Arm => "ARM",
                 Machine.I386 => "X86",

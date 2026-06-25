@@ -751,8 +751,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             return;
         }
 
-        // Resolve the target framework of the testhost apphost we are about to launch by reading testhost.dll next to
-        // it.
+        // Resolve the target framework of the testhost apphost we are about to launch by reading the managed testhost
+        // assembly next to it. Its name mirrors the apphost (e.g. testhost.dll for testhost.exe, testhost.x86.dll for
+        // testhost.x86.exe), so we just swap the apphost's extension for .dll.
         var testHostDllPath = Path.ChangeExtension(startInfo.FileName, ".dll");
         var testHostFramework = GetTestHostTargetFramework(testHostDllPath);
         if (testHostFramework is null)
@@ -829,7 +830,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
     /// <summary>
     /// Resolves the target framework of the testhost apphost by reading the <see cref="TargetFrameworkAttribute"/>
-    /// from <paramref name="testHostDllPath"/> (the managed testhost.dll next to the apphost), or
+    /// from <paramref name="testHostDllPath"/> (the managed testhost assembly next to the apphost, e.g. testhost.dll
+    /// or testhost.x86.dll), or
     /// <see langword="null"/> when it cannot be determined.
     /// </summary>
     internal virtual FrameworkName? GetTestHostTargetFramework(string testHostDllPath)
