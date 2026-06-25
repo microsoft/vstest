@@ -881,7 +881,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             using var peReader = new PEReader(stream);
             return peReader.PEHeaders.CoffHeader.Machine switch
             {
-                Machine.Amd64 or Machine.IA64 => PlatformArchitecture.X64,
+                Machine.Amd64 => PlatformArchitecture.X64,
                 Machine.Arm64 => PlatformArchitecture.ARM64,
                 Machine.Arm => PlatformArchitecture.ARM,
                 Machine.I386 => PlatformArchitecture.X86,
