@@ -755,6 +755,11 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // assembly next to it. Its name mirrors the apphost (e.g. testhost.dll for testhost.exe, testhost.x86.dll for
         // testhost.x86.exe), so we just swap the apphost's extension for .dll.
         var testHostDllPath = Path.ChangeExtension(startInfo.FileName, ".dll");
+        if (testHostDllPath.IsNullOrEmpty())
+        {
+            return;
+        }
+
         var testHostFramework = GetTestHostTargetFramework(testHostDllPath);
         if (testHostFramework is null)
         {
