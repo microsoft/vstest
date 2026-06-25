@@ -9,9 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
-using System.Runtime.Versioning;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -245,38 +243,21 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         string? dotnetRootPath = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH");
         string? dotnetRootArchitecture = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE");
 
-        // True when dotnetRootPath/dotnetRootArchitecture were derived below from the architecture-less DOTNET_ROOT
-        // (direct invocation) rather than provided explicitly by the SDK via VSTEST_DOTNET_ROOT_PATH. In that case the
-        // architecture-less DOTNET_ROOT is ambiguous - an apphost honors it regardless of its own architecture - so for
-        // a modern apphost we additionally clear it in the testHostExeFound block below (issue #16151).
-        bool dotnetRootIsAmbiguous = false;
-
-        if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
-        {
-            if (StringUtils.IsNullOrWhiteSpace(dotnetRootArchitecture))
-            {
-                throw new InvalidOperationException("'VSTEST_DOTNET_ROOT_PATH' and 'VSTEST_DOTNET_ROOT_ARCHITECTURE' must be both always set. If you are seeing this error, this is a bug in dotnet SDK that sets those variables.");
-            }
-
-            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: VSTEST_DOTNET_ROOT_PATH={dotnetRootPath}");
-            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: VSTEST_DOTNET_ROOT_ARCHITECTURE={dotnetRootArchitecture}");
-
-            if (!FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS))
-            {
-                // Set DOTNET_ROOT_<ARCH> for any run, so it gets propagated to testhost and its child processes, like dotnet run does it. This allows executables that start under testhost to find the path to dotnet
-                // from which we called dotnet test. Before this change we only expected testhost.exe to be in this situation, but with xunit v3 running separate exe under testhost, the need for setting architecture
-                // specific DOTNET_ROOT increases and makes this necessary for users to have good experience.
-                SetDotnetRootForArchitecture(startInfo, dotnetRootPath!, dotnetRootArchitecture);
-            }
-        }
-        else
+        if (StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
         {
             // Direct invocation: VSTEST_DOTNET_ROOT_PATH was not provided by the SDK (e.g. vstest.console.exe is run
             // under Visual Studio or by hand instead of through `dotnet test`, which is the layer that normally
             // computes the architecture specific dotnet root for us). The surrounding environment - or the caller via
-            // runsettings <EnvironmentVariables> - may still carry an architecture-less DOTNET_ROOT. Derive the dotnet
-            // root and the architecture it actually points at (from the dotnet muxer's PE header) so the
-            // testHostExeFound block below can resolve it the same way as the SDK provided values.
+            // runsettings <EnvironmentVariables> - may still carry an architecture-less DOTNET_ROOT. An apphost honors
+            // that architecture-less DOTNET_ROOT regardless of its own architecture, so if it points at a different
+            // architecture (commonly an x64 install) an x86 apphost picks it up and tries to load the x64 hostfxr.dll
+            // into the 32-bit process, failing with 0x800700C1 (ERROR_BAD_EXE_FORMAT). See
+            // https://github.com/microsoft/vstest/issues/16151.
+            //
+            // Derive dotnetRootPath and the architecture it actually points at (from the dotnet muxer's PE header) and
+            // clear the ambiguous architecture-less DOTNET_ROOT, so the resolution below treats it like the SDK
+            // provided values: it sets the architecture specific DOTNET_ROOT_<ARCH> (preferred by modern apphosts) and,
+            // for a legacy apphost whose architecture matches, re-establishes DOTNET_ROOT / DOTNET_ROOT(x86).
             var dotnetRoot = TryGetTestHostEnvironmentVariable(startInfo, "DOTNET_ROOT", out var callerProvidedDotnetRoot)
                 ? callerProvidedDotnetRoot
                 : _environmentVariableHelper.GetEnvironmentVariable("DOTNET_ROOT");
@@ -290,9 +271,33 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 {
                     dotnetRootPath = dotnetRoot;
                     dotnetRootArchitecture = ambientArchitecture.ToString();
-                    dotnetRootIsAmbiguous = true;
-                    EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: Derived dotnet root '{dotnetRootPath}' (architecture '{dotnetRootArchitecture}') from the architecture-less DOTNET_ROOT.");
+
+                    // Clear the ambiguous architecture-less DOTNET_ROOT for the testhost. Setting it to empty is treated
+                    // by the host as not set. The resolution below re-establishes the right variable for the testhost.
+                    startInfo.EnvironmentVariables ??= new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+                    startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
+
+                    EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: Derived dotnet root '{dotnetRootPath}' (architecture '{dotnetRootArchitecture}') from the architecture-less DOTNET_ROOT and cleared the ambiguous DOTNET_ROOT.");
                 }
+            }
+        }
+
+        if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
+        {
+            if (StringUtils.IsNullOrWhiteSpace(dotnetRootArchitecture))
+            {
+                throw new InvalidOperationException("'VSTEST_DOTNET_ROOT_PATH' and 'VSTEST_DOTNET_ROOT_ARCHITECTURE' must be both always set. If you are seeing this error, this is a bug in dotnet SDK that sets those variables.");
+            }
+
+            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: dotnet root path={dotnetRootPath}");
+            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: dotnet root architecture={dotnetRootArchitecture}");
+
+            if (!FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS))
+            {
+                // Set DOTNET_ROOT_<ARCH> for any run, so it gets propagated to testhost and its child processes, like dotnet run does it. This allows executables that start under testhost to find the path to dotnet
+                // from which we called dotnet test. Before this change we only expected testhost.exe to be in this situation, but with xunit v3 running separate exe under testhost, the need for setting architecture
+                // specific DOTNET_ROOT increases and makes this necessary for users to have good experience.
+                SetDotnetRootForArchitecture(startInfo, dotnetRootPath!, dotnetRootArchitecture);
             }
         }
 
@@ -577,7 +582,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // i.e. I've got only private install and no global installation, in this case apphost needs to use env var to locate runtime.
         if (testHostExeFound)
         {
-            if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath) && !dotnetRootIsAmbiguous)
+            if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
             {
                 // The parent process is passing to us the path in which the dotnet.exe is and is passing the architecture of the dotnet.exe,
                 // so if the child process (testhost) is the same architecture it can pick up that dotnet.exe location and run. This is to allow
@@ -643,39 +648,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                             }
                         }
                     }
-                }
-            }
-            else if (dotnetRootIsAmbiguous)
-            {
-                // Direct invocation: dotnetRootPath/dotnetRootArchitecture were derived above from the architecture-less
-                // DOTNET_ROOT. An architecture-less DOTNET_ROOT is honored by an apphost regardless of its own
-                // architecture, so if it points at a different architecture (commonly an x64 install) an x86 apphost
-                // picks it up and tries to load the x64 hostfxr.dll into the 32-bit process, failing with 0x800700C1
-                // (ERROR_BAD_EXE_FORMAT). See https://github.com/microsoft/vstest/issues/16151.
-                //
-                // For a modern (.NET 6+) apphost, set the architecture specific DOTNET_ROOT_<ARCH> for the architecture
-                // the install actually is, and clear the ambiguous architecture-less DOTNET_ROOT so a mismatched
-                // architecture apphost cannot pick it up. Legacy (pre-.NET 6) apphosts only understand DOTNET_ROOT /
-                // DOTNET_ROOT(x86), so for those (or when we cannot determine the framework) we leave the environment
-                // untouched.
-                var testHostDllPath = Path.ChangeExtension(startInfo.FileName, ".dll");
-                var testHostFramework = GetTestHostTargetFramework(testHostDllPath);
-                if (testHostFramework is not null && !IsLegacyDotnetCoreFramework(testHostFramework))
-                {
-                    // Promote to the architecture specific variable, unless it is already provided (by the caller for
-                    // the testhost or by the surrounding environment), in which case we trust the existing value.
-                    var dotnetRootArchVariable = $"DOTNET_ROOT_{dotnetRootArchitecture!.ToUpperInvariant()}";
-                    if (!TryGetTestHostEnvironmentVariable(startInfo, dotnetRootArchVariable, out _))
-                    {
-                        SetDotnetRootForArchitecture(startInfo, dotnetRootPath!, dotnetRootArchitecture!);
-                    }
-
-                    // Clear the ambiguous architecture-less DOTNET_ROOT for the testhost. The modern apphost resolves
-                    // via DOTNET_ROOT_<ARCH> or its own default install location instead. Setting it to empty is treated
-                    // by the host as not set.
-                    startInfo.EnvironmentVariables ??= new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-                    startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
-                    EqtTrace.Verbose("DotnetTestHostManager: Clearing architecture-less DOTNET_ROOT for the testhost to avoid an architecture mismatch.");
                 }
             }
         }
@@ -786,12 +758,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         }
     }
 
-    // .NET 6 is the first runtime whose apphost understands the architecture specific DOTNET_ROOT_<ARCH> variables.
-    // Older apphosts only honor DOTNET_ROOT and DOTNET_ROOT(x86).
-    private static bool IsLegacyDotnetCoreFramework(FrameworkName framework)
-        => string.Equals(framework.Identifier, ".NETCoreApp", StringComparison.OrdinalIgnoreCase)
-            && framework.Version < new Version(6, 0);
-
     /// <summary>
     /// Looks up an environment variable that the caller explicitly set for the testhost (i.e. one present in
     /// <paramref name="startInfo"/>'s <see cref="TestProcessStartInfo.EnvironmentVariables"/>, typically coming from
@@ -857,92 +823,31 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         }
     }
 
-    /// <summary>
-    /// Resolves the target framework of the testhost apphost by reading the <see cref="TargetFrameworkAttribute"/>
-    /// from <paramref name="testHostDllPath"/> (the managed testhost assembly next to the apphost, e.g. testhost.dll
-    /// or testhost.x86.dll), or
-    /// <see langword="null"/> when it cannot be determined.
-    /// </summary>
-    internal virtual FrameworkName? GetTestHostTargetFramework(string testHostDllPath)
-    {
-        if (!_fileHelper.Exists(testHostDllPath))
-        {
-            return null;
-        }
-
-        try
-        {
-            using var stream = _fileHelper.GetStream(testHostDllPath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            using var peReader = new PEReader(stream);
-            var metadataReader = peReader.GetMetadataReader();
-
-            foreach (var handle in metadataReader.GetAssemblyDefinition().GetCustomAttributes())
-            {
-                var attribute = metadataReader.GetCustomAttribute(handle);
-                if (!IsTargetFrameworkAttribute(metadataReader, attribute))
-                {
-                    continue;
-                }
-
-                // The custom attribute blob for TargetFrameworkAttribute(string) is: a 2-byte prolog (0x0001)
-                // followed by a SerString holding the framework name (e.g. ".NETCoreApp,Version=v8.0").
-                var blobReader = metadataReader.GetBlobReader(attribute.Value);
-                if (blobReader.Length < 2 || blobReader.ReadUInt16() != 1)
-                {
-                    continue;
-                }
-
-                var frameworkName = blobReader.ReadSerializedString();
-                if (!StringUtilities.IsNullOrWhiteSpace(frameworkName))
-                {
-                    return new FrameworkName(frameworkName);
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            EqtTrace.Verbose($"DotnetTestHostManager.GetTestHostTargetFramework: Failed to read target framework from '{testHostDllPath}': {ex.Message}");
-        }
-
-        return null;
-    }
-
-    private static bool IsTargetFrameworkAttribute(MetadataReader metadataReader, CustomAttribute attribute)
-    {
-        if (attribute.Constructor.Kind != HandleKind.MemberReference)
-        {
-            return false;
-        }
-
-        var memberReference = metadataReader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
-        if (memberReference.Parent.Kind != HandleKind.TypeReference)
-        {
-            return false;
-        }
-
-        var typeReference = metadataReader.GetTypeReference((TypeReferenceHandle)memberReference.Parent);
-        return metadataReader.GetString(typeReference.Name) == nameof(TargetFrameworkAttribute)
-            && metadataReader.GetString(typeReference.Namespace) == typeof(TargetFrameworkAttribute).Namespace;
-    }
-
     private void SetDotnetRootForArchitecture(TestProcessStartInfo startInfo, string dotnetRootPath, string dotnetRootArchitecture)
     {
         var environmentVariableName = $"DOTNET_ROOT_{dotnetRootArchitecture.ToUpperInvariant()}";
+
+        startInfo.EnvironmentVariables ??= new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
+
+        // Don't overwrite a value the caller provided explicitly for the testhost (e.g. via runsettings
+        // <EnvironmentVariables>). This also makes the method idempotent, so it is safe to call more than once.
+        if (TryGetTestHostEnvironmentVariable(startInfo, environmentVariableName, out _))
+        {
+            EqtTrace.Verbose($"DotnetTestHostManager.SetDotnetRootForArchitecture: The variable {environmentVariableName} was already provided for the testhost, don't override it.");
+            return;
+        }
 
         var existingDotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(environmentVariableName);
         if (!StringUtilities.IsNullOrWhiteSpace(existingDotnetRoot))
         {
             EqtTrace.Verbose($"DotnetTestHostManager.SetDotnetRootForArchitecture: The variable {environmentVariableName} is already set in the surrounding environment, don't add it to testhost start info, because we want to keep what user provided externally.");
+            return;
         }
-        else
-        {
-            startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
 
-            // Set the architecture specific variable to the environment of the process so it is picked up.
-            startInfo.EnvironmentVariables.Add(environmentVariableName, dotnetRootPath);
+        // Set the architecture specific variable to the environment of the process so it is picked up.
+        startInfo.EnvironmentVariables[environmentVariableName] = dotnetRootPath;
 
-            EqtTrace.Verbose($"DotnetTestHostManager.SetDotnetRootForArchitecture: Adding {environmentVariableName}={dotnetRootPath} to testhost start info.");
-        }
+        EqtTrace.Verbose($"DotnetTestHostManager.SetDotnetRootForArchitecture: Adding {environmentVariableName}={dotnetRootPath} to testhost start info.");
     }
 
     /// <inheritdoc/>
