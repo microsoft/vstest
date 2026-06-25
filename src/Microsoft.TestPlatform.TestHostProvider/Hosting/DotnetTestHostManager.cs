@@ -243,19 +243,31 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         string? dotnetRootPath = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_PATH");
         string? dotnetRootArchitecture = _environmentVariableHelper.GetEnvironmentVariable("VSTEST_DOTNET_ROOT_ARCHITECTURE");
 
-        if (StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
+        if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
+        {
+            // The SDK (dotnet test) computed the architecture specific dotnet root for us and passed it via
+            // VSTEST_DOTNET_ROOT_PATH / VSTEST_DOTNET_ROOT_ARCHITECTURE. This is the primary source and takes precedence.
+            if (StringUtils.IsNullOrWhiteSpace(dotnetRootArchitecture))
+            {
+                throw new InvalidOperationException("'VSTEST_DOTNET_ROOT_PATH' and 'VSTEST_DOTNET_ROOT_ARCHITECTURE' must be both always set. If you are seeing this error, this is a bug in dotnet SDK that sets those variables.");
+            }
+
+            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: VSTEST_DOTNET_ROOT_PATH={dotnetRootPath}");
+            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: VSTEST_DOTNET_ROOT_ARCHITECTURE={dotnetRootArchitecture}");
+        }
+        else
         {
             // Direct invocation: VSTEST_DOTNET_ROOT_PATH was not provided by the SDK (e.g. vstest.console.exe is run
             // under Visual Studio or by hand instead of through `dotnet test`, which is the layer that normally
-            // computes the architecture specific dotnet root for us). The surrounding environment - or the caller via
-            // runsettings <EnvironmentVariables> - may still carry an architecture-less DOTNET_ROOT. An apphost honors
-            // that architecture-less DOTNET_ROOT regardless of its own architecture, so if it points at a different
-            // architecture (commonly an x64 install) an x86 apphost picks it up and tries to load the x64 hostfxr.dll
-            // into the 32-bit process, failing with 0x800700C1 (ERROR_BAD_EXE_FORMAT). See
-            // https://github.com/microsoft/vstest/issues/16151.
+            // computes the architecture specific dotnet root for us). Only as a fallback - when the SDK did not provide
+            // the dotnet root - look at the architecture-less DOTNET_ROOT from the surrounding environment or the caller
+            // via runsettings <EnvironmentVariables>. An apphost honors that architecture-less DOTNET_ROOT regardless of
+            // its own architecture, so if it points at a different architecture (commonly an x64 install) an x86 apphost
+            // picks it up and tries to load the x64 hostfxr.dll into the 32-bit process, failing with 0x800700C1
+            // (ERROR_BAD_EXE_FORMAT). See https://github.com/microsoft/vstest/issues/16151.
             //
-            // Derive dotnetRootPath and the architecture it actually points at (from the dotnet muxer's PE header) and
-            // clear the ambiguous architecture-less DOTNET_ROOT, so the resolution below treats it like the SDK
+            // Override dotnetRootPath with the architecture it actually points at (from the dotnet muxer's PE header)
+            // and clear the ambiguous architecture-less DOTNET_ROOT, so the resolution below treats it like the SDK
             // provided values: it sets the architecture specific DOTNET_ROOT_<ARCH> (preferred by modern apphosts) and,
             // for a legacy apphost whose architecture matches, re-establishes DOTNET_ROOT / DOTNET_ROOT(x86).
             var dotnetRoot = TryGetTestHostEnvironmentVariable(startInfo, "DOTNET_ROOT", out var callerProvidedDotnetRoot)
@@ -282,23 +294,13 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             }
         }
 
-        if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
+        if (!StringUtilities.IsNullOrWhiteSpace(dotnetRootPath)
+            && !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS))
         {
-            if (StringUtils.IsNullOrWhiteSpace(dotnetRootArchitecture))
-            {
-                throw new InvalidOperationException("'VSTEST_DOTNET_ROOT_PATH' and 'VSTEST_DOTNET_ROOT_ARCHITECTURE' must be both always set. If you are seeing this error, this is a bug in dotnet SDK that sets those variables.");
-            }
-
-            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: dotnet root path={dotnetRootPath}");
-            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: dotnet root architecture={dotnetRootArchitecture}");
-
-            if (!FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS))
-            {
-                // Set DOTNET_ROOT_<ARCH> for any run, so it gets propagated to testhost and its child processes, like dotnet run does it. This allows executables that start under testhost to find the path to dotnet
-                // from which we called dotnet test. Before this change we only expected testhost.exe to be in this situation, but with xunit v3 running separate exe under testhost, the need for setting architecture
-                // specific DOTNET_ROOT increases and makes this necessary for users to have good experience.
-                SetDotnetRootForArchitecture(startInfo, dotnetRootPath!, dotnetRootArchitecture);
-            }
+            // Set DOTNET_ROOT_<ARCH> for any run, so it gets propagated to testhost and its child processes, like dotnet run does it. This allows executables that start under testhost to find the path to dotnet
+            // from which we called dotnet test. Before this change we only expected testhost.exe to be in this situation, but with xunit v3 running separate exe under testhost, the need for setting architecture
+            // specific DOTNET_ROOT increases and makes this necessary for users to have good experience.
+            SetDotnetRootForArchitecture(startInfo, dotnetRootPath!, dotnetRootArchitecture!);
         }
 
         // .NET core host manager is not a shared host. It will expect a single test source to be provided.
