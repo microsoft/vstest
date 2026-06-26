@@ -84,6 +84,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
         EqtTrace.Info("VsTestConsoleRequestSender.InitializeCommunication: Started.");
 
+        _processExitCancellationTokenSource?.Dispose();
         _processExitCancellationTokenSource = new CancellationTokenSource();
         _handShakeSuccessful = false;
         _handShakeComplete.Reset();
@@ -125,6 +126,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     {
         EqtTrace.Info($"VsTestConsoleRequestSender.InitializeCommunicationAsync: Started with client connection timeout {clientConnectionTimeout} milliseconds.");
 
+        _processExitCancellationTokenSource?.Dispose();
         _processExitCancellationTokenSource = new CancellationTokenSource();
         _handShakeSuccessful = false;
         _handShakeComplete.Reset();
@@ -132,7 +134,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         try
         {
             port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-            var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
+            using var timeoutSource = new CancellationTokenSource(clientConnectionTimeout);
             await Task.Run(() =>
                 _communicationManager.AcceptClientAsync(), timeoutSource.Token).ConfigureAwait(false);
 
@@ -850,6 +852,9 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
     public void Dispose()
     {
         _communicationManager?.StopServer();
+        _processExitCancellationTokenSource?.Cancel();
+        _processExitCancellationTokenSource?.Dispose();
+        _handShakeComplete.Dispose();
     }
 
     #endregion

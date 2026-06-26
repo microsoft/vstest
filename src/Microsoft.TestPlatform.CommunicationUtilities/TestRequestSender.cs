@@ -235,7 +235,7 @@ public class TestRequestSender : ITestRequestSender
         // Test host compares the version with the highest version it can support.
         // Test host sends back the lower number of the two. So the highest protocol version, that both sides support is used.
         // Error case: test host can send a protocol error if it cannot find a supported version
-        var protocolNegotiated = new ManualResetEvent(false);
+        using var protocolNegotiated = new ManualResetEvent(false);
 
         EventHandler<MessageReceivedEventArgs> onMessageReceived = (sender, args) =>
         {
@@ -522,6 +522,8 @@ public class TestRequestSender : ITestRequestSender
         }
 
         _communicationEndpoint.Stop();
+        _connected.Dispose();
+        _clientExited.Dispose();
         GC.SuppressFinalize(this);
     }
 

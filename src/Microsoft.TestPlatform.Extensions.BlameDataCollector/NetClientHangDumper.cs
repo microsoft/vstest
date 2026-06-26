@@ -56,8 +56,7 @@ internal class NetClientHangDumper : IHangDumper
         // we will be dumping it before it observes the child exiting and we get a more accurate results. If we did not
         // do this, then parent that is awaiting child might exit before we get to dumping it.
         var tasks = new List<Task>();
-        var timeout = new CancellationTokenSource();
-        timeout.CancelAfter(TimeSpan.FromMinutes(5));
+        using var timeout = new CancellationTokenSource(TimeSpan.FromMinutes(5));
         foreach (var p in bottomUpTree)
         {
             TPDebug.Assert(p != null);
