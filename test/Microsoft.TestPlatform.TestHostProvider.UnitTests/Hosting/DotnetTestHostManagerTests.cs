@@ -1269,6 +1269,7 @@ public class DotnetTestHostManagerTests
 
         internal override PlatformArchitecture? GetExecutableArchitecture(string executablePath)
             => OverrideExecutableArchitecture ? ExecutableArchitecture : base.GetExecutableArchitecture(executablePath);
+
         /// <summary>
         /// When set, overrides native-module detection so tests can simulate native vs managed sources without
         /// providing real PE bytes. When null, the real <see cref="DotnetTestHostManager.IsNativeModule"/> runs.
