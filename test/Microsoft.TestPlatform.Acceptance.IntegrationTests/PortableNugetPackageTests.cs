@@ -24,8 +24,8 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -39,8 +39,8 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -38,7 +38,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -61,7 +61,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
     [TestMethod]
     // Validates filter expression that is passed all the way down to testhost, unlikely that we will see difference in beharior between desktop and netcore runners.
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

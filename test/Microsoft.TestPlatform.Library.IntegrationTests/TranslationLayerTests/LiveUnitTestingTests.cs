@@ -37,7 +37,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
 
     [TestMethod]
     // Touches appdomain settings, preferring .NET Framework testhost here.
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void DiscoverTestsUsingLiveUnitTesting(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -62,7 +62,7 @@ public class LiveUnitTestingTests : AcceptanceTestBase
 
     [TestMethod]
     // Touches appdomain settings, preferring .NET Framework testhost here.
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void RunTestsWithLiveUnitTesting(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

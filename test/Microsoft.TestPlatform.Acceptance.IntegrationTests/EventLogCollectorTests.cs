@@ -20,7 +20,7 @@ public class EventLogCollectorTests : AcceptanceTestBase
     [Ignore]
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void EventLogDataCollectorShoudCreateLogFileHavingEvents(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -41,7 +41,7 @@ public class EventLogCollectorTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void EventLogDataCollectorShoudCreateLogFileWithoutEventsIfEventsAreNotLogged(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

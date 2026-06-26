@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class SerializerSelectionTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetCoreRunner(Core11TargetFramework)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void OnNetCoreRunner_ShouldUseSystemTextJson(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -25,7 +25,7 @@ public class SerializerSelectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFrameworkRunner(Net481TargetFramework)]
+    [TestMatrix(console: VSTestConsole.NetFx, testHost: TestHost.NetFx)]
     public void OnNetFrameworkRunner_ShouldUseJsonite(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

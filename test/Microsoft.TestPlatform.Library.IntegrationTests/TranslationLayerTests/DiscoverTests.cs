@@ -45,7 +45,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -63,7 +63,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -86,8 +86,8 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Smoke")]
-    [NetCoreTargetFrameworkDataSource]
-    [NetFullTargetFrameworkDataSource(useVsixRunner: true)]
+    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: TestHost.NetFx, vsix: true)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -105,7 +105,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -134,7 +134,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -162,7 +162,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -184,8 +184,8 @@ public class DiscoverTests : AcceptanceTestBase
     // Normally we test on two runner, against single .NET Testhost, but because source navigation happens in testhost
     // it is better to test against both desktop and core runners to make sure source navigation discovery works in both scenarios.
     // We run .NET Runner -> .NET Testhost and .NET Framework Runner -> .NET Frameworks Testhost.
-    [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.NetFx, testHost: TestHost.NetFx)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -205,7 +205,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     [Ignore("Flaky on CI")]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {

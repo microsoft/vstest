@@ -36,7 +36,7 @@ public class CustomTestHostLauncherTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource()]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void RunTestsWithCustomTestHostLauncherAttachesToDebuggerUsingTheProvidedLauncher(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -59,7 +59,7 @@ public class CustomTestHostLauncherTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [TestCategory("Feature")]
-    [WrapperCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void RunAllTestsWithMixedTFMsWillProvideAdditionalInformationToTheDebugger(RunnerInfo runnerInfo)
     {
         // Arrange

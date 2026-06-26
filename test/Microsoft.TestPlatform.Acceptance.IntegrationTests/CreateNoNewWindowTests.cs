@@ -12,7 +12,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class CreateNoNewWindowTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: false)]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void WhenCreateNoNewWindowIsFalse_DiagShowsCreateNoWindowFalse(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -34,7 +34,7 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: false)]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void WhenCreateNoNewWindowIsTrue_DiagShowsCreateNoWindowTrue(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -56,7 +56,7 @@ public class CreateNoNewWindowTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: false)]
+    [TestMatrix(testHost: TestHost.NetFx)]
     public void WhenCreateNoNewWindowIsNotSet_DefaultIsTrue(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

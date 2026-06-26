@@ -18,7 +18,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void MSBuildLoggerCanBeEnabledByBuildPropertyAndDoesNotEatSpecialChars(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -56,7 +56,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void MSBuildLoggerCanBeDisabledByBuildProperty(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -76,7 +76,7 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void MSBuildLoggerCanBeDisabledByEnvironmentVariableProperty(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
