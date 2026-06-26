@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DiscoveryTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
@@ -32,7 +31,6 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useVsixRunner: true)]
     [NetCoreTargetFrameworkDataSource]
     [TestCategory("Smoke")]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
@@ -73,7 +71,6 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
     {

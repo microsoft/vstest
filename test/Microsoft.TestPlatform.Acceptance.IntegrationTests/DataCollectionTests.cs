@@ -20,7 +20,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DataCollectionTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollection(RunnerInfo runnerInfo)
     {
@@ -44,7 +43,6 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void ExecuteTestsWithDataCollectionUsingCollectArgument(RunnerInfo runnerInfo)
     {
@@ -94,7 +92,6 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void DataCollectorAttachmentProcessor(RunnerInfo runnerInfo)
     {

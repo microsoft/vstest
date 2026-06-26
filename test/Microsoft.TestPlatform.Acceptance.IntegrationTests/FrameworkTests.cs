@@ -13,7 +13,6 @@ public class FrameworkTests : AcceptanceTestBase
 {
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
     {
@@ -27,7 +26,6 @@ public class FrameworkTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
     {

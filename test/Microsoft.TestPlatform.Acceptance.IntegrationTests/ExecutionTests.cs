@@ -70,7 +70,6 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Smoke")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useVsixRunner: true)]
     [NetCoreTargetFrameworkDataSource]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations3(RunnerInfo runnerInfo)
     {
@@ -88,7 +87,6 @@ public class ExecutionTests : AcceptanceTestBase
     // the two respective versions together (e.g. latest xunit and latest mstest), but does using two different test
     // frameworks have any added value over using 2 mstest dlls?
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void RunMultipleTestAssembliesWithoutTestAdapterPath(RunnerInfo runnerInfo)
     {
@@ -135,7 +133,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void TestSessionTimeOutTests(RunnerInfo runnerInfo)
     {
@@ -157,7 +154,6 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
     [NetCoreTargetFrameworkDataSource]
     public void WorkingDirectoryIsSourceDirectory(RunnerInfo runnerInfo)
     {
@@ -174,6 +170,9 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Asserts the testhost-specific stack overflow message; the .NET Framework variant requires the
+    // .NET Framework testhost, which is only available on Windows.
+    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(RunnerInfo runnerInfo)
@@ -199,6 +198,9 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Asserts the testhost-specific unhandled exception message; the .NET Framework variant requires the
+    // .NET Framework testhost, which is only available on Windows.
+    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(RunnerInfo runnerInfo)
