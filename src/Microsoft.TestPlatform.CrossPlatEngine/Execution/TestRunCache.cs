@@ -232,15 +232,15 @@ internal class TestRunCache : ITestRunCache
     {
         lock (_syncObject)
         {
-            if (completedTest == null)
+            if (completedTest is null)
             {
                 EqtTrace.Warning("TestRunCache: completedTest is null");
                 return false;
             }
 
-            if (_inProgressTests == null || _inProgressTests.Count == 0)
+            if (_inProgressTests.Count == 0)
             {
-                EqtTrace.Warning("TestRunCache: InProgressTests is null");
+                EqtTrace.Warning("TestRunCache: InProgressTests is empty");
                 return false;
             }
 
@@ -252,7 +252,7 @@ internal class TestRunCache : ITestRunCache
 
             // Try finding/removing a matching test corresponding to the completed test
             var inProgressTest = _inProgressTests.FirstOrDefault(inProgress => inProgress.Id == completedTest.Id);
-            if (inProgressTest != null)
+            if (inProgressTest is not null)
             {
                 removed = _inProgressTests.Remove(inProgressTest);
             }
