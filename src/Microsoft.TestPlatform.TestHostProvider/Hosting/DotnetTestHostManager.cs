@@ -253,9 +253,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // hostfxr.dll into the 32-bit process, failing with 0x800700C1 (ERROR_BAD_EXE_FORMAT). See
         // https://github.com/microsoft/vstest/issues/16151. We derive the architecture the install actually is (from the
         // dotnet muxer's PE header) so the resolution below can set the architecture specific DOTNET_ROOT_<ARCH>, and we
-        // clear the ambiguous DOTNET_ROOT only when it points at a different architecture than the testhost - when it
-        // matches, DOTNET_ROOT correctly locates the runtime (often the only place it exists, e.g. a private install) so
-        // we must leave it in place.
+        // clear the ambiguous DOTNET_ROOT so the apphost does not pick it up and fail.
         if (StringUtilities.IsNullOrWhiteSpace(dotnetRootPath))
         {
             var dotnetRoot = TryGetTestHostEnvironmentVariable(startInfo, "DOTNET_ROOT", out var callerProvidedDotnetRoot)
@@ -274,22 +272,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
 
                     EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: Derived dotnet root '{dotnetRootPath}' (architecture '{dotnetRootArchitecture}') from the architecture-less DOTNET_ROOT.");
 
-                    // testhost.exe is x64, the architecture suffixed variants carry their own architecture; a Default /
-                    // AnyCPU target maps to the x64 testhost.
-                    var testHostArchitecture = _architecture is Architecture.Default or Architecture.AnyCPU
-                        ? Architecture.X64
-                        : _architecture;
-
-                    if (!string.Equals(dotnetRootArchitecture, testHostArchitecture.ToString(), StringComparison.OrdinalIgnoreCase))
-                    {
-                        // Mismatch (e.g. x86 testhost, x64 DOTNET_ROOT): clear the ambiguous architecture-less DOTNET_ROOT
-                        // so the testhost cannot pick it up and load a mismatched hostfxr. Setting it to empty is treated
-                        // by the host as not set; the resolution below sets DOTNET_ROOT_<ARCH> for the install's own
-                        // architecture (and, for a legacy apphost whose architecture matches, DOTNET_ROOT / DOTNET_ROOT(x86)).
-                        startInfo.EnvironmentVariables ??= new Dictionary<string, string?>(StringComparer.OrdinalIgnoreCase);
-                        startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
-                        EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: DOTNET_ROOT points at architecture '{dotnetRootArchitecture}' but the testhost is '{testHostArchitecture}', clearing the ambiguous DOTNET_ROOT to avoid an architecture mismatch.");
-                    }
+                    startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
+                    EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: DOTNET_ROOT points at architecture '{dotnetRootArchitecture}' but the testhost is '{testHostArchitecture}', clearing the ambiguous DOTNET_ROOT to avoid an architecture mismatch.");
                 }
             }
         }
@@ -301,8 +285,8 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 throw new InvalidOperationException("'VSTEST_DOTNET_ROOT_PATH' and 'VSTEST_DOTNET_ROOT_ARCHITECTURE' must be both always set. If you are seeing this error, this is a bug in dotnet SDK that sets those variables.");
             }
 
-            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: VSTEST_DOTNET_ROOT_PATH={dotnetRootPath}");
-            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: VSTEST_DOTNET_ROOT_ARCHITECTURE={dotnetRootArchitecture}");
+            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: dotnet root path={dotnetRootPath}");
+            EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: dotnet root architecture={dotnetRootArchitecture}");
 
             if (!FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS))
             {
@@ -654,10 +638,9 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                         else
                         {
                             const string dotnetRoot = "DOTNET_ROOT";
-                            if (StringUtils.IsNullOrWhiteSpace(_environmentVariableHelper.GetEnvironmentVariable(dotnetRoot)))
-                            {
-                                startInfo.EnvironmentVariables.Add(dotnetRoot, dotnetRootPath);
-                            }
+                            // If the architecture is not x86 and the testhost is does not understand architecture specific DOTNET_ROOT_<ARCH>, 
+                            // we have to re-insert the more generic DOTNET_ROOT.
+                            startInfo.EnvironmentVariables.Add(dotnetRoot, dotnetRootPath);
                         }
                     }
                 }
