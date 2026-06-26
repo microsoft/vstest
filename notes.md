@@ -21,7 +21,8 @@
 - Tests live in `test/Microsoft.TestPlatform.Common.UnitTests/` and `test/Microsoft.TestPlatform.Filter.Source.UnitTests/`.
 - CrossPlatEngine tests: `test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/` — TFMs: `net11.0;net481`.
 - Client `ManualResetEvent` in `TestRunRequest._runCompletionEvent` and `DiscoveryRequest._discoveryCompleted` are long-duration per-run waits — NOT hot paths; not worth changing.
-- `JsoniteConvert.DeserializeTestCase` and `DeserializeTestResult`: fixed in PR #aw_pr_ipc_deser (2026-06-25) — replaced `ContainsKey`+`TryGetValue` double-hash with single `TryGetValue`; eliminates ~20K redundant hash lookups per 10K-test run.
+- `JsoniteConvert.DeserializeTestCase` and `DeserializeTestResult`: fixed in PR #16170 (2026-06-25) — replaced `ContainsKey`+`TryGetValue` double-hash with single `TryGetValue`; eliminates ~20K redundant hash lookups per 10K-test run.
+- `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases`: fixed in PR #aw_pr_disc_alloc (2026-06-26) — extracted `MarkSourceWithStatus` private helper; hot loop now calls it directly instead of `MarkSourcesWithStatus(new[] { source }, ...)`; eliminates ~10K `string[1]` allocations per 10K-test discovery run.
 
 ## Optimisation Backlog
 
@@ -40,8 +41,9 @@
 | 2026-06-21 | #16147 (MERGED) | Replace Task.FromResult(0) with Task.CompletedTask in IPC channel |
 | 2026-06-22 | #16150 (MERGED) | Replace ManualResetEvent with ManualResetEventSlim in JobQueue |
 | 2026-06-23 | #16160 (MERGED) | FastFilter.Evaluate: foreach kvp + foreach instead of Any(lambda); NO ValidForProperties change |
-| 2026-06-24 | #16165 (open, CI green) | Pre-allocate List<T>(InitialCapacity) in DiscoveryResultCache+TestRunCache; remove Collection<T> virtual-method layer |
-| 2026-06-25 | #aw_pr_ipc_deser (open, CI pending) | JsoniteConvert: replace ContainsKey+TryGetValue with single TryGetValue in DeserializeTestCase+DeserializeTestResult |
+| 2026-06-24 | #16165 (MERGED 2026-06-26) | Pre-allocate List<T>(InitialCapacity) in DiscoveryResultCache+TestRunCache; remove Collection<T> virtual-method layer |
+| 2026-06-25 | #16170 (open, CI green) | JsoniteConvert: replace ContainsKey+TryGetValue with single TryGetValue in DeserializeTestCase+DeserializeTestResult |
+| 2026-06-26 | #aw_pr_disc_alloc (open, CI pending) | DiscoveryDataAggregator: eliminate string[1] array per test case in discovery source tracking hot loop |
 
 ## Backlog Cursor
 
@@ -50,4 +52,4 @@
 
 ## Last Run
 
-- 2026-06-25: Task 4 (PR #16165 all CI green, mergeable), Task 2 (scanned JsoniteConvert — found ContainsKey+TryGetValue double-hash in IPC deserialization), Task 3 (created PR ipc-deserialize-single-lookup: eliminates ~20K redundant hash lookups per 10K-test run; 630/630 tests pass), Task 7 (monthly summary updated: PR #16165 number fixed, new PR #aw_pr_ipc_deser added)
+- 2026-06-26: Task 4 (PR #16165 MERGED, PR #16170 CI green awaiting review), Task 2 (scanned DiscoveryDataAggregator — found string[1] allocation per test case in discovery hot loop), Task 3 (created PR disc-alloc: eliminates ~10K string[1] allocations per 10K-test run; 0 failures in CrossPlatEngine.UnitTests), Task 7 (monthly summary updated: PR #16165 marked MERGED, #aw_pr_ipc_deser→#16170, new PR #aw_pr_disc_alloc added)
