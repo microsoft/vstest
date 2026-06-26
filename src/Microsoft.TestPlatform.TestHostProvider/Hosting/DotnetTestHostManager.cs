@@ -638,9 +638,10 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                         else
                         {
                             const string dotnetRoot = "DOTNET_ROOT";
-                            // If the architecture is not x86 and the testhost is does not understand architecture specific DOTNET_ROOT_<ARCH>, 
-                            // we have to re-insert the more generic DOTNET_ROOT.
-                            startInfo.EnvironmentVariables.Add(dotnetRoot, dotnetRootPath);
+                            // If the architecture is not x86 and the testhost does not understand the architecture
+                            // specific DOTNET_ROOT_<ARCH>, we have to re-insert the more generic DOTNET_ROOT. Use the
+                            // indexer (not Add) because the architecture-less DOTNET_ROOT was cleared to empty above.
+                            startInfo.EnvironmentVariables[dotnetRoot] = dotnetRootPath;
                         }
                     }
                 }
