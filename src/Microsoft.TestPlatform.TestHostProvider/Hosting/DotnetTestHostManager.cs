@@ -273,7 +273,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                     EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: Derived dotnet root '{dotnetRootPath}' (architecture '{dotnetRootArchitecture}') from the architecture-less DOTNET_ROOT.");
 
                     startInfo.EnvironmentVariables["DOTNET_ROOT"] = string.Empty;
-                    EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: DOTNET_ROOT points at architecture '{dotnetRootArchitecture}' but the testhost is '{testHostArchitecture}', clearing the ambiguous DOTNET_ROOT to avoid an architecture mismatch.");
+                    EqtTrace.Verbose($"DotnetTestHostmanager.GetTestHostProcessStartInfo: clearing the ambiguous DOTNET_ROOT to avoid an architecture mismatch.");
                 }
             }
         }
