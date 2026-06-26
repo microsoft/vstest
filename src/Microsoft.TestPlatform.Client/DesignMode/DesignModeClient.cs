@@ -327,24 +327,29 @@ public class DesignModeClient : IDesignModeClient
                 waitHandle.Set();
             };
 
-            _communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
+            try
+            {
+                _communicationManager.SendMessage(MessageType.CustomTestHostLaunch, testProcessStartInfo);
 
-            // LifeCycle of the TP through DesignModeClient is maintained by the IDEs or user-facing-clients like LUTs, who call TestPlatform
-            // TP is handing over the control of launch to these IDEs and so, TP has to wait indefinite
-            // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
-            // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
-            // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
-            WaitHandle.WaitAny([waitHandle, cancellationToken.WaitHandle]);
+                // LifeCycle of the TP through DesignModeClient is maintained by the IDEs or user-facing-clients like LUTs, who call TestPlatform
+                // TP is handing over the control of launch to these IDEs and so, TP has to wait indefinite
+                // Even if TP has a timeout here, there is no way TP can abort or stop the thread/task that is hung in IDE or LUT
+                // Even if TP can abort the API somehow, TP is essentially putting IDEs or Clients in inconsistent state without having info on
+                // Since the IDEs own user-UI-experience here, TP will let the custom host launch as much time as IDEs define it for their users
+                WaitHandle.WaitAny([waitHandle, cancellationToken.WaitHandle]);
 
-            cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
 
-            onCustomTestHostLaunchAckReceived = null;
+                TPDebug.Assert(ackMessage is not null, "ackMessage is null");
+                var ackPayload = _dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
+                TPDebug.Assert(ackPayload is not null, "ackPayload is null");
 
-            TPDebug.Assert(ackMessage is not null, "ackMessage is null");
-            var ackPayload = _dataSerializer.DeserializePayload<CustomHostLaunchAckPayload>(ackMessage);
-            TPDebug.Assert(ackPayload is not null, "ackPayload is null");
-
-            return ackPayload.HostProcessId > 0 ? ackPayload.HostProcessId : throw new TestPlatformException(ackPayload.ErrorMessage);
+                return ackPayload.HostProcessId > 0 ? ackPayload.HostProcessId : throw new TestPlatformException(ackPayload.ErrorMessage);
+            }
+            finally
+            {
+                onCustomTestHostLaunchAckReceived = null;
+            }
         }
     }
 
@@ -369,38 +374,44 @@ public class DesignModeClient : IDesignModeClient
                 waitHandle.Set();
             };
 
-            // TODO: formalize this so we can the deprecation version from the message data, and automatically switch
-            // to the new message, including type safety, where we determine T from the payload. And maybe give SendMessage
-            // a type of T as well to prevent some more mistakes.
-            if (_protocolConfig.Version < 7)
+            try
             {
-                _communicationManager.SendMessage(MessageType.EditorAttachDebugger, attachDebuggerInfo.ProcessId, _protocolConfig.Version);
-            }
-            else
-            {
-                var payload = new EditorAttachDebuggerPayload
+                // TODO: formalize this so we can the deprecation version from the message data, and automatically switch
+                // to the new message, including type safety, where we determine T from the payload. And maybe give SendMessage
+                // a type of T as well to prevent some more mistakes.
+                if (_protocolConfig.Version < 7)
                 {
-                    Sources = attachDebuggerInfo.Sources,
-                    TargetFramework = attachDebuggerInfo.TargetFramework?.ToString(),
-                    ProcessID = attachDebuggerInfo.ProcessId,
-                };
-                _communicationManager.SendMessage(MessageType.EditorAttachDebugger2, payload);
+                    _communicationManager.SendMessage(MessageType.EditorAttachDebugger, attachDebuggerInfo.ProcessId, _protocolConfig.Version);
+                }
+                else
+                {
+                    var payload = new EditorAttachDebuggerPayload
+                    {
+                        Sources = attachDebuggerInfo.Sources,
+                        TargetFramework = attachDebuggerInfo.TargetFramework?.ToString(),
+                        ProcessID = attachDebuggerInfo.ProcessId,
+                    };
+                    _communicationManager.SendMessage(MessageType.EditorAttachDebugger2, payload);
+                }
+
+                WaitHandle.WaitAny([waitHandle, cancellationToken.WaitHandle]);
+
+                cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
+
+                TPDebug.Assert(ackMessage is not null, "ackMessage is null");
+                var ackPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
+                TPDebug.Assert(ackPayload is not null, "ackPayload is null");
+                if (!ackPayload.Attached)
+                {
+                    EqtTrace.Warning($"DesignModeClient.AttachDebuggerToProcess: Attaching to process failed: {ackPayload.ErrorMessage}");
+                }
+
+                return ackPayload.Attached;
             }
-
-            WaitHandle.WaitAny([waitHandle, cancellationToken.WaitHandle]);
-
-            cancellationToken.ThrowTestPlatformExceptionIfCancellationRequested();
-            onAttachDebuggerAckRecieved = null;
-
-            TPDebug.Assert(ackMessage is not null, "ackMessage is null");
-            var ackPayload = _dataSerializer.DeserializePayload<EditorAttachDebuggerAckPayload>(ackMessage);
-            TPDebug.Assert(ackPayload is not null, "ackPayload is null");
-            if (!ackPayload.Attached)
+            finally
             {
-                EqtTrace.Warning($"DesignModeClient.AttachDebuggerToProcess: Attaching to process failed: {ackPayload.ErrorMessage}");
+                onAttachDebuggerAckRecieved = null;
             }
-
-            return ackPayload.Attached;
         }
     }
 

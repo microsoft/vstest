@@ -854,6 +854,7 @@ internal class VsTestConsoleRequestSender : ITranslationLayerRequestSender
         _communicationManager?.StopServer();
         _processExitCancellationTokenSource?.Cancel();
         _processExitCancellationTokenSource?.Dispose();
+        _processExitCancellationTokenSource = null;
         _handShakeComplete.Dispose();
     }
 
