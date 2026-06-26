@@ -25,7 +25,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// discoverable location (it lives next to the build under <c>.dotnet/dotnet-sdk-x86</c>), the x86
 /// runtime location is provided explicitly via <c>DOTNET_ROOT_X86</c> / <c>DOTNET_ROOT(x86)</c> - the
 /// same approach the existing architecture-switch acceptance tests use. The strict
-/// "fails without the fix" behavior is covered by the <c>DotnetRootEnvironmentNormalizer</c> unit tests; this
+/// "fails without the fix" behavior is covered by the <c>DotnetTestHostManagerTests</c> unit tests; this
 /// test guards the direct-invocation x86 flow end-to-end.
 /// </summary>
 [TestClass]
