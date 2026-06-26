@@ -80,6 +80,8 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // .NET Framework testhost-specific assembly loading; not applicable to the netcore testhost.
+    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void DataCollectorAssemblyLoadingShouldNotThrowErrorForFullFramework(RunnerInfo runnerInfo)
     {

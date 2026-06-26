@@ -106,6 +106,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
 
     [TestMethod]
     // TODO: this does not work with netcore testhost, why?
+    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void RunTestsWithNonDllAdapter(RunnerInfo runnerInfo)
     {
