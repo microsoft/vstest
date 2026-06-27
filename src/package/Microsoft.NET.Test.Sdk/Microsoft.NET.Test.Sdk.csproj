@@ -22,6 +22,9 @@
   <ItemGroup>
     <Compile Remove="netcoreapp\Microsoft.NET.Test.Sdk.Program.cs" />
     <None Include="netcoreapp\Microsoft.NET.Test.Sdk.Program.cs" />
+    <!-- run-as-exe: generated Main for .NET Framework test projects built as exe. -->
+    <Compile Remove="netfx\Microsoft.NET.Test.Sdk.Program.cs" />
+    <None Include="netfx\Microsoft.NET.Test.Sdk.Program.cs" />
   </ItemGroup>
 
   <!-- Package dependencies, expressed per target framework via references to the sibling packable projects.
@@ -32,7 +35,10 @@
        Microsoft.TestPlatform.TestHost.props that deploys the testhost.exe apphost). This matches the
        hand-written nuspec, whose dependencies carried no exclude. By default pack emits
        exclude="Build,Analyzers" for a ProjectReference, which would suppress those props. -->
-  <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+  <!-- net8.0 depends on TestHost for the bundled .NET runtime; net462 references it too so run-as-exe test
+       projects (OutputType=Exe) get the testhost closure and the build integration. Normal .NET Framework
+       hosting still comes from vstest.console. -->
+  <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.TestHost\Microsoft.TestPlatform.TestHost.csproj" PrivateAssets="none" />
   </ItemGroup>
   <ItemGroup>
@@ -59,8 +65,9 @@
     <None Include="netcoreapp\Microsoft.NET.Test.Sdk.Program.fs" Pack="true" PackagePath="build\net8.0\" />
     <None Include="netcoreapp\Microsoft.NET.Test.Sdk.Program.vb" Pack="true" PackagePath="build\net8.0\" />
 
-    <!-- net462 targets -->
+    <!-- net462 targets + run-as-exe generated Main -->
     <None Include="netfx\Microsoft.NET.Test.Sdk.targets" Pack="true" PackagePath="build\net462\" />
+    <None Include="netfx\Microsoft.NET.Test.Sdk.Program.cs" Pack="true" PackagePath="build\net462\" />
 
     <!-- netcoreapp2.0 / netstandard2.0 incompatibility-shim targets (root targets file) -->
     <None Include="Microsoft.NET.Test.Sdk.targets" Pack="true" PackagePath="build\netcoreapp2.0\;build\netstandard2.0\;buildMultiTargeting\netcoreapp2.0\;buildMultiTargeting\netstandard2.0\" />

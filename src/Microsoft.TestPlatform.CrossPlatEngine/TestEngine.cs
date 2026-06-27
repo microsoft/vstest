@@ -90,7 +90,7 @@ public class TestEngine : ITestEngine
         // This is a big if that figures out if we can run in process. In process run is very restricted, it is non-parallel run
         // that has the same target framework as the current process, and it also must not be running in DesignMode (server mode / under IDE)
         // and more conditions. In all other cases we run in a separate testhost process.
-        if (ShouldRunInProcess(discoveryCriteria.RunSettings!, isParallelRun, isDataCollectorEnabled: false, testHostManagers))
+        if (ShouldRunInProcess(discoveryCriteria.RunSettings!, isParallelRun, isDataCollectorEnabled: false, sourceToSourceDetailMap, testHostManagers))
         {
             // We are running in process, so whatever the architecture and framework that was figured out is, it must be compatible. If we have more
             // changes that we want to do to runsettings in the future, based on SourceDetail then it will depend on those details. But in general
@@ -217,6 +217,7 @@ public class TestEngine : ITestEngine
                 testRunCriteria.TestRunSettings,
                 isParallelRun,
                 isDataCollectorEnabled || isInProcDataCollectorEnabled,
+                sourceToSourceDetailMap,
                 testHostProviders))
         {
             // Not updating runsettings from source detail on purpose here. We are running in process, so whatever the settings we figured out at the start. They must be compatible
@@ -369,6 +370,7 @@ public class TestEngine : ITestEngine
                 testSessionCriteria.RunSettings!,
                 isParallelRun,
                 isDataCollectorEnabled || isInProcDataCollectorEnabled,
+                sourceToSourceDetailMap,
                 testRuntimeProviders))
         {
             // In this case all tests will be run in the current process (vstest.console), so there is no
@@ -449,10 +451,10 @@ public class TestEngine : ITestEngine
         // out which runtime providers would run them, and if the runtime provider is shared or not.
         mostRecentlyCreatedInstance = null;
         var testRuntimeProviders = new List<TestRuntimeProviderInfo>();
-        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}");
+        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}|{k.ExecutionPreference}");
         foreach (var runConfiguration in uniqueRunConfigurations)
         {
-            // It is okay to take the first (or any) source detail in the group. We are grouping to get the same source detail, so all architectures and frameworks are the same.
+            // It is okay to take the first (or any) source detail in the group. We are grouping on all values in the detail so we can take any.
             var sourceDetail = runConfiguration.First();
             var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(runSettings, sourceDetail);
             var sources = runConfiguration.Select(c => c.Source!).ToList();
@@ -596,11 +598,18 @@ public class TestEngine : ITestEngine
         string runsettings,
         bool isParallelEnabled,
         bool isDataCollectorEnabled,
+        IDictionary<string, SourceDetail> sourceToSourceDetailMap,
         List<TestRuntimeProviderInfo> testHostProviders)
     {
         if (testHostProviders.Count > 1)
         {
             EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run has multiple different architectures or frameworks, running in isolation (in a separate testhost proces).");
+            return false;
+        }
+
+        if (sourceToSourceDetailMap.Any(s => (s.Value.ExecutionPreference ?? ExecutionPreference.Default) != ExecutionPreference.Default))
+        {
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: At least one source has non-default execution preference, running in isolation (in a separate testhost process).");
             return false;
         }
 

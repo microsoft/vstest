@@ -77,6 +77,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private string _hostPackageVersion = "15.0.0";
     private Architecture _architecture;
     private Framework? _targetFramework;
+    private bool _runAsExe;
     private bool _isVersionCheckRequired = true;
     private string? _dotnetHostPath;
     private bool _captureOutput;
@@ -205,6 +206,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
         _dotnetHostPath = runConfiguration.DotnetHostPath;
+        _runAsExe = runConfiguration.ExecutionPreference == ExecutionPreference.RunAsExe;
     }
 
     /// <inheritdoc/>
@@ -302,6 +304,29 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         var args = string.Empty;
         var sourcePath = sources.Single();
         var sourceFile = Path.GetFileNameWithoutExtension(sourcePath);
+
+        // When the test project opted into running as its own executable (RunAsExe), use the apphost/executable
+        // that the SDK built next to the test assembly as the host instead of spawning dotnet on testhost.dll.
+        // If no executable is found we keep the default behavior (dotnet muxer / custom host path).
+        if (_runAsExe)
+        {
+            var exePath = TryGetExePathFromDll(sourcePath);
+            if (exePath != null)
+            {
+                EqtTrace.Verbose("DotnetTestHostmanager: Using executable next to source as host: {0}", exePath);
+                _dotnetHostPath = exePath;
+
+                // Tell the host process it runs as its own executable so it disables the custom assembly resolver
+                // (dependencies are next to the exe). See DefaultTestHostManager.RunAsExeEnvironmentVariableName.
+                startInfo.EnvironmentVariables ??= new Dictionary<string, string?>();
+                startInfo.EnvironmentVariables[DefaultTestHostManager.RunAsExeEnvironmentVariableName] = "1";
+            }
+            else
+            {
+                EqtTrace.Verbose("DotnetTestHostmanager: RunAsExe was requested but no executable was found next to {0}, falling back to the default dotnet host.", sourcePath);
+            }
+        }
+
         var sourceDirectory = Path.GetDirectoryName(sourcePath)!;
 
         // Probe for runtime config and deps file for the test source
@@ -1162,5 +1187,16 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         }
 
         return testHostPath;
+    }
+
+    internal static string? TryGetExePathFromDll(string sourcePath)
+    {
+        if (Path.GetExtension(sourcePath) != ".dll")
+        {
+            return null;
+        }
+
+        var exe = Path.ChangeExtension(sourcePath, ".exe"); // todo: linux macos
+        return File.Exists(exe) ? exe : null;
     }
 }

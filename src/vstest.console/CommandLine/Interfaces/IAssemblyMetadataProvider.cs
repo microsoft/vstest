@@ -21,4 +21,6 @@ internal interface IAssemblyMetadataProvider
     /// Determines Architecture from filePath.
     /// </summary>
     Architecture GetArchitecture(string filePath);
+
+    bool HasRunAsExe(string filePath);
 }

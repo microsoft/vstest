@@ -92,6 +92,23 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         return archType;
     }
 
+    /// <inheritdoc />
+    public bool HasRunAsExe(string filePath)
+    {
+        try
+        {
+            using var assemblyStream = _fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
+            var result = GetRunAsExeFromAssemblyMetadata(assemblyStream);
+            EqtTrace.Info("AssemblyMetadataProvider.HasRunAsExe: RunAsExe:'{0}' for source: '{1}'", result, filePath);
+            return result;
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Warning("AssemblyMetadataProvider.HasRunAsExe: failed to determine RunAsExe exception: {0} for assembly: {1}", ex, filePath);
+            return false;
+        }
+    }
+
     private Architecture GetArchitectureFromAssemblyMetadata(string path)
     {
         Architecture arch = Architecture.AnyCPU;
@@ -153,6 +170,59 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         }
 
         return frameworkName;
+    }
+
+    private static bool GetRunAsExeFromAssemblyMetadata(Stream assemblyStream)
+    {
+#pragma warning disable IDE0063 // Use simple 'using' statement
+        using (var peReader = new PEReader(assemblyStream))
+        {
+            var metadataReader = peReader.GetMetadataReader();
+
+            foreach (var customAttributeHandle in metadataReader.CustomAttributes)
+            {
+                var attr = metadataReader.GetCustomAttribute(customAttributeHandle);
+
+                // Display the attribute type full name
+                StringHandle? typeNameHandle = null;
+                if (attr.Constructor.Kind == HandleKind.MethodDefinition)
+                {
+                    MethodDefinition methodDefinition = metadataReader.GetMethodDefinition((MethodDefinitionHandle)attr.Constructor);
+                    TypeDefinition typeDefinition = metadataReader.GetTypeDefinition(methodDefinition.GetDeclaringType());
+                    typeNameHandle = typeDefinition.Name;
+                }
+                else if (attr.Constructor.Kind == HandleKind.MemberReference)
+                {
+                    MemberReference mref = metadataReader.GetMemberReference((MemberReferenceHandle)attr.Constructor);
+
+                    if (mref.Parent.Kind == HandleKind.TypeReference)
+                    {
+                        TypeReference tref = metadataReader.GetTypeReference((TypeReferenceHandle)mref.Parent);
+                        typeNameHandle = tref.Name;
+                    }
+                    else if (mref.Parent.Kind == HandleKind.TypeDefinition)
+                    {
+                        TypeDefinition tdef = metadataReader.GetTypeDefinition((TypeDefinitionHandle)mref.Parent);
+                        typeNameHandle = tdef.Name;
+                    }
+                }
+
+                if (typeNameHandle == null)
+                {
+                    continue;
+                }
+
+                var typeName = metadataReader.GetString(typeNameHandle.Value);
+
+                if (string.Equals(typeName, "RunAsExeAttribute", StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+        }
+#pragma warning restore IDE0063 // Use simple 'using' statement
+
+        return false;
     }
 
     private Architecture MapToArchitecture(ProcessorArchitecture processorArchitecture, string assemblyPath)

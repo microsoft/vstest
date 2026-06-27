@@ -63,6 +63,14 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     private Framework? _targetFramework;
     private ITestHostLauncher? _customTestHostLauncher;
     private Process? _testHostProcess;
+    private bool _runAsExe;
+
+    /// <summary>
+    /// Environment variable used to tell the host process that it is running as its own executable (run-as-exe),
+    /// so it disables the custom assembly resolver (all dependencies are next to the exe). Kept in sync with the
+    /// reader in <c>Microsoft.VisualStudio.TestPlatform.Common.Utilities.AssemblyResolver</c>.
+    /// </summary>
+    internal const string RunAsExeEnvironmentVariableName = "VSTEST_RUNASEXE";
     private StringBuilder? _testHostProcessStdError;
     private StringBuilder? _testHostProcessStdOut;
     private IMessageLogger? _messageLogger;
@@ -180,26 +188,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
     {
         TPDebug.Assert(IsInitialized, "Initialize must have been called before GetTestHostProcessStartInfo");
 
-        string testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
-
-        var currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).Assembly.Location);
         var argumentsString = " " + connectionInfo.ToCommandLineOptions();
-
-        TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
-
-        // check in current location for testhost exe
-        var testhostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
-
-        var originalTestHostProcessName = testHostProcessName;
-
-        if (!_fileHelper.Exists(testhostProcessPath))
-        {
-            // We assume that we could not find testhost.exe in the root folder so we are going to lookup in the
-            // TestHostNetFramework folder (assuming we are currently running under .NET) or in dotnet SDK
-            // context.
-            testHostProcessName = Path.Combine("TestHostNetFramework", originalTestHostProcessName);
-            testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
-        }
 
         if (_disableAppDomain)
         {
@@ -208,9 +197,70 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
             argumentsString += " --testsourcepath " + sources.FirstOrDefault()?.AddDoubleQuote();
         }
 
-        EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Trying to use {0} from {1}", originalTestHostProcessName, testhostProcessPath);
+        string originalTestHostProcessName;
+        string testHostProcessPath;
+        string? currentWorkingDirectory;
 
-        var launcherPath = testhostProcessPath;
+        // When the test project opted into running as its own executable (RunAsExe) it builds an executable next
+        // to its test assembly that hosts the test framework directly. In that case we use that executable as the
+        // testhost instead of the built-in testhost.exe. Running as exe is only valid for a non-shared host (a
+        // single source per process) with appdomains disabled. If the executable cannot be found we fall back to
+        // the built-in testhost below.
+        string? exeNextToSource = null;
+        if (_runAsExe && !Shared && _disableAppDomain)
+        {
+            var sourcePath = sources.Single();
+            var candidate = Path.Combine(Path.GetDirectoryName(sourcePath)!, Path.GetFileName(Path.ChangeExtension(sourcePath, ".exe")));
+            if (_fileHelper.Exists(candidate))
+            {
+                exeNextToSource = candidate;
+            }
+            else
+            {
+                EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: RunAsExe was requested but no executable was found at {0}, falling back to the built-in testhost.", candidate);
+            }
+        }
+
+        if (exeNextToSource != null)
+        {
+            EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Using executable next to source as testhost: {0}", exeNextToSource);
+            originalTestHostProcessName = Path.GetFileName(exeNextToSource);
+            testHostProcessPath = exeNextToSource;
+            currentWorkingDirectory = Path.GetDirectoryName(exeNextToSource);
+
+            // The test project runs as its own executable (run-as-exe). Tell the host process to disable the
+            // custom assembly resolver: in this mode every dependency lives next to the exe (the app base) and is
+            // resolved by the runtime + app.config binding redirects, so we must not resolve dependencies from
+            // other locations/versions (which would mix dependencies). The host reads this via AssemblyResolver.
+            environmentVariables ??= new Dictionary<string, string?>();
+            environmentVariables[RunAsExeEnvironmentVariableName] = "1";
+        }
+        else
+        {
+            var testHostProcessName = GetTestHostName(_architecture, _targetFramework, _processHelper.GetCurrentProcessArchitecture());
+            currentWorkingDirectory = Path.GetDirectoryName(typeof(DefaultTestHostManager).Assembly.Location);
+            TPDebug.Assert(currentWorkingDirectory is not null, "Current working directory must not be null.");
+
+            // check in current location for testhost exe
+            testHostProcessPath = Path.Combine(currentWorkingDirectory, testHostProcessName);
+
+            originalTestHostProcessName = testHostProcessName;
+
+            if (!_fileHelper.Exists(testHostProcessPath))
+            {
+                // We assume that we could not find testhost.exe in the root folder so we are going to lookup in the
+                // TestHostNetFramework folder (assuming we are currently running under .NET) or in dotnet SDK
+                // context.
+                testHostProcessName = Path.Combine("TestHostNetFramework", originalTestHostProcessName);
+                testHostProcessPath = Path.Combine(currentWorkingDirectory, "..", testHostProcessName);
+            }
+        }
+
+        TPDebug.Assert(currentWorkingDirectory is not null, "currentWorkingDirectory must not be null.");
+
+        EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Trying to use {0} from {1}", originalTestHostProcessName, testHostProcessPath);
+
+        var launcherPath = testHostProcessPath;
         var processName = _processHelper.GetCurrentProcessFileName();
         if (processName is not null)
         {
@@ -218,7 +268,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                 && !processName.EndsWith(DotnetHostHelper.MONOEXENAME, StringComparison.OrdinalIgnoreCase))
             {
                 launcherPath = _dotnetHostHelper.GetMonoPath();
-                argumentsString = testhostProcessPath.AddDoubleQuote() + " " + argumentsString;
+                argumentsString = testHostProcessPath.AddDoubleQuote() + " " + argumentsString;
             }
             else
             {
@@ -226,11 +276,11 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
                 if (_environment.OperatingSystem.Equals(PlatformOperatingSystem.Windows)
                     && !(processName.EndsWith("dotnet", StringComparison.OrdinalIgnoreCase)
                         || processName.EndsWith("dotnet.exe", StringComparison.OrdinalIgnoreCase))
-                    && !File.Exists(testhostProcessPath))
+                    && !File.Exists(testHostProcessPath))
                 {
-                    testhostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
-                    EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Could not find {0} in previous location, now using {1}", originalTestHostProcessName, testhostProcessPath);
-                    launcherPath = testhostProcessPath;
+                    testHostProcessPath = Path.Combine(currentWorkingDirectory, "..", originalTestHostProcessName);
+                    EqtTrace.Verbose("DefaultTestHostmanager.GetTestHostProcessStartInfo: Could not find {0} in previous location, now using {1}", originalTestHostProcessName, testHostProcessPath);
+                    launcherPath = testHostProcessPath;
                 }
             }
         }
@@ -382,6 +432,7 @@ public class DefaultTestHostManager : ITestRuntimeProvider2
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
         _testHostProcess = null;
+        _runAsExe = runConfiguration.ExecutionPreference == ExecutionPreference.RunAsExe;
 
         _disableAppDomain = runConfiguration.DisableAppDomain;
         // If appdomains are disabled the host cannot be shared, because sharing means loading multiple assemblies

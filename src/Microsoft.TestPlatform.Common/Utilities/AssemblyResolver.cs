@@ -34,6 +34,15 @@ internal class AssemblyResolver : IDisposable
     private Stack<string>? _currentlyResolvingResources;
 
     /// <summary>
+    /// When true, the test project is running as its own executable (run-as-exe), so the custom resolver is
+    /// disabled: every dependency lives next to the exe (the app base) and is resolved by the runtime +
+    /// app.config binding redirects. Resolving from the adapter/extension directories here would let us load
+    /// dependencies from other locations or versions (mixing dependencies), which is exactly what run-as-exe
+    /// avoids.
+    /// </summary>
+    private readonly bool _isRunningAsExe;
+
+    /// <summary>
     /// Assembly resolver for platform
     /// </summary>
     private readonly IAssemblyResolver _platformAssemblyResolver;
@@ -52,6 +61,14 @@ internal class AssemblyResolver : IDisposable
         EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
 
         _searchDirectories = directories == null || !directories.Any() ? new HashSet<string>() : new HashSet<string>(directories);
+
+        // The test host manager sets VSTEST_RUNASEXE when it launches a test project that runs as its own
+        // executable. In that mode the custom resolver is disabled (see the field documentation).
+        _isRunningAsExe = RunAsExeHelper.IsRunningAsExe;
+        if (_isRunningAsExe)
+        {
+            EqtTrace.Info("AssemblyResolver.ctor: Running as exe, custom assembly resolver is disabled (dependencies are resolved from the executable's own folder).");
+        }
 
         _platformAssemblyResolver = new PlatformAssemblyResolver();
         _platformAssemblyLoadContext = new PlatformAssemblyLoadContext();
@@ -82,6 +99,16 @@ internal class AssemblyResolver : IDisposable
     /// </returns>
     private Assembly? OnResolve(object? sender, AssemblyResolveEventArgs? args)
     {
+        if (_isRunningAsExe)
+        {
+            // Running as exe: the dependency is expected to be next to the exe and resolved by the runtime. The
+            // fact that we got here means the runtime could not resolve it on its own; we still decline so we
+            // don't mix dependencies. The trace below surfaces exactly which assembly was missing from the app
+            // base, which is useful when validating that everything ships next to a run-as-exe test project.
+            EqtTrace.Verbose("AssemblyResolver.OnResolve: Running as exe, custom resolver disabled; not resolving '{0}'.", args?.Name);
+            return null;
+        }
+
         if (StringUtils.IsNullOrEmpty(args?.Name))
         {
             Debug.Fail("AssemblyResolver.OnResolve: args.Name is null or empty.");

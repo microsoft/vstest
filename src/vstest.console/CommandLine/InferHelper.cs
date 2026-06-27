@@ -166,10 +166,26 @@ internal class InferHelper
 
             try
             {
-                FrameworkName fx;
+                FrameworkName fx = new(Framework.DefaultFramework.Name);
                 if (IsDllOrExe(source))
                 {
-                    fx = _assemblyMetadataProvider.GetFrameworkName(source);
+                    var extension = Path.GetExtension(source);
+                    if (extension is ".exe" or "")
+                    {
+                        var dll = Path.ChangeExtension(source, ".dll");
+                        if (File.Exists(dll))
+                        {
+                            fx = _assemblyMetadataProvider.GetFrameworkName(dll);
+                        }
+                        else
+                        {
+                            fx = _assemblyMetadataProvider.GetFrameworkName(source);
+                        }
+                    }
+                    else
+                    {
+                        fx = _assemblyMetadataProvider.GetFrameworkName(source);
+                    }
                 }
                 else
                 {
@@ -230,5 +246,46 @@ internal class InferHelper
         var extType = Path.GetExtension(filePath);
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
                                    extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
+    }
+
+    internal void DetectRunAsExe(IList<string>? sources, out IDictionary<string, ExecutionPreference> sourceToExecutionPreferenceMap)
+    {
+        sourceToExecutionPreferenceMap = new Dictionary<string, ExecutionPreference>();
+
+        if (sources == null || sources.Count == 0)
+            return;
+
+        DetermineRunAsExe(sources, out sourceToExecutionPreferenceMap);
+    }
+
+    private void DetermineRunAsExe(IEnumerable<string?> sources, out IDictionary<string, ExecutionPreference> sourceToExecutionPreferenceMap)
+    {
+        sourceToExecutionPreferenceMap = new Dictionary<string, ExecutionPreference>();
+
+        foreach (var source in sources)
+        {
+            if (source is null)
+            {
+                continue;
+            }
+
+            ExecutionPreference preference;
+            if (IsDllOrExe(source))
+            {
+                // A test framework opts into running the test project as its own executable by adding the
+                // [RunAsExe] assembly attribute to the test assembly. When present we prefer running the exe
+                // that the project built next to its assembly instead of spawning the built-in testhost.
+                // When the attribute is absent we keep the default behavior (built-in testhost).
+                var optedIn = _assemblyMetadataProvider.HasRunAsExe(source);
+                preference = optedIn ? ExecutionPreference.RunAsExe : ExecutionPreference.Default;
+                EqtTrace.Info("InferHelper.DetermineRunAsExe: source '{0}' [RunAsExe] opt-in={1}, execution preference={2}.", source, optedIn, preference);
+            }
+            else
+            {
+                preference = ExecutionPreference.Default;
+            }
+
+            sourceToExecutionPreferenceMap.Add(source, preference);
+        }
     }
 }

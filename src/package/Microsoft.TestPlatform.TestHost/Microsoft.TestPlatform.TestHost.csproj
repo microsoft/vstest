@@ -19,15 +19,21 @@
     <!-- NU5128: net462 ships an empty dependency group; NU5100: bundled assemblies live under lib\ and
          build\ rather than being the project's own build output. -->
     <NoWarn>$(NoWarn);NU5128;NU5100</NoWarn>
-    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeTestHostContent</TargetsForTfmSpecificContentInPackage>
+    <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);IncludeTestHostContent;IncludeRunAsExeContent</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
 
   <ItemGroup>
     <ProjectReference Include="$(RepoRoot)src\testhost\testhost.csproj" PrivateAssets="all" />
     <ProjectReference Include="$(RepoRoot)src\testhost.x86\testhost.x86.csproj" PrivateAssets="all" />
-    <!-- ObjectModel ships as its own package, so it is a real dependency for the .NET build. -->
-    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj"
-                      Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetCoreAppMinimum)')) " />
+    <!-- ObjectModel ships as its own package, so it is a real dependency. net8.0 needs it for the bundled
+         runtime; net462 needs it so run-as-exe test projects can reference the [RunAsExe] attribute (which lives
+         in ObjectModel) at compile time, and so NuGet unifies ObjectModel to this version. -->
+    <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
+    <!-- run-as-exe: a referenceable .NET Framework testhost.dll (OutputType=Library, AssemblyName=testhost),
+         bundled privately so net462 test projects built as exe can reference the testhost entry point. It is
+         dropped from the package dependency list by RemoveTestHostProjectDependencies below. -->
+    <ProjectReference Include="$(RepoRoot)src\testhost.library\testhost.library.csproj"
+                      Condition=" '$(TargetFramework)' == 'net462' " PrivateAssets="all" />
   </ItemGroup>
 
   <!-- The testhost executables are bundled as content, not consumed as packages, so they must not
@@ -36,7 +42,7 @@
   <Target Name="RemoveTestHostProjectDependencies" BeforeTargets="GenerateNuspec">
     <ItemGroup>
       <_ProjectReferencesWithVersions Remove="@(_ProjectReferencesWithVersions)"
-                                      Condition=" '%(Filename)' == 'testhost' or '%(Filename)' == 'testhost.x86' " />
+                                      Condition=" '%(Filename)' == 'testhost' or '%(Filename)' == 'testhost.x86' or '%(Filename)' == 'testhost.library' " />
     </ItemGroup>
   </Target>
 
@@ -73,6 +79,9 @@
     <None Include="$(SrcPackageFolder)ThirdPartyNotices.txt" Pack="true" PackagePath="" />
     <!-- .NET Framework consumers get the testhost shipped with vstest.console, so only a stub is needed. -->
     <None Include="_._" Pack="true" PackagePath="lib\net462\" />
+    <!-- run-as-exe: net462 build integration (Exe-conditional testhost reference + closure copy). -->
+    <None Include="build\net462\Microsoft.TestPlatform.TestHost.props" Pack="true" PackagePath="build\net462\" />
+    <None Include="build\net462\Microsoft.TestPlatform.TestHost.targets" Pack="true" PackagePath="build\net462\" />
   </ItemGroup>
 
   <!-- Bundle the .NET testhost runtime output: the platform assemblies and satellites in lib\net8.0,
@@ -109,6 +118,30 @@
       <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
       <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" PackagePath="lib/$(TargetFramework)/" />
       <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+    </ItemGroup>
+  </Target>
+
+  <!-- run-as-exe: .NET Framework testhost closure, shipped under build\net462\runAsExe\ (NOT lib\, so it is
+       never auto-referenced). The build\net462 targets reference testhost.dll and copy this closure next to the
+       test output only for projects that opted into OutputType=Exe. Runs in the net462 inner build. -->
+  <Target Name="IncludeRunAsExeContent"
+          Condition=" '$(TargetFramework)' == 'net462' "
+          Returns="@(TfmSpecificPackageFile)">
+    <ItemGroup>
+      <!-- Platform assemblies (everything except this package's own TestHost assembly). -->
+      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.VisualStudio.TestPlatform.*.dll" PackagePath="build/net462/runAsExe/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.*.dll"
+                              Exclude="$(OutputPath)Microsoft.TestPlatform.TestHost.dll"
+                              PackagePath="build/net462/runAsExe/" />
+      <!-- The referenceable testhost.dll (from testhost.library). -->
+      <TfmSpecificPackageFile Include="$(OutputPath)testhost.dll" PackagePath="build/net462/runAsExe/" />
+      <!-- msdia natives. -->
+      <TfmSpecificPackageFile Include="$(OutputPath)x86\msdia140.dll" PackagePath="build/net462/runAsExe/x86/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)x64\msdia140.dll" PackagePath="build/net462/runAsExe/x64/" />
+      <!-- Satellite resources for the bundled assemblies. -->
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" PackagePath="build/net462/runAsExe/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CrossPlatEngine.resources.dll" PackagePath="build/net462/runAsExe/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" PackagePath="build/net462/runAsExe/" />
     </ItemGroup>
   </Target>
 </Project>

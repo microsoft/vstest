@@ -46,6 +46,7 @@
     <Project Path="src/testhost.arm64/testhost.arm64.csproj" />
     <Project Path="src/testhost.x86/testhost.x86.csproj" />
     <Project Path="src/testhost/testhost.csproj" />
+    <Project Path="src/testhost.library/testhost.library.csproj" />
     <Project Path="src/vstest.console.arm64/vstest.console.arm64.csproj" />
     <Project Path="src/vstest.console/vstest.console.csproj" />
   </Folder>

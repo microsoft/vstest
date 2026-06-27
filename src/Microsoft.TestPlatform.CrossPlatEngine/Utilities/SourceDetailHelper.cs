@@ -21,7 +21,15 @@ internal static class SourceDetailHelper
         var navigator = document.CreateNavigator();
 
         InferRunSettingsHelper.UpdateTargetFramework(document, sourceDetail.Framework!.ToString(), overwrite: true);
-        InferRunSettingsHelper.UpdateTargetPlatform(document, sourceDetail.Architecture.ToString(), overwrite: true);
+        InferRunSettingsHelper.UpdateTargetPlatform(document, sourceDetail.Architecture.GetValueOrDefault().ToString(), overwrite: true);
+
+        if (sourceDetail.ExecutionPreference == ExecutionPreference.RunAsExe)
+        {
+            // When running as executable it makes no sense to pass the test app config to the exe to load it, this happens automatically
+            // when we run the exe thanks to runtime.
+            InferRunSettingsHelper.UpdateExecutionPreference(document, sourceDetail.ExecutionPreference.GetValueOrDefault().ToString(), overwrite: true);
+            InferRunSettingsHelper.UpdateDisableAppDomain(document, true.ToString(), overwrite: true);
+        }
 
         var updatedRunSettings = navigator!.OuterXml;
         return updatedRunSettings;

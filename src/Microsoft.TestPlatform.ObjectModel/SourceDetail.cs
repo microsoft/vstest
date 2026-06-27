@@ -6,6 +6,7 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 public class SourceDetail
 {
     public string? Source { get; internal set; }
-    public Architecture Architecture { get; internal set; }
+    public Architecture? Architecture { get; internal set; }
     public Framework? Framework { get; internal set; }
+    public ExecutionPreference? ExecutionPreference { get; internal set; }
 }
