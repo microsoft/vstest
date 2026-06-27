@@ -47,7 +47,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void RunAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -64,8 +64,8 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
-    [NetFullTargetFrameworkDataSource(useVsixRunner: true)]
+    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: TestHost.NetFx, vsix: true)]
     [TestCategory("Smoke")]
     public void RunAllTestsFromDlls(RunnerInfo runnerInfo)
     {
@@ -84,7 +84,7 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [WrapperCompatibilityDataSource()]
+    [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void RunAllTestsWithMixedTFMsWillRunTestsFromAllProvidedDllEvenWhenTheyMixTFMs(RunnerInfo runnerInfo)
     {
         // Arrange
@@ -109,7 +109,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -129,7 +129,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -152,7 +152,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.Net)]
     public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -171,8 +171,8 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     // This is testing the behavior of crash in testhost, run on different testhost, and just .NET runner.
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.NetFx)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -196,8 +196,8 @@ public class RunTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(useDesktopRunner: false)]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.NetFx)]
+    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -18,8 +18,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DiscoveryTests : AcceptanceTestBase
 {
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -32,8 +32,8 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useVsixRunner: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx, inProcess: true, vsix: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     [TestCategory("Smoke")]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
     {
@@ -56,7 +56,7 @@ public class DiscoveryTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
     {
         var dummyFilePath = Path.Combine(TempDirectory.Path, $"{Guid.NewGuid()}.txt");
@@ -74,8 +74,8 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: TestHost.NetFx)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -120,7 +120,7 @@ public class DiscoveryTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     public void DiscoverTestsShouldSucceedWhenAtLeastOneDllFindsRuntimeProvider(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
