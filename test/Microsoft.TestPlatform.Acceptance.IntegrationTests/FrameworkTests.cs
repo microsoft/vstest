@@ -13,7 +13,6 @@ public class FrameworkTests : AcceptanceTestBase
 {
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void FrameworkArgumentShouldWork(RunnerInfo runnerInfo)
     {
@@ -27,7 +26,6 @@ public class FrameworkTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void FrameworkShortNameArgumentShouldWork(RunnerInfo runnerInfo)
     {
@@ -69,6 +67,7 @@ public class FrameworkTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
+    // The .NET (Core) runner produces a different framework-incompatible warning on non-Windows, so keep this Windows-only.
     [TestCategory("Windows-Review")]
     public void RunSpecificTestsShouldWorkWithFrameworkInCompatibleWarning(RunnerInfo runnerInfo)
     {
