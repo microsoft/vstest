@@ -69,6 +69,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private readonly IWindowsRegistryHelper _windowsRegistryHelper;
     private readonly IEnvironmentVariableHelper _environmentVariableHelper;
 
+    private IMessageLogger? _messageLogger;
     private ITestHostLauncher? _customTestHostLauncher;
     private Process? _testHostProcess;
     private StringBuilder? _testHostProcessStdError;
@@ -201,6 +202,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         _createNoNewWindow = runConfiguration.CreateNoNewWindow;
         var forwardOutput = runConfiguration.ForwardStandardOutput;
         _testHostManagerCallbacks = new TestHostManagerCallbacks(forwardOutput, logger);
+        _messageLogger = logger;
 
         _architecture = runConfiguration.TargetPlatform;
         _targetFramework = runConfiguration.TargetFramework;
@@ -411,6 +413,15 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
             if (testHostPath.IsNullOrEmpty())
             {
                 // We still did not find testhost.dll. Try finding it next to vstest.console, (or in next to vstest.console ./TestHostNet for .NET Framework)
+
+                // If the project has a proper deps.json but testhost is not listed in it, the most likely cause is
+                // a missing reference to 'Microsoft.NET.Test.Sdk'. Warn the user to help them diagnose the failure.
+                if (_fileHelper.Exists(depsFilePath) && _fileHelper.Exists(runtimeConfigDevPath))
+                {
+                    string message = string.Format(CultureInfo.CurrentCulture, Resources.MissingTestSdkWarning, sourcePath);
+                    EqtTrace.Warning("DotnetTestHostManager.GetTestHostProcessStartInfo: {0}", message);
+                    _messageLogger?.SendMessage(TestMessageLevel.Warning, message);
+                }
 #if NETFRAMEWORK
                 var testHostNextToRunner = Path.Combine(Path.GetDirectoryName(Assembly.GetEntryAssembly()!.Location)!, "TestHostNet", "testhost.dll");
 #else
