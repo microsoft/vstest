@@ -20,7 +20,7 @@
       <trans-unit id="AvailableExtensionFormat">
         <source>    {0}</source>
         <target state="new">    {0}</target>
-        <note>{Locked}</note>
+        <note />
       </trans-unit>
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
@@ -170,7 +170,7 @@
       <trans-unit id="AvailableTestsFormat">
         <source>    {0}</source>
         <target state="new">    {0}</target>
-        <note>{Locked}</note>
+        <note />
       </trans-unit>
       <trans-unit id="RunSettingsArgumentHelp">
         <source>--Settings|/Settings:&lt;Settings File&gt;
