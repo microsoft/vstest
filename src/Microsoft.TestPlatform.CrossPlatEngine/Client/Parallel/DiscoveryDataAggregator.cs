@@ -191,34 +191,39 @@ internal sealed class DiscoveryDataAggregator
                 continue;
             }
 
-            _sourcesWithDiscoveryStatus.AddOrUpdate(source,
-                _ =>
-                {
-                    if (status != DiscoveryStatus.NotDiscovered)
-                    {
-                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Undiscovered {source} added with status: '{status}'.");
-                    }
-                    else
-                    {
-                        EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Adding {source} with status: '{status}'.");
-                    }
-
-                    return status;
-                },
-                (_, previousStatus) =>
-                {
-                    if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
-                        || previousStatus == DiscoveryStatus.PartiallyDiscovered && (status == DiscoveryStatus.NotDiscovered || status == DiscoveryStatus.SkippedDiscovery))
-                    {
-                        EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourcesWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
-                    }
-                    else if (previousStatus != status)
-                    {
-                        EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesWithStatus: Upgrading {source} status from '{previousStatus}' to '{status}'.");
-                    }
-                    return status;
-                });
+            MarkSourceWithStatus(source, status);
         }
+    }
+
+    private void MarkSourceWithStatus(string source, DiscoveryStatus status)
+    {
+        _sourcesWithDiscoveryStatus.AddOrUpdate(source,
+            _ =>
+            {
+                if (status != DiscoveryStatus.NotDiscovered)
+                {
+                    EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourceWithStatus: Undiscovered {source} added with status: '{status}'.");
+                }
+                else
+                {
+                    EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourceWithStatus: Adding {source} with status: '{status}'.");
+                }
+
+                return status;
+            },
+            (_, previousStatus) =>
+            {
+                if (previousStatus == DiscoveryStatus.FullyDiscovered && status != DiscoveryStatus.FullyDiscovered
+                    || previousStatus == DiscoveryStatus.PartiallyDiscovered && (status == DiscoveryStatus.NotDiscovered || status == DiscoveryStatus.SkippedDiscovery))
+                {
+                    EqtTrace.Warning($"DiscoveryDataAggregator.MarkSourceWithStatus: Downgrading source {source} status from '{previousStatus}' to '{status}'.");
+                }
+                else if (previousStatus != status)
+                {
+                    EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourceWithStatus: Upgrading {source} status from '{previousStatus}' to '{status}'.");
+                }
+                return status;
+            });
     }
 
     /// <summary>
@@ -252,13 +257,13 @@ internal sealed class DiscoveryDataAggregator
             // assume that the previous source was fully discovered.
             if (previousSource is null || previousSource == currentSource)
             {
-                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+                MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
             }
             else if (currentSource != previousSource)
             {
                 EqtTrace.Verbose($"DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases: Discovered test source changed from {previousSource} to {currentSource}.");
-                MarkSourcesWithStatus(new[] { previousSource }, DiscoveryStatus.FullyDiscovered);
-                MarkSourcesWithStatus(new[] { currentSource }, DiscoveryStatus.PartiallyDiscovered);
+                MarkSourceWithStatus(previousSource, DiscoveryStatus.FullyDiscovered);
+                MarkSourceWithStatus(currentSource, DiscoveryStatus.PartiallyDiscovered);
             }
 
             previousSource = currentSource;
