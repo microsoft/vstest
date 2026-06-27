@@ -22,14 +22,14 @@
 - CrossPlatEngine tests: `test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/` — TFMs: `net11.0;net481`.
 - Client `ManualResetEvent` in `TestRunRequest._runCompletionEvent` and `DiscoveryRequest._discoveryCompleted` are long-duration per-run waits — NOT hot paths; not worth changing.
 - `JsoniteConvert.DeserializeTestCase` and `DeserializeTestResult`: fixed in PR #16170 (2026-06-25) — replaced `ContainsKey`+`TryGetValue` double-hash with single `TryGetValue`; eliminates ~20K redundant hash lookups per 10K-test run.
-- `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases`: fixed in PR #aw_pr_disc_alloc (2026-06-26) — extracted `MarkSourceWithStatus` private helper; hot loop now calls it directly instead of `MarkSourcesWithStatus(new[] { source }, ...)`; eliminates ~10K `string[1]` allocations per 10K-test discovery run.
+- `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases`: fixed in PR #16177 (2026-06-26, CI green) — extracted `MarkSourceWithStatus` private helper; hot loop now calls it directly instead of `MarkSourcesWithStatus(new[] { source }, ...)`; eliminates ~10K `string[1]` allocations per 10K-test discovery run.
+- `Condition.Evaluate` slow-filter path: fixed in PR #aw_pr_cond_eval (2026-06-27) — fast path for `string` property values avoids `new string[1]` allocation per evaluated test case; affects all `~`/`!~` filters (e.g., `FullyQualifiedName~Test`); ~240KB GC pressure eliminated per 10K-test filter pass.
 
 ## Optimisation Backlog
 
 | Priority | Focus Area | Opportunity | Estimated Impact |
 |----------|------------|-------------|------------------|
 | HIGH | Build | Issue #15295 / PR #16043: `MsCoverageReferencedPathMaps` — PR already open by maintainers; monitor for merge | HIGH |
-| LOW | Code-Level | `Condition.GetPropertyValue` allocates `string[1]` per non-array property in slow-filter path | LOW |
 | LOW | Code-Level | `MsTestV1TelemetryHelper.AddTelemetry`: `ContainsKey` + `[]` double-hash (MSTest v1 users only; not a priority) | LOW |
 
 ## Completed Work
@@ -42,8 +42,9 @@
 | 2026-06-22 | #16150 (MERGED) | Replace ManualResetEvent with ManualResetEventSlim in JobQueue |
 | 2026-06-23 | #16160 (MERGED) | FastFilter.Evaluate: foreach kvp + foreach instead of Any(lambda); NO ValidForProperties change |
 | 2026-06-24 | #16165 (MERGED 2026-06-26) | Pre-allocate List<T>(InitialCapacity) in DiscoveryResultCache+TestRunCache; remove Collection<T> virtual-method layer |
-| 2026-06-25 | #16170 (open, CI green) | JsoniteConvert: replace ContainsKey+TryGetValue with single TryGetValue in DeserializeTestCase+DeserializeTestResult |
-| 2026-06-26 | #aw_pr_disc_alloc (open, CI pending) | DiscoveryDataAggregator: eliminate string[1] array per test case in discovery source tracking hot loop |
+| 2026-06-25 | #16170 (MERGED 2026-06-27) | JsoniteConvert: replace ContainsKey+TryGetValue with single TryGetValue in DeserializeTestCase+DeserializeTestResult |
+| 2026-06-26 | #16177 (open, CI green) | DiscoveryDataAggregator: eliminate string[1] array per test case in discovery source tracking hot loop |
+| 2026-06-27 | #aw_pr_cond_eval (open) | Condition.Evaluate: fast path for string property values; eliminates string[1] per test case with ~/!~ filters |
 
 ## Backlog Cursor
 
@@ -52,4 +53,4 @@
 
 ## Last Run
 
-- 2026-06-26: Task 4 (PR #16165 MERGED, PR #16170 CI green awaiting review), Task 2 (scanned DiscoveryDataAggregator — found string[1] allocation per test case in discovery hot loop), Task 3 (created PR disc-alloc: eliminates ~10K string[1] allocations per 10K-test run; 0 failures in CrossPlatEngine.UnitTests), Task 7 (monthly summary updated: PR #16165 marked MERGED, #aw_pr_ipc_deser→#16170, new PR #aw_pr_disc_alloc added)
+- 2026-06-27: Task 4 (PR #16170 MERGED; PR #16177 CI green awaiting review), Task 2 (scanned Condition.Evaluate slow-filter path — found string[1] per test case for single-string properties), Task 3 (created PR #aw_pr_cond_eval: fast path for string values in Condition.Evaluate; eliminates ~240KB GC pressure per 10K-test filter pass; 73/73 + 45/45 tests pass), Task 7 (monthly summary updated)
