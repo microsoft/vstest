@@ -4,6 +4,7 @@
 using System.Collections.Generic;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -124,5 +125,26 @@ public class DiscoveryDataAggregatorRegressionTests
         // Status should still be NotDiscovered since update was skipped
         var result = aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
         Assert.HasCount(1, result);
+    }
+
+    // Pins the _isMessageSent guard for MarkSourcesBasedOnDiscoveredTestCases
+    [TestMethod]
+    public void MarkSourcesBasedOnDiscoveredTestCases_AfterMessageSent_ShouldSkipUpdate()
+    {
+        var aggregator = new DiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(new[] { "test.dll" }, DiscoveryStatus.NotDiscovered);
+
+        // Mark message as sent before the batch arrives
+        aggregator.TryAggregateIsMessageSent();
+
+        // This batch should be entirely skipped since message was already sent
+        var testCases = new[] { new TestCase { Source = "test.dll" } };
+        aggregator.MarkSourcesBasedOnDiscoveredTestCases(null, testCases);
+
+        // Status should still be NotDiscovered, not PartiallyDiscovered
+        var notDiscovered = aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered);
+        var partiallyDiscovered = aggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered);
+        Assert.HasCount(1, notDiscovered);
+        Assert.IsEmpty(partiallyDiscovered);
     }
 }

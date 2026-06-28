@@ -250,6 +250,12 @@ internal sealed class DiscoveryDataAggregator
 
         foreach (var testCase in testCases)
         {
+            if (_isMessageSent == 1)
+            {
+                EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases: Message was already sent so skipping remaining source updates.");
+                return previousSource;
+            }
+
             var currentSource = testCase.Source;
 
             // We rely on the fact that sources are processed in a sequential way, which
