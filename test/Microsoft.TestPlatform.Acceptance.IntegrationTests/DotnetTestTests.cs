@@ -118,8 +118,6 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     [Ignore("TODO: This scenario is broken in real environment as well (running with shipped `dotnet test`. Old tests (before arcade) use location of vstest.console that have more dlls in place than what we ship, and they make it work.")]
     public void RunDotnetTestWithNativeDll(RunnerInfo runnerInfo)
