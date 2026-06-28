@@ -22,8 +22,9 @@
 - CrossPlatEngine tests: `test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/` — TFMs: `net11.0;net481`.
 - Client `ManualResetEvent` in `TestRunRequest._runCompletionEvent` and `DiscoveryRequest._discoveryCompleted` are long-duration per-run waits — NOT hot paths; not worth changing.
 - `JsoniteConvert.DeserializeTestCase` and `DeserializeTestResult`: fixed in PR #16170 (2026-06-25) — replaced `ContainsKey`+`TryGetValue` double-hash with single `TryGetValue`; eliminates ~20K redundant hash lookups per 10K-test run.
-- `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases`: fixed in PR #16177 (2026-06-26, CI green) — extracted `MarkSourceWithStatus` private helper; hot loop now calls it directly instead of `MarkSourcesWithStatus(new[] { source }, ...)`; eliminates ~10K `string[1]` allocations per 10K-test discovery run.
-- `Condition.Evaluate` slow-filter path: fixed in PR #aw_pr_cond_eval (2026-06-27) — fast path for `string` property values avoids `new string[1]` allocation per evaluated test case; affects all `~`/`!~` filters (e.g., `FullyQualifiedName~Test`); ~240KB GC pressure eliminated per 10K-test filter pass.
+- `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases`: fixed in PR #16177 (2026-06-26, CI green; 2026-06-28 fix pushed: per-test-case `_isMessageSent` guard restored inside foreach loop per code review; new test added) — extracted `MarkSourceWithStatus` private helper; hot loop now calls it directly instead of `MarkSourcesWithStatus(new[] { source }, ...)`; eliminates ~10K `string[1]` allocations per 10K-test discovery run.
+- `Condition.Evaluate` slow-filter path: fixed in PR #16179 (2026-06-27) — fast path for `string` property values avoids `new string[1]` allocation per evaluated test case; affects all `~`/`!~` filters (e.g., `FullyQualifiedName~Test`); ~240KB GC pressure eliminated per 10K-test filter pass.
+- `FilterExpression.Evaluate` slow-filter path: fixed in PR #aw_pr_fexpr (2026-06-28) — leaf-node fast path avoids `IterateFilterExpression` allocation (2× `Stack<T>` ~48B each + lambda ~32B = ~128B per test case) for single-condition nodes; most common `~` filter (`FullyQualifiedName~Test`) is always a leaf. ~1.25MB GC pressure eliminated per 10K-test `~` filter pass.
 
 ## Optimisation Backlog
 
@@ -44,7 +45,9 @@
 | 2026-06-24 | #16165 (MERGED 2026-06-26) | Pre-allocate List<T>(InitialCapacity) in DiscoveryResultCache+TestRunCache; remove Collection<T> virtual-method layer |
 | 2026-06-25 | #16170 (MERGED 2026-06-27) | JsoniteConvert: replace ContainsKey+TryGetValue with single TryGetValue in DeserializeTestCase+DeserializeTestResult |
 | 2026-06-26 | #16177 (open, CI green) | DiscoveryDataAggregator: eliminate string[1] array per test case in discovery source tracking hot loop |
-| 2026-06-27 | #aw_pr_cond_eval (open) | Condition.Evaluate: fast path for string property values; eliminates string[1] per test case with ~/!~ filters |
+| 2026-06-27 | #16179 (open, CI green) | Condition.Evaluate: fast path for string property values; eliminates string[1] per test case with ~/!~ filters |
+| 2026-06-28 | #aw_pr_fexpr (open) | FilterExpression.Evaluate: leaf-node fast path; avoids 2×Stack + lambda per test case in all ~ filters; ~1.25MB GC pressure eliminated per 10K-test run |
+| 2026-06-28 | #16177 (fix pushed) | DiscoveryDataAggregator: restored per-test-case _isMessageSent guard inside foreach loop (reviewer feedback fix); added pinning test |
 
 ## Backlog Cursor
 
@@ -53,4 +56,4 @@
 
 ## Last Run
 
-- 2026-06-27: Task 4 (PR #16170 MERGED; PR #16177 CI green awaiting review), Task 2 (scanned Condition.Evaluate slow-filter path — found string[1] per test case for single-string properties), Task 3 (created PR #aw_pr_cond_eval: fast path for string values in Condition.Evaluate; eliminates ~240KB GC pressure per 10K-test filter pass; 73/73 + 45/45 tests pass), Task 7 (monthly summary updated)
+- 2026-06-28: Task 4 (PR #16177: pushed fix for per-test-case `_isMessageSent` guard inside loop + new pinning test; PR #16179: CI green, clean expert review — no action needed), Task 3 (scanned FilterExpression.Evaluate: leaf-node fast path created in PR #aw_pr_fexpr; eliminates 2×Stack+lambda ~128B per test case with `FullyQualifiedName~Test`-style filters; ~1.25MB GC per 10K-test run), Task 7 (monthly summary updated, issue #16140)
