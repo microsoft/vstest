@@ -17,11 +17,6 @@
         <target state="translated">以下测试执行外接程序可用:</target>
         <note />
       </trans-unit>
-      <trans-unit id="AvailableExtensionFormat">
-        <source>    {0}</source>
-        <target state="new">    {0}</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
         <target state="translated">        {0}: {1}</target>
@@ -164,11 +159,6 @@
       <trans-unit id="AvailableSettingsProvidersHeaderMessage">
         <source>The following Settings Providers Add-Ins are available:</source>
         <target state="translated">以下设置提供程序外接程序可用:</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AvailableTestsFormat">
-        <source>    {0}</source>
-        <target state="new">    {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="RunSettingsArgumentHelp">

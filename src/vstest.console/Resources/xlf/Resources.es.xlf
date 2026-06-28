@@ -17,11 +17,6 @@
         <target state="translated">Los siguientes complementos de ejecución de pruebas están disponibles:</target>
         <note />
       </trans-unit>
-      <trans-unit id="AvailableExtensionFormat">
-        <source>    {0}</source>
-        <target state="new">    {0}</target>
-        <note />
-      </trans-unit>
       <trans-unit id="AvailableExtensionsMetadataFormat">
         <source>        {0}: {1}</source>
         <target state="translated">        {0}: {1}</target>
@@ -165,11 +160,6 @@
       <trans-unit id="AvailableSettingsProvidersHeaderMessage">
         <source>The following Settings Providers Add-Ins are available:</source>
         <target state="translated">Los siguientes complementos de proveedores de configuración están disponibles:</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="AvailableTestsFormat">
-        <source>    {0}</source>
-        <target state="new">    {0}</target>
         <note />
       </trans-unit>
       <trans-unit id="RunSettingsArgumentHelp">
