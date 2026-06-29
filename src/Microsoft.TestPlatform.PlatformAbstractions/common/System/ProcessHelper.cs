@@ -7,9 +7,7 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Threading;
-#if !NET
 using System.Threading.Tasks;
-#endif
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 
@@ -22,6 +20,14 @@ public partial class ProcessHelper : IProcessHelper
 {
     private static readonly string Arm = "arm";
     private readonly Process _currentProcess = Process.GetCurrentProcess();
+
+    // Bounded time (ms) we wait for a crashed process's redirected stderr to reach EOF before reading it,
+    // so a late-delivered crash callstack (e.g. "Stack overflow.") is not dropped. See the Exited handler.
+    private const int CrashErrorDrainTimeout = 5000;
+
+    // Bounded time (ms) we wait for stderr to drain after a clean exit, kept short so neither the common
+    // case nor the rare grandchild-keeps-the-pipe-open case adds latency. See the Exited handler.
+    private const int CleanExitErrorDrainTimeout = 500;
 
 #if !NET
     private readonly IEnvironment _environment;
@@ -127,20 +133,22 @@ public partial class ProcessHelper : IProcessHelper
                 process.OutputDataReceived += (sender, args) => outputCallBack(sender as Process, args.Data);
             }
 
-            // Set once the redirected stderr stream reaches EOF (signaled by a null Data event,
+            // Completed once the redirected stderr stream reaches EOF (signaled by a null Data event,
             // which is raised after all stderr lines have been handed to errorCallback). This is
             // the only reliable signal that the asynchronously-collected error output is complete:
             // neither WaitForExit(timeout) nor WaitForExitAsync guarantees the ErrorDataReceived
-            // callbacks have run. The exit handler below waits (bounded) on this before reading.
-            ManualResetEventSlim? errorStreamClosed = null;
+            // callbacks have run. The exit handler below awaits (bounded) on this before reading.
+            TaskCompletionSource<bool>? errorStreamClosed = null;
             if (errorCallback != null)
             {
-                errorStreamClosed = new ManualResetEventSlim(initialState: false);
+                // RunContinuationsAsynchronously so completing this from the ErrorDataReceived callback does not
+                // inline the exit handler's continuation onto the stderr-reader thread.
+                errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
                 process.ErrorDataReceived += (sender, args) =>
                 {
                     if (args.Data is null)
                     {
-                        errorStreamClosed.Set();
+                        errorStreamClosed.TrySetResult(true);
                     }
 
                     errorCallback(sender as Process, args.Data);
@@ -151,8 +159,8 @@ public partial class ProcessHelper : IProcessHelper
             {
                 process.Exited += async (sender, args) =>
                 {
-                    const int timeout = 500;
-                    var stopwatch = Stopwatch.StartNew();
+                    // Bounded time we give the process to fully exit after we are notified of its exit.
+                    const int processExitTimeout = 500;
 
                     if (sender is Process p)
                     {
@@ -172,7 +180,7 @@ public partial class ProcessHelper : IProcessHelper
                             //
                             // For older frameworks, the solution is more tricky but it seems we can get the expected
                             // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
-                            var cts = new CancellationTokenSource(timeout);
+                            var cts = new CancellationTokenSource(processExitTimeout);
 #if NET
                             await p.WaitForExitAsync(cts.Token);
 #else
@@ -191,7 +199,7 @@ public partial class ProcessHelper : IProcessHelper
                             // the testhost to become a zombie process in the first place.
                             if (_environment.OperatingSystem is PlatformOperatingSystem.Windows)
                             {
-                                p.WaitForExit(timeout);
+                                p.WaitForExit(processExitTimeout);
                             }
                             else
                             {
@@ -222,12 +230,27 @@ public partial class ProcessHelper : IProcessHelper
                             // the exit) or InvalidOperationException.
                         }
 
-                        // The process has exited. Within the SAME bounded budget used above, wait for the
-                        // redirected stderr to reach EOF so that asynchronously-collected error output
-                        // (e.g. a testhost crash callstack such as "Stack overflow.") is complete before the
-                        // exit callback consumes it. WaitForExit(timeout)/WaitForExitAsync do not guarantee
-                        // the ErrorDataReceived callbacks have run.
-                        WaitForErrorStreamToDrain(errorStreamClosed, timeout, stopwatch.ElapsedMilliseconds);
+                        // The process has exited. Asynchronously wait (bounded) for the redirected stderr to reach
+                        // EOF so that asynchronously-collected error output (e.g. a testhost crash callstack such as
+                        // "Stack overflow.") is complete before the exit callback consumes it.
+                        // WaitForExit(timeout)/WaitForExitAsync do not guarantee the ErrorDataReceived callbacks
+                        // have run.
+                        //
+                        // We await rather than block here on purpose: the crash callstack can be delivered to
+                        // ErrorDataReceived noticeably late under load (e.g. thread-pool starvation while many test
+                        // hosts run in parallel on CI), and blocking a thread-pool thread for the whole drain budget
+                        // would compete with the very ErrorDataReceived callback we are waiting for and could starve
+                        // it out. Dropping that output both produces a misleading error message and makes
+                        // RunTestsShouldThrowOnStackOverflowException flaky.
+                        //
+                        // This drain budget is intentionally separate from (and far more generous than) the
+                        // process-exit budget above, and the generous part is only spent when the process exited
+                        // abnormally. A clean exit gets only a short grace period so we never add latency to the
+                        // common case (e.g. when a grandchild process keeps the stderr pipe open and EOF never
+                        // arrives). In every case the wait returns as soon as EOF is observed, so a process that
+                        // exits and drains promptly pays almost nothing.
+                        var errorDrainTimeout = DidProcessExitCleanly(p) ? CleanExitErrorDrainTimeout : CrashErrorDrainTimeout;
+                        await WaitForErrorStreamToDrainAsync(errorStreamClosed, errorDrainTimeout).ConfigureAwait(false);
                     }
 
                     // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
@@ -252,24 +275,50 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <summary>
-    /// Waits, bounded by the time remaining in <paramref name="budgetMilliseconds"/>, for the redirected
-    /// standard error stream to reach EOF (signaled via <paramref name="errorStreamClosed"/>). This ensures
-    /// all <see cref="Process.ErrorDataReceived"/> callbacks have completed - and therefore the captured
-    /// error output is complete - before it is consumed by the exit callback. It returns immediately when
-    /// there is no redirected error stream, when it has already drained, or when the budget is already
-    /// exhausted (e.g. a grandchild process keeps the pipe open), so the caller can never hang.
+    /// Asynchronously waits, bounded by <paramref name="timeoutMilliseconds"/>, for the redirected standard
+    /// error stream to reach EOF (signaled by completing <paramref name="errorStreamClosed"/>). This ensures all
+    /// <see cref="Process.ErrorDataReceived"/> callbacks have completed - and therefore the captured error
+    /// output is complete - before it is consumed by the exit callback. It returns immediately when there is
+    /// no redirected error stream or when the timeout is not positive, and is otherwise bounded by the timeout
+    /// (e.g. a grandchild process keeps the pipe open), so the caller can never hang. It deliberately does not
+    /// block the calling thread while waiting, so it does not consume a thread-pool thread that the pending
+    /// <see cref="Process.ErrorDataReceived"/> callback may itself need in order to deliver EOF under
+    /// thread-pool starvation.
     /// </summary>
-    internal static void WaitForErrorStreamToDrain(ManualResetEventSlim? errorStreamClosed, int budgetMilliseconds, long elapsedMilliseconds)
+    internal static async Task WaitForErrorStreamToDrainAsync(TaskCompletionSource<bool>? errorStreamClosed, int timeoutMilliseconds)
     {
-        if (errorStreamClosed is null)
+        if (errorStreamClosed is null || timeoutMilliseconds <= 0)
         {
             return;
         }
 
-        var remainingMilliseconds = budgetMilliseconds - (int)elapsedMilliseconds;
-        if (remainingMilliseconds > 0)
+        using var timeoutCancellation = new CancellationTokenSource();
+        var delayTask = Task.Delay(timeoutMilliseconds, timeoutCancellation.Token);
+        var completedTask = await Task.WhenAny(errorStreamClosed.Task, delayTask).ConfigureAwait(false);
+
+        // Stop the timer as soon as the stream drains so we don't leave it pending for the whole timeout.
+        if (completedTask != delayTask)
         {
-            errorStreamClosed.Wait(remainingMilliseconds);
+            timeoutCancellation.Cancel();
+        }
+    }
+
+    /// <summary>
+    /// Returns <see langword="true"/> when the process has exited with a zero exit code. A non-zero exit code
+    /// (a crash) - or an exit code that cannot be retrieved - is treated as not-clean so the caller waits the
+    /// longer stderr drain budget and does not truncate potentially important crash output.
+    /// </summary>
+    private static bool DidProcessExitCleanly(Process process)
+    {
+        try
+        {
+            return process.HasExited && process.ExitCode == 0;
+        }
+        catch
+        {
+            // If the exit code is not retrievable (e.g. the process handle is gone), assume a crash so we
+            // give the redirected stderr the longer budget to drain.
+            return false;
         }
     }
 
