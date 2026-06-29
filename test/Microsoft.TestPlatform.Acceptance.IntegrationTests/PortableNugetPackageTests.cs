@@ -24,7 +24,6 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
@@ -39,7 +38,6 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {

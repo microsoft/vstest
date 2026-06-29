@@ -37,6 +37,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // WrapperCompatibilityDataSource includes the .NET Framework runner, which is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
     [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void RunTestsWithTestCaseFilter(RunnerInfo runnerInfo)

@@ -313,8 +313,6 @@ public class RunsettingsTests : AcceptanceTestBase
     /// </summary>
     /// <param name="runnerInfo"></param>
     [TestMethod]
-    // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.NetFx)]
     [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)

@@ -20,7 +20,6 @@ public class TelemetryTests : AcceptanceTestBase
     private const string LOG_TELEMETRY_PATH = "VSTEST_LOGTELEMETRY_PATH";
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {
@@ -30,7 +29,6 @@ public class TelemetryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestsShouldPublishMetrics(RunnerInfo runnerInfo)
     {

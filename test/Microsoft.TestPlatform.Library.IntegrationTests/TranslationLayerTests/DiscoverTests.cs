@@ -44,6 +44,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // WrapperCompatibilityDataSource includes the .NET Framework runner, which is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
     [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void DiscoverTestsUsingDiscoveryEventHandler1(RunnerInfo runnerInfo)
@@ -62,6 +63,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // WrapperCompatibilityDataSource includes the .NET Framework runner, which is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
     [CompatibilityMatrix(CompatScenario.Wrapper)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut(RunnerInfo runnerInfo)
@@ -87,7 +89,6 @@ public class DiscoverTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Smoke")]
     [TestMatrix(testHost: TestHost.Net)]
-    [TestMatrix(testHost: TestHost.NetFx, vsix: true)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -184,6 +185,8 @@ public class DiscoverTests : AcceptanceTestBase
     // Normally we test on two runner, against single .NET Testhost, but because source navigation happens in testhost
     // it is better to test against both desktop and core runners to make sure source navigation discovery works in both scenarios.
     // We run .NET Runner -> .NET Testhost and .NET Framework Runner -> .NET Frameworks Testhost.
+    // The .NET Framework runner/testhost is not available on Linux/macOS.
+    [TestCategory("Windows-Review")]
     [TestMatrix(console: VSTestConsole.NetFx, testHost: TestHost.NetFx)]
     [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)

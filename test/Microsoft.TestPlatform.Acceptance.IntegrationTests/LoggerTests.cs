@@ -16,8 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class LoggerTests : AcceptanceTestBase
 {
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -37,8 +36,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void HtmlLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -58,8 +56,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void HtmlLoggerWithFriendlyNameContainsExpectedContent(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -106,8 +103,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -147,8 +143,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedIfNoTestsExecutedAndTreatNoTestsAsErrorIsTrue(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -170,8 +165,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -193,7 +187,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedWhenDataCollectorLogsError(RunnerInfo runnerInfo)
     {
@@ -222,7 +215,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerResultSummaryOutcomeValueShouldBeCompletedWhenDataCollectorLogsErrorAndTreatErrorMessagesAsWarningsIsTrue(RunnerInfo runnerInfo)
     {
@@ -315,7 +307,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerShouldNotDoubleCountDataDrivenTestResults(RunnerInfo runnerInfo)
     {
@@ -347,7 +338,6 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void TrxLoggerShouldPlaceTrxFileInSubdirectoryWhenLogFileNameContainsPath(RunnerInfo runnerInfo)
     {

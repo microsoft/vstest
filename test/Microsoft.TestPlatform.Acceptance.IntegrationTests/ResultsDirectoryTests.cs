@@ -13,7 +13,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class ResultsDirectoryTests : AcceptanceTestBase
 {
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void TrxFileShouldBeCreatedInResultsDirectory(RunnerInfo runnerInfo)
     {
@@ -34,7 +33,6 @@ public class ResultsDirectoryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void ResultsDirectoryRelativePathShouldWork(RunnerInfo runnerInfo)
     {

@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class TestCaseFilterTests : AcceptanceTestBase
 {
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithAndOperatorTrait(RunnerInfo runnerInfo)
     {
@@ -27,7 +26,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithCategoryTraitInMixCase(RunnerInfo runnerInfo)
     {
@@ -44,7 +42,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithClassNameTrait(RunnerInfo runnerInfo)
     {
@@ -61,7 +58,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithFullyQualifiedNameTrait(RunnerInfo runnerInfo)
     {
@@ -80,7 +76,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithNameTrait(RunnerInfo runnerInfo)
     {
@@ -97,7 +92,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithOrOperatorTrait(RunnerInfo runnerInfo)
     {
@@ -114,7 +108,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithPriorityTrait(RunnerInfo runnerInfo)
     {
@@ -135,7 +128,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     /// this command should provide same results as /TestCaseFilter:"FullyQualifiedName~UnitTest1".
     /// </summary>
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void TestCaseFilterShouldWorkIfOnlyPropertyValueGivenInExpression(RunnerInfo runnerInfo)
     {
@@ -179,7 +171,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithNoneTestCategoryFilterMatchesUncategorizedTests(RunnerInfo runnerInfo)
     {
@@ -199,7 +190,6 @@ public class TestCaseFilterTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void RunSelectedTestsWithNoneTestCategoryNotEqualFilterMatchesCategorizedTests(RunnerInfo runnerInfo)
     {

@@ -25,6 +25,9 @@ public class SerializerSelectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // The .NET Framework runner (and its Jsonite serializer) only runs on Windows; the core counterpart
+    // is covered by OnNetCoreRunner_ShouldUseSystemTextJson.
+    [TestCategory("Windows-Review")]
     [TestMatrix(console: VSTestConsole.NetFx, testHost: TestHost.NetFx)]
     public void OnNetFrameworkRunner_ShouldUseJsonite(RunnerInfo runnerInfo)
     {

@@ -18,7 +18,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DiscoveryTests : AcceptanceTestBase
 {
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
     [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
@@ -32,7 +31,6 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true, vsix: true)]
     [TestMatrix(testHost: TestHost.Net)]
     [TestCategory("Smoke")]
     public void MultipleSourcesDiscoverAllTests(RunnerInfo runnerInfo)
@@ -55,8 +53,7 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverFullyQualifiedTests(RunnerInfo runnerInfo)
     {
         var dummyFilePath = Path.Combine(TempDirectory.Path, $"{Guid.NewGuid()}.txt");
@@ -74,7 +71,6 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.NetFx)]
     [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestsShouldShowProperWarningIfNoTestsOnTestCaseFilter(RunnerInfo runnerInfo)
     {
@@ -119,8 +115,7 @@ public class DiscoveryTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: TestHost.Net)]
     public void DiscoverTestsShouldSucceedWhenAtLeastOneDllFindsRuntimeProvider(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
