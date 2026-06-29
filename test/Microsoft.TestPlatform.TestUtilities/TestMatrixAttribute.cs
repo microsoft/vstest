@@ -39,7 +39,7 @@ public sealed class TestMatrixAttribute : Attribute, ITestDataSource
     /// <param name="testHost">Which testhost target framework to run against: both (default), only net481, or only net11.0.</param>
     /// <param name="inIsolation">Emit the <c>/InIsolation</c> row for the .NET Framework console × .NET Framework testhost cell (default <see langword="true"/>). Ignored for every other cell.</param>
     /// <param name="inProcess">Additionally run the .NET Framework console × .NET Framework testhost cell in-process (without <c>/InIsolation</c>). Ignored for every other cell.</param>
-    /// <param name="vsix">Additionally run the vstest.console shipped in the Visual Studio VSIX. Implies a .NET Framework console and testhost.</param>
+    /// <param name="vsix">Additively run the vstest.console shipped in the Visual Studio VSIX as its own row (a .NET Framework console and testhost), independent of the <paramref name="console"/> and <paramref name="testHost"/> axes. Windows-only.</param>
     public TestMatrixAttribute(
         VSTestConsole console = VSTestConsole.Both,
         TestHost testHost = TestHost.Both,
@@ -89,12 +89,14 @@ public sealed class TestMatrixAttribute : Attribute, ITestDataSource
                 {
                     AddRow(dataRows, IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null);
                 }
-
-                if (_vsix)
-                {
-                    AddRow(dataRows, IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null, vsixConsole: true);
-                }
             }
+        }
+
+        // The VSIX console is a .NET Framework console driving a .NET Framework testhost. `vsix: true` is
+        // additive: it always adds a VSIX run regardless of the console/testHost axes (Windows-only).
+        if (_vsix && isWindows)
+        {
+            AddRow(dataRows, IntegrationTestBase.DesktopRunnerFramework, AcceptanceTestBase.DesktopTargetFramework, inIsolationValue: null, vsixConsole: true);
         }
 
         // .NET testhost (net11.0).
