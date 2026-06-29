@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -28,6 +29,15 @@ public partial class ProcessHelper : IProcessHelper
     // Bounded time (ms) we wait for stderr to drain after a clean exit, kept short so neither the common
     // case nor the rare grandchild-keeps-the-pipe-open case adds latency. See the Exited handler.
     private const int CleanExitErrorDrainTimeout = 500;
+
+    // Processes we deliberately killed (e.g. when aborting or cleaning up a run). Their abnormal exit code is
+    // expected and is not a crash, so the exit handler must not spend the long stderr-drain budget on them -
+    // that would make aborting a run from an IDE slow whenever a grandchild process (e.g. a browser driver)
+    // keeps the stderr pipe open. ConditionalWeakTable holds only weak references to the processes, so entries
+    // disappear when a process is collected and nothing has to be removed explicitly.
+    private readonly ConditionalWeakTable<Process, object> _deliberatelyTerminatedProcesses = new();
+    private readonly object _deliberatelyTerminatedProcessesLock = new();
+    private static readonly object DeliberateTerminationMarker = new();
 
 #if !NET
     private readonly IEnvironment _environment;
@@ -244,12 +254,13 @@ public partial class ProcessHelper : IProcessHelper
                         // RunTestsShouldThrowOnStackOverflowException flaky.
                         //
                         // This drain budget is intentionally separate from (and far more generous than) the
-                        // process-exit budget above, and the generous part is only spent when the process exited
-                        // abnormally. A clean exit gets only a short grace period so we never add latency to the
-                        // common case (e.g. when a grandchild process keeps the stderr pipe open and EOF never
-                        // arrives). In every case the wait returns as soon as EOF is observed, so a process that
-                        // exits and drains promptly pays almost nothing.
-                        var errorDrainTimeout = DidProcessExitCleanly(p) ? CleanExitErrorDrainTimeout : CrashErrorDrainTimeout;
+                        // process-exit budget above, and the generous part is only spent when the process crashed -
+                        // i.e. it exited abnormally on its own. A clean exit, or a process we deliberately killed
+                        // (e.g. aborting a run from an IDE), gets only a short grace period so we never add latency
+                        // to those cases - in particular we must not hang for seconds on abort when a grandchild
+                        // process keeps the stderr pipe open and EOF never arrives. In every case the wait returns
+                        // as soon as EOF is observed, so a process that exits and drains promptly pays almost nothing.
+                        var errorDrainTimeout = GetErrorDrainTimeout(DidProcessExitCleanly(p), WasDeliberatelyTerminated(p));
                         await WaitForErrorStreamToDrainAsync(errorStreamClosed, errorDrainTimeout).ConfigureAwait(false);
                     }
 
@@ -319,6 +330,34 @@ public partial class ProcessHelper : IProcessHelper
             // If the exit code is not retrievable (e.g. the process handle is gone), assume a crash so we
             // give the redirected stderr the longer budget to drain.
             return false;
+        }
+    }
+
+    /// <summary>
+    /// Picks the bounded time we are willing to wait for the redirected stderr to reach EOF. A genuine crash
+    /// (an abnormal exit we did not cause) gets the generous budget so a late-delivered crash callstack is
+    /// captured; a clean exit, or a process we deliberately killed (an abort/cleanup), gets only the short
+    /// budget so we never add latency to those cases.
+    /// </summary>
+    internal static int GetErrorDrainTimeout(bool exitedCleanly, bool deliberatelyTerminated)
+        => exitedCleanly || deliberatelyTerminated ? CleanExitErrorDrainTimeout : CrashErrorDrainTimeout;
+
+    private void MarkDeliberatelyTerminated(Process process)
+    {
+        lock (_deliberatelyTerminatedProcessesLock)
+        {
+            if (!_deliberatelyTerminatedProcesses.TryGetValue(process, out _))
+            {
+                _deliberatelyTerminatedProcesses.Add(process, DeliberateTerminationMarker);
+            }
+        }
+    }
+
+    private bool WasDeliberatelyTerminated(Process process)
+    {
+        lock (_deliberatelyTerminatedProcessesLock)
+        {
+            return _deliberatelyTerminatedProcesses.TryGetValue(process, out _);
         }
     }
 
@@ -395,6 +434,11 @@ public partial class ProcessHelper : IProcessHelper
         {
             if (process is Process proc && !proc.HasExited)
             {
+                // Killing a still-running process on purpose (abort/cleanup): record it so the exit handler
+                // treats the resulting abnormal exit as an abort (short stderr drain), not a crash (long
+                // stderr drain). A process that exits on its own is never recorded here, so a genuine crash
+                // still gets the generous budget.
+                MarkDeliberatelyTerminated(proc);
                 proc.Kill();
             }
         }

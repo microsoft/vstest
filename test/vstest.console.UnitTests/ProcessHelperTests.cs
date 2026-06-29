@@ -91,4 +91,24 @@ public class ProcessHelperTests
             stopwatch.ElapsedMilliseconds,
             $"With no redirected error stream the method must be a no-op (took {stopwatch.ElapsedMilliseconds} ms).");
     }
+
+    [TestMethod]
+    public void GetErrorDrainTimeoutShouldUseTheGenerousBudgetOnlyForACrash()
+    {
+        // A crash is an abnormal exit we did not cause: not a clean exit and not something we killed.
+        var crash = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, deliberatelyTerminated: false);
+        var cleanExit = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: true, deliberatelyTerminated: false);
+        var aborted = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, deliberatelyTerminated: true);
+        var cleanAndAborted = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: true, deliberatelyTerminated: true);
+
+        Assert.IsGreaterThan(
+            cleanExit,
+            crash,
+            "A crash must wait longer for stderr to drain than a clean exit, so a late crash callstack is captured.");
+
+        // A process we deliberately killed (e.g. aborting from an IDE) must drain as fast as a clean exit, so
+        // an abort never hangs for seconds when a grandchild keeps the stderr pipe open.
+        Assert.AreEqual(cleanExit, aborted, "A deliberately terminated process must use the short (clean-exit) budget.");
+        Assert.AreEqual(cleanExit, cleanAndAborted, "A clean, deliberately terminated process must use the short budget.");
+    }
 }
