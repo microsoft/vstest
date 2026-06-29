@@ -179,7 +179,7 @@ internal sealed class Condition
         {
             null => null,
             string[] arr => arr,
-            _ => new[] { propertyValue.ToString()! },
+            _ => [propertyValue.ToString()!],
         };
 
         return Operation switch
