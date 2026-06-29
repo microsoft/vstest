@@ -88,7 +88,7 @@ public class DiscoverTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Smoke")]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -106,7 +106,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void DiscoverTestsUsingEventHandler2AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -135,7 +135,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void DiscoverTestsUsingEventHandler1AndBatchSize(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -163,7 +163,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void DiscoverTestUsingEventHandler2ShouldContainAllSourcesAsFullyDiscovered(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -187,8 +187,8 @@ public class DiscoverTests : AcceptanceTestBase
     // We run .NET Runner -> .NET Testhost and .NET Framework Runner -> .NET Frameworks Testhost.
     // The .NET Framework runner/testhost is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
-    [TestMatrix(console: VSTestConsole.NetFx, testHost: TestHost.NetFx)]
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
+    [TestMatrix(console: NetFx, testHost: NetFx)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void DiscoverTestsUsingSourceNavigation(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -208,7 +208,7 @@ public class DiscoverTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     [Ignore("Flaky on CI")]
     public async Task CancelTestDiscovery(RunnerInfo runnerInfo)
     {

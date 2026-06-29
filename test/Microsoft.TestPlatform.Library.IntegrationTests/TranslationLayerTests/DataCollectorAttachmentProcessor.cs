@@ -44,7 +44,7 @@ public class DataCollectorAttachmentProcessor : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public async Task AttachmentProcessorDataCollector_ExtensionFileNotLocked(RunnerInfo runnerInfo)
     {
         // arrange

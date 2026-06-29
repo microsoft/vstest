@@ -37,17 +37,17 @@ public class TargetFrameworkTestHostDemultiplexer : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void ExecuteContainerInMultiHost(RunnerInfo runnerInfo)
         => ExecuteContainerInMultiHost(runnerInfo, 3);
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void ExecuteContainerInMultiHost_MoreHostsThanTests(RunnerInfo runnerInfo)
         => ExecuteContainerInMultiHost(runnerInfo, 20);
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void ExecuteSingleContainerInDefaultSingleHost(RunnerInfo runnerInfo)
         => ExecuteContainerInMultiHost(runnerInfo, -1);
 

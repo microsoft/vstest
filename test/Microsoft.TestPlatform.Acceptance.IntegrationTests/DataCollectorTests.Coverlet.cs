@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class DataCollectorTestsCoverlets : AcceptanceTestBase
 {
     [TestMethod]
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunCoverletCoverage(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

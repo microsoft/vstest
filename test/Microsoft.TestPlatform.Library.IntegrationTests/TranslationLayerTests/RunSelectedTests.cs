@@ -37,7 +37,7 @@ public class RunSelectedTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void RunSelectedTestsWithoutTestPlatformOptions(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -56,7 +56,7 @@ public class RunSelectedTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void RunSelectedTestsWithTestPlatformOptions(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -13,7 +13,7 @@ public class SelfContainedAppTests : AcceptanceTestBase
 {
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunningApplicationThatIsBuiltAsSelfContainedWillNotFailToFindHostpolicyDll(RunnerInfo runnerInfo)
     {
         // when the application is self-contained which is dictated by the RuntimeIdentifier and OutputType project

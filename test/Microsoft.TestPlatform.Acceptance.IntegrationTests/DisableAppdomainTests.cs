@@ -17,7 +17,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows")]
     // Run in .NET Framework testhost, disabling appdomain will force running out of process in all cases.
-    [TestMatrix(testHost: TestHost.NetFx, inProcess: true)]
+    [TestMatrix(testHost: NetFx, inProcess: true)]
     public void DisableAppdomainTest(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -30,7 +30,7 @@ public class DisableAppdomainTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows")]
-    [TestMatrix(testHost: TestHost.NetFx)]
+    [TestMatrix(testHost: NetFx)]
     public void NewtonSoftDependencyWithDisableAppdomainTest(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

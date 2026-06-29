@@ -24,7 +24,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -38,7 +38,7 @@ public class PortableNugetPackageTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void DiscoverAllTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

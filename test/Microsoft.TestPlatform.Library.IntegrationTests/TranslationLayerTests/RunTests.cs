@@ -65,7 +65,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     [TestCategory("Smoke")]
     public void RunAllTestsFromDlls(RunnerInfo runnerInfo)
     {
@@ -110,7 +110,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -130,7 +130,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void RunTestsWithTelemetryOptedIn(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -153,7 +153,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(testHost: TestHost.Net)]
+    [TestMatrix(testHost: Net)]
     public void RunTestsWithTelemetryOptedOut(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -175,8 +175,8 @@ public class RunTests : AcceptanceTestBase
     // The assertion below branches on the .NET Framework-specific stack overflow message, and the
     // .NET Framework testhost is only available on Windows, so this runs as Windows-Review.
     [TestCategory("Windows-Review")]
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.NetFx)]
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
+    [TestMatrix(console: Net, testHost: NetFx)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunTestsShouldThrowOnStackOverflowException(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -199,7 +199,7 @@ public class RunTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunTestsShouldShowProperWarningOnNoTestsForTestCaseFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);

@@ -62,7 +62,7 @@ public class RunTestsWithFilterTests : AcceptanceTestBase
 
     [TestMethod]
     // Validates filter expression that is passed all the way down to testhost, unlikely that we will see difference in beharior between desktop and netcore runners.
-    [TestMatrix(console: VSTestConsole.Net, testHost: TestHost.Net)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunTestsWithFastFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
