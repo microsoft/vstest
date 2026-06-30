@@ -15,18 +15,6 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
 [DataContract]
 public class AfterTestRunEndResult
 {
-    // We have more than one ctor for backward-compatibility reason. This non-public default
-    // constructor exists so the serializers can construct the instance when a parameterized
-    // constructor cannot be used; the real (de)serialization paths build via the parameterized
-    // constructor (see AfterTestRunEndResultConverter and JsoniteConvert), so we initialize the
-    // non-nullable collections to empty here to guarantee they are never null.
-    private AfterTestRunEndResult()
-    {
-        AttachmentSets = new Collection<AttachmentSet>();
-        InvokedDataCollectors = null;
-        Metrics = new Dictionary<string, object>();
-    }
-
     /// <summary>
     /// Initializes a new instance of the <see cref="AfterTestRunEndResult"/> class.
     /// </summary>
