@@ -25,9 +25,15 @@ public class ProcessHelperTests
     [TestMethod]
     public async Task WaitForErrorStreamToDrainShouldReturnOnceTheErrorStreamCloses()
     {
-        // The stream has already reached EOF (all ErrorDataReceived callbacks have been delivered).
+        // EOF arrives a little AFTER we start waiting, mimicking a slow ErrorDataReceived delivery that lands
+        // just after the exit handler begins draining. The wait must observe that late completion and return
+        // promptly once it arrives - not return early (dropping the crash callstack) and not block to the timeout.
         var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        errorStreamClosed.TrySetResult(true);
+        _ = Task.Run(async () =>
+        {
+            await Task.Delay(150);
+            errorStreamClosed.TrySetResult(true);
+        });
 
         var stopwatch = Stopwatch.StartNew();
         await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
@@ -37,7 +43,25 @@ public class ProcessHelperTests
         Assert.IsLessThan(
             3000L,
             stopwatch.ElapsedMilliseconds,
-            $"The method should return as soon as the stream is drained, not at the timeout (took {stopwatch.ElapsedMilliseconds} ms).");
+            $"The method should return shortly after the stream closes, not at the timeout (took {stopwatch.ElapsedMilliseconds} ms).");
+    }
+
+    [TestMethod]
+    public async Task WaitForErrorStreamToDrainShouldReturnImmediatelyWhenAlreadyDrained()
+    {
+        // The stream has already reached EOF (all ErrorDataReceived callbacks have been delivered) before we
+        // start waiting, so the common fast path must not add any latency.
+        var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        errorStreamClosed.TrySetResult(true);
+
+        var stopwatch = Stopwatch.StartNew();
+        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
+        stopwatch.Stop();
+
+        Assert.IsLessThan(
+            250L,
+            stopwatch.ElapsedMilliseconds,
+            $"When the stream is already drained the method must return immediately (took {stopwatch.ElapsedMilliseconds} ms).");
     }
 
     [TestMethod]

@@ -190,7 +190,9 @@ public partial class ProcessHelper : IProcessHelper
                             //
                             // For older frameworks, the solution is more tricky but it seems we can get the expected
                             // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
-                            var cts = new CancellationTokenSource(processExitTimeout);
+                            // 'using' so the timer the timeout allocates is released as soon as we are done waiting,
+                            // instead of leaking one per process exit when many test hosts are spawned.
+                            using var cts = new CancellationTokenSource(processExitTimeout);
 #if NET
                             await p.WaitForExitAsync(cts.Token);
 #else
