@@ -868,16 +868,17 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
-      원인 모드에서 테스트를 실행합니다. 이 옵션은 테스트 호스트 크래시를 유발하는 문제 있는 테스트를 격리하는 데 유용합니다.
-      이 경우 현재 디렉터리에 "Sequence.xml"라는 출력 파일을 만들며,
-      이 파일에는 크래시 이전 테스트 실행 순서가 캡처되어 있습니다.
-      필요에 따라 테스트 호스트에 대한 프로세스 덤프를 수집하도록 선택할 수 있습니다.
-      덤프를 수집하도록 선택하는 경우 기본적으로 크래시에 대한 미니 덤프가 수집됩니다.
-      다음과 같은 몇 가지 선택적 매개 변수로 이 기본 동작을 재정의하도록 선택할 수도 있습니다.
-      CollectAlways - 크래시가 없는 경우에도 종료 시 덤프를 수집함(true/false) 
-      DumpType - 덤프 유형을 지정함(mini/full).
-      예: /Blame
+        <target state="new">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Collecting a crash dump on Windows requires procdump.exe and procdump64.exe to be available in PATH, or in a directory pointed to by the PROCDUMP_PATH environment variable. The tools can be downloaded from https://docs.microsoft.com/sysinternals/downloads/procdump.
+      Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
         <note />
