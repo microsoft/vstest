@@ -13,14 +13,18 @@
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <!-- This target required to enable /collect:"Code Coverage" in "dotnet publish" scenario with "dotnet vstest".
-       E.g: Release pipelines where user/project nuget cache not available on current machine. -->
+       E.g: Release pipelines where user/project nuget cache not available on current machine.
+       Uses Overwrite="false" so that files already placed by Microsoft.Testing.Extensions.CodeCoverage
+       (which ships newer versions of these artifacts) are not replaced with the older versions
+       from this package, regardless of target execution order. -->
   <Target Name="CopyTraceDataCollectorArtifacts" AfterTargets="ComputeFilesToPublish">
 
     <ItemGroup>
       <TraceDataCollectorArtifacts Include="$(MSBuildThisFileDirectory)\**\*.*" />
     </ItemGroup>
 
-    <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)" />
+    <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)"
+          Overwrite="false" />
 
   </Target>
 
