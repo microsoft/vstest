@@ -14,6 +14,9 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
+#if NETCOREAPP
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
+#endif
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -120,6 +123,14 @@ public class TestEngine : ITestEngine
         var discoveryDataAggregator = new DiscoveryDataAggregator();
         Func<TestRuntimeProviderInfo, DiscoveryCriteria, IProxyDiscoveryManager> proxyDiscoveryManagerCreator = (runtimeProviderInfo, discoveryCriteria) =>
         {
+#if NETCOREAPP
+            if (runtimeProviderInfo.SourceDetails.Count > 0
+                && runtimeProviderInfo.SourceDetails[0].ExecutionPreference == ExecutionPreference.MicrosoftTestingPlatform)
+            {
+                EqtTrace.Verbose("TestEngine.GetDiscoveryManager: routing to MtpProxyDiscoveryManager for Microsoft.Testing.Platform sources.");
+                return new MtpProxyDiscoveryManager();
+            }
+#endif
             var sources = discoveryCriteria.Sources.ToList();
             var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
             hostManager?.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings!);
@@ -262,6 +273,14 @@ public class TestEngine : ITestEngine
     // This is internal so tests can use it.
     internal IProxyExecutionManager CreateNonParallelExecutionManager(IRequestData requestData, TestRunCriteria testRunCriteria, bool isDataCollectorEnabled, TestRuntimeProviderInfo runtimeProviderInfo)
     {
+#if NETCOREAPP
+        if (runtimeProviderInfo.SourceDetails.Count > 0
+            && runtimeProviderInfo.SourceDetails[0].ExecutionPreference == ExecutionPreference.MicrosoftTestingPlatform)
+        {
+            EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: routing to MtpProxyExecutionManager for Microsoft.Testing.Platform sources.");
+            return new MtpProxyExecutionManager();
+        }
+#endif
         // SetupChannel ProxyExecutionManager with data collection if data collectors are
         // specified in run settings.
         // Create a new host manager, to be associated with individual
