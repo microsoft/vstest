@@ -12,6 +12,9 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -25,7 +28,28 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+
+    /// <summary>
+    /// Optional data collection manager (e.g. code coverage). When present, it is started before the
+    /// run to obtain profiler environment variables that are injected into the MTP application, is
+    /// notified of the MTP application's process id, and is asked for its attachments (such as the
+    /// .coverage file) once the run completes.
+    /// </summary>
+    private readonly IProxyDataCollectionManager? _dataCollectionManager;
+
+    private readonly DataCollectionRunEventsHandler? _dataCollectionEventsHandler;
+
     private bool _isInitialized;
+
+    public MtpProxyExecutionManager()
+    {
+    }
+
+    public MtpProxyExecutionManager(IProxyDataCollectionManager dataCollectionManager)
+    {
+        _dataCollectionManager = dataCollectionManager;
+        _dataCollectionEventsHandler = new DataCollectionRunEventsHandler();
+    }
 
     public bool IsInitialized => _isInitialized;
 
@@ -46,8 +70,11 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         var aggregate = new RunAggregate();
         var attachments = new List<AttachmentSet>();
         var executorUris = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var invokedDataCollectors = new List<InvokedDataCollector>();
         int processId = 0;
         bool aborted = false;
+
+        BeforeTestRun(eventHandler);
 
         foreach (var (source, tests) in BuildWork(testRunCriteria))
         {
@@ -72,6 +99,8 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             }
         }
 
+        AfterTestRun(attachments, invokedDataCollectors);
+
         TestRunStatistics finalStats = aggregate.Snapshot();
         var completeArgs = new TestRunCompleteEventArgs(
             finalStats,
@@ -81,8 +110,88 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             new Collection<AttachmentSet>(attachments),
             stopwatch.Elapsed);
 
+        foreach (InvokedDataCollector collector in invokedDataCollectors)
+        {
+            completeArgs.InvokedDataCollectors.Add(collector);
+        }
+
         eventHandler.HandleTestRunComplete(completeArgs, null, attachments, executorUris.ToList());
         return processId;
+    }
+
+    /// <summary>
+    /// Starts the data collector (if any) before the run and injects the profiler environment
+    /// variables it produces into the MTP application launch. Any messages the data collector logged
+    /// during startup are forwarded to the run events handler.
+    /// </summary>
+    private void BeforeTestRun(IInternalTestRunEventsHandler eventHandler)
+    {
+        if (_dataCollectionManager is null)
+        {
+            return;
+        }
+
+        _dataCollectionManager.Initialize();
+
+        DataCollectionParameters parameters;
+        try
+        {
+            parameters = _dataCollectionManager.BeforeTestRunStart(
+                resetDataCollectors: true,
+                isRunStartingNow: true,
+                runEventsHandler: _dataCollectionEventsHandler!);
+        }
+        catch (Exception)
+        {
+            _dataCollectionManager.AfterTestRunEnd(isCanceled: true, runEventsHandler: _dataCollectionEventsHandler!);
+            throw;
+        }
+
+        if (parameters?.EnvironmentVariables is { } dataCollectionEnvironmentVariables)
+        {
+            EnvironmentVariables ??= new Dictionary<string, string?>();
+            foreach (KeyValuePair<string, string?> variable in dataCollectionEnvironmentVariables)
+            {
+                EnvironmentVariables[variable.Key] = variable.Value;
+            }
+        }
+
+        // Surface any messages the data collector produced while starting up.
+        foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler!.Messages)
+        {
+            eventHandler.HandleLogMessage(message.Item1, message.Item2);
+        }
+
+        _dataCollectionEventsHandler.Messages.Clear();
+    }
+
+    /// <summary>
+    /// Ends the data collector (if any) after the run and collects its attachments (such as the
+    /// .coverage file) and the list of invoked data collectors.
+    /// </summary>
+    private void AfterTestRun(List<AttachmentSet> attachments, List<InvokedDataCollector> invokedDataCollectors)
+    {
+        if (_dataCollectionManager is null)
+        {
+            return;
+        }
+
+        DataCollectionResult result = _dataCollectionManager.AfterTestRunEnd(
+            _cancellationTokenSource.IsCancellationRequested,
+            _dataCollectionEventsHandler!);
+
+        if (result.Attachments is { Count: > 0 })
+        {
+            lock (attachments)
+            {
+                attachments.AddRange(result.Attachments);
+            }
+        }
+
+        if (result.InvokedDataCollectors is { Count: > 0 })
+        {
+            invokedDataCollectors.AddRange(result.InvokedDataCollectors);
+        }
     }
 
     public void Cancel(IInternalTestRunEventsHandler eventHandler) => _cancellationTokenSource.Cancel();
@@ -93,6 +202,15 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
     public void Dispose()
     {
+        try
+        {
+            _dataCollectionManager?.Dispose();
+        }
+        catch
+        {
+            // ignore
+        }
+
         try
         {
             _cancellationTokenSource.Dispose();
@@ -163,6 +281,11 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         };
 
         connection.Start(source, EnvironmentVariables, MtpClientHelpers.GetConnectionTimeout());
+
+        // Let the data collector (e.g. code coverage) know the process it should track. The profiler
+        // env vars were already injected via EnvironmentVariables above.
+        _dataCollectionManager?.TestHostLaunched(connection.ProcessId);
+
         connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
 
         var runId = Guid.NewGuid();

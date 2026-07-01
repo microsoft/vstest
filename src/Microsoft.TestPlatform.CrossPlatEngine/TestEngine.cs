@@ -277,6 +277,17 @@ public class TestEngine : ITestEngine
         if (runtimeProviderInfo.SourceDetails.Count > 0
             && runtimeProviderInfo.SourceDetails[0].ExecutionPreference == ExecutionPreference.MicrosoftTestingPlatform)
         {
+            if (isDataCollectorEnabled)
+            {
+                EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: routing to MtpProxyExecutionManager (with data collection) for Microsoft.Testing.Platform sources.");
+                var mtpSources = runtimeProviderInfo.SourceDetails.Select(r => r.Source!).ToList();
+                return new MtpProxyExecutionManager(
+                    new ProxyDataCollectionManager(
+                        requestData,
+                        runtimeProviderInfo.RunSettings,
+                        mtpSources));
+            }
+
             EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: routing to MtpProxyExecutionManager for Microsoft.Testing.Platform sources.");
             return new MtpProxyExecutionManager();
         }
