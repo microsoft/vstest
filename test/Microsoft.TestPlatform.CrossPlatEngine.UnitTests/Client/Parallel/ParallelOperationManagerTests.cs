@@ -42,7 +42,7 @@ public class ParallelOperationManagerTests
             // This is what the data should be:
             // - At the start we schedule as much work as we can, workloads 1, 2, 3
             //   are started and grab a slot.
-            //   We only update the slot count after scheduling all the work up to the max parallel level,
+            //   All managers are reserved (added to the active set) before any workload starts running,
             //   so when we reach this method, all the slots are already occupied, so for workloads 1, 2, 3 we record 3, 3, 3.
             // - Workload 1 finishes and leaves the slot, 4 starts and grabs a slot, 2, 3, 4 are now running we record 3.
             // - workload 2 finishes and leaves the slot, 5 starts and grabs a slot, 3, 4, 5 are now running we record 3.

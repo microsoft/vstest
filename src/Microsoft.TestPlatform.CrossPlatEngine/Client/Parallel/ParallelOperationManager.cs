@@ -11,13 +11,47 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 
 /// <summary>
-/// Manages work that is done on multiple managers (testhosts) in parallel such as parallel discovery or parallel run.
-///
-/// This is a plain producer/consumer work queue: workloads (a single source, multiple sources, or a batch of test
-/// cases) are placed in a queue, and up to <see cref="MaxParallelLevel"/> managers (testhosts) pull from that queue.
-/// When a manager finishes its workload it calls <see cref="RunNextWork"/>, which frees the manager and pulls the
-/// next workload from the queue until the queue is empty.
+/// Manages work that is done on multiple managers (testhosts) in parallel, such as parallel discovery or parallel
+/// run. It is a plain producer/consumer queue: <see cref="StartWork"/> enqueues all the workloads (a single source,
+/// multiple sources, or a batch of test cases), and up to <see cref="MaxParallelLevel"/> managers pull from that
+/// queue. When a manager finishes its workload the consumer calls <see cref="RunNextWork"/>, which frees the manager
+/// and pulls the next workload until the queue is empty.
 /// </summary>
+/// <remarks>
+/// <code>
+///     workloads
+///         |                StartWork enqueues every workload
+///         v
+///   +-------------------+
+///   | _pendingWorkloads |  FIFO queue of work waiting for a free manager
+///   +-------------------+
+///         |                RunWorkInParallel dequeues while a slot is free
+///         v                (i.e. while _activeManagers holds fewer than MaxParallelLevel managers)
+///   +-------+  +-------+  +-------+
+///   | mgr 1 |  | mgr 2 |  | mgr 3 |   _activeManagers: at most MaxParallelLevel testhosts
+///   +-------+  +-------+  +-------+
+///       |          |          |
+///       |          |          |      each manager runs one workload on its testhost over IPC;
+///       v          v          v      from here on the work is fire-and-forget
+///     - - - - - asynchronous - - - - -
+///       |          |          |      when a testhost is done, its event handler calls
+///       v          v          v      RunNextWork(manager) - that out-of-band call is the "done" signal
+///   RunNextWork: remove the finished manager, then RunWorkInParallel pulls the next workload
+/// </code>
+///
+/// Why is this hand-rolled instead of a bounded primitive (SemaphoreSlim, System.Threading.Channels, or TPL
+/// Dataflow's ActionBlock with MaxDegreeOfParallelism)? All of those bound concurrency around an awaitable unit of
+/// work: the primitive starts a Task and watches that Task complete to release a slot. Our unit of work is not
+/// awaitable. A manager is a separate testhost process; it runs its workload over an IPC connection and reports
+/// completion much later through an out-of-band event (HandlePartialRunComplete / HandlePartialDiscoveryComplete),
+/// which is what calls RunNextWork. To adopt a bounded primitive we would have to bridge every workload to a
+/// TaskCompletionSource, complete it from that event, and add the matching cancellation plumbing - which relocates
+/// the complexity instead of removing it, and we would still need the queue and the active-manager list anyway.
+///
+/// We also keep the full active-manager list (not just a counter) because it is the cancellation surface: Abort /
+/// Cancel / Close are broadcast to every in-flight manager through <see cref="DoActionOnAllManagers"/>, so we need
+/// the live set of managers, not only how many there are.
+/// </remarks>
 internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkload> : IDisposable
 {
     private readonly Func<TestRuntimeProviderInfo, TWorkload, TManager> _createNewManager;
@@ -36,11 +70,11 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
 
     public int MaxParallelLevel { get; }
 
-    /// <summary>Number of managers that are currently running a workload.</summary>
-    public int OccupiedSlotCount { get; private set; }
+    /// <summary>Number of managers that are currently running a workload. Exposed mainly for tests and diagnostics.</summary>
+    public int OccupiedSlotCount => _activeManagers.Count;
 
-    /// <summary>Number of managers that could still be started before reaching <see cref="MaxParallelLevel"/>.</summary>
-    public int AvailableSlotCount { get; private set; }
+    /// <summary>Number of managers that could still be started before reaching <see cref="MaxParallelLevel"/>. Exposed mainly for tests and diagnostics.</summary>
+    public int AvailableSlotCount => MaxParallelLevel - _activeManagers.Count;
 
     /// <summary>
     /// Creates new instance of ParallelOperationManager.
@@ -52,19 +86,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
     {
         _createNewManager = createNewManager;
         MaxParallelLevel = parallelLevel;
-        UpdateSlotCounts();
-    }
-
-    // Called under _lock.
-    private void UpdateSlotCounts()
-    {
-        OccupiedSlotCount = _activeManagers.Count;
-        AvailableSlotCount = MaxParallelLevel - OccupiedSlotCount;
-
-        if (EqtTrace.IsVerboseEnabled)
-        {
-            EqtTrace.Verbose($"ParallelOperationManager.UpdateSlotCounts: OccupiedSlotCount = {OccupiedSlotCount}, AvailableSlotCount = {AvailableSlotCount}, pending workloads = {_pendingWorkloads.Count}.");
-        }
     }
 
     public void StartWork(
@@ -110,6 +131,8 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
         // lock. That way, if multiple completions come in at the same time, they only block each other while
         // reserving a slot, and not while actually starting their assigned work.
         List<(TManager Manager, TEventHandler EventHandler, TWorkload Work)> reserved = new();
+        int activeCount;
+        int pendingCount;
         lock (_lock)
         {
             // When HandlePartialDiscovery or HandlePartialRun are in progress and we call StopAllManagers, it is
@@ -130,9 +153,13 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
                 reserved.Add((manager, eventHandler, workload.Work));
             }
 
-            // Update the counts before we start any work, so that when a workload observes OccupiedSlotCount from
-            // its runWorkload callback, it already reflects every manager reserved in this pass.
-            UpdateSlotCounts();
+            activeCount = _activeManagers.Count;
+            pendingCount = _pendingWorkloads.Count;
+        }
+
+        if (EqtTrace.IsVerboseEnabled)
+        {
+            EqtTrace.Verbose($"ParallelOperationManager.RunWorkInParallel: {activeCount} managers active (max {MaxParallelLevel}), {pendingCount} workloads still pending.");
         }
 
         foreach (var (manager, eventHandler, work) in reserved)
@@ -160,8 +187,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             {
                 throw new InvalidOperationException("The provided manager was not found among the active managers.");
             }
-
-            UpdateSlotCounts();
         }
 
         RunWorkInParallel();
@@ -236,7 +261,6 @@ internal sealed class ParallelOperationManager<TManager, TEventHandler, TWorkloa
             _acceptMoreWork = false;
             _pendingWorkloads.Clear();
             _activeManagers.Clear();
-            UpdateSlotCounts();
         }
     }
 
