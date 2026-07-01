@@ -886,14 +886,6 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml)
     {
         var config = XmlRunSettingsUtilities.GetRunConfigurationNode(runsettingsXml);
-
-        // Microsoft.Testing.Platform sources are driven directly over the MTP protocol and must not be
-        // hosted by a vstest testhost, so decline them here and let routing fall through to the MTP path.
-        if (config.ExecutionPreference == ExecutionPreference.MicrosoftTestingPlatform)
-        {
-            return false;
-        }
-
         var framework = config.TargetFramework;
 
         return framework!.Name.IndexOf("netcoreapp", StringComparison.OrdinalIgnoreCase) >= 0

@@ -31,7 +31,6 @@ public class InferRunSettingsHelper
     private const string ResultsDirectoryNodeName = "ResultsDirectory";
     private const string TargetPlatformNodeName = "TargetPlatform";
     private const string TargetFrameworkNodeName = "TargetFrameworkVersion";
-    private const string ExecutionPreferenceNodeName = "ExecutionPreference";
     private const string TargetDevice = "TargetDevice";
 
     private const string DesignModeNodePath = @"/RunSettings/RunConfiguration/DesignMode";
@@ -40,7 +39,6 @@ public class InferRunSettingsHelper
     private const string RunConfigurationNodePath = @"/RunSettings/RunConfiguration";
     private const string TargetPlatformNodePath = @"/RunSettings/RunConfiguration/TargetPlatform";
     private const string TargetFrameworkNodePath = @"/RunSettings/RunConfiguration/TargetFrameworkVersion";
-    private const string ExecutionPreferenceNodePath = @"/RunSettings/RunConfiguration/ExecutionPreference";
     private const string ResultsDirectoryNodePath = @"/RunSettings/RunConfiguration/ResultsDirectory";
     private const string TargetDeviceNodePath = @"/RunSettings/RunConfiguration/TargetDevice";
     private const string EnvironmentVariablesNodePath = @"/RunSettings/RunConfiguration/EnvironmentVariables";
@@ -456,15 +454,6 @@ public class InferRunSettingsHelper
     /// <param name="overwrite">Overwrite option.</param>
     public static void UpdateTargetPlatform(XmlDocument runSettingsDocument, string platform, bool overwrite = false)
         => AddNodeIfNotPresent(runSettingsDocument, TargetPlatformNodePath, TargetPlatformNodeName, platform, overwrite);
-
-    /// <summary>
-    /// Updates the <c>RunConfiguration.ExecutionPreference</c> value for a run settings. If the value is already set, behavior depends on overwrite.
-    /// </summary>
-    /// <param name="runSettingsDocument">Navigator for runsettings xml</param>
-    /// <param name="executionPreference">Value to set</param>
-    /// <param name="overwrite">Overwrite option.</param>
-    public static void UpdateExecutionPreference(XmlDocument runSettingsDocument, string executionPreference, bool overwrite = false)
-        => AddNodeIfNotPresent(runSettingsDocument, ExecutionPreferenceNodePath, ExecutionPreferenceNodeName, executionPreference, overwrite);
 
     public static bool TryGetDeviceXml(XPathNavigator runSettingsNavigator, [NotNullWhen(true)] out string? deviceXml)
     {
