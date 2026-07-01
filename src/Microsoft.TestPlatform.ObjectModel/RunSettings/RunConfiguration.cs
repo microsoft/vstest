@@ -234,6 +234,14 @@ public class RunConfiguration : TestRunSettings
     }
 
     /// <summary>
+    /// Gets how the sources in this run should be hosted and communicated with. Defaults to
+    /// <c>Default</c> (vstest testhost protocol); set to <c>MicrosoftTestingPlatform</c> when the
+    /// sources are Microsoft.Testing.Platform applications that vstest drives directly over the MTP
+    /// protocol instead of launching a vstest testhost.
+    /// </summary>
+    public ExecutionPreference ExecutionPreference { get; internal set; }
+
+    /// <summary>
     /// Gets or sets the default platform that will be used for AnyCPU sources, or non-dll sources. Possible values are <see cref="Architecture"/> except for AnyCPU and Default.
     /// </summary>
     public Architecture? DefaultPlatform
@@ -488,6 +496,14 @@ public class RunConfiguration : TestRunSettings
         XmlElement targetPlatform = doc.CreateElement("TargetPlatform");
         targetPlatform.InnerXml = TargetPlatform.ToString();
         root.AppendChild(targetPlatform);
+
+        // Only emit when non-default so that runsettings for the common (vstest testhost) case are unchanged.
+        if (ExecutionPreference != default)
+        {
+            XmlElement executionPreference = doc.CreateElement("ExecutionPreference");
+            executionPreference.InnerXml = ExecutionPreference.ToString();
+            root.AppendChild(executionPreference);
+        }
 
         if (DefaultPlatform != null)
         {
@@ -795,6 +811,19 @@ public class RunConfiguration : TestRunSettings
                         }
 
                         runConfiguration.TargetPlatform = archType;
+                        break;
+
+                    case nameof(ExecutionPreference):
+                        XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
+                        string executionPreferenceString = reader.ReadElementContentAsString();
+                        if (!Enum.TryParse(executionPreferenceString, ignoreCase: true, out ExecutionPreference executionPreferenceValue)
+                            || !Enum.IsDefined(typeof(ExecutionPreference), executionPreferenceValue))
+                        {
+                            throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
+                                Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, executionPreferenceString, elementName));
+                        }
+
+                        runConfiguration.ExecutionPreference = executionPreferenceValue;
                         break;
 
                     case nameof(DefaultPlatform):

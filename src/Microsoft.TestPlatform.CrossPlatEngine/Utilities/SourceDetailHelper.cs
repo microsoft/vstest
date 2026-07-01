@@ -23,6 +23,15 @@ internal static class SourceDetailHelper
         InferRunSettingsHelper.UpdateTargetFramework(document, sourceDetail.Framework!.ToString(), overwrite: true);
         InferRunSettingsHelper.UpdateTargetPlatform(document, sourceDetail.Architecture.ToString(), overwrite: true);
 
+        // Emit the execution preference so downstream components (e.g. test host managers deciding
+        // whether they can run the source) can see that a source should be driven over the
+        // Microsoft.Testing.Platform protocol rather than a vstest testhost. Only emitted when
+        // non-default to keep runsettings for the common case unchanged.
+        if (sourceDetail.ExecutionPreference != ExecutionPreference.Default)
+        {
+            InferRunSettingsHelper.UpdateExecutionPreference(document, sourceDetail.ExecutionPreference.ToString(), overwrite: true);
+        }
+
         var updatedRunSettings = navigator!.OuterXml;
         return updatedRunSettings;
     }

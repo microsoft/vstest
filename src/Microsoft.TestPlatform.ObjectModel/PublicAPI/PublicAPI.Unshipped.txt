@@ -19,3 +19,4 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference.Default = 0 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
 Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference.MicrosoftTestingPlatform = 1 -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
 Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail.ExecutionPreference.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference
+Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.ExecutionPreference.get -> Microsoft.VisualStudio.TestPlatform.ObjectModel.ExecutionPreference

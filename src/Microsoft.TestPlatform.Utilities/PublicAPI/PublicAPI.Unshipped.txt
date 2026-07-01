@@ -1,1 +1,2 @@
 #nullable enable
+static Microsoft.VisualStudio.TestPlatform.Utilities.InferRunSettingsHelper.UpdateExecutionPreference(System.Xml.XmlDocument! runSettingsDocument, string! executionPreference, bool overwrite = false) -> void
