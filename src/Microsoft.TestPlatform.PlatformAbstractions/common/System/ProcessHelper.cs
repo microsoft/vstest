@@ -221,6 +221,12 @@ public partial class ProcessHelper : IProcessHelper
                                     {
                                         if (!p.HasExited)
                                         {
+                                            // We are force-killing a process that overran the exit budget (e.g. a
+                                            // grandchild keeps it hanging). Record it as a deliberate termination -
+                                            // exactly like TerminateProcess does - BEFORE killing, so the stderr
+                                            // drain below uses the short abort budget instead of treating our own
+                                            // kill as a crash and waiting the generous 5s budget unnecessarily.
+                                            MarkDeliberatelyTerminated(p);
                                             p.Kill();
                                         }
                                     }
