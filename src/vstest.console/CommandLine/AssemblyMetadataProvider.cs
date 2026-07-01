@@ -11,6 +11,7 @@ using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -98,7 +99,7 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
         try
         {
             using var assemblyStream = _fileHelper.GetStream(filePath, FileMode.Open, FileAccess.Read);
-            var result = GetIsMicrosoftTestingPlatformApp(assemblyStream);
+            var result = MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp(assemblyStream);
             EqtTrace.Info("AssemblyMetadataProvider.IsMicrosoftTestingPlatformApp: '{0}' for source: '{1}'", result, filePath);
             return result;
         }
@@ -107,97 +108,6 @@ internal class AssemblyMetadataProvider : IAssemblyMetadataProvider
             EqtTrace.Warning("AssemblyMetadataProvider.IsMicrosoftTestingPlatformApp: failed to read assembly metadata, exception: {0} for assembly: {1}", ex, filePath);
             return false;
         }
-    }
-
-    private const string MicrosoftTestingPlatformApplicationMetadataKey = "Microsoft.Testing.Platform.Application";
-
-    private static bool GetIsMicrosoftTestingPlatformApp(Stream assemblyStream)
-    {
-        using var peReader = new PEReader(assemblyStream);
-        if (!peReader.HasMetadata)
-        {
-            return false;
-        }
-
-        var metadataReader = peReader.GetMetadataReader();
-
-        // Microsoft.Testing.Platform applications are marked at build time with
-        // [assembly: AssemblyMetadata("Microsoft.Testing.Platform.Application", "true")] by the
-        // Microsoft.Testing.Platform MSBuild targets. We only look at assembly-level attributes.
-        foreach (var handle in metadataReader.GetAssemblyDefinition().GetCustomAttributes())
-        {
-            var attribute = metadataReader.GetCustomAttribute(handle);
-            if (!IsAssemblyMetadataAttribute(metadataReader, attribute))
-            {
-                continue;
-            }
-
-            try
-            {
-                // AssemblyMetadataAttribute has a (string key, string value) constructor. The custom attribute
-                // blob is: 2-byte prolog (0x0001), then the two serialized strings, then the named-argument count.
-                var blob = metadataReader.GetBlobReader(attribute.Value);
-                if (blob.ReadUInt16() != 1)
-                {
-                    continue;
-                }
-
-                var key = blob.ReadSerializedString();
-                var value = blob.ReadSerializedString();
-                if (string.Equals(key, MicrosoftTestingPlatformApplicationMetadataKey, StringComparison.Ordinal)
-                    && string.Equals(value, "true", StringComparison.OrdinalIgnoreCase))
-                {
-                    return true;
-                }
-            }
-            catch (Exception ex)
-            {
-                EqtTrace.Verbose("AssemblyMetadataProvider.GetIsMicrosoftTestingPlatformApp: could not decode AssemblyMetadata attribute: {0}", ex);
-            }
-        }
-
-        return false;
-    }
-
-    private static bool IsAssemblyMetadataAttribute(MetadataReader metadataReader, CustomAttribute attribute)
-    {
-        StringHandle typeNameHandle;
-        StringHandle typeNamespaceHandle;
-        switch (attribute.Constructor.Kind)
-        {
-            case HandleKind.MemberReference:
-                var memberReference = metadataReader.GetMemberReference((MemberReferenceHandle)attribute.Constructor);
-                switch (memberReference.Parent.Kind)
-                {
-                    case HandleKind.TypeReference:
-                        var typeReference = metadataReader.GetTypeReference((TypeReferenceHandle)memberReference.Parent);
-                        typeNameHandle = typeReference.Name;
-                        typeNamespaceHandle = typeReference.Namespace;
-                        break;
-                    case HandleKind.TypeDefinition:
-                        var typeDefinition = metadataReader.GetTypeDefinition((TypeDefinitionHandle)memberReference.Parent);
-                        typeNameHandle = typeDefinition.Name;
-                        typeNamespaceHandle = typeDefinition.Namespace;
-                        break;
-                    default:
-                        return false;
-                }
-
-                break;
-
-            case HandleKind.MethodDefinition:
-                var methodDefinition = metadataReader.GetMethodDefinition((MethodDefinitionHandle)attribute.Constructor);
-                var declaringType = metadataReader.GetTypeDefinition(methodDefinition.GetDeclaringType());
-                typeNameHandle = declaringType.Name;
-                typeNamespaceHandle = declaringType.Namespace;
-                break;
-
-            default:
-                return false;
-        }
-
-        return string.Equals(metadataReader.GetString(typeNameHandle), "AssemblyMetadataAttribute", StringComparison.Ordinal)
-            && string.Equals(metadataReader.GetString(typeNamespaceHandle), "System.Reflection", StringComparison.Ordinal);
     }
 
     private Architecture GetArchitectureFromAssemblyMetadata(string path)
