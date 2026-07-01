@@ -379,9 +379,11 @@ public class TestHostProviderManagerTests
 
         public bool Shared => false;
 
-        // Source-blind resolution never selects this provider; it only claims a run through the source-aware
-        // hook below. This proves the manager consults sources, not just the runsettings.
-        public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml) => false;
+        // Deliberately "greedy" source-blind answer: this would match any runsettings, yet the manager must
+        // never select a source-aware provider through the source-blind pass. It may only be chosen via the
+        // source-aware hook below. This proves the exclusion is enforced by the manager, not by the provider
+        // politely declining.
+        public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml) => true;
 
         public bool CanExecuteCurrentRunConfiguration(string? runsettingsXml, IEnumerable<string> sources)
         {

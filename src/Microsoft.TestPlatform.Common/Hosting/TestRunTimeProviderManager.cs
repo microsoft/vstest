@@ -64,8 +64,18 @@ public class TestRuntimeProviderManager : ITestRuntimeProviderManager
         }
 
         // Second pass: the legacy, source-blind resolution based purely on the run configuration.
+        // Source-aware providers already had their (source-based) first refusal above, so exclude them here.
+        // Re-consulting them would be redundant, and — more importantly — a provider that declined by source
+        // must not be re-admitted by matching only the target framework. Enforcing the exclusion in the manager
+        // keeps the "first refusal" contract here, instead of relying on every source-aware provider to remember
+        // to return false when asked the source-blind question.
         foreach (var testExtension in _testHostExtensionManager.TestExtensions)
         {
+            if (testExtension.Value is ISourceAwareTestRuntimeProvider)
+            {
+                continue;
+            }
+
             if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguration))
             {
                 // we are creating a new Instance of ITestRuntimeProvider so that each POM gets it's own object of ITestRuntimeProvider
