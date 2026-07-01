@@ -449,7 +449,7 @@ public class TestEngine : ITestEngine
         // out which runtime providers would run them, and if the runtime provider is shared or not.
         mostRecentlyCreatedInstance = null;
         var testRuntimeProviders = new List<TestRuntimeProviderInfo>();
-        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}");
+        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}|{k.ExecutionPreference}");
         foreach (var runConfiguration in uniqueRunConfigurations)
         {
             // It is okay to take the first (or any) source detail in the group. We are grouping to get the same source detail, so all architectures and frameworks are the same.
@@ -601,6 +601,14 @@ public class TestEngine : ITestEngine
         if (testHostProviders.Count > 1)
         {
             EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run has multiple different architectures or frameworks, running in isolation (in a separate testhost proces).");
+            return false;
+        }
+
+        // Microsoft.Testing.Platform sources are hosted out-of-process and communicate over the MTP protocol,
+        // so they can never run in-process inside vstest.console.
+        if (testHostProviders.Any(p => p.SourceDetails.Any(s => s.ExecutionPreference == ExecutionPreference.MicrosoftTestingPlatform)))
+        {
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run contains Microsoft.Testing.Platform sources, running in isolation.");
             return false;
         }
 

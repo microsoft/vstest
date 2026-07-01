@@ -231,4 +231,43 @@ internal class InferHelper
         return extType != null && (extType.Equals(".dll", StringComparison.OrdinalIgnoreCase) ||
                                    extType.Equals(".exe", StringComparison.OrdinalIgnoreCase));
     }
+
+    /// <summary>
+    /// Determines, per source, how the test platform should host it. A source is hosted as a
+    /// Microsoft.Testing.Platform (MTP) application when its assembly is marked with
+    /// <c>[assembly: AssemblyMetadata("Microsoft.Testing.Platform.Application", "true")]</c>; otherwise the
+    /// default vstest hosting is used.
+    /// </summary>
+    public void DetectExecutionPreference(IList<string>? sources, out IDictionary<string, ExecutionPreference> sourceToExecutionPreferenceMap)
+    {
+        sourceToExecutionPreferenceMap = new Dictionary<string, ExecutionPreference>();
+        if (sources == null || sources.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var source in sources)
+        {
+            if (source is null)
+            {
+                continue;
+            }
+
+            var preference = ExecutionPreference.Default;
+            try
+            {
+                if (IsDllOrExe(source) && _assemblyMetadataProvider.IsMicrosoftTestingPlatformApp(source))
+                {
+                    preference = ExecutionPreference.MicrosoftTestingPlatform;
+                }
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning("InferHelper.DetectExecutionPreference: Failed to detect execution preference for source '{0}', using default. Exception: {1}", source, ex);
+            }
+
+            EqtTrace.Info("InferHelper.DetectExecutionPreference: source '{0}' execution preference '{1}'.", source, preference);
+            sourceToExecutionPreferenceMap[source] = preference;
+        }
+    }
 }
