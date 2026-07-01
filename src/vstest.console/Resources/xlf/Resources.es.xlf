@@ -871,16 +871,17 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
-      Ejecuta la prueba en modo blame. Esta opción es útil a la hora de aislar la prueba problemática que provoca el bloqueo del host de prueba.
-      Crea un archivo de salida en el directorio actual como "Sequence.xml",
-      que captura el orden de ejecución de la prueba antes del bloqueo.
-      Tiene la opción de elegir recopilar el volcado de proceso para el host de prueba.
-      Cuando elige recopilar el volcado, de forma predeterminada se recopila un mini volcado en un bloqueo.
-      También puede elegir invalidar este comportamiento predeterminado mediante algunos parámetros opcionales:
-      CollectAlways: para recopilar un volcado al salir incluso aunque no haya un bloqueo (true/false) 
-      DumpType: para especificar el tipo de volcado (mini/completo).
-      Ejemplo: /Blame
+        <target state="new">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
+      It creates an output file in the current directory as "Sequence.xml",
+      that captures the order of execution of test before the crash.
+      You may optionally choose to collect process dump for the test host.
+      When you choose to collect dump, by default, a mini dump will be collected on a crash.
+      You may also choose to override this default behaviour by some optional parameters:
+      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
+      DumpType - To specify dump type (mini/full).
+      Collecting a crash dump on Windows requires procdump.exe and procdump64.exe to be available in PATH, or in a directory pointed to by the PROCDUMP_PATH environment variable. The tools can be downloaded from https://docs.microsoft.com/sysinternals/downloads/procdump.
+      Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
         <note />
