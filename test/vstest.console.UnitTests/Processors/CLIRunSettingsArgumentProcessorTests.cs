@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -68,14 +68,14 @@ public class CliRunSettingsArgumentProcessorTests
     [TestMethod]
     public void GetMetadataShouldReturnRunSettingsArgumentProcessorCapabilities()
     {
-        var processor = new CliRunSettingsArgumentProcessor();
+        var processor = new CliRunSettingsArgumentProcessor(new TestableRunSettingsProvider());
         Assert.IsTrue(processor.Metadata.Value is CliRunSettingsArgumentProcessorCapabilities);
     }
 
     [TestMethod]
     public void GetExecuterShouldReturnRunSettingsArgumentProcessorCapabilities()
     {
-        var processor = new CliRunSettingsArgumentProcessor();
+        var processor = new CliRunSettingsArgumentProcessor(new TestableRunSettingsProvider());
         Assert.IsTrue(processor.Executor!.Value is CliRunSettingsArgumentExecutor);
     }
 

@@ -28,6 +28,12 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
 
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
+    private readonly IRunSettingsProvider _runSettingsProvider;
+
+    public PlatformArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    {
+        _runSettingsProvider = runSettingsProvider;
+    }
 
     /// <summary>
     /// Gets the metadata.
@@ -42,7 +48,7 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new PlatformArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+            new PlatformArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider));
 
         set => _executor = value;
     }
