@@ -15,6 +15,7 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces;
@@ -59,6 +60,7 @@ internal class Executor
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     private readonly IProcessHelper _processHelper;
     private readonly IEnvironment _environment;
+    private readonly IRunSettingsProvider _runSettingsProvider;
     private bool _showHelp;
 
     /// <summary>
@@ -89,6 +91,11 @@ internal class Executor
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
+        : this(output, testPlatformEventSource, processHelper, environment, RunSettingsManager.Instance)
+    {
+    }
+
+    internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment, IRunSettingsProvider runSettingsProvider)
     {
         DebuggerBreakpoint.AttachVisualStudioDebugger(WellKnownDebugEnvironmentVariables.VSTEST_RUNNER_DEBUG_ATTACHVS);
         DebuggerBreakpoint.WaitForNativeDebugger(WellKnownDebugEnvironmentVariables.VSTEST_RUNNER_NATIVE_DEBUG);
@@ -99,6 +106,7 @@ internal class Executor
         _showHelp = true;
         _processHelper = processHelper;
         _environment = environment;
+        _runSettingsProvider = runSettingsProvider;
     }
 
     /// <summary>
@@ -220,7 +228,7 @@ internal class Executor
     {
         processors = new List<IArgumentProcessor>();
         int result = 0;
-        var processorFactory = ArgumentProcessorFactory.Create();
+        var processorFactory = ArgumentProcessorFactory.Create(runSettingsProvider: _runSettingsProvider);
         for (var index = 0; index < args.Length; index++)
         {
             var arg = args[index];
@@ -268,7 +276,7 @@ internal class Executor
         }
 
         // Initialize Runsettings with defaults
-        RunSettingsManager.Instance.AddDefaultRunSettings();
+        _runSettingsProvider.AddDefaultRunSettings();
 
         // Ensure we have an action argument.
         EnsureActionArgumentIsPresent(processors, processorFactory);

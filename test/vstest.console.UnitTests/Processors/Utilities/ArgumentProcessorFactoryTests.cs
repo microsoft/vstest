@@ -6,10 +6,13 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
+using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
+
+using vstest.console.UnitTests.Processors;
 
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests.Processors.Utilities;
 
@@ -164,7 +167,11 @@ public class ArgumentProcessorFactoryTests
 
         foreach (var processor in allProcessors)
         {
-            var instance = Activator.CreateInstance(processor) as IArgumentProcessor;
+            // Some processors require an IRunSettingsProvider via constructor injection; the rest are parameterless.
+            var runSettingsCtor = processor.GetConstructor([typeof(IRunSettingsProvider)]);
+            var instance = (runSettingsCtor is not null
+                ? runSettingsCtor.Invoke([new TestableRunSettingsProvider()])
+                : Activator.CreateInstance(processor)) as IArgumentProcessor;
             Assert.IsNotNull(instance, $"Unable to instantiate processor: {processor}");
 
             var specialProcessor = instance.Metadata.Value.IsSpecialCommand;

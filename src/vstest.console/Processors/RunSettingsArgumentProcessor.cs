@@ -30,6 +30,12 @@ internal class RunSettingsArgumentProcessor : IArgumentProcessor
 
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
+    private readonly IRunSettingsProvider _runSettingsProvider;
+
+    public RunSettingsArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    {
+        _runSettingsProvider = runSettingsProvider;
+    }
 
     /// <summary>
     /// Gets the metadata.
@@ -44,7 +50,7 @@ internal class RunSettingsArgumentProcessor : IArgumentProcessor
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new RunSettingsArgumentExecutor(CommandLineOptions.Instance, RunSettingsManager.Instance));
+            new RunSettingsArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider));
 
         set => _executor = value;
     }

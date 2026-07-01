@@ -32,14 +32,14 @@ public class PlatformArgumentProcessorTests
     [TestMethod]
     public void GetMetadataShouldReturnPlatformArgumentProcessorCapabilities()
     {
-        var processor = new PlatformArgumentProcessor();
+        var processor = new PlatformArgumentProcessor(new TestableRunSettingsProvider());
         Assert.IsTrue(processor.Metadata.Value is PlatformArgumentProcessorCapabilities);
     }
 
     [TestMethod]
     public void GetExecuterShouldReturnPlatformArgumentExecutor()
     {
-        var processor = new PlatformArgumentProcessor();
+        var processor = new PlatformArgumentProcessor(new TestableRunSettingsProvider());
         Assert.IsTrue(processor.Executor!.Value is PlatformArgumentExecutor);
     }
 
