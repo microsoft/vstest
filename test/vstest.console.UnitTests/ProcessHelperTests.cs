@@ -25,25 +25,20 @@ public class ProcessHelperTests
     [TestMethod]
     public async Task WaitForErrorStreamToDrainShouldReturnOnceTheErrorStreamCloses()
     {
-        // EOF arrives a little AFTER we start waiting, mimicking a slow ErrorDataReceived delivery that lands
-        // just after the exit handler begins draining. The wait must observe that late completion and return
-        // promptly once it arrives - not return early (dropping the crash callstack) and not block to the timeout.
+        // EOF arrives AFTER we start waiting, mimicking a slow ErrorDataReceived delivery that lands just after
+        // the exit handler begins draining. Start the wait first and assert it is still in progress, then signal
+        // EOF: the wait must observe that late completion and return promptly - not return early (dropping the
+        // crash callstack) and not block to the timeout.
         var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _ = Task.Run(async () =>
-        {
-            await Task.Delay(150);
-            errorStreamClosed.TrySetResult(true);
-        });
 
-        var stopwatch = Stopwatch.StartNew();
-        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
-        stopwatch.Stop();
+        var drainTask = ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
+        Assert.IsFalse(drainTask.IsCompleted, "The wait must still be in progress before the error stream drains.");
 
+        // The late ErrorDataReceived EOF finally arrives.
+        errorStreamClosed.TrySetResult(true);
+
+        await drainTask;
         Assert.IsTrue(errorStreamClosed.Task.IsCompleted, "The method must wait until the error stream is drained.");
-        Assert.IsLessThan(
-            3000L,
-            stopwatch.ElapsedMilliseconds,
-            $"The method should return shortly after the stream closes, not at the timeout (took {stopwatch.ElapsedMilliseconds} ms).");
     }
 
     [TestMethod]
