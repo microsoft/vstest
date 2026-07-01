@@ -34,11 +34,20 @@ public class ProcessHelperTests
         var drainTask = ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
         Assert.IsFalse(drainTask.IsCompleted, "The wait must still be in progress before the error stream drains.");
 
-        // The late ErrorDataReceived EOF finally arrives.
+        // The late ErrorDataReceived EOF finally arrives; the wait must observe it and return promptly. The
+        // budget above is far larger than this should take, so if the wait ignored EOF and always ran to the
+        // timeout the elapsed-time assertion below would catch it (the await would take ~5s, not a few ms).
+        var stopwatch = Stopwatch.StartNew();
         errorStreamClosed.TrySetResult(true);
 
         await drainTask;
+        stopwatch.Stop();
+
         Assert.IsTrue(errorStreamClosed.Task.IsCompleted, "The method must wait until the error stream is drained.");
+        Assert.IsLessThan(
+            2000L,
+            stopwatch.ElapsedMilliseconds,
+            $"The wait must return as soon as the late EOF is observed, not run to the timeout (took {stopwatch.ElapsedMilliseconds} ms).");
     }
 
     [TestMethod]

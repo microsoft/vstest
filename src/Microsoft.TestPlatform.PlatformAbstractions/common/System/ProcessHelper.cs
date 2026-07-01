@@ -298,15 +298,16 @@ public partial class ProcessHelper : IProcessHelper
     /// error stream to reach EOF (signaled by completing <paramref name="errorStreamClosed"/>). This ensures all
     /// <see cref="Process.ErrorDataReceived"/> callbacks have completed - and therefore the captured error
     /// output is complete - before it is consumed by the exit callback. It returns immediately when there is
-    /// no redirected error stream or when the timeout is not positive, and is otherwise bounded by the timeout
-    /// (e.g. a grandchild process keeps the pipe open), so the caller can never hang. It deliberately does not
+    /// no redirected error stream, when the timeout is not positive, or when the stream has already drained
+    /// (the common case), and is otherwise bounded by the timeout (e.g. a grandchild process keeps the pipe
+    /// open), so the caller can never hang. It deliberately does not
     /// block the calling thread while waiting, so it does not consume a thread-pool thread that the pending
     /// <see cref="Process.ErrorDataReceived"/> callback may itself need in order to deliver EOF under
     /// thread-pool starvation.
     /// </summary>
     internal static async Task WaitForErrorStreamToDrainAsync(TaskCompletionSource<bool>? errorStreamClosed, int timeoutMilliseconds)
     {
-        if (errorStreamClosed is null || timeoutMilliseconds <= 0)
+        if (errorStreamClosed is null || timeoutMilliseconds <= 0 || errorStreamClosed.Task.IsCompleted)
         {
             return;
         }
