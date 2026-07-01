@@ -475,6 +475,23 @@ public class TestEngine : ITestEngine
             var sourceDetail = runConfiguration.First();
             var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(runSettings, sourceDetail);
             var sources = runConfiguration.Select(c => c.Source!).ToList();
+
+#if NETCOREAPP
+            // Microsoft.Testing.Platform sources are driven directly over the MTP protocol by
+            // MtpProxyDiscoveryManager / MtpProxyExecutionManager, so they do not use a vstest
+            // ITestRuntimeProvider (testhost) at all. Register them with a sentinel provider type
+            // so the "no runtime provider" guard does not reject them and so the parallel managers
+            // treat their workloads as runnable (HasProvider checks Type is not null). The actual
+            // routing to the MTP proxies happens in the discovery/execution manager creators based
+            // on ExecutionPreference.
+            if (sourceDetail.ExecutionPreference == ExecutionPreference.MicrosoftTestingPlatform)
+            {
+                testRuntimeProviders.Add(new TestRuntimeProviderInfo(typeof(ITestRuntimeProvider), shared: false,
+                    runsettingsXml, sourceDetails: runConfiguration.ToList()));
+                continue;
+            }
+#endif
+
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
 
             if (testRuntimeProvider != null)
