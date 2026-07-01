@@ -43,8 +43,27 @@ public class TestRuntimeProviderManager : ITestRuntimeProviderManager
         return host?.Value;
     }
 
-    public virtual ITestRuntimeProvider? GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string>? _)
+    public virtual ITestRuntimeProvider? GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string>? sources)
     {
+        // First pass: give source-aware providers first refusal. These providers (e.g. the
+        // Microsoft.Testing.Platform provider) can inspect the actual sources to decide whether they own the
+        // run, so they must be consulted before the generic, source-blind providers that match only by target
+        // framework. This gives the more specific provider priority without any global ordering scheme, and
+        // without relying on the generic providers to decline.
+        if (sources is not null && sources.Count > 0)
+        {
+            foreach (var testExtension in _testHostExtensionManager.TestExtensions)
+            {
+                if (testExtension.Value is ISourceAwareTestRuntimeProvider sourceAware
+                    && sourceAware.CanExecuteCurrentRunConfiguration(runConfiguration, sources))
+                {
+                    // We are creating a new instance of ITestRuntimeProvider so that each POM gets its own object of ITestRuntimeProvider.
+                    return (ITestRuntimeProvider?)Activator.CreateInstance(testExtension.Value.GetType());
+                }
+            }
+        }
+
+        // Second pass: the legacy, source-blind resolution based purely on the run configuration.
         foreach (var testExtension in _testHostExtensionManager.TestExtensions)
         {
             if (testExtension.Value.CanExecuteCurrentRunConfiguration(runConfiguration))
