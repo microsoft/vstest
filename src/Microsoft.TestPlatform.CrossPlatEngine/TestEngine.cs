@@ -2,7 +2,6 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,13 +12,10 @@ using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
-#if NETCOREAPP
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
-#endif
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -40,11 +36,6 @@ public class TestEngine : ITestEngine
     private readonly ITestRuntimeProviderManager _testHostProviderManager;
     private readonly IProcessHelper _processHelper;
     private readonly IEnvironment _environment;
-
-    // Caches whether a given source is a Microsoft.Testing.Platform application. Detection reads the
-    // assembly metadata, so we memoize per source path. Concurrent because the discovery/execution
-    // manager creators can be invoked from parallel proxy-manager threads.
-    private readonly ConcurrentDictionary<string, bool> _mtpSourceCache = new(StringComparer.OrdinalIgnoreCase);
 
     private ITestExtensionManager? _testExtensionManager;
 
@@ -130,16 +121,19 @@ public class TestEngine : ITestEngine
         var discoveryDataAggregator = new DiscoveryDataAggregator();
         Func<TestRuntimeProviderInfo, DiscoveryCriteria, IProxyDiscoveryManager> proxyDiscoveryManagerCreator = (runtimeProviderInfo, discoveryCriteria) =>
         {
-#if NETCOREAPP
-            if (runtimeProviderInfo.SourceDetails.Count > 0
-                && IsMicrosoftTestingPlatformSource(runtimeProviderInfo.SourceDetails[0]))
-            {
-                EqtTrace.Verbose("TestEngine.GetDiscoveryManager: routing to MtpProxyDiscoveryManager for Microsoft.Testing.Platform sources.");
-                return new MtpProxyDiscoveryManager();
-            }
-#endif
             var sources = discoveryCriteria.Sources.ToList();
             var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
+
+            // A runtime provider may host the run over its own protocol (e.g. Microsoft.Testing.Platform's
+            // JSON-RPC) instead of launching a vstest testhost. Such a provider supplies its own proxy managers
+            // via IProxyManagerFactory, so ask the resolved provider for the discovery manager rather than
+            // building the standard vstest testhost proxy.
+            if (hostManager is IProxyManagerFactory proxyManagerFactory)
+            {
+                EqtTrace.Verbose("TestEngine.GetDiscoveryManager: provider '{0}' supplies its own discovery manager.", hostManager.GetType().Name);
+                return proxyManagerFactory.CreateDiscoveryManager();
+            }
+
             hostManager?.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings!);
 
             ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
@@ -280,31 +274,26 @@ public class TestEngine : ITestEngine
     // This is internal so tests can use it.
     internal IProxyExecutionManager CreateNonParallelExecutionManager(IRequestData requestData, TestRunCriteria testRunCriteria, bool isDataCollectorEnabled, TestRuntimeProviderInfo runtimeProviderInfo)
     {
-#if NETCOREAPP
-        if (runtimeProviderInfo.SourceDetails.Count > 0
-            && IsMicrosoftTestingPlatformSource(runtimeProviderInfo.SourceDetails[0]))
-        {
-            if (isDataCollectorEnabled)
-            {
-                EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: routing to MtpProxyExecutionManager (with data collection) for Microsoft.Testing.Platform sources.");
-                var mtpSources = runtimeProviderInfo.SourceDetails.Select(r => r.Source!).ToList();
-                return new MtpProxyExecutionManager(
-                    new ProxyDataCollectionManager(
-                        requestData,
-                        runtimeProviderInfo.RunSettings,
-                        mtpSources));
-            }
-
-            EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: routing to MtpProxyExecutionManager for Microsoft.Testing.Platform sources.");
-            return new MtpProxyExecutionManager();
-        }
-#endif
         // SetupChannel ProxyExecutionManager with data collection if data collectors are
         // specified in run settings.
         // Create a new host manager, to be associated with individual
         // ProxyExecutionManager(&POM)
         var sources = runtimeProviderInfo.SourceDetails.Select(r => r.Source!).ToList();
         var hostManager = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runtimeProviderInfo.RunSettings, sources);
+
+        // A runtime provider may host the run over its own protocol (e.g. Microsoft.Testing.Platform's
+        // JSON-RPC) instead of launching a vstest testhost. Such a provider supplies its own proxy managers
+        // via IProxyManagerFactory, so ask the resolved provider for the execution manager (wiring in data
+        // collection when enabled) rather than building the standard vstest testhost proxy.
+        if (hostManager is IProxyManagerFactory proxyManagerFactory)
+        {
+            IProxyDataCollectionManager? dataCollectionManager = isDataCollectorEnabled
+                ? new ProxyDataCollectionManager(requestData, runtimeProviderInfo.RunSettings, sources)
+                : null;
+            EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: provider '{0}' supplies its own execution manager (data collection: {1}).", hostManager.GetType().Name, isDataCollectorEnabled);
+            return proxyManagerFactory.CreateExecutionManager(dataCollectionManager);
+        }
+
         ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
         hostManager!.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings!);
 
@@ -483,32 +472,19 @@ public class TestEngine : ITestEngine
         out ITestRuntimeProvider? mostRecentlyCreatedInstance)
     {
         // Group source details to get unique frameworks and architectures for which we will run, so we can figure
-        // out which runtime providers would run them, and if the runtime provider is shared or not.
+        // out which runtime providers would run them, and if the runtime provider is shared or not. A source-aware
+        // provider (e.g. Microsoft.Testing.Platform) claims sources by their shape, not just their framework, so we
+        // include the claiming provider's type in the grouping key: this keeps such sources in their own
+        // configuration instead of being merged with generic (framework-only) sources of the same TFM/architecture.
         mostRecentlyCreatedInstance = null;
         var testRuntimeProviders = new List<TestRuntimeProviderInfo>();
-        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}|{IsMicrosoftTestingPlatformSource(k)}");
+        var uniqueRunConfigurations = sourceToSourceDetailMap.Values.GroupBy(k => $"{k.Framework}|{k.Architecture}|{_testHostProviderManager.GetSourceAwareRuntimeProviderType(runSettings, k.Source!)?.AssemblyQualifiedName ?? string.Empty}");
         foreach (var runConfiguration in uniqueRunConfigurations)
         {
             // It is okay to take the first (or any) source detail in the group. We are grouping to get the same source detail, so all architectures and frameworks are the same.
             var sourceDetail = runConfiguration.First();
             var runsettingsXml = SourceDetailHelper.UpdateRunSettingsFromSourceDetail(runSettings, sourceDetail);
             var sources = runConfiguration.Select(c => c.Source!).ToList();
-
-#if NETCOREAPP
-            // Microsoft.Testing.Platform sources are driven directly over the MTP protocol by
-            // MtpProxyDiscoveryManager / MtpProxyExecutionManager, so they do not use a vstest
-            // ITestRuntimeProvider (testhost) at all. Register them with a sentinel provider type
-            // so the "no runtime provider" guard does not reject them and so the parallel managers
-            // treat their workloads as runnable (HasProvider checks Type is not null). The actual
-            // routing to the MTP proxies happens in the discovery/execution manager creators based
-            // on the source being a Microsoft.Testing.Platform app.
-            if (IsMicrosoftTestingPlatformSource(sourceDetail))
-            {
-                testRuntimeProviders.Add(new TestRuntimeProviderInfo(typeof(ITestRuntimeProvider), shared: false,
-                    runsettingsXml, sourceDetails: runConfiguration.ToList()));
-                continue;
-            }
-#endif
 
             var testRuntimeProvider = _testHostProviderManager.GetTestHostManagerByRunConfiguration(runsettingsXml, sources);
 
@@ -646,16 +622,6 @@ public class TestEngine : ITestEngine
         return parallelLevelToUse;
     }
 
-    // Returns true when the source is a Microsoft.Testing.Platform application. The result is derived
-    // from the source assembly itself (its build-time metadata), which is the information TestEngine
-    // already has via SourceDetail, and is memoized per source path.
-    private bool IsMicrosoftTestingPlatformSource(SourceDetail sourceDetail)
-    {
-        var source = sourceDetail.Source;
-        return !StringUtils.IsNullOrEmpty(source)
-            && _mtpSourceCache.GetOrAdd(source, static s => MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp(s));
-    }
-
     private bool ShouldRunInProcess(
         string runsettings,
         bool isParallelEnabled,
@@ -668,11 +634,12 @@ public class TestEngine : ITestEngine
             return false;
         }
 
-        // Microsoft.Testing.Platform sources are hosted out-of-process and communicate over the MTP protocol,
-        // so they can never run in-process inside vstest.console.
-        if (testHostProviders.Any(p => p.SourceDetails.Any(IsMicrosoftTestingPlatformSource)))
+        // A provider that supplies its own proxy managers (IProxyManagerFactory) hosts the run over its own
+        // protocol out-of-process (e.g. Microsoft.Testing.Platform's JSON-RPC), so it can never run in-process
+        // inside vstest.console.
+        if (testHostProviders.Any(p => p.Type is not null && typeof(IProxyManagerFactory).IsAssignableFrom(p.Type)))
         {
-            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run contains Microsoft.Testing.Platform sources, running in isolation.");
+            EqtTrace.Info("TestEngine.ShouldRunInNoIsolation: This run contains a provider that hosts its own protocol out-of-process, running in isolation.");
             return false;
         }
 

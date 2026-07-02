@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Reflection.Metadata;
 using System.Reflection.PortableExecutable;
@@ -24,24 +25,37 @@ internal static class MicrosoftTestingPlatformDetector
 {
     private const string MicrosoftTestingPlatformApplicationMetadataKey = "Microsoft.Testing.Platform.Application";
 
+    // Detection reads the assembly's PE metadata from disk, and a single run can ask about the same source
+    // several times (grouping, provider resolution, and per-source proxy creation). Memoize per source path so
+    // we read each assembly at most once. Concurrent because resolution can happen on parallel proxy threads.
+    private static readonly ConcurrentDictionary<string, bool> Cache = new(StringComparer.OrdinalIgnoreCase);
+
     /// <summary>
     /// Returns <see langword="true"/> if the assembly at <paramref name="filePath"/> is a
     /// Microsoft.Testing.Platform application. Never throws; returns <see langword="false"/> on any error.
     /// </summary>
     public static bool IsMicrosoftTestingPlatformApp(string filePath)
     {
-        try
+        if (filePath is null)
         {
-            using var assemblyStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-            var result = IsMicrosoftTestingPlatformApp(assemblyStream);
-            EqtTrace.Info("MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp: '{0}' for source: '{1}'", result, filePath);
-            return result;
-        }
-        catch (Exception ex)
-        {
-            EqtTrace.Warning("MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp: failed to read assembly metadata, exception: {0} for assembly: {1}", ex, filePath);
             return false;
         }
+
+        return Cache.GetOrAdd(filePath, static path =>
+        {
+            try
+            {
+                using var assemblyStream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                var result = IsMicrosoftTestingPlatformApp(assemblyStream);
+                EqtTrace.Info("MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp: '{0}' for source: '{1}'", result, path);
+                return result;
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Warning("MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp: failed to read assembly metadata, exception: {0} for assembly: {1}", ex, path);
+                return false;
+            }
+        });
     }
 
     /// <summary>

@@ -43,6 +43,25 @@ public class TestRuntimeProviderManager : ITestRuntimeProviderManager
         return host?.Value;
     }
 
+    Type? ITestRuntimeProviderManager.GetSourceAwareRuntimeProviderType(string? runConfiguration, string source)
+    {
+        // Consult only the source-aware providers (the first-refusal pass), mirroring the first loop of
+        // GetTestHostManagerByRunConfiguration, but for a single source and without instantiating anything.
+        // Callers use the returned type purely as a grouping discriminator, so a source claimed by a
+        // source-aware provider is scheduled separately from a generic (source-blind) source.
+        var sources = new List<string> { source };
+        foreach (var testExtension in _testHostExtensionManager.TestExtensions)
+        {
+            if (testExtension.Value is ISourceAwareTestRuntimeProvider sourceAware
+                && sourceAware.CanExecuteCurrentRunConfiguration(runConfiguration, sources))
+            {
+                return testExtension.Value.GetType();
+            }
+        }
+
+        return null;
+    }
+
     public virtual ITestRuntimeProvider? GetTestHostManagerByRunConfiguration(string? runConfiguration, List<string>? sources)
     {
         // First pass: give source-aware providers first refusal. These providers (e.g. the
