@@ -107,12 +107,16 @@ For isolated projects with few dependencies:
 For a single project you can also build+test its csproj directly with the bootstrapped SDK:
 
 ```bash
+# Windows
 ./.dotnet/dotnet.exe test test/Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests/*.csproj -c Debug
+
+# Linux / macOS
+./.dotnet/dotnet test test/Microsoft.TestPlatform.Extensions.HtmlLogger.UnitTests/*.csproj -c Debug
 ```
 
 ### Test Categories (smoke / integration / performance / compatibility)
 
-These are **switches** handled by `eng/Build.ps1` — NOT `-projects` values:
+These are **switches** handled by `eng/build.ps1` — NOT `-projects` values:
 
 ```bash
 # Windows
@@ -130,7 +134,7 @@ These are **switches** handled by `eng/Build.ps1` — NOT `-projects` values:
 ### Filter by Test Name
 
 Use the `-filter` parameter. Do **not** pass `--filter` inside `TestRunnerAdditionalArguments` —
-`eng/Build.ps1` explicitly throws if you do.
+`eng/build.ps1` explicitly throws if you do.
 
 ```bash
 # Windows
