@@ -1,10 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETCOREAPP
-
 using System;
-using System.Text.Json;
+using System.Collections.Generic;
+
+using Jsonite;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -31,30 +31,30 @@ internal static class MtpTestNodeConverter
     /// Returns true when the node represents a runnable test (a leaf "action" node) rather than a
     /// grouping node (namespace/class/suite).
     /// </summary>
-    public static bool IsActionNode(JsonElement node)
-        => GetString(node, MtpConstants.NodeType) is "action";
+    public static bool IsActionNode(JsonObject node)
+        => MtpJson.GetString(node, MtpConstants.NodeType) is "action";
 
-    public static string? GetExecutionState(JsonElement node)
-        => GetString(node, MtpConstants.ExecutionState);
+    public static string? GetExecutionState(JsonObject node)
+        => MtpJson.GetString(node, MtpConstants.ExecutionState);
 
-    public static TestCase ToTestCase(JsonElement node, string source)
+    public static TestCase ToTestCase(JsonObject node, string source)
     {
-        string uid = GetString(node, MtpConstants.Uid) ?? Guid.NewGuid().ToString();
-        string fullyQualifiedName = GetString(node, MtpConstants.VsTestFullyQualifiedName) ?? uid;
-        string executorUri = GetString(node, MtpConstants.VsTestExecutorUri) ?? MtpConstants.DefaultExecutorUri;
+        string uid = MtpJson.GetString(node, MtpConstants.Uid) ?? Guid.NewGuid().ToString();
+        string fullyQualifiedName = MtpJson.GetString(node, MtpConstants.VsTestFullyQualifiedName) ?? uid;
+        string executorUri = MtpJson.GetString(node, MtpConstants.VsTestExecutorUri) ?? MtpConstants.DefaultExecutorUri;
 
         var testCase = new TestCase(fullyQualifiedName, new Uri(executorUri), source)
         {
-            DisplayName = GetString(node, MtpConstants.DisplayName) ?? fullyQualifiedName,
+            DisplayName = MtpJson.GetString(node, MtpConstants.DisplayName) ?? fullyQualifiedName,
         };
 
         testCase.SetPropertyValue(MtpUidProperty, uid);
 
-        string? file = GetString(node, MtpConstants.LocationFile);
+        string? file = MtpJson.GetString(node, MtpConstants.LocationFile);
         if (!string.IsNullOrEmpty(file))
         {
             testCase.CodeFilePath = file;
-            if (TryGetInt(node, MtpConstants.LocationLineStart, out int line))
+            if (MtpJson.TryGetInt(node, MtpConstants.LocationLineStart, out int line))
             {
                 testCase.LineNumber = line;
             }
@@ -64,7 +64,7 @@ internal static class MtpTestNodeConverter
         return testCase;
     }
 
-    public static TestResult ToTestResult(JsonElement node, string source)
+    public static TestResult ToTestResult(JsonObject node, string source)
     {
         var testCase = ToTestCase(node, source);
         string? state = GetExecutionState(node);
@@ -73,11 +73,11 @@ internal static class MtpTestNodeConverter
         {
             Outcome = ToOutcome(state),
             DisplayName = testCase.DisplayName,
-            ErrorMessage = GetString(node, MtpConstants.ErrorMessage),
-            ErrorStackTrace = GetString(node, MtpConstants.ErrorStackTrace),
+            ErrorMessage = MtpJson.GetString(node, MtpConstants.ErrorMessage),
+            ErrorStackTrace = MtpJson.GetString(node, MtpConstants.ErrorStackTrace),
         };
 
-        if (TryGetDouble(node, MtpConstants.TimeDurationMs, out double durationMs))
+        if (MtpJson.TryGetDouble(node, MtpConstants.TimeDurationMs, out double durationMs))
         {
             result.Duration = TimeSpan.FromMilliseconds(durationMs);
         }
@@ -103,54 +103,25 @@ internal static class MtpTestNodeConverter
             _ => TestOutcome.None,
         };
 
-    private static void AddTraits(JsonElement node, TestCase testCase)
+    private static void AddTraits(JsonObject node, TestCase testCase)
     {
-        if (!node.TryGetProperty(MtpConstants.Traits, out JsonElement traits) || traits.ValueKind != JsonValueKind.Array)
+        if (MtpJson.GetValue(node, MtpConstants.Traits) is not JsonArray traits)
         {
             return;
         }
 
-        foreach (JsonElement trait in traits.EnumerateArray())
+        foreach (object? traitObject in traits)
         {
-            if (trait.ValueKind != JsonValueKind.Object)
+            if (traitObject is not JsonObject trait)
             {
                 continue;
             }
 
-            foreach (JsonProperty property in trait.EnumerateObject())
+            foreach (KeyValuePair<string, object> property in trait)
             {
-                string value = property.Value.ValueKind == JsonValueKind.String ? property.Value.GetString() ?? string.Empty : string.Empty;
-                testCase.Traits.Add(new Trait(property.Name, value));
+                string value = property.Value as string ?? string.Empty;
+                testCase.Traits.Add(new Trait(property.Key, value));
             }
         }
     }
-
-    private static string? GetString(JsonElement node, string key)
-        => node.ValueKind == JsonValueKind.Object && node.TryGetProperty(key, out JsonElement value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
-
-    private static bool TryGetInt(JsonElement node, string key, out int result)
-    {
-        if (node.ValueKind == JsonValueKind.Object && node.TryGetProperty(key, out JsonElement value) && value.ValueKind == JsonValueKind.Number && value.TryGetInt32(out result))
-        {
-            return true;
-        }
-
-        result = 0;
-        return false;
-    }
-
-    private static bool TryGetDouble(JsonElement node, string key, out double result)
-    {
-        if (node.ValueKind == JsonValueKind.Object && node.TryGetProperty(key, out JsonElement value) && value.ValueKind == JsonValueKind.Number && value.TryGetDouble(out result))
-        {
-            return true;
-        }
-
-        result = 0;
-        return false;
-    }
 }
-
-#endif

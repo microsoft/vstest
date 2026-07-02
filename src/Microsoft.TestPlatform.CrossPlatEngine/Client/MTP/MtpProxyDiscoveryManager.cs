@@ -1,13 +1,12 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETCOREAPP
-
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
+
+using Jsonite;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -98,7 +97,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
                 return;
             }
 
-            foreach (JsonElement node in MtpClientHelpers.EnumerateNodes(parameters))
+            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
             {
                 if (MtpTestNodeConverter.IsActionNode(node))
                 {
@@ -140,5 +139,3 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
         return chunk.Count;
     }
 }
-
-#endif

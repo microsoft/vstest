@@ -1,8 +1,6 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETCOREAPP
-
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -11,9 +9,10 @@ using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+
+using Jsonite;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -25,17 +24,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 /// vstest is the JSON-RPC client here: it opens a loopback TCP listener, launches the MTP
 /// application with <c>--server --client-port &lt;port&gt;</c>, and the application connects back to
 /// the listener. Messages are framed with LSP-style <c>Content-Length</c> headers.
+///
+/// The wire is serialized with Jsonite rather than System.Text.Json so this client works on every
+/// framework we ship, including the .NET Framework runner (no System.Text.Json dependency and thus
+/// no binding-redirect fallout). Parsed messages are plain <see cref="JsonObject"/>/<see
+/// cref="JsonArray"/> object graphs.
 /// </summary>
 internal sealed class MtpServerConnection : IDisposable
 {
-    private static readonly JsonSerializerOptions SerializerOptions = new()
-    {
-        DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull,
-    };
-
     private readonly TcpListener _listener;
     private readonly int _port;
-    private readonly ConcurrentDictionary<int, TaskCompletionSource<JsonElement>> _pending = new();
+    private readonly ConcurrentDictionary<int, TaskCompletionSource<object?>> _pending = new();
     private readonly object _writeLock = new();
     private readonly CancellationTokenSource _cts = new();
     private readonly StringBuilder _standardError = new();
@@ -48,10 +47,10 @@ internal sealed class MtpServerConnection : IDisposable
     private bool _disposed;
 
     /// <summary>
-    /// Raised for each <c>testing/testUpdates/tests</c> notification. The argument is a clone of the
-    /// notification <c>params</c> element (safe to read after the read loop moves on).
+    /// Raised for each <c>testing/testUpdates/tests</c> notification. The argument is the parsed
+    /// notification <c>params</c> value (a <see cref="JsonObject"/>), or <c>null</c> when absent.
     /// </summary>
-    public event Action<JsonElement>? TestNodesUpdated;
+    public event Action<object?>? TestNodesUpdated;
 
     /// <summary>
     /// Raised for each <c>client/log</c> notification with (level, message).
@@ -127,10 +126,10 @@ internal sealed class MtpServerConnection : IDisposable
     /// <summary>
     /// Sends a JSON-RPC request and awaits the response.
     /// </summary>
-    public async Task<JsonElement> InvokeAsync(string method, object? parameters, CancellationToken cancellationToken)
+    public async Task<object?> InvokeAsync(string method, object? parameters, CancellationToken cancellationToken)
     {
         int id = Interlocked.Increment(ref _nextId);
-        var tcs = new TaskCompletionSource<JsonElement>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var tcs = new TaskCompletionSource<object?>(TaskCreationOptions.RunContinuationsAsynchronously);
         _pending[id] = tcs;
 
         var envelope = new Dictionary<string, object?>
@@ -143,7 +142,7 @@ internal sealed class MtpServerConnection : IDisposable
 
         WriteMessage(envelope);
 
-        using var registration = cancellationToken.Register(static state => ((TaskCompletionSource<JsonElement>)state!).TrySetCanceled(), tcs);
+        using var registration = cancellationToken.Register(static state => ((TaskCompletionSource<object?>)state!).TrySetCanceled(), tcs);
         try
         {
             return await tcs.Task.ConfigureAwait(false);
@@ -184,7 +183,7 @@ internal sealed class MtpServerConnection : IDisposable
             throw new InvalidOperationException("MTP connection has not been established.");
         }
 
-        string json = JsonSerializer.Serialize(envelope, SerializerOptions);
+        string json = Json.Serialize(envelope);
         byte[] body = Encoding.UTF8.GetBytes(json);
         byte[] header = Encoding.ASCII.GetBytes($"{MtpConstants.ContentLengthHeader} {body.Length}\r\nContent-Type: {MtpConstants.ContentType}\r\n\r\n");
 
@@ -237,10 +236,10 @@ internal sealed class MtpServerConnection : IDisposable
 
     private void Dispatch(byte[] body)
     {
-        JsonDocument document;
+        object? parsed;
         try
         {
-            document = JsonDocument.Parse(body);
+            parsed = Json.Deserialize(Encoding.UTF8.GetString(body));
         }
         catch (JsonException ex)
         {
@@ -248,50 +247,49 @@ internal sealed class MtpServerConnection : IDisposable
             return;
         }
 
-        using (document)
+        if (parsed is not JsonObject root)
         {
-            JsonElement root = document.RootElement;
-            bool hasId = root.TryGetProperty("id", out JsonElement idElement) && idElement.ValueKind == JsonValueKind.Number;
+            return;
+        }
 
-            if (root.TryGetProperty("method", out JsonElement methodElement))
+        int? id = root.TryGetValue("id", out object? idValue) && MtpJson.TryToInt(idValue, out int parsedId)
+            ? parsedId
+            : (int?)null;
+
+        if (root.TryGetValue("method", out object? methodValue) && methodValue is string method)
+        {
+            object? parameters = root.TryGetValue("params", out object? p) ? p : null;
+            HandleServerMessage(method, parameters, id);
+            return;
+        }
+
+        if (id is int responseId && _pending.TryGetValue(responseId, out var tcs))
+        {
+            if (root.TryGetValue("error", out object? errorValue) && errorValue is JsonObject error)
             {
-                string method = methodElement.GetString() ?? string.Empty;
-                JsonElement parameters = root.TryGetProperty("params", out JsonElement p) ? p : default;
-                HandleServerMessage(method, parameters, hasId ? idElement.GetInt32() : (int?)null);
-                return;
+                string message = error.TryGetValue("message", out object? m) && m is string ms ? ms : "unknown error";
+                tcs.TrySetException(new InvalidOperationException($"MTP request '{responseId}' failed: {message}"));
             }
-
-            if (hasId)
+            else
             {
-                int id = idElement.GetInt32();
-                if (_pending.TryGetValue(id, out var tcs))
-                {
-                    if (root.TryGetProperty("error", out JsonElement errorElement))
-                    {
-                        string message = errorElement.TryGetProperty("message", out JsonElement m) ? m.GetString() ?? "unknown error" : "unknown error";
-                        tcs.TrySetException(new InvalidOperationException($"MTP request '{id}' failed: {message}"));
-                    }
-                    else
-                    {
-                        JsonElement result = root.TryGetProperty("result", out JsonElement r) ? r.Clone() : default;
-                        tcs.TrySetResult(result);
-                    }
-                }
+                object? result = root.TryGetValue("result", out object? r) ? r : null;
+                tcs.TrySetResult(result);
             }
         }
     }
 
-    private void HandleServerMessage(string method, JsonElement parameters, int? id)
+    private void HandleServerMessage(string method, object? parameters, int? id)
     {
         switch (method)
         {
             case MtpConstants.TestUpdatesTestsMethod:
-                TestNodesUpdated?.Invoke(parameters.ValueKind == JsonValueKind.Undefined ? default : parameters.Clone());
+                TestNodesUpdated?.Invoke(parameters);
                 break;
 
             case MtpConstants.ClientLogMethod:
-                string level = parameters.TryGetProperty("level", out JsonElement l) ? l.GetString() ?? "Information" : "Information";
-                string message = parameters.TryGetProperty("message", out JsonElement msg) ? msg.GetString() ?? string.Empty : string.Empty;
+                JsonObject? logParams = MtpJson.AsObject(parameters);
+                string level = MtpJson.GetString(logParams, "level") ?? "Information";
+                string message = MtpJson.GetString(logParams, "message") ?? string.Empty;
                 LogReceived?.Invoke(level, message);
                 break;
 
@@ -466,7 +464,11 @@ internal sealed class MtpServerConnection : IDisposable
         {
             if (_process is { HasExited: false })
             {
+#if NETCOREAPP
                 _process.Kill(entireProcessTree: true);
+#else
+                _process.Kill();
+#endif
             }
         }
         catch
@@ -486,5 +488,3 @@ internal sealed class MtpServerConnection : IDisposable
         _cts.Dispose();
     }
 }
-
-#endif

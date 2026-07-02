@@ -1,16 +1,14 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETCOREAPP
-
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text.Json;
 using System.Threading;
+
+using Jsonite;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
@@ -66,7 +64,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
     public int StartTestRun(TestRunCriteria testRunCriteria, IInternalTestRunEventsHandler eventHandler)
     {
-        var stopwatch = Stopwatch.StartNew();
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         var aggregate = new RunAggregate();
         var attachments = new List<AttachmentSet>();
         var executorUris = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -242,7 +240,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             }
 
             var results = new List<TestResult>();
-            foreach (JsonElement node in MtpClientHelpers.EnumerateNodes(parameters))
+            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
             {
                 if (!MtpTestNodeConverter.IsActionNode(node))
                 {
@@ -296,7 +294,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
 
         var runTask = connection.InvokeAsync(MtpConstants.RunTestsMethod, runParameters, _cancellationTokenSource.Token);
-        JsonElement response = runTask.GetAwaiter().GetResult();
+        object? response = runTask.GetAwaiter().GetResult();
         completed.Wait(TimeSpan.FromSeconds(3));
 
         CollectAttachments(response, attachments);
@@ -326,19 +324,19 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             })
             .ToList();
 
-    private static void CollectAttachments(JsonElement response, List<AttachmentSet> attachments)
+    private static void CollectAttachments(object? response, List<AttachmentSet> attachments)
     {
-        if (response.ValueKind != JsonValueKind.Object
-            || !response.TryGetProperty(MtpConstants.AttachmentsProperty, out JsonElement attachmentArray)
-            || attachmentArray.ValueKind != JsonValueKind.Array)
+        if (MtpJson.AsObject(response) is not JsonObject responseObject
+            || !responseObject.TryGetValue(MtpConstants.AttachmentsProperty, out object? attachmentsValue)
+            || attachmentsValue is not JsonArray attachmentArray)
         {
             return;
         }
 
         var set = new AttachmentSet(new Uri(MtpConstants.DefaultExecutorUri), "Microsoft.Testing.Platform");
-        foreach (JsonElement attachment in attachmentArray.EnumerateArray())
+        foreach (object? attachmentObject in attachmentArray)
         {
-            if (attachment.ValueKind != JsonValueKind.Object)
+            if (attachmentObject is not JsonObject attachment)
             {
                 continue;
             }
@@ -368,10 +366,8 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
     }
 
-    private static string? GetStringProperty(JsonElement element, string name)
-        => element.TryGetProperty(name, out JsonElement value) && value.ValueKind == JsonValueKind.String
-            ? value.GetString()
-            : null;
+    private static string? GetStringProperty(JsonObject element, string name)
+        => element.TryGetValue(name, out object? value) && value is string text ? text : null;
 
     private static bool TryCreateFileUri(string path, out Uri? uri)
     {
@@ -407,5 +403,3 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             => new(_executed, new Dictionary<TestOutcome, long>(_byOutcome));
     }
 }
-
-#endif

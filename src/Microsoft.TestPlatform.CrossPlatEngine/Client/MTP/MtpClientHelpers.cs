@@ -1,12 +1,11 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NETCOREAPP
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Text.Json;
+
+using Jsonite;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -63,31 +62,36 @@ internal static class MtpClientHelpers
 
     /// <summary>
     /// Returns true when a <c>testing/testUpdates/tests</c> notification is the completion sentinel
-    /// (its <c>changes</c> array is <c>null</c>).
+    /// (its <c>changes</c> array is <c>null</c> or absent).
     /// </summary>
-    public static bool IsCompletionSentinel(JsonElement parameters)
-        => parameters.ValueKind != JsonValueKind.Object
-            || !parameters.TryGetProperty(MtpConstants.ChangesProperty, out JsonElement changes)
-            || changes.ValueKind == JsonValueKind.Null;
+    public static bool IsCompletionSentinel(object? parameters)
+    {
+        JsonObject? node = MtpJson.AsObject(parameters);
+        return node is null
+            || !node.TryGetValue(MtpConstants.ChangesProperty, out object? changes)
+            || changes is null;
+    }
 
     /// <summary>
     /// Enumerates the <c>node</c> objects carried by a <c>testing/testUpdates/tests</c> notification.
     /// </summary>
-    public static IEnumerable<JsonElement> EnumerateNodes(JsonElement parameters)
+    public static IEnumerable<JsonObject> EnumerateNodes(object? parameters)
     {
-        if (parameters.ValueKind != JsonValueKind.Object || !parameters.TryGetProperty(MtpConstants.ChangesProperty, out JsonElement changes) || changes.ValueKind != JsonValueKind.Array)
+        if (MtpJson.AsObject(parameters) is not JsonObject node
+            || !node.TryGetValue(MtpConstants.ChangesProperty, out object? changesValue)
+            || changesValue is not JsonArray changes)
         {
             yield break;
         }
 
-        foreach (JsonElement change in changes.EnumerateArray())
+        foreach (object? changeObject in changes)
         {
-            if (change.ValueKind == JsonValueKind.Object && change.TryGetProperty(MtpConstants.NodeProperty, out JsonElement node) && node.ValueKind == JsonValueKind.Object)
+            if (changeObject is JsonObject change
+                && change.TryGetValue(MtpConstants.NodeProperty, out object? nodeValue)
+                && nodeValue is JsonObject testNode)
             {
-                yield return node;
+                yield return testNode;
             }
         }
     }
 }
-
-#endif
