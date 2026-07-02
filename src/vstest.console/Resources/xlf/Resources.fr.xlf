@@ -868,17 +868,17 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="new">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
-      Runs the test in blame mode. This option is helpful in isolating the problematic test causing test host crash.
-      It creates an output file in the current directory as "Sequence.xml",
-      that captures the order of execution of test before the crash.
-      You may optionally choose to collect process dump for the test host.
-      When you choose to collect dump, by default, a mini dump will be collected on a crash.
-      You may also choose to override this default behaviour by some optional parameters:
-      CollectAlways - To collect dump on exit even if there is no crash (true/false) 
-      DumpType - To specify dump type (mini/full).
-      Collecting a crash dump on Windows requires procdump.exe and procdump64.exe to be available in PATH, or in a directory pointed to by the PROCDUMP_PATH environment variable. The tools can be downloaded from https://docs.microsoft.com/sysinternals/downloads/procdump.
-      Example: /Blame
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+      Exécute le test en mode blâme. Cette option est utile pour isoler le test problématique provoquant le crash de l'hôte de test.
+      Il crée un fichier de sortie dans le répertoire courant comme "Sequence.xml",
+      qui capture l'ordre d'exécution des tests avant le crash.
+      Vous pouvez éventuellement choisir de collecter le vidage de processus pour l'hôte de test.
+      Lorsque vous choisissez de collecter le vidage, par défaut, un mini vidage sera collecté lors d'un crash.
+      Vous pouvez également choisir de remplacer ce comportement par défaut par certains paramètres facultatifs :
+      CollectAlways - Pour collecter le vidage à la sortie, même s’il n’y a pas d’incident (true/false) 
+      DumpType – Pour spécifier le type de vidage (mini/complet).
+      La collecte d’un vidage sur incident sur Windows nécessite que procdump.exe et procdump64.exe soient disponibles dans PATH ou dans un répertoire désigné par la variable d’environnement PROCDUMP_PATH. Les outils peuvent être téléchargés à partir de https://docs.microsoft.com/sysinternals/downloads/procdump.
+      Exemple: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
         <note />
