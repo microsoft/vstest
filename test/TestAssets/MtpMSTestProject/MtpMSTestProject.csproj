@@ -2,8 +2,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <!-- Pinned to net8.0 so the app runs on the same runtime as the locally built runner. -->
-    <TargetFramework>net8.0</TargetFramework>
+    <!-- Multi-targeted so the acceptance harness can resolve the net11.0 build (its mainstream test
+         target framework) while the net8.0 build stays available for the standalone manual E2E runs. -->
+    <TargetFrameworks>net8.0;net11.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
     <Nullable>enable</Nullable>
 
