@@ -105,9 +105,6 @@ internal class PortArgumentExecutor : IArgumentExecutor
     /// </summary>
     private readonly IProcessHelper _processHelper;
 
-    /// <summary>
-    /// Used to flag that the run was started from an Editor or IDE.
-    /// </summary>
     private readonly IRunSettingsHelper _runSettingsHelper;
 
     /// <summary>

@@ -238,14 +238,10 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             }
         }
 
-        if (key.Equals(PlatformArgumentExecutor.RunSettingsPath))
+        if (key.Equals(PlatformArgumentExecutor.RunSettingsPath) && Enum.TryParse<Architecture>(value, true, out var architecture))
         {
-            bool success = Enum.TryParse<Architecture>(value, true, out var architecture);
-            if (success)
-            {
-                _runSettingsHelper.IsDefaultTargetArchitecture = false;
-                _commandLineOptions.TargetArchitecture = architecture;
-            }
+            _runSettingsHelper.IsDefaultTargetArchitecture = false;
+            _commandLineOptions.TargetArchitecture = architecture;
         }
     }
 }
