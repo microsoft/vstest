@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -40,14 +41,14 @@ public class RunSettingsArgumentProcessorTests
     [TestMethod]
     public void GetMetadataShouldReturnRunSettingsArgumentProcessorCapabilities()
     {
-        var processor = new RunSettingsArgumentProcessor(new TestableRunSettingsProvider());
+        var processor = new RunSettingsArgumentProcessor(new TestableRunSettingsProvider(), new RunSettingsHelper());
         Assert.IsTrue(processor.Metadata.Value is RunSettingsArgumentProcessorCapabilities);
     }
 
     [TestMethod]
     public void GetExecuterShouldReturnRunSettingsArgumentExecutor()
     {
-        var processor = new RunSettingsArgumentProcessor(new TestableRunSettingsProvider());
+        var processor = new RunSettingsArgumentProcessor(new TestableRunSettingsProvider(), new RunSettingsHelper());
         Assert.IsTrue(processor.Executor!.Value is RunSettingsArgumentExecutor);
     }
 
@@ -77,14 +78,14 @@ public class RunSettingsArgumentProcessorTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfArgumentIsNull()
     {
-        var ex = Assert.ThrowsExactly<CommandLineException>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!).Initialize(null));
+        var ex = Assert.ThrowsExactly<CommandLineException>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!, new RunSettingsHelper()).Initialize(null));
         Assert.Contains("The /Settings parameter requires a settings file to be provided.", ex.Message);
     }
 
     [TestMethod]
     public void InitializeShouldThrowExceptionIfArgumentIsWhiteSpace()
     {
-        var ex = Assert.ThrowsExactly<CommandLineException>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!).Initialize("  "));
+        var ex = Assert.ThrowsExactly<CommandLineException>(() => new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!, new RunSettingsHelper()).Initialize("  "));
         Assert.Contains("The /Settings parameter requires a settings file to be provided.", ex.Message);
     }
 
@@ -93,7 +94,7 @@ public class RunSettingsArgumentProcessorTests
     {
         var fileName = "C:\\Imaginary\\nonExistentFile.txt";
 
-        var executor = new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!);
+        var executor = new RunSettingsArgumentExecutor(CommandLineOptions.Instance, null!, new RunSettingsHelper());
         var mockFileHelper = new Mock<IFileHelper>();
         mockFileHelper.Setup(fh => fh.Exists(It.IsAny<string>())).Returns(false);
 
@@ -407,7 +408,7 @@ public class RunSettingsArgumentProcessorTests
             CommandLineOptions commandLineOptions,
             IRunSettingsProvider runSettingsManager,
             string? runSettings)
-            : base(commandLineOptions, runSettingsManager)
+            : base(commandLineOptions, runSettingsManager, new RunSettingsHelper())
 
         {
             _runSettingsString = runSettings;

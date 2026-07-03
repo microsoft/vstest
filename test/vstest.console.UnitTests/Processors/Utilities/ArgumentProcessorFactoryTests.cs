@@ -8,6 +8,8 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -167,11 +169,18 @@ public class ArgumentProcessorFactoryTests
 
         foreach (var processor in allProcessors)
         {
-            // Some processors require an IRunSettingsProvider via constructor injection; the rest are parameterless.
-            var runSettingsCtor = processor.GetConstructor([typeof(IRunSettingsProvider)]);
-            var instance = (runSettingsCtor is not null
-                ? runSettingsCtor.Invoke([new TestableRunSettingsProvider()])
-                : Activator.CreateInstance(processor)) as IArgumentProcessor;
+            // Processors declare different constructor shapes: some take an IRunSettingsProvider, some take
+            // an IRunSettingsHelper, some take both, and the rest are parameterless. Pick the matching one.
+            var runSettingsProvider = new TestableRunSettingsProvider();
+            var runSettingsHelper = new RunSettingsHelper();
+
+            var instance = (processor.GetConstructor([typeof(IRunSettingsProvider), typeof(IRunSettingsHelper)]) is { } providerAndHelperCtor
+                ? providerAndHelperCtor.Invoke([runSettingsProvider, runSettingsHelper])
+                : processor.GetConstructor([typeof(IRunSettingsProvider)]) is { } providerCtor
+                    ? providerCtor.Invoke([runSettingsProvider])
+                    : processor.GetConstructor([typeof(IRunSettingsHelper)]) is { } helperCtor
+                        ? helperCtor.Invoke([runSettingsHelper])
+                        : Activator.CreateInstance(processor)) as IArgumentProcessor;
             Assert.IsNotNull(instance, $"Unable to instantiate processor: {processor}");
 
             var specialProcessor = instance.Metadata.Value.IsSpecialCommand;

@@ -63,6 +63,7 @@ public class TestRequestManagerTests
     private readonly Mock<ITestRunAttachmentsProcessingManager> _mockAttachmentsProcessingManager;
     private readonly Mock<IEnvironment> _mockEnvironment;
     private readonly Mock<IEnvironmentVariableHelper> _mockEnvironmentVariableHelper;
+    private readonly IRunSettingsHelper _runSettingsHelper;
 
     private const string DefaultRunsettings = @"<?xml version=""1.0"" encoding=""utf-8""?>
                 <RunSettings>
@@ -85,6 +86,7 @@ public class TestRequestManagerTests
         _mockProcessHelper = new Mock<IProcessHelper>();
         _mockEnvironment = new Mock<IEnvironment>();
         _mockEnvironmentVariableHelper = new Mock<IEnvironmentVariableHelper>();
+        _runSettingsHelper = new RunSettingsHelper();
 
         _mockMetricsPublisher = new Mock<IMetricsPublisher>();
         _mockMetricsPublisherTask = Task.FromResult(_mockMetricsPublisher.Object);
@@ -99,7 +101,8 @@ public class TestRequestManagerTests
             _mockProcessHelper.Object,
             _mockAttachmentsProcessingManager.Object,
             _mockEnvironment.Object,
-            _mockEnvironmentVariableHelper.Object);
+            _mockEnvironmentVariableHelper.Object,
+            _runSettingsHelper);
         _mockTestPlatform.Setup(tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
             .Returns(_mockDiscoveryRequest.Object);
         _mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
@@ -2842,14 +2845,13 @@ public class TestRequestManagerTests
     [DataRow("x86")]
     [DataRow("x64")]
     [DataRow("arm64")]
-    // Don't parallelize because we can run into conflict with GetDefaultArchitecture -> RunSettingsHelper.Instance.IsDefaultTargetArchitecture
-    // which is set by some other test.
-    [DoNotParallelize]
     public void SettingDefaultPlatformUsesItForAnyCPUSourceButNotForNonAnyCPUSource(string defaultPlatform)
     {
         // -- Arrange
 
-        RunSettingsHelper.Instance.IsDefaultTargetArchitecture = true;
+        // GetDefaultArchitecture reads IsDefaultTargetArchitecture from the injected IRunSettingsHelper, so we set it
+        // on that per-test instance rather than the shared RunSettingsHelper.Instance static. That keeps the test isolated.
+        _runSettingsHelper.IsDefaultTargetArchitecture = true;
         var payload = new DiscoveryRequestPayload()
         {
             Sources = new List<string>() { "AnyCPU.dll", "x64.dll" },

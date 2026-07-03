@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 using CommandLineResources = Microsoft.VisualStudio.TestPlatform.CommandLine.Resources.Resources;
 
@@ -29,10 +29,12 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
     private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly IRunSettingsHelper _runSettingsHelper;
 
-    public PlatformArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    public PlatformArgumentProcessor(IRunSettingsProvider runSettingsProvider, IRunSettingsHelper runSettingsHelper)
     {
         _runSettingsProvider = runSettingsProvider;
+        _runSettingsHelper = runSettingsHelper;
     }
 
     /// <summary>
@@ -48,7 +50,7 @@ internal class PlatformArgumentProcessor : IArgumentProcessor
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new PlatformArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider));
+            new PlatformArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider, _runSettingsHelper));
 
         set => _executor = value;
     }
@@ -80,6 +82,8 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
 
     private readonly IRunSettingsProvider _runSettingsManager;
 
+    private readonly IRunSettingsHelper _runSettingsHelper;
+
     public const string RunSettingsPath = "RunConfiguration.TargetPlatform";
 
     /// <summary>
@@ -87,12 +91,15 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
     /// </summary>
     /// <param name="options"> The options. </param>
     /// <param name="runSettingsManager"> The runsettings manager. </param>
-    public PlatformArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager)
+    /// <param name="runSettingsHelper"> The runsettings helper. </param>
+    public PlatformArgumentExecutor(CommandLineOptions options, IRunSettingsProvider runSettingsManager, IRunSettingsHelper runSettingsHelper)
     {
         ValidateArg.NotNull(options, nameof(options));
         ValidateArg.NotNull(runSettingsManager, nameof(runSettingsManager));
+        ValidateArg.NotNull(runSettingsHelper, nameof(runSettingsHelper));
         _commandLineOptions = options;
         _runSettingsManager = runSettingsManager;
+        _runSettingsHelper = runSettingsHelper;
     }
 
 
@@ -125,7 +132,7 @@ internal class PlatformArgumentExecutor : IArgumentExecutor
 
         if (validPlatform)
         {
-            RunSettingsHelper.Instance.IsDefaultTargetArchitecture = false;
+            _runSettingsHelper.IsDefaultTargetArchitecture = false;
             _commandLineOptions.TargetArchitecture = platform;
             _runSettingsManager.UpdateRunSettingsNode(RunSettingsPath, platform.ToString());
         }
