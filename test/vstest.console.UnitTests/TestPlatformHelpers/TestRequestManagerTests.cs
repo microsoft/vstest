@@ -36,6 +36,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
+using vstest.console.UnitTests.Processors;
 using vstest.console.UnitTests.TestDoubles;
 
 using Constants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
@@ -2889,6 +2890,57 @@ public class TestRequestManagerTests
         actualSourceToSourceDetailMap!["AnyCPU.dll"].Architecture.Should().Be(expectedPlatform);
         // The dll that has a specific architecture always remains that specific architecture.
         actualSourceToSourceDetailMap!["x64.dll"].Architecture.Should().Be(Architecture.X64);
+    }
+
+    [TestMethod]
+    public void WritingIsDefaultTargetArchitectureThroughPlatformArgumentExecutorIsObservedByTestRequestManager()
+    {
+        // -- Arrange
+        // The --Platform argument executor (the writer) and this TestRequestManager (the reader) are handed the same
+        // IRunSettingsHelper instance: _runSettingsHelper, which was injected into the manager in the test constructor.
+        // This guards the same-instance contract of the injection - a flag the writer sets has to be observed by the
+        // reader precisely because both ends resolve to one object and not to two separate copies.
+        _runSettingsHelper.IsDefaultTargetArchitecture.Should().BeTrue("the flag defaults to true before any --Platform is parsed");
+
+        // GetDefaultArchitecture honors <DefaultPlatform> only while IsDefaultTargetArchitecture is true; once the flag
+        // is false it returns the run configuration's TargetPlatform default instead. ARM is used as the <DefaultPlatform>
+        // because it is never the architecture the tests actually run on, so the two branches resolve to different values
+        // and the assertion below can only pass if the writer's flip was observed by the reader through the shared helper.
+        var payload = new DiscoveryRequestPayload()
+        {
+            Sources = new List<string>() { "AnyCPU.dll" },
+            RunSettings =
+                @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DefaultPlatform>ARM</DefaultPlatform>
+                     </RunConfiguration>
+                </RunSettings>"
+        };
+        _mockAssemblyMetadataProvider.Setup(m => m.GetArchitecture("AnyCPU.dll")).Returns(Architecture.AnyCPU);
+
+        Dictionary<string, SourceDetail>? actualSourceToSourceDetailMap = null;
+        var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
+        _mockTestPlatform.Setup(mt => mt.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.IsAny<DiscoveryCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()))
+            .Callback((IRequestData _, DiscoveryCriteria _, TestPlatformOptions _, Dictionary<string, SourceDetail> sourceToSourceDetailMap, IWarningLogger _) =>
+                actualSourceToSourceDetailMap = sourceToSourceDetailMap)
+            .Returns(mockDiscoveryRequest.Object);
+
+        // -- Act
+        // Writer: parsing "--Platform x64" flips IsDefaultTargetArchitecture to false on the shared helper. A throwaway
+        // CommandLineOptions keeps the write isolated to the helper under test.
+        new PlatformArgumentExecutor(new CommandLineOptions(), new TestableRunSettingsProvider(), _runSettingsHelper)
+            .Initialize("x64");
+        _runSettingsHelper.IsDefaultTargetArchitecture.Should().BeFalse("the --Platform executor writes the flag on the injected instance");
+
+        // Reader: the manager infers the AnyCPU source's architecture through the same helper instance.
+        _testRequestManager.DiscoverTests(payload, new Mock<ITestDiscoveryEventsRegistrar>().Object, _protocolConfig);
+
+        // -- Assert
+        actualSourceToSourceDetailMap.Should().NotBeNull();
+        actualSourceToSourceDetailMap!["AnyCPU.dll"].Architecture.Should().Be(
+            Constants.DefaultPlatform,
+            "with IsDefaultTargetArchitecture flipped to false through the shared helper the manager returns the run configuration's TargetPlatform default and ignores <DefaultPlatform>ARM</DefaultPlatform>");
     }
 
     [TestMethod]
