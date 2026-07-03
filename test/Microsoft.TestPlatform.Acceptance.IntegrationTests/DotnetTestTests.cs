@@ -18,7 +18,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     [TestCategory("Smoke")]
     public void RunDotnetTestWithCsproj(RunnerInfo runnerInfo)
     {
@@ -34,7 +34,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunDotnetTestWithDll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -49,7 +49,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunDotnetTestWithCsprojPassInlineSettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -64,7 +64,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunDotnetTestWithDllPassInlineSettings(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -77,7 +77,38 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
+    [Ignore("TODO: This scenario is broken in real environment as well (running with shipped `dotnet test`. Old tests (before arcade) use location of vstest.console that have more dlls in place than what we ship, and they make it work.")]
+    public void RunDotnetTestWithNativeDll(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        string assemblyRelativePath = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\x64\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
+        var assemblyAbsolutePath = Path.Combine(_testEnvironment.GlobalPackageDirectory, assemblyRelativePath);
+
+        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(assemblyAbsolutePath));
+
+        ValidateSummaryStatus(1, 1, 0);
+        ExitCodeEquals(1);
+    }
+
+    [TestMethod]
+    [TestMatrix(console: Net, testHost: Net)]
+    public void RunDotnetTestAndSeeOutputFromConsoleWriteLine(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPath = GetAssetFullPath("OutputtingTestProject.dll");
+        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" ", workingDirectory: Path.GetDirectoryName(assemblyPath));
+
+        StdOutputContains("MY OUTPUT FROM TEST");
+
+        ValidateSummaryStatus(1, 0, 0);
+        ExitCodeEquals(0);
+    }
+
+    [TestMethod]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunDotnetTestShouldRespectLoggerVerbosityFromRunSettings(RunnerInfo runnerInfo)
     {
         // Regression test for https://github.com/microsoft/vstest/issues/10369
@@ -115,36 +146,5 @@ public class DotnetTestTests : AcceptanceTestBase
         StdOutputContains("Passed PassingTest");
         ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
-    }
-
-    [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    [Ignore("TODO: This scenario is broken in real environment as well (running with shipped `dotnet test`. Old tests (before arcade) use location of vstest.console that have more dlls in place than what we ship, and they make it work.")]
-    public void RunDotnetTestWithNativeDll(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        string assemblyRelativePath = @"microsoft.testplatform.testasset.nativecpp\2.0.0\contentFiles\any\any\x64\Microsoft.TestPlatform.TestAsset.NativeCPP.dll";
-        var assemblyAbsolutePath = Path.Combine(_testEnvironment.GlobalPackageDirectory, assemblyRelativePath);
-
-        InvokeDotnetTest($@"{assemblyAbsolutePath} --logger:""Console;Verbosity=normal""", workingDirectory: Path.GetDirectoryName(assemblyAbsolutePath));
-
-        ValidateSummaryStatus(1, 1, 0);
-        ExitCodeEquals(1);
-    }
-
-    [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
-    public void RunDotnetTestAndSeeOutputFromConsoleWriteLine(RunnerInfo runnerInfo)
-    {
-        SetTestEnvironment(_testEnvironment, runnerInfo);
-
-        var assemblyPath = GetAssetFullPath("OutputtingTestProject.dll");
-        InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal"" ", workingDirectory: Path.GetDirectoryName(assemblyPath));
-
-        StdOutputContains("MY OUTPUT FROM TEST");
-
-        ValidateSummaryStatus(1, 0, 0);
-        ExitCodeEquals(0);
     }
 }
