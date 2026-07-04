@@ -108,7 +108,7 @@ public class DotnetTestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(console: Net, testHost: Net)]
+    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestShouldRespectLoggerVerbosityFromRunSettings(RunnerInfo runnerInfo)
     {
         // Regression test for https://github.com/microsoft/vstest/issues/10369
