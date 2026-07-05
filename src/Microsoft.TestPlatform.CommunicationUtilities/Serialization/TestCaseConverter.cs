@@ -142,7 +142,7 @@ internal class TestCaseConverter : JsonConverter<TestCase>
         // TestCase.Id
         writer.WriteStartObject();
         WriteProperty(writer, TestCaseProperties.Id, options);
-        writer.WriteStringValue(value.Id.ToString());
+        writer.WriteStringValue(value.Id);
         writer.WriteEndObject();
 
         // TestCase.LineNumber

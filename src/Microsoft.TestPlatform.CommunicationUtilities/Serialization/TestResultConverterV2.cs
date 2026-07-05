@@ -125,7 +125,9 @@ internal class TestResultConverterV2 : JsonConverter<TestResult>
         StjSafe.Serialize(writer, value.Messages, options);
 
         writer.WriteString("ComputerName", value.ComputerName);
-        writer.WriteString("Duration", value.Duration.ToString());
+        Span<char> durationBuf = stackalloc char[32];
+        value.Duration.TryFormat(durationBuf, out int durationChars, default, CultureInfo.InvariantCulture);
+        writer.WriteString("Duration", durationBuf[..durationChars]);
         writer.WriteString("StartTime", value.StartTime);
         writer.WriteString("EndTime", value.EndTime);
 

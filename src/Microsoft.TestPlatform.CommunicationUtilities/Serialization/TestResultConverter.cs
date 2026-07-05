@@ -161,7 +161,9 @@ internal class TestResultConverter : JsonConverter<TestResult>
         // TestResult.Duration
         writer.WriteStartObject();
         WriteProperty(writer, TestResultProperties.Duration, options);
-        writer.WriteStringValue(value.Duration.ToString());
+        Span<char> durationBuf = stackalloc char[32];
+        value.Duration.TryFormat(durationBuf, out int durationChars, default, CultureInfo.InvariantCulture);
+        writer.WriteStringValue(durationBuf[..durationChars]);
         writer.WriteEndObject();
 
         // TestResult.StartTime
