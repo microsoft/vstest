@@ -1,5 +1,5 @@
 # Efficiency Improver — vstest Repo Memory
-_Last updated: 2026-07-04_
+_Last updated: 2026-07-05_
 
 ## Build / Test Commands
 - Bootstrap + full build: `./build.sh` (downloads pinned .NET 11 SDK to `.dotnet/`)
@@ -14,7 +14,8 @@ _Last updated: 2026-07-04_
 
 ### Open PRs
 - **PR #16210**: Eliminate GetRawText() string alloc across 9 STJ deserializer converters: OPEN — all CI green ✅ — created 2026-07-03. Branch: `efficiency/eliminate-getrawtext-in-serializers`
-- **PR #aw_discAgg**: Eliminate O(N) ConcurrentDictionary.AddOrUpdate + array allocs in DiscoveryDataAggregator hot path: OPEN — created 2026-07-04. Branch: `efficiency/discovery-source-tracking-opt`
+- **PR #16213**: Eliminate O(N) ConcurrentDictionary.AddOrUpdate + array allocs in DiscoveryDataAggregator hot path: OPEN — all CI green ✅ — created 2026-07-04. Branch: `efficiency/discovery-source-tracking-opt`
+- **PR #aw_durGuid** (pending creation): Eliminate Duration.ToString() + Guid.ToString() in IPC serializers — created 2026-07-05. Branch: `efficiency/eliminate-duration-tostring-in-serializers`
 
 ### Merged PRs (all confirmed)
 - PR #16193: v2 serialization Guid.ToString elimination (MERGED 2026-07-01)
@@ -35,14 +36,14 @@ _Last updated: 2026-07-04_
 - **Hot-path hierarchy** (frequency per test case, highest first):
   1. Filter eval: `FilterExpression.Evaluate` → `FastFilter.Evaluate` or `Condition.Evaluate` — all optimized ✅
   2. Test result: `TestRunCache.OnNewTestResult` → stats update — optimized ✅
-  3. IPC write: `TestCaseConverterV2.Write`, `TestResultConverterV2.Write` — Guid.ToString optimized in #16193 ✅
+  3. IPC write: `TestCaseConverterV2.Write`, `TestResultConverterV2.Write` — Guid.ToString + Duration.ToString optimized ✅ (V1 converters also fixed in #aw_durGuid)
   4. IPC read: `JsoniteConvert.DeserializeTestCase/Result` — optimized ✅
   5. IPC deserialize: GetRawText() in 9 Deserialize calls → OPEN in #16210
   6. Discovery: `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases` — O(N)→O(1) per source in #aw_discAgg ✅
 
 - **GetRawText().Trim('"') pattern**: 5 remaining sites (no easy win; deferred)
 - **TimeSpan.TryFormat**: use `format: default, formatProvider: CultureInfo.InvariantCulture` to satisfy CA1305
-- **Utf8JsonWriter native overloads**: WriteStringValue(Guid), WriteString(string, Guid) avoid ToString allocations
+- **Utf8JsonWriter native overloads**: WriteStringValue(Guid), WriteString(string, Guid) avoid ToString allocations; WriteString(string, ReadOnlySpan<char>) + TryFormat avoids Duration.ToString alloc
 - **GitHubAPI note**: Use safeoutputs for writes; list_pull_requests may return large output — use search_pull_requests for filtered queries
 - **test.sh -p pattern**: runs ALL test projects, not just matching ones; use `dotnet run --project test/<proj>.csproj -f net11.0` for targeted runs
 - **8 pre-existing failures** in CrossPlatEngine tests on Linux: Windows-path tests (C:\...) — NOT caused by our changes
@@ -55,15 +56,15 @@ _Last updated: 2026-07-04_
 | LOW | Code | MSTestV1TelemetryHelper ContainsKey+[] double-hash | MSTestV1 only |
 
 ## Backlog Cursor
-- CrossPlatEngine/Execution, CrossPlatEngine/Discovery, CommunicationUtilities/Serialization, and Filter.Source: fully scanned
+- CrossPlatEngine/Execution, CrossPlatEngine/Discovery, CommunicationUtilities/Serialization (all converters), and Filter.Source: fully scanned
 - TrxLogger: scanned — main opportunities are one-per-run, not per-test; low impact
 - ObjectModel: serialization-only patterns; low impact
 - Remaining unexplored: DataCollectors internals, CrossPlatEngine/Parallel (beyond DiscoveryDataAggregator)
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
-- Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — created 2026-07-03, updated 2026-07-04
-- Last run: 2026-07-04 (run ID 28713232251)
+- Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — created 2026-07-03, updated 2026-07-05
+- Last run: 2026-07-05 (run ID 28748142713)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
