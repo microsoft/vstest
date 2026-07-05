@@ -245,12 +245,12 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         return false;
     }
 
-    internal static void AddDataCollectorToRunSettings(string arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
+    internal static void AddDataCollectorToRunSettings(string arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string? nugetPackagesOverride = null)
     {
-        AddDataCollectorToRunSettings([arguments], runSettingsManager, fileHelper, string.Empty);
+        AddDataCollectorToRunSettings([arguments], runSettingsManager, fileHelper, string.Empty, nugetPackagesOverride);
     }
 
-    internal static void AddDataCollectorToRunSettings(string[] arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string exceptionMessage)
+    internal static void AddDataCollectorToRunSettings(string[] arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string exceptionMessage, string? nugetPackagesOverride = null)
     {
         var collectorName = arguments[0];
         var additionalConfigurations = arguments.Skip(1).ToArray();
@@ -286,11 +286,124 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             EnableCoverletInProcDataCollector(collectorName, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
         }
+
+        if (string.Equals(collectorName, MicrosoftCodeCoverageConstants.FriendlyName, StringComparison.OrdinalIgnoreCase))
+        {
+            // When --collect:"Code Coverage" is specified without an explicit --testAdapterPath, auto-discover
+            // the Microsoft Code Coverage adapter from the NuGet global packages directory. This enables
+            // `dotnet test *.dll --collect:"Code Coverage"` to work without requiring the MSBuild task
+            // that normally injects the adapter path via VSTestTraceDataCollectorDirectoryPath.
+            TryAddCodeCoverageAdapterPath(runSettingsManager, nugetPackagesOverride);
+        }
     }
 
     internal static void AddDataCollectorFriendlyName(string friendlyName)
     {
         EnabledDataCollectors.Add(friendlyName.ToLower(CultureInfo.CurrentCulture));
+    }
+
+    /// <summary>
+    /// Attempts to add the Microsoft Code Coverage adapter path to the run settings by
+    /// auto-discovering the <c>microsoft.codecoverage</c> NuGet package in the global packages directory.
+    /// No-ops silently when the package cannot be found.
+    /// </summary>
+    internal static void TryAddCodeCoverageAdapterPath(IRunSettingsProvider runSettingsManager, string? nugetPackagesOverride = null)
+    {
+        if (!TryGetCodeCoverageAdapterPath(out var ccAdapterPath, nugetPackagesOverride))
+        {
+            EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Microsoft.CodeCoverage package not found in NuGet global packages; skipping auto-injection.");
+            return;
+        }
+
+        var existingPathsRaw = runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath);
+        var existingPaths = existingPathsRaw.IsNullOrEmpty()
+            ? []
+            : existingPathsRaw.Split(';').Where(p => !p.IsNullOrEmpty()).ToList();
+
+        if (existingPaths.Any(p => string.Equals(p, ccAdapterPath, StringComparison.OrdinalIgnoreCase)))
+        {
+            return;
+        }
+
+        existingPaths.Add(ccAdapterPath);
+        runSettingsManager.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, string.Join(";", existingPaths));
+        EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Injected Code Coverage adapter path '{0}'.", ccAdapterPath);
+    }
+
+    /// <summary>
+    /// Finds the <c>build/</c> directory of the latest installed <c>microsoft.codecoverage</c>
+    /// NuGet package. Returns <see langword="false"/> when no suitable package is found.
+    /// </summary>
+    internal static bool TryGetCodeCoverageAdapterPath([NotNullWhen(true)] out string? path, string? nugetPackagesOverride = null)
+    {
+        path = null;
+
+        var nugetPackagesPath = nugetPackagesOverride ?? GetNuGetGlobalPackagesPath();
+        if (nugetPackagesPath is null)
+        {
+            return false;
+        }
+
+        var ccPackagePath = Path.Combine(nugetPackagesPath, "microsoft.codecoverage");
+        if (!Directory.Exists(ccPackagePath))
+        {
+            return false;
+        }
+
+        string? bestPath = null;
+        Version? bestVersion = null;
+
+        foreach (var versionDir in Directory.GetDirectories(ccPackagePath))
+        {
+            var buildDir = Path.Combine(versionDir, "build");
+            if (!Directory.Exists(buildDir))
+            {
+                continue;
+            }
+
+            var version = ParseNuGetVersion(Path.GetFileName(versionDir));
+            if (version is null)
+            {
+                continue;
+            }
+
+            if (bestVersion is null || version > bestVersion)
+            {
+                bestVersion = version;
+                bestPath = buildDir;
+            }
+        }
+
+        path = bestPath;
+        return path is not null;
+    }
+
+    private static string? GetNuGetGlobalPackagesPath()
+    {
+        var envPath = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+        if (!envPath.IsNullOrEmpty())
+        {
+            return envPath;
+        }
+
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return userProfile.IsNullOrEmpty() ? null : Path.Combine(userProfile, ".nuget", "packages");
+    }
+
+    private static Version? ParseNuGetVersion(string versionName)
+    {
+        // Strip pre-release suffix (e.g. "18.5.0-preview-1" → "18.5.0") so Version.TryParse works.
+        var dashIndex = versionName.IndexOf('-');
+        var versionString = dashIndex >= 0 ? versionName.Substring(0, dashIndex) : versionName;
+        return Version.TryParse(versionString, out var version) ? version : null;
+    }
+
+    internal static class MicrosoftCodeCoverageConstants
+    {
+        /// <summary>
+        /// Microsoft Code Coverage data collector friendly name.
+        /// </summary>
+        public const string FriendlyName = "Code Coverage";
     }
 
     internal static class CoverletConstants

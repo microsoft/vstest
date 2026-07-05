@@ -3,10 +3,12 @@
 
 using System;
 using System.Globalization;
+using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -116,15 +118,10 @@ public class EnableCodeCoverageArgumentProcessorTests
 
         _executor.Initialize(string.Empty);
 
-        Assert.AreEqual(string.Join(Environment.NewLine,
-            "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-            "<RunSettings>",
-            "  <DataCollectionRunSettings>",
-            "    <DataCollectors>",
-            "      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />",
-            "    </DataCollectors>",
-            "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
+        var xml = _settingsProvider.ActiveRunSettings!.SettingsXml!;
+        var dataCollectors = XmlRunSettingsUtilities.GetDataCollectionRunSettings(xml)!.DataCollectorSettingsList;
+        var ccCollector = dataCollectors.Single(dc => string.Equals(dc.FriendlyName, "Code Coverage", StringComparison.OrdinalIgnoreCase));
+        Assert.IsTrue(ccCollector.IsEnabled, "Expected the 'Code Coverage' data collector to be enabled.");
     }
 
     [TestMethod]
@@ -139,16 +136,10 @@ public class EnableCodeCoverageArgumentProcessorTests
 
         _executor.Initialize(string.Empty);
 
-        Assert.AreEqual(string.Join(Environment.NewLine,
-            "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-            "<RunSettings>",
-            "  <DataCollectionRunSettings>",
-            "    <DataCollectors>",
-            "      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />",
-            "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"True\" />",
-            "    </DataCollectors>",
-            "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
+        var xml = _settingsProvider.ActiveRunSettings!.SettingsXml!;
+        var dataCollectors = XmlRunSettingsUtilities.GetDataCollectionRunSettings(xml)!.DataCollectorSettingsList;
+        Assert.IsTrue(dataCollectors.Single(dc => string.Equals(dc.FriendlyName, "Code Coverage", StringComparison.OrdinalIgnoreCase)).IsEnabled);
+        Assert.IsTrue(dataCollectors.Single(dc => string.Equals(dc.FriendlyName, "MyDataCollector1", StringComparison.OrdinalIgnoreCase)).IsEnabled, "Other enabled data collectors must remain enabled.");
     }
 
     [TestMethod]
@@ -162,16 +153,10 @@ public class EnableCodeCoverageArgumentProcessorTests
 
         _executor.Initialize(string.Empty);
 
-        Assert.AreEqual(string.Join(Environment.NewLine,
-            "<?xml version=\"1.0\" encoding=\"utf-16\"?>",
-            "<RunSettings>",
-            "  <DataCollectionRunSettings>",
-            "    <DataCollectors>",
-            "      <DataCollector friendlyName=\"Code Coverage\" enabled=\"True\" />",
-            "      <DataCollector friendlyName=\"MyDataCollector1\" enabled=\"False\" />",
-            "    </DataCollectors>",
-            "  </DataCollectionRunSettings>",
-            "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
+        var xml = _settingsProvider.ActiveRunSettings!.SettingsXml!;
+        var dataCollectors = XmlRunSettingsUtilities.GetDataCollectionRunSettings(xml)!.DataCollectorSettingsList;
+        Assert.IsTrue(dataCollectors.Single(dc => string.Equals(dc.FriendlyName, "Code Coverage", StringComparison.OrdinalIgnoreCase)).IsEnabled);
+        Assert.IsFalse(dataCollectors.Single(dc => string.Equals(dc.FriendlyName, "MyDataCollector1", StringComparison.OrdinalIgnoreCase)).IsEnabled, "Other disabled data collectors must not be enabled.");
     }
 
     #endregion
