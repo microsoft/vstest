@@ -116,6 +116,15 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             throw new SettingsException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.CollectWithTestSettingErrorMessage, argument));
         }
         AddDataCollectorToRunSettings(collectArgumentList, _runSettingsManager, _fileHelper, exceptionMessage);
+
+        if (string.Equals(collectArgumentList[0], MicrosoftCodeCoverageConstants.FriendlyName, StringComparison.OrdinalIgnoreCase))
+        {
+            // Auto-discover the Microsoft Code Coverage adapter from the NuGet global packages directory when
+            // --collect:"Code Coverage" is used in DLL mode (where the MSBuild task is never invoked and
+            // VSTestTraceDataCollectorDirectoryPath is never set). This is intentionally scoped to the
+            // --collect CLI path only; --enable-code-coverage relies on the project's MSBuild setup.
+            TryAddCodeCoverageAdapterPath(_runSettingsManager);
+        }
     }
 
     /// <summary>
@@ -245,12 +254,12 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         return false;
     }
 
-    internal static void AddDataCollectorToRunSettings(string arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string? nugetPackagesOverride = null)
+    internal static void AddDataCollectorToRunSettings(string arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
     {
-        AddDataCollectorToRunSettings([arguments], runSettingsManager, fileHelper, string.Empty, nugetPackagesOverride);
+        AddDataCollectorToRunSettings([arguments], runSettingsManager, fileHelper, string.Empty);
     }
 
-    internal static void AddDataCollectorToRunSettings(string[] arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string exceptionMessage, string? nugetPackagesOverride = null)
+    internal static void AddDataCollectorToRunSettings(string[] arguments, IRunSettingsProvider runSettingsManager, IFileHelper fileHelper, string exceptionMessage)
     {
         var collectorName = arguments[0];
         var additionalConfigurations = arguments.Skip(1).ToArray();
@@ -286,15 +295,6 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             EnableCoverletInProcDataCollector(collectorName, inProcDataCollectionRunSettings, runSettingsManager, fileHelper);
             runSettingsManager.UpdateRunSettingsNodeInnerXml(Constants.InProcDataCollectionRunSettingsName, inProcDataCollectionRunSettings.ToXml().InnerXml);
         }
-
-        if (string.Equals(collectorName, MicrosoftCodeCoverageConstants.FriendlyName, StringComparison.OrdinalIgnoreCase))
-        {
-            // When --collect:"Code Coverage" is specified without an explicit --testAdapterPath, auto-discover
-            // the Microsoft Code Coverage adapter from the NuGet global packages directory. This enables
-            // `dotnet test *.dll --collect:"Code Coverage"` to work without requiring the MSBuild task
-            // that normally injects the adapter path via VSTestTraceDataCollectorDirectoryPath.
-            TryAddCodeCoverageAdapterPath(runSettingsManager, nugetPackagesOverride);
-        }
     }
 
     internal static void AddDataCollectorFriendlyName(string friendlyName)
@@ -320,8 +320,9 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             ? []
             : existingPathsRaw.Split(';').Where(p => !p.IsNullOrEmpty()).ToList();
 
-        if (existingPaths.Any(p => string.Equals(p, ccAdapterPath, StringComparison.OrdinalIgnoreCase)))
+        if (existingPaths.Count > 0)
         {
+            // User explicitly configured adapter paths — don't clobber with auto-discovered NuGet path.
             return;
         }
 
@@ -392,10 +393,22 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
     private static Version? ParseNuGetVersion(string versionName)
     {
-        // Strip pre-release suffix (e.g. "18.5.0-preview-1" → "18.5.0") so Version.TryParse works.
         var dashIndex = versionName.IndexOf('-');
-        var versionString = dashIndex >= 0 ? versionName.Substring(0, dashIndex) : versionName;
-        return Version.TryParse(versionString, out var version) ? version : null;
+        var isPreRelease = dashIndex >= 0;
+        var versionString = isPreRelease ? versionName.Substring(0, dashIndex) : versionName;
+        if (!Version.TryParse(versionString, out var version))
+        {
+            return null;
+        }
+
+        // Encode stability into the Revision field: stable = int.MaxValue, pre-release = 0.
+        // When the numeric portion differs (e.g. "18.6.0-preview-1" vs "18.5.0"), the higher numeric
+        // version wins as expected. When the numeric portion is identical (e.g. "18.5.0" vs "18.5.0-preview-1"),
+        // the stable release wins — matching NuGet SemVer semantics where pre-releases are less than their
+        // corresponding stable release.
+        return isPreRelease
+            ? new Version(version.Major, version.Minor, version.Build, 0)
+            : new Version(version.Major, version.Minor, version.Build, int.MaxValue);
     }
 
     internal static class MicrosoftCodeCoverageConstants

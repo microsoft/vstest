@@ -771,8 +771,29 @@ public class CollectArgumentProcessorTests
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
-            // 18.6.0 (stripped) > 18.5.0 so the preview wins the numeric comparison
+            // 18.6.0-preview-1 has a higher numeric version (18.6 > 18.5), so it wins even though it's a pre-release.
             Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-preview-1", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_StableBeatsPreReleaseWhenSameNumerics()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0-preview-1", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // Stable release wins over a pre-release with the same numeric version (NuGet SemVer: pre-release < release).
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
         }
         finally
         {
@@ -804,7 +825,7 @@ public class CollectArgumentProcessorTests
     }
 
     [TestMethod]
-    public void TryAddCodeCoverageAdapterPath_DoesNotDuplicatePath_WhenCalledTwice()
+    public void TryAddCodeCoverageAdapterPath_SkipsInjection_WhenAdapterPathAlreadyPresent()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
@@ -828,21 +849,25 @@ public class CollectArgumentProcessorTests
     }
 
     [TestMethod]
-    public void AddDataCollectorToRunSettings_WithCodeCoverage_InjectsAdapterPath()
+    public void TryAddCodeCoverageAdapterPath_SkipsInjection_WhenExplicitAdapterPathAlreadySet()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
             var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
             Directory.CreateDirectory(buildDir);
+            var userPath = Path.Combine(tempDir, "my-custom-adapters");
+            Directory.CreateDirectory(userPath);
 
             var settingsProvider = new TestableRunSettingsProvider();
             settingsProvider.AddDefaultRunSettings();
+            settingsProvider.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, userPath);
 
-            CollectArgumentExecutor.AddDataCollectorToRunSettings("Code Coverage", settingsProvider, new Mock<IFileHelper>().Object, nugetPackagesOverride: tempDir);
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
 
             var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
-            Assert.IsTrue(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase), "Expected the CC adapter path to be injected into TestAdaptersPaths.");
+            Assert.IsFalse(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase),
+                "Expected auto-injection to be skipped when the user has already configured adapter paths.");
         }
         finally
         {
