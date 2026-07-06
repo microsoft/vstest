@@ -25,9 +25,6 @@
     </PackageDescription>
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <SuppressDependenciesWhenPacking>true</SuppressDependenciesWhenPacking>
-    <!-- NU5128: The .targets file is intentionally placed in runtimes/any/native/ rather than build/.
-         The SDK pack auto-generates build/netstandard2.0/ metadata even though lib/netstandard2.0/ is present,
-         causing NuGet to warn. This is expected and by design. -->
     <NoWarn>$(NoWarn);NU5128</NoWarn>
   </PropertyGroup>
 
