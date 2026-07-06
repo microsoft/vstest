@@ -4,7 +4,6 @@
 #if NETCOREAPP
 
 using System;
-using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -32,8 +31,8 @@ internal class TestCaseConverterV2 : JsonConverter<TestCase>
             testCase.ExecutorUri = new Uri(uri.GetString()!);
         if (data.TryGetProperty("Source", out var source))
             testCase.Source = source.GetString()!;
-        if (data.TryGetProperty("Id", out var id) && id.ValueKind != JsonValueKind.Null)
-            testCase.Id = GuidPolyfill.Parse(id.GetString()!, CultureInfo.InvariantCulture);
+        if (data.TryGetProperty("Id", out var id) && id.TryGetGuid(out var guidValue))
+            testCase.Id = guidValue;
         if (data.TryGetProperty("DisplayName", out var display) && display.ValueKind != JsonValueKind.Null)
             testCase.DisplayName = display.GetString()!;
         if (data.TryGetProperty("CodeFilePath", out var codePath) && codePath.ValueKind != JsonValueKind.Null)
