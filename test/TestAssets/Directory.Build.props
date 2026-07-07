@@ -17,7 +17,7 @@
     <!-- Suppress warning about using a preview of NETSDK -->
     NETSDK1057;
 
-    <!-- Use Environment.ProcessId instead of Process.GetCurrentProcess().Id, api is not available on all targetted frameworks. -->
+    <!-- Use Environment.ProcessId instead of Process.GetCurrentProcess().Id, API is not available on all targeted frameworks. -->
     CA1837;
 
     <!-- These test assets (in particular the generated compatibility matrix) intentionally reference old, pinned
