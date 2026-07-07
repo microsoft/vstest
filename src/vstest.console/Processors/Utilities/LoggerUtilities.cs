@@ -68,10 +68,19 @@ internal class LoggerUtilities
             logger.Configuration = outerNode;
         }
 
-        // Remove existing logger.
+        // Remove existing logger, preserving its Configuration when the new logger has none.
         var existingLoggerIndex = loggerRunSettings.GetExistingLoggerIndex(logger);
         if (existingLoggerIndex >= 0)
         {
+            var existingLogger = loggerRunSettings.LoggerSettingsList[existingLoggerIndex];
+
+            // When no new Configuration is being set, preserve the existing logger's Configuration
+            // so that LoggerRunSettings in .runsettings files are not silently discarded.
+            if (logger.Configuration is null && existingLogger.Configuration is not null)
+            {
+                logger.Configuration = existingLogger.Configuration;
+            }
+
             loggerRunSettings.LoggerSettingsList.RemoveAt(existingLoggerIndex);
         }
 

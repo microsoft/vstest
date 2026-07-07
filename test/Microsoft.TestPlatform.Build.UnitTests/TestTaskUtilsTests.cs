@@ -311,4 +311,49 @@ public class TestTaskUtilsTests
 
         Assert.Contains("--nologo", commandline);
     }
+
+    [TestMethod]
+    public void CreateArgumentShouldNotInjectVerbosityWhenSettingsFileIsProvided()
+    {
+        _vsTestTask.VSTestVerbosity = "normal";
+        _vsTestTask.VSTestSetting = @"c:\path\to\sample.runsettings";
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        // When a settings file is used, verbosity is NOT injected — the settings file may
+        // configure LoggerRunSettings with its own verbosity.
+        Assert.DoesNotMatchRegex(new Regex("(--logger:Console;Verbosity=)"), commandline);
+        Assert.Contains("--logger:Console", commandline);
+    }
+
+    [TestMethod]
+    public void CreateArgumentShouldInjectVerbosityWhenNoSettingsFileIsProvided()
+    {
+        _vsTestTask.VSTestVerbosity = "normal";
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        // Without a settings file, verbosity is injected from MSBuild verbosity.
+        Assert.Contains("--logger:Console;Verbosity=normal", commandline);
+    }
+
+    [TestMethod]
+    public void CreateArgumentShouldInjectVerbosityForVSTestTask2EvenWhenSettingsFileIsProvided()
+    {
+        // VSTestTask2 uses MSBuildLogger whose verbosity is always driven by MSBuild, not by
+        // the user's settings file. Even when a settings file is in use, MSBuildLogger must
+        // receive the MSBuild-derived verbosity so it doesn't silently fall back to a default.
+        ITestTask vsTestTask2 = new VSTestTask2
+        {
+            BuildEngine = new FakeBuildEngine(),
+            TestFileFullPath = new TaskItem(@"C:\path\to\test-assembly.dll"),
+            VSTestFramework = ".NETCoreapp,Version2.0",
+            VSTestVerbosity = "normal",
+            VSTestSetting = @"c:\path\to\sample.runsettings",
+        };
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(vsTestTask2);
+
+        Assert.Contains("--logger:Microsoft.TestPlatform.MSBuildLogger;Verbosity=normal", commandline);
+    }
 }

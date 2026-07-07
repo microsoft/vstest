@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Spustí test v režimu blame. Tato možnost je užitečná při izolaci problematického testu, který způsobuje jeho chybové ukončení.
       Vytvoří výstupní soubor v aktuálním adresáři jako Sequence.xml,
       který zachytí pořadí provádění testu před chybovým ukončením.

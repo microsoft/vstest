@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       원인 모드에서 테스트를 실행합니다. 이 옵션은 테스트 호스트 크래시를 유발하는 문제 있는 테스트를 격리하는 데 유용합니다.
       이 경우 현재 디렉터리에 "Sequence.xml"라는 출력 파일을 만들며,
       이 파일에는 크래시 이전 테스트 실행 순서가 캡처되어 있습니다.

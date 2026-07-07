@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Uruchamia test w trybie Blame. Ta opcja jest pomocna w odizolowaniu problematycznego testu powodującego awarię hosta testów.
       Tworzy w bieżącym katalogu plik wyjściowy „Sequence.xml”,
       który przechwytuje kolejność wykonywania testu przed awarią.

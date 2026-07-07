@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Führt den Test im blame-Modus aus. Diese Option ist hilfreich zum Isolieren des problematischen Tests, der einen Absturz des Testhosts verursacht.
       Im aktuellen Verzeichnis wird eine Ausgabedatei namens "Sequence.xml" erstellt,
       in der die Reihenfolge der Testausführung vor dem Absturz erfasst wird.

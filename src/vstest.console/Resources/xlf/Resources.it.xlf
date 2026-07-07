@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Valore];[DumpType]=[Valore]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Valore];[DumpType]=[Valore]
       Esegue il test in modalità di segnalazione errore. Questa opzione è utile per isolare il test problematico che causa l'arresto anomalo di Test Host.
       Crea nella directory corrente un file di output "Sequence.xml", che
       acquisisce l'ordine di esecuzione del test prima dell'arresto anomalo.

@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[значение];[DumpType]=[значение]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[значение];[DumpType]=[значение]
       Выполняет тест в blame-режиме. Этот вариант помогает изолировать проблемный тест, вызывающий сбой хоста для тестов.
       В текущем каталоге создается выходной файл "Sequence.xml",
       который записывает порядок выполнения теста перед сбоем.

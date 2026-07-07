@@ -868,7 +868,7 @@ Günlükler için izleme düzeyini aşağıda gösterildiği gibi değiştirin
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Testi blame modunda çalıştırır. Bu seçenek, test ana bilgisayarının kilitlenmesine neden olan sorunlu testin ayrı tutulmasını sağlar.
       Geçerli dizinde “Sequence.xml” adlı bir çıktı dosyası oluşturur,
       kilitlenmeden önce testin yürütülme düzenini yakalayan.

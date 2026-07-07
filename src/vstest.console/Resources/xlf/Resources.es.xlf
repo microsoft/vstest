@@ -871,7 +871,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
+        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Value];[DumpType]=[Value]
       Ejecuta la prueba en modo blame. Esta opción es útil a la hora de aislar la prueba problemática que provoca el bloqueo del host de prueba.
       Crea un archivo de salida en el directorio actual como "Sequence.xml",
       que captura el orden de ejecución de la prueba antes del bloqueo.

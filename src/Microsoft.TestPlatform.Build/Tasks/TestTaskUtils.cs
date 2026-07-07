@@ -105,24 +105,37 @@ internal static class TestTaskUtils
         // add the logger and verbosity, so we know what to use in vstest.console.
         if (!isLoggerSpecifiedByUser)
         {
-            string vsTestVerbosity = "minimal";
-            if (!task.VSTestVerbosity.IsNullOrWhiteSpace())
+            // For VSTestTask (Console logger): when a settings file is provided, the user may have
+            // configured the logger verbosity in LoggerRunSettings. Don't inject Verbosity here so
+            // that the settings file configuration takes precedence.
+            // For VSTestTask2 (MSBuildLogger): always inject the MSBuild-derived verbosity. The
+            // MSBuildLogger verbosity is driven by MSBuild, not by user settings, so it must always
+            // reflect the MSBuild-derived value regardless of whether a settings file is present.
+            if (isRunSettingsEnabled && task is VSTestTask)
             {
-                var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
-                var quietTestLogging = new List<string>() { "q", "quiet" };
-
-                string taskVsTestVerbosity = task.VSTestVerbosity.ToLowerInvariant();
-                if (normalTestLogging.Contains(taskVsTestVerbosity))
-                {
-                    vsTestVerbosity = "normal";
-                }
-                else if (quietTestLogging.Contains(taskVsTestVerbosity))
-                {
-                    vsTestVerbosity = "quiet";
-                }
+                builder.AppendSwitchUnquotedIfNotNull("--logger:", loggerToUse);
             }
+            else
+            {
+                string vsTestVerbosity = "minimal";
+                if (!task.VSTestVerbosity.IsNullOrWhiteSpace())
+                {
+                    var normalTestLogging = new List<string>() { "n", "normal", "d", "detailed", "diag", "diagnostic" };
+                    var quietTestLogging = new List<string>() { "q", "quiet" };
 
-            builder.AppendSwitchUnquotedIfNotNull("--logger:", $"{loggerToUse};Verbosity={vsTestVerbosity}");
+                    string taskVsTestVerbosity = task.VSTestVerbosity.ToLowerInvariant();
+                    if (normalTestLogging.Contains(taskVsTestVerbosity))
+                    {
+                        vsTestVerbosity = "normal";
+                    }
+                    else if (quietTestLogging.Contains(taskVsTestVerbosity))
+                    {
+                        vsTestVerbosity = "quiet";
+                    }
+                }
+
+                builder.AppendSwitchUnquotedIfNotNull("--logger:", $"{loggerToUse};Verbosity={vsTestVerbosity}");
+            }
         }
 
         if (task.VSTestBlame || task.VSTestBlameCrash || task.VSTestBlameHang)
