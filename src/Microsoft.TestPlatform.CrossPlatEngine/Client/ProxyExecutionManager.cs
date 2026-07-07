@@ -49,6 +49,8 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
     /// <inheritdoc/>
     public bool IsInitialized { get; private set; }
 
+    private TestSessionPool SessionPool => _testSessionPool ?? TestSessionPool.Instance;
+
     /// <summary>
     /// Gets or sets the cancellation token source.
     /// </summary>
@@ -398,7 +400,7 @@ internal class ProxyExecutionManager : IProxyExecutionManager, IBaseProxy, IInte
             return;
         }
 
-        (_testSessionPool ?? TestSessionPool.Instance).ReturnProxy(_testSessionInfo, _proxyOperationManager.Id);
+        SessionPool.ReturnProxy(_testSessionInfo, _proxyOperationManager.Id);
     }
 
     /// <inheritdoc/>

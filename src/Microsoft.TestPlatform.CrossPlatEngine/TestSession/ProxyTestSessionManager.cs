@@ -56,6 +56,8 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
 
     internal ProxyDisposalOnCreationFailPolicy DisposalPolicy { get; set; } = ProxyDisposalOnCreationFailPolicy.DisposeAllOnFailure;
 
+    private TestSessionPool SessionPool => _testSessionPool ?? TestSessionPool.Instance;
+
     private IDictionary<string, string?> TestSessionEnvironmentVariables
     {
         get
@@ -192,7 +194,7 @@ public class ProxyTestSessionManager : IProxyTestSessionManager
         }
 
         // Make the session available.
-        if (!(_testSessionPool ?? TestSessionPool.Instance).AddSession(_testSessionInfo, this))
+        if (!SessionPool.AddSession(_testSessionInfo, this))
         {
             requestData?.MetricsCollection.Add(
                 TelemetryDataConstants.TestSessionState,

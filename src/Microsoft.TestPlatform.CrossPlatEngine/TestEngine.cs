@@ -40,6 +40,8 @@ public class TestEngine : ITestEngine
 
     private ITestExtensionManager? _testExtensionManager;
 
+    private TestSessionPool SessionPool => _testSessionPool ?? TestSessionPool.Instance;
+
     public TestEngine()
         : this(TestRuntimeProviderManager.Instance, new ProcessHelper())
     {
@@ -153,7 +155,7 @@ public class TestEngine : ITestEngine
 
                     // In case we have an active test session, we always prefer the already
                     // created proxies instead of the ones that need to be created on the spot.
-                    var proxyOperationManager = (_testSessionPool ?? TestSessionPool.Instance).TryTakeProxy(
+                    var proxyOperationManager = SessionPool.TryTakeProxy(
                         discoveryCriteria.TestSessionInfo,
                         source,
                         runtimeProviderInfo.RunSettings,
@@ -317,7 +319,7 @@ public class TestEngine : ITestEngine
                     string source,
                     ProxyExecutionManager proxyExecutionManager) =>
                 {
-                    var proxyOperationManager = (_testSessionPool ?? TestSessionPool.Instance).TryTakeProxy(
+                    var proxyOperationManager = SessionPool.TryTakeProxy(
                         testRunCriteria.TestSessionInfo,
                         source,
                         runtimeProviderInfo.RunSettings,

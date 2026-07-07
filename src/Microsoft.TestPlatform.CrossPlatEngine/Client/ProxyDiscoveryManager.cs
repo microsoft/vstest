@@ -41,6 +41,8 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
     private bool _skipDefaultAdapters;
     private string? _previousSource;
 
+    private TestSessionPool SessionPool => _testSessionPool ?? TestSessionPool.Instance;
+
     /// <summary>
     /// Initializes a new instance of the <see cref="ProxyDiscoveryManager"/> class.
     /// </summary>
@@ -292,7 +294,7 @@ public class ProxyDiscoveryManager : IProxyDiscoveryManager, IBaseProxy, ITestDi
             return;
         }
 
-        (_testSessionPool ?? TestSessionPool.Instance).ReturnProxy(_testSessionInfo, _proxyOperationManager.Id);
+        SessionPool.ReturnProxy(_testSessionInfo, _proxyOperationManager.Id);
     }
 
     /// <inheritdoc/>
