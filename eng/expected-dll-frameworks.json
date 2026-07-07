@@ -143,7 +143,7 @@
       "tools/net462/Common7/IDE/Extensions/TestPlatform/System.Runtime.CompilerServices.Unsafe.dll": "none",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CommunicationUtilities.dll": "net",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CoreUtilities.dll": "net",
-      "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CrossPlatEngine.dll": "netstandard",
+      "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.CrossPlatEngine.dll": "net",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.PlatformAbstractions.dll": "net",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.TestPlatform.Utilities.dll": "netstandard",
       "tools/net462/Common7/IDE/Extensions/TestPlatform/TestHostNet/Microsoft.VisualStudio.TestPlatform.Common.dll": "netstandard",
