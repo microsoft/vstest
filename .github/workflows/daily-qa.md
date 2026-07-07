@@ -10,7 +10,23 @@ on:
 
 timeout-minutes: 20
 
-permissions: read-all
+permissions:
+  actions: read
+  attestations: read
+  checks: read
+  contents: read
+  copilot-requests: write
+  deployments: read
+  discussions: read
+  issues: read
+  models: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  statuses: read
+  vulnerability-alerts: read
 
 network:
   allowed:
@@ -44,7 +60,6 @@ safe-outputs:
 
 tools:
   github:
-    lockdown: true
     toolsets: [repos, pull_requests, issues]
     min-integrity: none
   bash: true
