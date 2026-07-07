@@ -30,6 +30,14 @@ internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
 
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
+    private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly CommandLineOptions _commandLineOptions;
+
+    public RunSpecificTestsArgumentProcessor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider)
+    {
+        _commandLineOptions = commandLineOptions;
+        _runSettingsProvider = runSettingsProvider;
+    }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
         => _metadata ??= new Lazy<IArgumentProcessorCapabilities>(() =>
@@ -39,10 +47,10 @@ internal class RunSpecificTestsArgumentProcessor : IArgumentProcessor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new RunSpecificTestsArgumentExecutor(
-                CommandLineOptions.Instance,
-                RunSettingsManager.Instance,
+                _commandLineOptions,
+                _runSettingsProvider,
                 TestRequestManager.Instance,
-                new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
+                new ArtifactProcessingManager(_commandLineOptions.TestSessionCorrelationId),
                 ConsoleOutput.Instance));
 
         set => _executor = value;
@@ -143,7 +151,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         _runSettingsManager = runSettingsProvider;
         Output = output;
         _discoveryEventsRegistrar = new DiscoveryEventsRegistrar(DiscoveryRequest_OnDiscoveredTests);
-        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager);
+        _testRunEventsRegistrar = new TestRunRequestEventsRegistrar(Output, _commandLineOptions, artifactProcessingManager, _runSettingsManager);
     }
 
     #region IArgumentProcessor
@@ -325,12 +333,14 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
         private readonly IOutput _output;
         private readonly CommandLineOptions _commandLineOptions;
         private readonly IArtifactProcessingManager _artifactProcessingManager;
+        private readonly IRunSettingsProvider _runSettingsProvider;
 
-        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions, IArtifactProcessingManager artifactProcessingManager)
+        public TestRunRequestEventsRegistrar(IOutput output, CommandLineOptions commandLineOptions, IArtifactProcessingManager artifactProcessingManager, IRunSettingsProvider runSettingsProvider)
         {
             _output = output;
             _commandLineOptions = commandLineOptions;
             _artifactProcessingManager = artifactProcessingManager;
+            _runSettingsProvider = runSettingsProvider;
         }
 
         public void LogWarning(string message)
@@ -362,7 +372,7 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
                 var testsFoundInAnySource = e.TestRunStatistics != null && (e.TestRunStatistics.ExecutedTests > 0);
 
                 // Indicate the user to use testadapterpath command if there are no tests found
-                if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
+                if (!testsFoundInAnySource && !_commandLineOptions.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                 }
@@ -371,8 +381,9 @@ internal class RunSpecificTestsArgumentExecutor : IArgumentExecutor
             // Collect tests session artifacts for post processing
             if (_commandLineOptions.ArtifactProcessingMode == ArtifactProcessingMode.Collect)
             {
-                TPDebug.Assert(RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is not null, "RunSettingsManager.Instance.ActiveRunSettings.SettingsXml is null");
-                _artifactProcessingManager.CollectArtifacts(e, RunSettingsManager.Instance.ActiveRunSettings.SettingsXml);
+                var settingsXml = _runSettingsProvider.ActiveRunSettings?.SettingsXml;
+                TPDebug.Assert(settingsXml is not null, "RunSettingsProvider.ActiveRunSettings.SettingsXml is null");
+                _artifactProcessingManager.CollectArtifacts(e, settingsXml);
             }
         }
     }
