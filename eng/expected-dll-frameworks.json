@@ -203,7 +203,7 @@
       "contentFiles/any/net10.0/TestHostNetFramework/System.Buffers.dll": "netframework",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Collections.Concurrent.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Collections.dll": "none",
-      "contentFiles/any/net10.0/TestHostNetFramework/System.Collections.Immutable.dll": "netstandard",
+      "contentFiles/any/net10.0/TestHostNetFramework/System.Collections.Immutable.dll": "netframework",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Collections.NonGeneric.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.Collections.Specialized.dll": "none",
       "contentFiles/any/net10.0/TestHostNetFramework/System.ComponentModel.dll": "none",

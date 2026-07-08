@@ -26,6 +26,15 @@
     <PublishForPackaging>true</PublishForPackaging>
   </PropertyGroup>
 
+  <!-- Publish the .NET Framework testhost (net462, win7-x64) once into the canonical
+       packaging-publish folder; the Microsoft.TestPlatform.CLI tool package harvests its
+       self-consistent closure (testhost.exe + .config + System.* + Test Platform dependency
+       assemblies and satellites) into the TestHostNetFramework payload. See
+       eng/PublishForPackaging.targets. Scoped to the .NET Framework minimum TFM (net462). -->
+  <PropertyGroup Condition="'$(TargetFramework)' == '$(NetFrameworkMinimum)'">
+    <PublishForPackaging>true</PublishForPackaging>
+  </PropertyGroup>
+
   <PropertyGroup Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetFrameworkMinimum)')) ">
     <RuntimeIdentifier Condition="'$(DotNetBuildSourceOnly)' != 'true'">win7-x64</RuntimeIdentifier>
     <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
