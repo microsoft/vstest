@@ -96,15 +96,20 @@ internal class TestRequestManager : ITestRequestManager
     /// Initializes a new instance of the <see cref="TestRequestManager"/> class.
     /// </summary>
     public TestRequestManager()
+        : this(CommandLineOptions.Instance)
+    {
+    }
+
+    internal TestRequestManager(CommandLineOptions commandLineOptions)
         : this(
-            CommandLineOptions.Instance,
+            commandLineOptions,
             TestPlatformFactory.GetTestPlatform(),
             TestRunResultAggregator.Instance,
             TestPlatformEventSource.Instance,
             new InferHelper(AssemblyMetadataProvider.Instance),
             MetricsPublisherFactory.GetMetricsPublisher(
                 IsTelemetryOptedIn(),
-                CommandLineOptions.Instance.IsDesignMode),
+                commandLineOptions.IsDesignMode),
             new ProcessHelper(),
             new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
             new PlatformEnvironment(),

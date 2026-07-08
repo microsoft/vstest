@@ -1002,6 +1002,44 @@ public class ConsoleLoggerTests
     }
 
     [TestMethod]
+    public void TestRunStartHandlerShouldUseInjectedCommandLineOptionsSourcesRatherThanTheStaticDefault()
+    {
+        // The console logger reads the discovered sources from the CommandLineOptions it was given. Injecting a distinct
+        // instance (with its own source) while the static default stays empty proves the reader resolves to the injected
+        // instance rather than to CommandLineOptions.Instance.
+        CommandLineOptions.Reset();
+
+        var fileHelper = new Mock<IFileHelper>();
+        var injectedOptions = new CommandLineOptions
+        {
+            FileHelper = fileHelper.Object,
+            FilePatternParser = new FilePatternParser(new Mock<Matcher>().Object, fileHelper.Object)
+        };
+        string testFilePath = Path.Combine(Path.GetTempPath(), "InjectedTestFile.dll");
+        fileHelper.Setup(fh => fh.Exists(testFilePath)).Returns(true);
+        injectedOptions.AddSource(testFilePath);
+
+        // The static default carries no sources, so a discovered count of 1 can only come from the injected instance.
+        Assert.AreEqual(0, CommandLineOptions.Instance.Sources.Count());
+
+        var consoleLogger = new ConsoleLogger(_mockOutput.Object, _mockProgressIndicator.Object, _mockFeatureFlag.Object, injectedOptions);
+
+        var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);
+        loggerEvents.EnableEvents();
+        var parameters = new Dictionary<string, string?>
+        {
+            { "verbosity", "normal" }
+        };
+        consoleLogger.Initialize(loggerEvents, parameters);
+
+        var testRunStartEventArgs = new TestRunStartEventArgs(new TestRunCriteria(new List<string> { testFilePath }, 1));
+        loggerEvents.RaiseTestRunStart(testRunStartEventArgs);
+        loggerEvents.WaitForEventCompletion();
+
+        _mockOutput.Verify(o => o.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, 1), OutputLevel.Information), Times.Once());
+    }
+
+    [TestMethod]
     public void TestRunStartHandlerShouldWriteNumberOfTestSourcesDiscoveredOnConsole()
     {
         var loggerEvents = new InternalTestLoggerEvents(TestSessionMessageLogger.Instance);

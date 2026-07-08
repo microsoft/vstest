@@ -121,11 +121,12 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     /// <summary>
     /// Constructor added for testing purpose
     /// </summary>
-    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator, IFeatureFlag featureFlag)
+    internal ConsoleLogger(IOutput output, IProgressIndicator progressIndicator, IFeatureFlag featureFlag, CommandLineOptions? commandLineOptions = null)
     {
         Output = output;
         _progressIndicator = progressIndicator;
         _featureFlag = featureFlag;
+        _commandLineOptions = commandLineOptions;
     }
 
     /// <summary>
@@ -141,6 +142,8 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     private IProgressIndicator? _progressIndicator;
 
     private readonly IFeatureFlag _featureFlag = FeatureFlag.Instance;
+
+    private readonly CommandLineOptions? _commandLineOptions;
 
     /// <summary>
     /// Get the verbosity level for the console logger
@@ -415,10 +418,11 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         TPDebug.Assert(Output != null, "Initialize should have been called");
 
         // Print all test containers.
-        Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, CommandLineOptions.Instance.Sources.Count()), OutputLevel.Information);
+        var commandLineOptions = _commandLineOptions ?? CommandLineOptions.Instance;
+        Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, commandLineOptions.Sources.Count()), OutputLevel.Information);
         if (VerbosityLevel == Verbosity.Detailed)
         {
-            foreach (var source in CommandLineOptions.Instance.Sources)
+            foreach (var source in commandLineOptions.Sources)
             {
                 Output.WriteLine(source, OutputLevel.Information);
             }
@@ -684,7 +688,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 // DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX(new UX) is disabled
                 _featureFlag.IsSet(FeatureFlag.VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX) ||
                 // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
-                CommandLineOptions.Instance.TestSessionCorrelationId is null)
+                (_commandLineOptions ?? CommandLineOptions.Instance).TestSessionCorrelationId is null)
             {
                 Output.Information(false, CommandLineResources.AttachmentsBanner);
                 TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachmentsCount > 0.");
