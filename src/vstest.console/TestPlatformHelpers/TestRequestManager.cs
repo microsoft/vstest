@@ -1421,9 +1421,21 @@ internal class TestRequestManager : ITestRequestManager
                 _telemetryOptedIn || IsTelemetryOptedIn()
                     ? new MetricsCollection()
                     : new NoOpMetricsCollection(),
-            IsTelemetryOptedIn = _telemetryOptedIn || IsTelemetryOptedIn()
+            IsTelemetryOptedIn = _telemetryOptedIn || IsTelemetryOptedIn(),
+            KnownExtensionInstanceFactory = CreateKnownExtensionInstance,
         };
     }
+
+    /// <summary>
+    /// Supplies pre-configured instances of vstest.console's own built-in extensions so they receive
+    /// injected dependencies (here: the parsed <see cref="CommandLineOptions"/>) instead of reaching
+    /// for process-wide singletons. Unknown extension URIs return <see langword="null"/> and are
+    /// reflection-activated as before, so this does not widen any public extension point.
+    /// </summary>
+    private object? CreateKnownExtensionInstance(Uri extensionUri)
+        => string.Equals(extensionUri.AbsoluteUri, ConsoleLogger.ExtensionUri, StringComparison.OrdinalIgnoreCase)
+            ? new ConsoleLogger(_commandLineOptions)
+            : null;
 
     private static List<string> GetSources(TestRunRequestPayload testRunRequestPayload)
     {
