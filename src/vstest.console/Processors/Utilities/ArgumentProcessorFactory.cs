@@ -77,7 +77,7 @@ internal class ArgumentProcessorFactory
         runSettingsProvider ??= RunSettingsManager.Instance;
         runSettingsHelper ??= RunSettingsHelper.Instance;
         commandLineOptions ??= new CommandLineOptions();
-        testRequestManager ??= new LazyTestRequestManager(() => new TestRequestManager(commandLineOptions));
+        testRequestManager ??= new LazyTestRequestManager(() => new TestRequestManager(commandLineOptions, new TestRunResultAggregator()));
         var defaultArgumentProcessor = GetDefaultArgumentProcessors(runSettingsProvider, runSettingsHelper, commandLineOptions, testRequestManager);
 
         if (!(featureFlag ?? FeatureFlag.Instance).IsSet(FeatureFlag.VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING))

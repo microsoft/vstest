@@ -101,12 +101,12 @@ internal class Executor
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
-        : this(output, testPlatformEventSource, processHelper, environment, RunSettingsManager.Instance, RunSettingsHelper.Instance, new CommandLineOptions(), TestRunResultAggregator.Instance)
+        : this(output, testPlatformEventSource, processHelper, environment, RunSettingsManager.Instance, RunSettingsHelper.Instance, new CommandLineOptions(), new TestRunResultAggregator())
     {
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment, IRunSettingsProvider runSettingsProvider)
-        : this(output, testPlatformEventSource, processHelper, environment, runSettingsProvider, RunSettingsHelper.Instance, new CommandLineOptions(), TestRunResultAggregator.Instance)
+        : this(output, testPlatformEventSource, processHelper, environment, runSettingsProvider, RunSettingsHelper.Instance, new CommandLineOptions(), new TestRunResultAggregator())
     {
     }
 
@@ -125,7 +125,7 @@ internal class Executor
         _runSettingsHelper = runSettingsHelper;
         _commandLineOptions = commandLineOptions;
         _testRunResultAggregator = testRunResultAggregator;
-        _testRequestManager = testRequestManager ?? new LazyTestRequestManager(() => new TestRequestManager(_commandLineOptions));
+        _testRequestManager = testRequestManager ?? new LazyTestRequestManager(() => new TestRequestManager(_commandLineOptions, _testRunResultAggregator));
     }
 
     /// <summary>

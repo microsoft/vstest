@@ -91,11 +91,11 @@ internal class TestRequestManager : ITestRequestManager
     private CancellationTokenSource? _currentAttachmentsProcessingCancellationTokenSource;
 
 
-    internal TestRequestManager(CommandLineOptions commandLineOptions)
+    internal TestRequestManager(CommandLineOptions commandLineOptions, TestRunResultAggregator testRunResultAggregator)
         : this(
             commandLineOptions,
             TestPlatformFactory.GetTestPlatform(),
-            TestRunResultAggregator.Instance,
+            testRunResultAggregator,
             TestPlatformEventSource.Instance,
             new InferHelper(AssemblyMetadataProvider.Instance),
             MetricsPublisherFactory.GetMetricsPublisher(

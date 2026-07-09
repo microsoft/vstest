@@ -120,7 +120,7 @@ public class RunTestsArgumentProcessorTests
 
         CommandLineOptions.Reset();
         CommandLineOptions.Instance.IsDesignMode = true;
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = new RunTestsArgumentExecutor(CommandLineOptions.Instance, runSettingsProvider, testRequestManager, _artifactProcessingManager.Object, _mockOutput.Object);
 
         Assert.AreEqual(ArgumentProcessorResult.Success, executor.Execute());
@@ -130,7 +130,7 @@ public class RunTestsArgumentProcessorTests
     public void ExecutorExecuteForNoSourcesShouldThrowCommandLineException()
     {
         CommandLineOptions.Reset();
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager);
 
         Assert.ThrowsExactly<CommandLineException>(() => executor.Execute());
@@ -160,7 +160,7 @@ public class RunTestsArgumentProcessorTests
         mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager);
 
         Assert.ThrowsExactly<TestPlatformException>(() => executor.Execute());
@@ -176,7 +176,7 @@ public class RunTestsArgumentProcessorTests
         mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager);
 
         Assert.ThrowsExactly<SettingsException>(() => executor.Execute());
@@ -192,7 +192,7 @@ public class RunTestsArgumentProcessorTests
         mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager);
 
         Assert.ThrowsExactly<InvalidOperationException>(() => executor.Execute());
@@ -208,7 +208,7 @@ public class RunTestsArgumentProcessorTests
         mockTestPlatform.Setup(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.IsAny<TestRunCriteria>(), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>())).Returns(mockTestRunRequest.Object);
 
         ResetAndAddSourceToCommandLineOptions();
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager);
 
         Assert.ThrowsExactly<Exception>(() => executor.Execute());
@@ -265,7 +265,7 @@ public class RunTestsArgumentProcessorTests
 
         ResetAndAddSourceToCommandLineOptions();
 
-        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
+        var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, mockTestPlatform.Object, new TestRunResultAggregator(), _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _environment.Object, _environmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager);
 
         return executor.Execute();
