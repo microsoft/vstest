@@ -8,6 +8,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
+using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -66,9 +67,9 @@ internal class ArgumentProcessorFactory
     /// </param>
     /// <param name="testRequestManager">
     /// The test request manager that the run/discovery argument processors hand to their executors.
-    /// When not provided the processors fall back to the ambient <see cref="Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers.TestRequestManager.Instance"/>
-    /// lazily, at the point the executor is built, so that commands that never touch it (for example
-    /// <c>--Help</c>) do not force its (relatively heavy) construction.
+    /// When not provided a request-scoped manager is created lazily, at the point the executor is
+    /// built, so that commands that never touch it (for example <c>--Help</c>) do not force its
+    /// (relatively heavy) construction.
     /// </param>
     /// <returns>ArgumentProcessorFactory.</returns>
     internal static ArgumentProcessorFactory Create(IFeatureFlag? featureFlag = null, IRunSettingsProvider? runSettingsProvider = null, IRunSettingsHelper? runSettingsHelper = null, CommandLineOptions? commandLineOptions = null, ITestRequestManager? testRequestManager = null)
@@ -76,6 +77,7 @@ internal class ArgumentProcessorFactory
         runSettingsProvider ??= RunSettingsManager.Instance;
         runSettingsHelper ??= RunSettingsHelper.Instance;
         commandLineOptions ??= CommandLineOptions.Instance;
+        testRequestManager ??= new LazyTestRequestManager(() => new TestRequestManager(commandLineOptions));
         var defaultArgumentProcessor = GetDefaultArgumentProcessors(runSettingsProvider, runSettingsHelper, commandLineOptions, testRequestManager);
 
         if (!(featureFlag ?? FeatureFlag.Instance).IsSet(FeatureFlag.VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING))
@@ -210,7 +212,7 @@ internal class ArgumentProcessorFactory
             .Where(lazyProcessor => lazyProcessor.Metadata.Value.IsSpecialCommand && lazyProcessor.Metadata.Value.AlwaysExecute);
     }
 
-    private static IList<IArgumentProcessor> GetDefaultArgumentProcessors(IRunSettingsProvider runSettingsProvider, IRunSettingsHelper runSettingsHelper, CommandLineOptions commandLineOptions, ITestRequestManager? testRequestManager) => new List<IArgumentProcessor> {
+    private static IList<IArgumentProcessor> GetDefaultArgumentProcessors(IRunSettingsProvider runSettingsProvider, IRunSettingsHelper runSettingsHelper, CommandLineOptions commandLineOptions, ITestRequestManager testRequestManager) => new List<IArgumentProcessor> {
         new HelpArgumentProcessor(),
         new TestSourceArgumentProcessor(commandLineOptions),
         new ListTestsArgumentProcessor(commandLineOptions, runSettingsProvider, testRequestManager),

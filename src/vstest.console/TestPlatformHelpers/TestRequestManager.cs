@@ -47,8 +47,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 /// </summary>
 internal class TestRequestManager : ITestRequestManager
 {
-    private static ITestRequestManager? s_testRequestManagerInstance;
-
     private readonly ITestPlatform _testPlatform;
     private readonly ITestPlatformEventSource _testPlatformEventSource;
     // TODO: No idea what is Task supposed to buy us, Tasks start immediately on instantiation
@@ -92,13 +90,6 @@ internal class TestRequestManager : ITestRequestManager
     /// </summary>
     private CancellationTokenSource? _currentAttachmentsProcessingCancellationTokenSource;
 
-    /// <summary>
-    /// Initializes a new instance of the <see cref="TestRequestManager"/> class.
-    /// </summary>
-    public TestRequestManager()
-        : this(CommandLineOptions.Instance)
-    {
-    }
 
     internal TestRequestManager(CommandLineOptions commandLineOptions)
         : this(
@@ -169,12 +160,6 @@ internal class TestRequestManager : ITestRequestManager
         _environmentVariableHelper = environmentVariableHelper;
         _runSettingsHelper = runSettingsHelper;
     }
-
-    /// <summary>
-    /// Gets the test request manager instance.
-    /// </summary>
-    public static ITestRequestManager Instance
-        => s_testRequestManagerInstance ??= new TestRequestManager();
 
     #region ITestRequestManager
 
