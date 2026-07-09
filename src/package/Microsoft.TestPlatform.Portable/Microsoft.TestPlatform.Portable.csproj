@@ -167,6 +167,10 @@
        The net462-tree targets are gated to the .NET Framework runner TFM (net48) and the net8.0-tree
        targets to the .NET runner TFM (net8.0). Both are inner TargetFrameworks of this project, so each
        target contributes to the package exactly once. -->
+  <PropertyGroup Condition="'$(DotNetBuildSourceOnly)' == 'true'">
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
   <PropertyGroup Condition="'$(DotNetBuildSourceOnly)' != 'true' and '$(OS)' == 'Windows_NT'">
     <TargetsForTfmSpecificContentInPackage>$(TargetsForTfmSpecificContentInPackage);_IncludePortableNetFxRunnerContent;_IncludePortableNetFxTestHostContent;_IncludePortableNetFxExtensionContent;_IncludePortableNetFxDumpContent;_IncludePortableNetRunnerContent;_IncludePortableNetDataCollectorContent;_IncludePortableNetExtensionContent;_IncludePortableNetDumpContent;_IncludePortableNetFrameworkTestHostPublishContent;_IncludePortableNetFrameworkTestHostContent</TargetsForTfmSpecificContentInPackage>
   </PropertyGroup>
