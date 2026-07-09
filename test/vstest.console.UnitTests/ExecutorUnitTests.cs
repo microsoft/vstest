@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 [DoNotParallelize]
 public class ExecutorUnitTests
 {
+    private readonly CommandLineOptions _commandLineOptions = new();
     private readonly Mock<ITestPlatformEventSource> _mockTestPlatformEventSource;
 
     public ExecutorUnitTests()
@@ -389,7 +390,7 @@ public class ExecutorUnitTests
             new PlatformEnvironment(),
             RunSettingsManager.Instance,
             RunSettingsHelper.Instance,
-            CommandLineOptions.Instance,
+            _commandLineOptions,
             injectedAggregator).Execute("--help");
 
         Assert.AreEqual(1, exitCodeWithInjected, "Executor must observe the injected aggregator's Failed outcome.");
@@ -403,7 +404,7 @@ public class ExecutorUnitTests
             new PlatformEnvironment(),
             RunSettingsManager.Instance,
             RunSettingsHelper.Instance,
-            CommandLineOptions.Instance,
+            _commandLineOptions,
             TestRunResultAggregator.Instance).Execute("--help");
 
         Assert.AreEqual(0, exitCodeWithStatic, "The static default aggregator is still Passed, so its Executor must not set the failure bit.");

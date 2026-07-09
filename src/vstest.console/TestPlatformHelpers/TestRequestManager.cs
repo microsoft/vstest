@@ -180,7 +180,10 @@ internal class TestRequestManager : ITestRequestManager
     /// <inheritdoc />
     public void ResetOptions()
     {
-        CommandLineOptions.Reset();
+        // Nothing to reset. The manager holds the CommandLineOptions it was constructed with and
+        // never mutates them per request; design-mode requests derive their state from the request
+        // payload (sources, run settings), not from shared mutable command-line options. This used
+        // to null a process-wide CommandLineOptions singleton, which no longer exists.
     }
 
     /// <inheritdoc />
