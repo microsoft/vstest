@@ -131,8 +131,6 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Output = output;
         _progressIndicator = progressIndicator;
         _featureFlag = featureFlag;
-        // Never fall back to CommandLineOptions.Instance: the logger owns its own options so tests
-        // stay isolated and the built-in logger no longer reads the process-wide singleton.
         _commandLineOptions = commandLineOptions ?? new CommandLineOptions();
     }
 
@@ -425,11 +423,10 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         TPDebug.Assert(Output != null, "Initialize should have been called");
 
         // Print all test containers.
-        var commandLineOptions = _commandLineOptions;
-        Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, commandLineOptions.Sources.Count()), OutputLevel.Information);
+        Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, _commandLineOptions.Sources.Count()), OutputLevel.Information);
         if (VerbosityLevel == Verbosity.Detailed)
         {
-            foreach (var source in commandLineOptions.Sources)
+            foreach (var source in _commandLineOptions.Sources)
             {
                 Output.WriteLine(source, OutputLevel.Information);
             }
