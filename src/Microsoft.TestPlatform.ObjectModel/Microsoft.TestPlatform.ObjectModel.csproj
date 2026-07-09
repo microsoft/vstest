@@ -23,20 +23,14 @@
     <ProjectReference Include="..\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" PrivateAssets="all" />
   </ItemGroup>
 
-  <!-- Bundle CoreUtilities and PlatformAbstractions DLLs + satellite resources into the package (they
-       are not separate NuGet packages). Each sibling assembly is taken from its own producing project's
-       build output for the matching target framework rather than cherry-picked from this project's
-       commingled $(OutputPath), so every bundled DLL is the exact build its owning project produced.
-       CoreUtilities and PlatformAbstractions multi-target the same framework set as this project, so
-       $(TargetFramework) maps one-to-one to the sibling's own output folder. Expanded at pack time
-       because the sibling folders are populated during the build. -->
+  <!-- Bundle CoreUtilities and PlatformAbstractions DLLs + satellite resources into the package (they are not separate NuGet packages). -->
   <Target Name="IncludeBundledAssembliesInPackage">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CoreUtilities\$(Configuration)\$(TargetFramework)\Microsoft.TestPlatform.CoreUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.PlatformAbstractions\$(Configuration)\$(TargetFramework)\Microsoft.TestPlatform.PlatformAbstractions.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.CoreUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.PlatformAbstractions.dll" PackagePath="lib/$(TargetFramework)/" />
       <!-- Satellite resources for bundled assemblies -->
-      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CoreUtilities\$(Configuration)\$(TargetFramework)\**\Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.PlatformAbstractions\$(Configuration)\$(TargetFramework)\**\Microsoft.TestPlatform.PlatformAbstractions.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.PlatformAbstractions.resources.dll" PackagePath="lib/$(TargetFramework)/" />
     </ItemGroup>
   </Target>
 
