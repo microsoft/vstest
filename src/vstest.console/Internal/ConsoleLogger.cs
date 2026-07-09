@@ -131,7 +131,9 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         Output = output;
         _progressIndicator = progressIndicator;
         _featureFlag = featureFlag;
-        _commandLineOptions = commandLineOptions;
+        // Never fall back to CommandLineOptions.Instance: the logger owns its own options so tests
+        // stay isolated and the built-in logger no longer reads the process-wide singleton.
+        _commandLineOptions = commandLineOptions ?? new CommandLineOptions();
     }
 
     /// <summary>
@@ -148,7 +150,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
 
     private readonly IFeatureFlag _featureFlag = FeatureFlag.Instance;
 
-    private readonly CommandLineOptions? _commandLineOptions;
+    private readonly CommandLineOptions _commandLineOptions;
 
     /// <summary>
     /// Get the verbosity level for the console logger
@@ -423,7 +425,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
         TPDebug.Assert(Output != null, "Initialize should have been called");
 
         // Print all test containers.
-        var commandLineOptions = _commandLineOptions ?? CommandLineOptions.Instance;
+        var commandLineOptions = _commandLineOptions;
         Output.WriteLine(string.Format(CultureInfo.CurrentCulture, CommandLineResources.TestSourcesDiscovered, commandLineOptions.Sources.Count()), OutputLevel.Information);
         if (VerbosityLevel == Verbosity.Detailed)
         {
@@ -693,7 +695,7 @@ internal class ConsoleLogger : ITestLoggerWithParameters
                 // DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX(new UX) is disabled
                 _featureFlag.IsSet(FeatureFlag.VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX) ||
                 // TestSessionCorrelationId is null(we're not running through the dotnet SDK).
-                (_commandLineOptions ?? CommandLineOptions.Instance).TestSessionCorrelationId is null)
+                _commandLineOptions.TestSessionCorrelationId is null)
             {
                 Output.Information(false, CommandLineResources.AttachmentsBanner);
                 TPDebug.Assert(e.AttachmentSets != null, "e.AttachmentSets should not be null when runLevelAttachmentsCount > 0.");
