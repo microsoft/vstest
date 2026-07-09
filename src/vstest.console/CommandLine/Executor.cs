@@ -100,12 +100,12 @@ internal class Executor
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment)
-        : this(output, testPlatformEventSource, processHelper, environment, RunSettingsManager.Instance, RunSettingsHelper.Instance, CommandLineOptions.Instance, TestRunResultAggregator.Instance)
+        : this(output, testPlatformEventSource, processHelper, environment, RunSettingsManager.Instance, RunSettingsHelper.Instance, new CommandLineOptions(), TestRunResultAggregator.Instance)
     {
     }
 
     internal Executor(IOutput output, ITestPlatformEventSource testPlatformEventSource, IProcessHelper processHelper, IEnvironment environment, IRunSettingsProvider runSettingsProvider)
-        : this(output, testPlatformEventSource, processHelper, environment, runSettingsProvider, RunSettingsHelper.Instance, CommandLineOptions.Instance, TestRunResultAggregator.Instance)
+        : this(output, testPlatformEventSource, processHelper, environment, runSettingsProvider, RunSettingsHelper.Instance, new CommandLineOptions(), TestRunResultAggregator.Instance)
     {
     }
 
