@@ -112,10 +112,15 @@ internal class ConsoleLogger : ITestLoggerWithParameters
     private string? _targetFramework;
 
     /// <summary>
-    /// Default constructor.
+    /// Constructor. The built-in console logger is activated directly by the composition root (see
+    /// <see cref="TestPlatformHelpers.TestRequestManager"/>) rather than by reflection, so it receives
+    /// the parsed <see cref="CommandLineOptions"/> by injection instead of reaching for the process-wide
+    /// singleton. <see cref="Output"/> and the progress indicator are established later, in
+    /// <see cref="Initialize(TestLoggerEvents, string)"/>.
     /// </summary>
-    public ConsoleLogger()
+    internal ConsoleLogger(CommandLineOptions commandLineOptions)
     {
+        _commandLineOptions = commandLineOptions;
     }
 
     /// <summary>
