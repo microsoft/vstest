@@ -43,17 +43,31 @@
     <None Include="$(SrcPackageFolder)ThirdPartyNotices.txt" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <!-- Bundle Common and CommunicationUtilities DLLs plus satellite resources (including CoreUtilities resources) into the package. -->
+  <!-- Bundle Common and CommunicationUtilities DLLs plus satellite resources (including CoreUtilities
+       resources) into the package (they are not separate NuGet packages). Each bundled assembly is
+       taken from its own producing project's build output for the matching target framework rather
+       than cherry-picked from this project's commingled $(OutputPath), so every bundled DLL is the
+       exact build its owning project produced. CommunicationUtilities and CoreUtilities multi-target
+       the same framework set as this project, so $(TargetFramework) maps one-to-one to their own
+       output. Common only builds net462 and netstandard2.0, so for .NET (Core) folders such as net8.0
+       the nearest-compatible netstandard2.0 flavor is used - exactly the one a Common ProjectReference
+       resolved into $(OutputPath) before this change. Expanded at pack time because the sibling folders
+       are populated during the build. -->
   <Target Name="IncludeBundledAssembliesInPackage">
+    <PropertyGroup>
+      <!-- Common has no net8.0 build; fall back to its netstandard2.0 flavor for .NET (Core) folders. -->
+      <_TranslationLayerCommonTfm>$(TargetFramework)</_TranslationLayerCommonTfm>
+      <_TranslationLayerCommonTfm Condition="!Exists('$(ArtifactsBinDir)Microsoft.TestPlatform.Common\$(Configuration)\$(TargetFramework)\')">netstandard2.0</_TranslationLayerCommonTfm>
+    </PropertyGroup>
     <ItemGroup>
-      <!-- The XML doc is emitted into the intermediate output, so include it explicitly (pack does not auto-pick it up). -->
+      <!-- The XML doc is emitted into this project's own intermediate output, so include it explicitly (pack does not auto-pick it up). -->
       <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.VsTestConsole.TranslationLayer.XML" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.VisualStudio.TestPlatform.Common.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.CommunicationUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Common\$(Configuration)\$(_TranslationLayerCommonTfm)\Microsoft.VisualStudio.TestPlatform.Common.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CommunicationUtilities\$(Configuration)\$(TargetFramework)\Microsoft.TestPlatform.CommunicationUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
       <!-- Satellite resources for bundled assemblies -->
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.VisualStudio.TestPlatform.Common.resources.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CommunicationUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Common\$(Configuration)\$(_TranslationLayerCommonTfm)\**\Microsoft.VisualStudio.TestPlatform.Common.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CommunicationUtilities\$(Configuration)\$(TargetFramework)\**\Microsoft.TestPlatform.CommunicationUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CoreUtilities\$(Configuration)\$(TargetFramework)\**\Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
     </ItemGroup>
   </Target>
 
