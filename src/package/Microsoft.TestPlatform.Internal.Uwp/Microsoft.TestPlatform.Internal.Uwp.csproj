@@ -30,20 +30,25 @@
     <None Include="README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
-  <!-- Bundle the test platform DLLs (ObjectModel, CrossPlatEngine and their dependencies) plus the
-       ObjectModel and CoreUtilities satellite resources into lib/netstandard2.0. -->
+  <!-- Bundle the test platform DLLs (ObjectModel, CrossPlatEngine and their dependency closure) plus
+       the ObjectModel and CoreUtilities satellite resources into lib/netstandard2.0. Each assembly is
+       taken from the single project that produces it (its own netstandard2.0 build output) rather than
+       cherry-picked from this package's commingled $(OutputPath), into which every ProjectReference
+       copies its output. Sourcing each DLL from its producer guarantees a self-consistent set instead
+       of files that happened to win a race in the shared folder. Expanded at pack time because the
+       producer folders are populated during the build. -->
   <Target Name="IncludeBundledAssembliesInPackage">
     <ItemGroup>
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.CoreUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.CrossPlatEngine.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.CommunicationUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.Utilities.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.VisualStudio.TestPlatform.Common.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)Microsoft.TestPlatform.PlatformAbstractions.dll" PackagePath="lib/$(TargetFramework)/" />
-      <!-- Only ObjectModel and CoreUtilities satellite resources are shipped. -->
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" PackagePath="lib/$(TargetFramework)/" />
-      <TfmSpecificPackageFile Include="$(OutputPath)**/Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.ObjectModel\$(Configuration)\netstandard2.0\Microsoft.VisualStudio.TestPlatform.ObjectModel.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CoreUtilities\$(Configuration)\netstandard2.0\Microsoft.TestPlatform.CoreUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CrossPlatEngine\$(Configuration)\netstandard2.0\Microsoft.TestPlatform.CrossPlatEngine.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CommunicationUtilities\$(Configuration)\netstandard2.0\Microsoft.TestPlatform.CommunicationUtilities.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Utilities\$(Configuration)\netstandard2.0\Microsoft.TestPlatform.Utilities.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Common\$(Configuration)\netstandard2.0\Microsoft.VisualStudio.TestPlatform.Common.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.PlatformAbstractions\$(Configuration)\netstandard2.0\Microsoft.TestPlatform.PlatformAbstractions.dll" PackagePath="lib/$(TargetFramework)/" />
+      <!-- Only ObjectModel and CoreUtilities satellite resources are shipped, each from its own build. -->
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.ObjectModel\$(Configuration)\netstandard2.0\**\Microsoft.VisualStudio.TestPlatform.ObjectModel.resources.dll" PackagePath="lib/$(TargetFramework)/" />
+      <TfmSpecificPackageFile Include="$(ArtifactsBinDir)Microsoft.TestPlatform.CoreUtilities\$(Configuration)\netstandard2.0\**\Microsoft.TestPlatform.CoreUtilities.resources.dll" PackagePath="lib/$(TargetFramework)/" />
     </ItemGroup>
   </Target>
 </Project>
