@@ -93,7 +93,7 @@ public class ListTestsArgumentProcessorTests
     [TestMethod]
     public void GetMetadataShouldReturnListTestsArgumentProcessorCapabilities()
     {
-        var processor = new ListTestsArgumentProcessor(CommandLineOptions.Instance, new TestableRunSettingsProvider());
+        var processor = new ListTestsArgumentProcessor(CommandLineOptions.Instance, new TestableRunSettingsProvider(), new Mock<ITestRequestManager>().Object);
         Assert.IsTrue(processor.Metadata.Value is ListTestsArgumentProcessorCapabilities);
     }
 
@@ -103,7 +103,7 @@ public class ListTestsArgumentProcessorTests
     [TestMethod]
     public void GetExecuterShouldReturnListTestsArgumentProcessorCapabilities()
     {
-        var processor = new ListTestsArgumentProcessor(CommandLineOptions.Instance, new TestableRunSettingsProvider());
+        var processor = new ListTestsArgumentProcessor(CommandLineOptions.Instance, new TestableRunSettingsProvider(), new Mock<ITestRequestManager>().Object);
         Assert.IsTrue(processor.Executor!.Value is ListTestsArgumentExecutor);
     }
 

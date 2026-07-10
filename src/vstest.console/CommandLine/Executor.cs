@@ -67,9 +67,10 @@ internal class Executor
     private readonly IRunSettingsHelper _runSettingsHelper;
     private readonly CommandLineOptions _commandLineOptions;
     private readonly TestRunResultAggregator _testRunResultAggregator;
-    // Left null in production so the argument processors resolve TestRequestManager.Instance lazily
-    // (only when a run/discovery command actually executes); tests inject a specific instance.
-    private readonly ITestRequestManager? _testRequestManager;
+    // The single request manager for this Executor. It is built lazily (the real manager reads the
+    // parsed command line and loads the test platform, which must happen after argument parsing), so
+    // commands that never run or discover tests (for example --Help) never construct it.
+    private readonly ITestRequestManager _testRequestManager;
     private bool _showHelp;
 
     /// <summary>
@@ -124,7 +125,7 @@ internal class Executor
         _runSettingsHelper = runSettingsHelper;
         _commandLineOptions = commandLineOptions;
         _testRunResultAggregator = testRunResultAggregator;
-        _testRequestManager = testRequestManager;
+        _testRequestManager = testRequestManager ?? new LazyTestRequestManager(() => new TestRequestManager(_commandLineOptions));
     }
 
     /// <summary>
@@ -230,7 +231,7 @@ internal class Executor
         _testPlatformEventSource.MetricsDisposeStart();
 
         // Disposing Metrics Publisher when VsTestConsole ends
-        TestRequestManager.Instance.Dispose();
+        _testRequestManager.Dispose();
 
         _testPlatformEventSource.MetricsDisposeStop();
         return exitCode;

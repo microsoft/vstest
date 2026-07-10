@@ -40,14 +40,14 @@ public class PortArgumentProcessorTests
     [TestMethod]
     public void GetMetadataShouldReturnPortArgumentProcessorCapabilities()
     {
-        var processor = new PortArgumentProcessor(CommandLineOptions.Instance, _runSettingsHelper);
+        var processor = new PortArgumentProcessor(CommandLineOptions.Instance, _runSettingsHelper, _testRequestManager.Object);
         Assert.IsTrue(processor.Metadata.Value is PortArgumentProcessorCapabilities);
     }
 
     [TestMethod]
     public void GetExecutorShouldReturnPortArgumentProcessorCapabilities()
     {
-        var processor = new PortArgumentProcessor(CommandLineOptions.Instance, _runSettingsHelper);
+        var processor = new PortArgumentProcessor(CommandLineOptions.Instance, _runSettingsHelper, _testRequestManager.Object);
         Assert.IsTrue(processor.Executor!.Value is PortArgumentExecutor);
     }
 
