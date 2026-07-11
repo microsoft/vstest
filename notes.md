@@ -1,5 +1,5 @@
 # Efficiency Improver — vstest Repo Memory
-_Last updated: 2026-07-06_
+_Last updated: 2026-07-11_
 
 ## Build / Test Commands
 - Bootstrap + full build: `./build.sh` (downloads pinned .NET 11 SDK to `.dotnet/`)
@@ -13,12 +13,10 @@ _Last updated: 2026-07-06_
 ## PR Status
 
 ### Open PRs
-- **PR #16210**: Eliminate GetRawText() string alloc across 9 STJ deserializer converters: OPEN — all CI green ✅ — created 2026-07-03. Branch: `efficiency/eliminate-getrawtext-in-serializers`
-- **PR #16213**: Eliminate O(N) ConcurrentDictionary.AddOrUpdate + array allocs in DiscoveryDataAggregator hot path: OPEN — all CI green ✅ — created 2026-07-04. Branch: `efficiency/discovery-source-tracking-opt`
-- **PR #16216**: Eliminate Duration.ToString() and Guid.ToString() allocations in IPC serializers: OPEN — all CI green ✅ — created 2026-07-05. Branch: `efficiency/eliminate-duration-tostring-in-serializers`
-- **PR TBD** (created 2026-07-06): Eliminate GetString()-then-parse in V2 IPC deserializers (TryGetGuid, TryGetDateTimeOffset) — 3 string allocs per test eliminated. Branch: `efficiency/eliminate-getstring-parse-in-v2-converters`. CI pending.
+(none — all prior efficiency PRs closed)
 
 ### Merged PRs (all confirmed)
+- PR #16210: Eliminate GetRawText() string alloc across 9 STJ deserializer converters (MERGED 2026-07-09)
 - PR #16193: v2 serialization Guid.ToString elimination (MERGED 2026-07-01)
 - PR #16144: DateTime.Now → UtcNow (MERGED)
 - PR #16147: Task.FromResult(0) → Task.CompletedTask (MERGED)
@@ -29,47 +27,47 @@ _Last updated: 2026-07-06_
 - PR #16179: Condition.Evaluate string[1] fast-path (MERGED)
 - PR #16182: FilterExpression.Evaluate leaf-node short-circuit (MERGED)
 
-### Closed PRs
-- PR #16139: ImmutableDictionary redundant lookups (CLOSED by maintainer — ToArray allocation concern)
-- PR #16177: DiscoveryDataAggregator string[1] (CLOSED 2026-06-30 — closed as draft; superseded by #16213)
+### Closed/Rejected PRs
+- PR #16139: ImmutableDictionary redundant lookups (CLOSED — ToArray allocation concern)
+- PR #16177: DiscoveryDataAggregator string[1] (CLOSED — superseded)
+- PR #16213: DiscoveryDataAggregator O(N) patterns (CLOSED — too small a win)
+- PR #16216: Duration.ToString / Guid.ToString allocs (CLOSED — too small a win)
+- PR #16222: TryGetGuid/TryGetDateTimeOffset (CLOSED — too small a win)
+
+## Maintainer Instructions (Issue #16229)
+- Weekly runs only; ≥15-20% measurable improvement required
+- Only HIGH-impact items actionable; MEDIUM goes to backlog only
+- Focus on fixed per-invocation overhead, not per-test micro-opts
+- Common case is 1 test; ~90% runs <1000 tests
+- O(n²) always in scope regardless of N
 
 ## Efficiency Notes (Key Insights)
-- **Hot-path hierarchy** (frequency per test case, highest first):
-  1. Filter eval: `FilterExpression.Evaluate` → `FastFilter.Evaluate` or `Condition.Evaluate` — all optimized ✅
-  2. Test result: `TestRunCache.OnNewTestResult` → stats update — optimized ✅
-  3. IPC write: `TestCaseConverterV2.Write`, `TestResultConverterV2.Write` — Guid.ToString + Duration.ToString optimized ✅ (V1 converters also fixed in #16216)
-  4. IPC read: `JsoniteConvert.DeserializeTestCase/Result` — optimized ✅
-  5. IPC deserialize V2: GetRawText() in 9 Deserialize calls → OPEN in #16210; GetString()-then-parse for Guid+DateTimeOffset → OPEN in TBD PR
-  6. Discovery: `DiscoveryDataAggregator.MarkSourcesBasedOnDiscoveredTestCases` — O(N)→O(1) per source in #16213 ✅
-
-- **GetRawText().Trim('"') pattern**: 5 remaining sites (no easy win; deferred)
-- **TimeSpan.TryFormat**: use `format: default, formatProvider: CultureInfo.InvariantCulture` to satisfy CA1305
-- **Utf8JsonWriter native overloads**: WriteStringValue(Guid), WriteString(string, Guid) avoid ToString allocations; WriteString(string, ReadOnlySpan<char>) + TryFormat avoids Duration.ToString alloc
-- **JsonElement typed accessors**: TryGetGuid(), TryGetDateTimeOffset() avoid GetString()-then-parse allocations; both available since .NET Core 3.0 — safe under #if NETCOREAPP
-- **GitHubAPI note**: Use safeoutputs for writes; list_pull_requests may return large output — use search_pull_requests for filtered queries
-- **test.sh -p pattern**: runs ALL test projects, not just matching ones; use `dotnet run --project test/<proj>.csproj -f net11.0` for targeted runs
-- **8 pre-existing failures** in CrossPlatEngine tests on Linux: Windows-path tests (C:\...) — NOT caused by our changes
+- **Workload profile**: single test is most common; total run time ~400ms-1.5s
+- **Run settings XML parsing**: parsed 5-6× per test run (TestRequestManager.EnsureSettingsAreInitialized does 3 parses, AddFakesConfigurationToRunsettings does 2 more). Each parse is <1ms for typical settings — not meeting the bar alone.
+- **Fakes Assembly.Load**: called on every test run, fails for non-Fakes users — but cost is minimal (~1ms).
+- **GetExtensionsDiscoveredFromAssembly**: calls Type.GetType() per cached extension — but cache is small (< 10 entries) so O(N) is fine.
+- **FastHeaderParse**: already optimized — few ms per 10k messages.
+- **All hot-path allocations**: filter eval, IPC serialization/deserialization — fully optimized in prior runs.
+- **Per-test loop work**: all common hot-paths in IPC, filter eval, cache already optimized.
+- **Big wins likely only in**: reducing XML parse count (bundle into single pass), reducing testhost spawn overhead (R2R compile), reducing IPC protocol round-trips.
 
 ## Optimization Backlog (sorted by priority)
 | Priority | Area | Opportunity | Notes |
 |---|---|---|---|
-| MEDIUM | Code | TestRunStatisticsConverter: TestOutcome.ToString() in WriteNumber (once per run) | Low impact |
+| MEDIUM | Code | Run settings XML parsed 5-6× per test run — could be reduced to 1 pass | Requires API changes; saves maybe 2-5ms; may not meet bar |
+| LOW | Code | TestRunStatisticsConverter: TestOutcome.ToString() in WriteNumber (once per run) | Very low impact |
 | LOW | Code | GetRawText().Trim('"') pattern (5 remaining sites) | Deferred |
-| LOW | Code | MSTestV1TelemetryHelper ContainsKey+[] double-hash | MSTestV1 only |
 
 ## Backlog Cursor
-- CrossPlatEngine/Execution, CrossPlatEngine/Discovery, CommunicationUtilities/Serialization (all V1+V2 converters including JsoniteConvert), and Filter.Source: fully scanned
-- TrxLogger: scanned — main opportunities are one-per-run, not per-test; low impact
-- ObjectModel: serialization-only patterns; low impact
-- JsoniteConvert.cs (#if !NETCOREAPP): has remaining Duration.ToString() + Guid.ToString() patterns but only runs on net48x hosts
-- MTP path (Microsoft.Testing.Platform adapters): scanned — no hot-path allocations found
-- DataCollectors internals: not yet scanned; likely low impact (not per-test-result)
-- CrossPlatEngine/Parallel (beyond DiscoveryDataAggregator): scanned ParallelRunDataAggregator — no significant per-test hot paths
+- All key hot paths fully scanned (IPC serialization V1+V2, filter eval, discovery aggregator, test run cache, parallel runners)
+- TestRequestManager startup path: partially scanned — XML parsing redundancy is the main finding (MEDIUM)
+- InferHelper, TestPluginCache, FakesUtilities: scanned — no high-impact issues found
+- Unexplored: testhost process launch optimization (R2R compilation), IPC protocol efficiency at wire level
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
-- Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — created 2026-07-03, updated 2026-07-06
-- Last run: 2026-07-06 (run ID 28810618351)
+- Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — created 2026-07-03, active
+- Last run: 2026-07-11 (run ID 29160627161)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
