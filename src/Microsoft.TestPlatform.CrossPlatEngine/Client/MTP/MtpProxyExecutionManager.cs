@@ -106,6 +106,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         AfterTestRun(attachments, invokedDataCollectors);
 
+        // Surface the data collector messages produced during the run and at session end (e.g.
+        // per-test-case notifications, warnings/errors, the Blame sequence-file path, disposal). They
+        // are buffered on the run events handler while the run is in flight and delivered during the
+        // AfterTestRunEnd exchange; the classic path relays them live, so on this path we flush them
+        // once the run is done. Without this they are silently dropped.
+        SurfaceDataCollectionMessages(eventHandler);
+
         TestRunStatistics finalStats = aggregate.Snapshot();
         var completeArgs = new TestRunCompleteEventArgs(
             finalStats,
@@ -180,7 +187,23 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
 
         // Surface any messages the data collector produced while starting up.
-        foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler!.Messages)
+        SurfaceDataCollectionMessages(eventHandler);
+    }
+
+    /// <summary>
+    /// Flushes any data collector log messages buffered on the run events handler to the run's event
+    /// handler. On the classic path the datacollector's messages are relayed to the console live; on
+    /// this path there is no live pump, so we drain the buffer at the points where new messages have
+    /// arrived (data collector startup and after the run completes).
+    /// </summary>
+    private void SurfaceDataCollectionMessages(IInternalTestRunEventsHandler eventHandler)
+    {
+        if (_dataCollectionEventsHandler is null || _dataCollectionEventsHandler.Messages.Count == 0)
+        {
+            return;
+        }
+
+        foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler.Messages)
         {
             eventHandler.HandleLogMessage(message.Item1, message.Item2);
         }

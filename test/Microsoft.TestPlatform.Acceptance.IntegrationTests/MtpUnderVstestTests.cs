@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -121,5 +122,53 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         InvokeVsTest(arguments);
 
         ValidateSummaryStatus(2, 1, 1);
+    }
+
+    [TestMethod]
+    // A generic out-of-process data collector (SampleDataCollector) subscribes to per-test-case
+    // start/end events, emits per-test-case attachments and reports the launched test-host PID. In the
+    // classic path the testhost drives all of that; under MTP there is no testhost, so vstest.console
+    // owns the datacollector lifecycle and forwards the per-test-case events itself. Blame is the
+    // most visible collector that needs this, but the wiring must work for ANY out-of-process
+    // collector (Blame, Event Log, custom ones). This guards that a generic collector on the MTP path
+    // completes the run (no shutdown hang), reports the collector lifecycle (SessionStarted,
+    // TestHostLaunched, per-test-case events, SessionEnded) and produces its attachments.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationWithGenericOutOfProcDataCollectorCompletesRun(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
+
+        var env = new Dictionary<string, string?>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+        };
+
+        InvokeVsTest(arguments, env);
+
+        // The run must complete with the usual summary rather than hang at shutdown.
+        ValidateSummaryStatus(2, 1, 1);
+
+        // The datacollector lifecycle must be driven end to end even though there is no testhost: the
+        // session events, the launched-process notification and the forwarded per-test-case events all
+        // have to reach the out-of-process collector.
+        StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
+        StdOutputContains("Data collector 'SampleDataCollector' message: TestHostLaunched");
+        StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
+        StdOutputContains("TestCaseStarted");
+        StdOutputContains("TestCaseEnded");
+
+        // Per-test-case attachments produced through the forwarded TestCaseStart events must be present.
+        var testCaseAttachments = Directory.GetFiles(TempDirectory.Path, "testcasefilename*.txt", SearchOption.AllDirectories);
+        Assert.IsNotEmpty(testCaseAttachments, "Expected per-test-case attachments produced by the out-of-process data collector on the MTP path.");
     }
 }
