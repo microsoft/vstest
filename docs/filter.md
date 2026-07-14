@@ -57,11 +57,9 @@ On Linux and macOS shells, escape `!` with a backslash when using the `!~` opera
 dotnet test --filter FullyQualifiedName\!~IntegrationTests
 ```
 
-If a `FullyQualifiedName` value contains a comma, such as a generic type argument list, escape the comma as `%2C` in the filter value:
+If a `FullyQualifiedName` value contains a comma, such as a generic type argument list, quote the filter expression so the comma is passed through literally (required in PowerShell):
 
-```shell
-dotnet test --filter "FullyQualifiedName=MyNamespace.MyTestsClass<ParameterType1%2CParameterType2>.MyTestMethod"
-```
+    dotnet test --filter "FullyQualifiedName=MyNamespace.MyTestsClass<ParameterType1,ParameterType2>.MyTestMethod"
 
 Expressions can be joined with boolean operators. The following boolean operators are supported:
 

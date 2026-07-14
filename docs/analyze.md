@@ -199,9 +199,9 @@ Coverage attachments are written under the test run's `TestResults` directory.
 > **Legacy guidance:**
 >
 > The steps below apply only to older projects that are pinned to Visual Studio 2017
-> and `netcoreapp1.1`. Modern SDK-style projects do not need this setup — the code
-> coverage collectors ship with the .NET SDK. Prefer the `dotnet test --collect`
-> commands shown above unless you are constrained to this legacy tooling.
+> and `netcoreapp1.1`. Modern SDK-style projects typically don't need this setup — use
+> `dotnet test --collect` instead (note: `"XPlat Code Coverage"` requires the `coverlet.collector` package).
+> Prefer the commands shown above unless you are constrained to this legacy tooling.
 
 Here's a sample project file, please note the xml entity marked as `Required`. Previously, the `Microsoft.VisualStudio.CodeCoverage` was required, but is now shipped with the SDK.
 
