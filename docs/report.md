@@ -125,7 +125,7 @@ Console logger is the default logger and it is used to output the test results t
 
 #### Syntax
 
-For dotnet test or dotnet vstest:
+For dotnet test or dotnet vstest (note: `dotnet vstest` is deprecated in favor of `dotnet test`, which can run assemblies directly):
 
 ```shell
 --logger:console[;verbosity=<Defaults to "minimal">]

@@ -1,6 +1,6 @@
 # VSTest Environment Variables
 
-This document lists all environment variables that are understood and handled by the Visual Studio Test Platform (VSTest). These variables can be used to configure various aspects of test execution, debugging, diagnostics, and feature behavior.
+This document lists environment variables that are currently handled by VSTest source code, plus a few historical variables that are called out as removed or obsolete. It is not an exhaustive list of every variable used by every adapter or hosting environment.
 
 ## Connection and Timeout Variables
 
@@ -31,7 +31,8 @@ This document lists all environment variables that are understood and handled by
 - **Example**: `VSTEST_DIAG_VERBOSITY=Info`
 
 ### VSTEST_LOGFOLDER
-- **Description**: Specifies the folder where test logs should be written.
+- **Status**: Removed. No current `src\` code reference was found.
+- **Previous description**: Specified the folder where test logs should be written.
 - **Example**: `VSTEST_LOGFOLDER=C:\TestLogs`
 
 ## Debug Variables
@@ -91,7 +92,7 @@ This document lists all environment variables that are understood and handled by
 - **Example**: `VSTEST_DEBUG_ATTACHVS_PATH=C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe`
 
 ### VSTEST_DEBUG_NOBP
-- **Description**: Disables breakpoints on executable entry points, to for more seemless debugging when using AttachVS.
+- **Description**: Disables breakpoints on executable entry points for more seamless debugging when using AttachVS.
 - **Values**: Set to "1" to disable breakpoints
 - **Example**: `VSTEST_DEBUG_NOBP=1`
 
@@ -111,9 +112,9 @@ This document lists all environment variables that are understood and handled by
 - **Values**: Set to any non-empty value to enable
 - **Example**: `VSTEST_DUMP_FORCEPROCDUMP=1`
 
-### VSTEST_DUMP_FORCENETDUMP (Removed in 18.5, selection of dumper is automatic.)
-- **Description**: Forces the use of dotnet-dump for crash dump collection.
-- **Values**: Set to any non-empty value to enable
+### VSTEST_DUMP_FORCENETDUMP
+- **Status**: Removed. No current `src\` code reference was found; dump tool selection is automatic.
+- **Previous description**: Forced the use of dotnet-dump for crash dump collection.
 - **Example**: `VSTEST_DUMP_FORCENETDUMP=1`
 
 ### VSTEST_DUMP_PROCDUMPARGUMENTS
@@ -130,14 +131,12 @@ This document lists all environment variables that are understood and handled by
 - **Description**: Disables artifact post-processing functionality.
 - **Values**: Set to any non-zero value to disable
 - **Example**: `VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING=1`
-- **Added**: Version 17.2-preview, 7.0-preview
 
 ### VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX
 - **Description**: Disables new SDK UX for artifact post-processing, showing old output format.
 - **Values**: Set to any non-zero value to disable
 - **Example**: `VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING_NEW_SDK_UX=1`
 - **Usage**: Useful when parsing console output and need to maintain compatibility
-- **Added**: Version 17.2-preview, 7.0-preview
 
 ### VSTEST_DISABLE_FASTER_JSON_SERIALIZATION
 - **Description**: Disables the faster JSON serialization mechanism and falls back to standard serialization.
@@ -215,7 +214,8 @@ This document lists all environment variables that are understood and handled by
 ## Configuration and Path Variables
 
 ### VSTEST_CONSOLE_PATH
-- **Description**: Specifies the path to the vstest.console executable.
+- **Status**: Removed. No current `src\` code reference was found.
+- **Previous description**: Specified the path to the vstest.console executable.
 - **Example**: `VSTEST_CONSOLE_PATH=C:\Tools\VSTest\vstest.console.exe`
 
 ### VSTEST_IGNORE_DOTNET_ROOT
@@ -242,14 +242,14 @@ This document lists all environment variables that are understood and handled by
 ## Windows App Host Variables
 
 ### VSTEST_WINAPPHOST_*
-- **Description**: Various environment variables related to Windows App Host configuration.
+- **Status**: Removed or internal to components no longer present in `src\`. No current `src\` code reference was found for the `VSTEST_WINAPPHOST_` prefix.
+- **Previous description**: Various environment variables related to Windows App Host configuration.
 - **Pattern**: Variables following the pattern `VSTEST_WINAPPHOST_{VARIABLE_NAME}`
-- **Usage**: Used internally for Windows App Host test execution scenarios
 
 ## Legacy/Experimental Variables
 
 ### VSTEST_EXPERIMENTAL_FORWARD_OUTPUT_FEATURE
-- **Description**: (Deprecated) Previously used to enable output forwarding feature.
+- **Description**: Obsolete. The source keeps this name only in a comment documenting that it was replaced by the standard-output capture and forwarding disable flags.
 - **Status**: Replaced by VSTEST_DISABLE_STANDARD_OUTPUT_CAPTURING and VSTEST_DISABLE_STANDARD_OUTPUT_FORWARDING
 - **Note**: This variable is no longer used as the feature is now enabled by default
 

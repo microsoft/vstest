@@ -9,5 +9,5 @@ Here are the current known issues you may face when running tests, along with av
 
 ## Change in test execution processes name
 
-- **Issue:** Tests that depend on the name of the currnet running process may fail.
+- **Issue:** Tests that depend on the name of the current running process may fail.
 - **Workaround:** Tests run in one of following process ```vstest.console.exe```, ```testhost.exe```, ```testhost.x86.exe``` or ```dotnet.exe``` based on run configuration (```/Platform``` and ```/Framework```). If the tests depend on the process name, then update the tests accordingly.
