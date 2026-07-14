@@ -31,8 +31,8 @@ public class NewDataCollector : DataCollector
 {
     private string logFileName = "DataCollectorLogs.txt";
     private DataCollectionEnvironmentContext? context;
-    private DataCollectionSink? dataSink;
-    private DataCollectionLogger? logger;
+    private DataCollectionSink dataSink = null!;
+    private DataCollectionLogger logger = null!;
 
     public override void Initialize(
             XmlElement? configurationElement,
@@ -57,8 +57,8 @@ public class NewDataCollector : DataCollector
 
         if (context is not null)
         {
-            dataSink?.SendFileAsync(context.SessionDataCollectionContext, filename, true);
-            logger?.LogWarning(context.SessionDataCollectionContext, "SessionStarted");
+            dataSink.SendFileAsync(context.SessionDataCollectionContext, filename, true);
+            logger.LogWarning(context.SessionDataCollectionContext, "SessionStarted");
         }
     }
 
