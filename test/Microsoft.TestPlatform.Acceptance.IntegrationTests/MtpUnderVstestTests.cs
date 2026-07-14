@@ -220,4 +220,27 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         // Only TestPasses and TestPassesToo match; TestFails and TestSkipped are excluded by the filter.
         ValidateSummaryStatus(2, 0, 0);
     }
+
+    [TestMethod]
+    // A /TestCaseFilter that matches nothing must run zero tests on the MTP path, not fall back to running
+    // the whole suite. This guards the regression the feature targets: before, a non-matching filter was
+    // silently ignored and every test ran (2/1/1). Here the filter matches no test, so nothing runs.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationHonorsNonMatchingTestCaseFilter(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"DisplayName~NoSuchTestNameMatchesThis\"");
+
+        InvokeVsTest(arguments);
+
+        ValidateSummaryStatus(0, 0, 0);
+    }
 }

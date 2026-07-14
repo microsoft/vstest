@@ -436,7 +436,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     private List<TestCase> DiscoverSourceTests(string source, IInternalTestRunEventsHandler eventHandler)
     {
         var discovered = new List<TestCase>();
-        var completed = new ManualResetEventSlim(false);
+        using var completed = new ManualResetEventSlim(false);
 
         using var connection = new MtpServerConnection();
         connection.LogReceived += (level, message) => eventHandler.HandleLogMessage(MtpClientHelpers.MapLevel(level), message);
@@ -460,7 +460,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             }
         };
 
-        connection.Start(source, EnvironmentVariables, MtpClientHelpers.GetConnectionTimeout());
+        // Discovery only needs to enumerate the tests to resolve the filter; it must not inject the
+        // data-collector profiler environment variables (those belong to the execution pass), so start
+        // with no environment variables, mirroring MtpProxyDiscoveryManager.
+        connection.Start(source, environmentVariables: null, MtpClientHelpers.GetConnectionTimeout());
         connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
 
         var runId = Guid.NewGuid();
@@ -468,15 +471,16 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             MtpConstants.DiscoverTestsMethod,
             new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() },
             _cancellationTokenSource.Token);
+        // The DiscoverTests response indicates the server finished discovery. Because messages arrive on a
+        // single ordered stream that we read sequentially, every node notification sent before the response
+        // has already been dispatched, so 'discovered' is complete once the response returns. Wait briefly
+        // for the trailing completion sentinel (honoring cancellation) purely to drain it; not observing it
+        // does not invalidate the discovered set the filter is evaluated against.
         discoverTask.GetAwaiter().GetResult();
-
-        // Wait for the discovery-completion sentinel, honoring cancellation. If it does not arrive within
-        // the window the discovered set may be incomplete, which would make a /TestCaseFilter run execute
-        // the wrong tests, so make that explicit in the logs instead of failing silently.
         if (!completed.Wait(TimeSpan.FromSeconds(3), _cancellationTokenSource.Token))
         {
             EqtTrace.Warning(
-                "MtpProxyExecutionManager.DiscoverSourceTests: discovery for '{0}' did not signal completion within the wait window; a /TestCaseFilter may be evaluated against an incomplete discovery set.",
+                "MtpProxyExecutionManager.DiscoverSourceTests: discovery for '{0}' did not signal the completion sentinel within the drain window; the /TestCaseFilter is evaluated against the nodes received so far.",
                 source);
         }
 
@@ -562,7 +566,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         return name => properties.TryGetValue(name, out List<string>? values) ? values.ToArray() : null;
     }
-    
+
     /// <summary>
     /// Reads the environment variables declared in the runsettings
     /// <c>RunConfiguration/EnvironmentVariables</c> and merges them into <see cref="EnvironmentVariables"/>
