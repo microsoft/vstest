@@ -187,12 +187,61 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(2, 1, 1);
+        // The asset runs 5 tests (TestPasses, TestPassesToo, the runsettings-env no-op, TestFails, TestSkipped).
+        ValidateSummaryStatus(3, 1, 1);
 
         var trxPath = Path.Combine(TempDirectory.Path, trxFileName);
         Assert.IsTrue(File.Exists(trxPath), "Expected a TRX at '{0}'.", trxPath);
         var trx = File.ReadAllText(trxPath);
         Assert.Contains("MTP_STDOUT_MARKER", trx, "Expected the test's standard output to be surfaced into the TRX.");
         Assert.Contains("MTP_STDERR_MARKER", trx, "Expected the test's standard error to be surfaced into the TRX.");
+    }
+
+    [TestMethod]
+    // /TestCaseFilter must scope an MTP run just like it does on the classic path. MTP has no notion of the
+    // vstest filter expression, so vstest.console discovers the app, evaluates the expression against the
+    // discovered tests and runs only the matching test-node uids. Before this the filter was silently
+    // ignored and the whole suite ran (X/N/N) where N>0. The filter here selects only the X passing tests.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationHonorsTestCaseFilter(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"DisplayName~TestPasses\"");
+
+        InvokeVsTest(arguments);
+
+        // Only TestPasses and TestPassesToo match; TestFails and TestSkipped are excluded by the filter.
+        ValidateSummaryStatus(2, 0, 0);
+    }
+
+    [TestMethod]
+    // A /TestCaseFilter that matches nothing must run zero tests on the MTP path, not fall back to running
+    // the whole suite. This guards the regression the feature targets: before, a non-matching filter was
+    // silently ignored and every test ran (N/N/N) where N>0. Here the filter matches no test, so nothing runs.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationHonorsNonMatchingTestCaseFilter(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"DisplayName~NoSuchTestNameMatchesThis\"");
+
+        InvokeVsTest(arguments);
+
+        ValidateSummaryStatus(0, 0, 0);
     }
 }

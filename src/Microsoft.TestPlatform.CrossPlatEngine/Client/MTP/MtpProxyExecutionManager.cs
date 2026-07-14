@@ -10,6 +10,7 @@ using System.Threading;
 
 using Jsonite;
 
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -98,7 +99,28 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
             try
             {
-                processId = RunSource(source, tests, eventHandler, aggregate, attachments, executorUris);
+                List<TestCase>? testsToRun = tests;
+
+                // A /TestCaseFilter run arrives as sources with no specific tests, so MTP has no notion of
+                // the vstest filter expression. Discover the source, evaluate the expression against the
+                // discovered tests (honoring traits and boolean operators exactly like the classic path)
+                // and run only the matching test-node uids. Without this the filter is silently ignored and
+                // the whole suite runs.
+                if (tests is null && !string.IsNullOrEmpty(testRunCriteria.TestCaseFilter))
+                {
+                    testsToRun = DiscoverAndFilter(source, testRunCriteria.TestCaseFilter!, testRunCriteria.FilterOptions, eventHandler);
+
+                    // The filter matched nothing for this source. Skip the source entirely: RunSource
+                    // cannot express "run zero tests" — it only sends the MTP tests filter when the list
+                    // has entries and otherwise omits it, which MTP treats as "run every test". So calling
+                    // RunSource with an empty list would run the whole suite; the continue avoids that.
+                    if (testsToRun.Count == 0)
+                    {
+                        continue;
+                    }
+                }
+
+                processId = RunSource(source, testsToRun, eventHandler, aggregate, attachments, executorUris);
             }
             catch (OperationCanceledException)
             {
@@ -377,6 +399,111 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         return (criteria.Sources ?? Enumerable.Empty<string>())
             .Select(source => (source, (List<TestCase>?)null));
+    }
+
+    /// <summary>
+    /// Discovers the tests in <paramref name="source"/> over MTP and returns only those matching the
+    /// vstest <paramref name="filter"/> expression, so a filtered run executes exactly the selected tests.
+    /// </summary>
+    private List<TestCase> DiscoverAndFilter(string source, string filter, FilterOptions? filterOptions, IInternalTestRunEventsHandler eventHandler)
+    {
+        var filterWrapper = new FilterExpressionWrapper(filter, filterOptions);
+        if (!string.IsNullOrEmpty(filterWrapper.ParseError))
+        {
+            throw new ObjectModel.Adapter.TestPlatformFormatException(filterWrapper.ParseError, filter);
+        }
+
+        var filterExpression = new TestCaseFilterExpression(filterWrapper);
+
+        List<TestCase> discovered = MtpClientHelpers.DiscoverSourceTests(source, eventHandler.HandleLogMessage, _cancellationTokenSource.Token);
+
+        var matched = new List<TestCase>();
+        foreach (TestCase testCase in discovered)
+        {
+            if (filterExpression.MatchTestCase(testCase, BuildPropertyProvider(testCase)))
+            {
+                matched.Add(testCase);
+            }
+        }
+
+        return matched;
+    }
+
+    /// <summary>
+    /// Builds the property-value lookup a <see cref="TestCaseFilterExpression"/> uses to evaluate a filter
+    /// against a single <see cref="TestCase"/>. Every property carried on the test case (e.g.
+    /// FullyQualifiedName, DisplayName, Source, CodeFilePath, ...) is exposed by its label, plus the
+    /// <c>Name</c> alias for DisplayName and every trait (so filters such as <c>TestCategory=Fast</c>,
+    /// <c>Priority=1</c> or <c>Source=...</c> behave like they do on the classic path).
+    /// </summary>
+    private static Func<string, object?> BuildPropertyProvider(TestCase testCase)
+    {
+        var properties = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
+
+        void Add(string key, string? value)
+        {
+            if (string.IsNullOrEmpty(key) || value is null)
+            {
+                return;
+            }
+
+            if (!properties.TryGetValue(key, out List<string>? values))
+            {
+                values = new List<string>();
+                properties[key] = values;
+            }
+
+            values.Add(value);
+        }
+
+        // Expose all registered properties on the test case by their filter label, so filters can match
+        // against any property the converter populated (FullyQualifiedName, DisplayName, Source,
+        // CodeFilePath, LineNumber, ...) rather than a hard-coded subset that silently evaluates to
+        // "no value" for everything else.
+        foreach (TestProperty property in testCase.Properties)
+        {
+            object? value = testCase.GetPropertyValue(property);
+            switch (value)
+            {
+                case null:
+                    break;
+                case string[] multiValue:
+                    foreach (string item in multiValue)
+                    {
+                        Add(property.Label, item);
+                    }
+
+                    break;
+                default:
+                    Add(property.Label, value.ToString());
+                    break;
+            }
+        }
+
+        // "Name" is the vstest filter alias for the display name; ensure both are always present even if
+        // the property store labelled them differently.
+        string displayName = testCase.DisplayName ?? testCase.FullyQualifiedName;
+        if (!properties.ContainsKey("FullyQualifiedName"))
+        {
+            Add("FullyQualifiedName", testCase.FullyQualifiedName);
+        }
+
+        if (!properties.ContainsKey("DisplayName"))
+        {
+            Add("DisplayName", displayName);
+        }
+
+        Add("Name", displayName);
+
+        // Traits (TestCategory, Priority, custom) are matched by trait name.
+        foreach (Trait trait in testCase.Traits)
+        {
+            Add(trait.Name, trait.Value);
+        }
+
+        return name => properties.TryGetValue(name, out List<string>? values)
+             ? (values.Count == 1 ? values[0] : values.ToArray())
+             : null;
     }
 
     /// <summary>
