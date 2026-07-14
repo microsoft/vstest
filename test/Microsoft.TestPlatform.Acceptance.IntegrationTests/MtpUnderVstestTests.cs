@@ -122,4 +122,29 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         ValidateSummaryStatus(2, 1, 1);
     }
+
+    [TestMethod]
+    // /TestCaseFilter must scope an MTP run just like it does on the classic path. MTP has no notion of the
+    // vstest filter expression, so vstest.console discovers the app, evaluates the expression against the
+    // discovered tests and runs only the matching test-node uids. Before this the filter was silently
+    // ignored and the whole suite ran (2/1/1). The filter here selects only the two passing tests.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationHonorsTestCaseFilter(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"DisplayName~TestPasses\"");
+
+        InvokeVsTest(arguments);
+
+        // Only TestPasses and TestPassesToo match; TestFails and TestSkipped are excluded by the filter.
+        ValidateSummaryStatus(2, 0, 0);
+    }
 }

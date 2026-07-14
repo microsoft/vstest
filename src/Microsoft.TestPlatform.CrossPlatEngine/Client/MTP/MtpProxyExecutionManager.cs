@@ -10,6 +10,7 @@ using System.Threading;
 
 using Jsonite;
 
+using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
@@ -90,7 +91,26 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
             try
             {
-                processId = RunSource(source, tests, eventHandler, aggregate, attachments, executorUris);
+                List<TestCase>? testsToRun = tests;
+
+                // A /TestCaseFilter run arrives as sources with no specific tests, so MTP has no notion of
+                // the vstest filter expression. Discover the source, evaluate the expression against the
+                // discovered tests (honoring traits and boolean operators exactly like the classic path)
+                // and run only the matching test-node uids. Without this the filter is silently ignored and
+                // the whole suite runs.
+                if (tests is null && !string.IsNullOrEmpty(testRunCriteria.TestCaseFilter))
+                {
+                    testsToRun = DiscoverAndFilter(source, testRunCriteria.TestCaseFilter!, testRunCriteria.FilterOptions, eventHandler);
+
+                    // The filter matched nothing for this source: run no tests (rather than the whole
+                    // suite). An empty, non-null list flows through as "run exactly these zero tests".
+                    if (testsToRun.Count == 0)
+                    {
+                        continue;
+                    }
+                }
+
+                processId = RunSource(source, testsToRun, eventHandler, aggregate, attachments, executorUris);
             }
             catch (OperationCanceledException)
             {
@@ -369,6 +389,112 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         return (criteria.Sources ?? Enumerable.Empty<string>())
             .Select(source => (source, (List<TestCase>?)null));
+    }
+
+    /// <summary>
+    /// Discovers the tests in <paramref name="source"/> over MTP and returns only those matching the
+    /// vstest <paramref name="filter"/> expression, so a filtered run executes exactly the selected tests.
+    /// </summary>
+    private List<TestCase> DiscoverAndFilter(string source, string filter, FilterOptions? filterOptions, IInternalTestRunEventsHandler eventHandler)
+    {
+        var filterWrapper = new FilterExpressionWrapper(filter, filterOptions);
+        if (!string.IsNullOrEmpty(filterWrapper.ParseError))
+        {
+            throw new ObjectModel.Adapter.TestPlatformFormatException(filterWrapper.ParseError, filter);
+        }
+
+        var filterExpression = new TestCaseFilterExpression(filterWrapper);
+
+        List<TestCase> discovered = DiscoverSourceTests(source, eventHandler);
+
+        var matched = new List<TestCase>();
+        foreach (TestCase testCase in discovered)
+        {
+            if (filterExpression.MatchTestCase(testCase, BuildPropertyProvider(testCase)))
+            {
+                matched.Add(testCase);
+            }
+        }
+
+        return matched;
+    }
+
+    /// <summary>
+    /// Runs an MTP discovery pass against <paramref name="source"/> and returns the discovered tests. Used
+    /// to resolve a <c>/TestCaseFilter</c> into a concrete set of tests to run by uid.
+    /// </summary>
+    private List<TestCase> DiscoverSourceTests(string source, IInternalTestRunEventsHandler eventHandler)
+    {
+        var discovered = new List<TestCase>();
+        var completed = new ManualResetEventSlim(false);
+
+        using var connection = new MtpServerConnection();
+        connection.LogReceived += (level, message) => eventHandler.HandleLogMessage(MtpClientHelpers.MapLevel(level), message);
+        connection.TestNodesUpdated += parameters =>
+        {
+            if (MtpClientHelpers.IsCompletionSentinel(parameters))
+            {
+                completed.Set();
+                return;
+            }
+
+            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
+            {
+                if (MtpTestNodeConverter.IsActionNode(node))
+                {
+                    lock (discovered)
+                    {
+                        discovered.Add(MtpTestNodeConverter.ToTestCase(node, source));
+                    }
+                }
+            }
+        };
+
+        connection.Start(source, EnvironmentVariables, MtpClientHelpers.GetConnectionTimeout());
+        connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
+
+        var runId = Guid.NewGuid();
+        var discoverTask = connection.InvokeAsync(
+            MtpConstants.DiscoverTestsMethod,
+            new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() },
+            _cancellationTokenSource.Token);
+        discoverTask.GetAwaiter().GetResult();
+        completed.Wait(TimeSpan.FromSeconds(3));
+
+        connection.SendNotification(MtpConstants.ExitMethod, null);
+
+        lock (discovered)
+        {
+            return discovered.ToList();
+        }
+    }
+
+    /// <summary>
+    /// Builds the property-value lookup a <see cref="TestCaseFilterExpression"/> uses to evaluate a filter
+    /// against a single <see cref="TestCase"/>: the well-known name properties plus every trait (so
+    /// filters such as <c>TestCategory=Fast</c> or <c>Priority=1</c> work on the MTP path).
+    /// </summary>
+    private static Func<string, object?> BuildPropertyProvider(TestCase testCase)
+    {
+        var properties = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["FullyQualifiedName"] = new() { testCase.FullyQualifiedName },
+            ["DisplayName"] = new() { testCase.DisplayName ?? testCase.FullyQualifiedName },
+            ["Name"] = new() { testCase.DisplayName ?? testCase.FullyQualifiedName },
+        };
+
+        foreach (Trait trait in testCase.Traits)
+        {
+            if (!properties.TryGetValue(trait.Name, out List<string>? values))
+            {
+                values = new List<string>();
+                properties[trait.Name] = values;
+            }
+
+            values.Add(trait.Value);
+        }
+
+        return name => properties.TryGetValue(name, out List<string>? values) ? values.ToArray() : null;
     }
 
     private static List<Dictionary<string, object?>> BuildTestsFilter(List<TestCase> tests)
