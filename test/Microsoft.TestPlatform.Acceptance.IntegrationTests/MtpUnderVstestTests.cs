@@ -122,4 +122,35 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         ValidateSummaryStatus(2, 1, 1);
     }
+
+    [TestMethod]
+    // A test's captured standard output/error must be surfaced to the loggers. The MTP node carries the
+    // per-test standardOutput/standardError; MtpTestNodeConverter now maps them onto the vstest result so
+    // the console and TRX show them. Before this the markers appeared nowhere. TestPassesToo writes the
+    // markers; the run produces a TRX that must contain them.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationSurfacesPerTestStandardOutput(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var trxFileName = "stdout.trx";
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /logger:trx;LogFileName={trxFileName}");
+
+        InvokeVsTest(arguments);
+
+        ValidateSummaryStatus(2, 1, 1);
+
+        var trxPath = Path.Combine(TempDirectory.Path, trxFileName);
+        Assert.IsTrue(File.Exists(trxPath), "Expected a TRX at '{0}'.", trxPath);
+        var trx = File.ReadAllText(trxPath);
+        Assert.Contains("MTP_STDOUT_MARKER", trx, "Expected the test's standard output to be surfaced into the TRX.");
+        Assert.Contains("MTP_STDERR_MARKER", trx, "Expected the test's standard error to be surfaced into the TRX.");
+    }
 }
