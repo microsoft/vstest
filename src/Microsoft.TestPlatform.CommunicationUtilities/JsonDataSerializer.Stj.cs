@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text.Encodings.Web;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+using System.Text.Json.Serialization.Metadata;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollection;
@@ -74,6 +75,11 @@ public partial class JsonDataSerializer
         NumberHandling = JsonNumberHandling.AllowReadingFromString,
         Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
         ReferenceHandler = ReferenceHandler.IgnoreCycles,
+        // Assign an explicit reflection-based resolver. When TypeInfoResolver is null, STJ falls back to
+        // the implicit default resolver which is disabled when a test project sets
+        // JsonSerializerIsReflectionEnabledByDefault=false (that switch flows into the testhost runtimeconfig),
+        // making testhost throw while deserializing the first protocol message and the runner time out. See #16274.
+        TypeInfoResolver = new DefaultJsonTypeInfoResolver(),
     };
 
     private static partial (int version, string? messageType) ParseHeaderFromJson(string rawMessage)
