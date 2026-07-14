@@ -298,7 +298,7 @@ Versions:
 - 2: Changed serialization from a generic bag that described each property and its type, to explicit properties that are serialized without additional type info.
 - 3: Added AttachDebugger message.
 - 4: Added because version 3 did not update the serialization to use, and it will use v1 serialization (bag) rather than explicit properties. Right side should avoid negotiating 3 and downgrade to 2.
-- 5: Reserved by the current source; no additional behavior is documented for this version.
+- 5: Added test session support. The TranslationLayer requires at least this version to negotiate test sessions (`MinimumProtocolVersionWithTestSessionSupport = 5` in `VsTestConsoleRequestSender`); the base `ProtocolVersioning` table in the source still marks it as `// 5: ???`.
 - 6: Added Abort and Cancel with handlers that report the status.
 - 7: Added SkippedDiscoveredSources.
 
@@ -612,6 +612,7 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
+    // Added in 17.2.0 (not gated by a protocol version; always serialized when present).
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -786,6 +787,7 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
+    // Added in 17.2.0 (not gated by a protocol version; always serialized when present).
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -1242,7 +1244,11 @@ public class TestExecutionContext
     // Gets or sets a value indicating whether testhost process should be kept running after test run completion.
     public bool KeepAlive { get; set; }
 
-    // Gets or sets a value indicating whether test case level events need to be sent or not.
+    // Gets or sets a value indicating whether test case level events (TestCaseStart / TestCaseEnd)
+    // need to be raised to data collectors during the run. It is set based on whether any registered
+    // data collector subscribed to per-test-case events; when true a dedicated socket port is opened
+    // for those events (see DataCollectionRequestHandler). The runner-side execution managers currently
+    // always pass false here.
     public bool AreTestCaseLevelEventsRequired { get; set; }
 
     // Gets or sets a value indicating whether execution is in debug mode.
@@ -1850,7 +1856,19 @@ Additional example of a toy test framework and adapter can be found in <https://
 
 The TranslationLayer exposes client-facing APIs for tools that want to drive discovery,
 execution, session management, and attachment processing through TestPlatform without
-shelling out to `vstest.console.exe`.
+shelling out to `vstest.console.exe`. The entry point is `IVsTestConsoleWrapper` (and its
+async counterpart `IVsTestConsoleWrapperAsync`), which wraps a `vstest.console` process and
+sends protocol messages to it. The main extension points are:
+
+- `StartSession` / `EndSession` - start and tear down the wrapped `vstest.console` process.
+- `InitializeExtensions` - register additional adapter/data-collector extension paths.
+- `DiscoverTests` - discover tests and receive results through an `ITestDiscoveryEventsHandler`.
+- `RunTests` / `RunTestsWithCustomTestHost` - run tests, optionally hosting the testhost through a
+  custom `ITestHostLauncher` (used to attach a debugger or control the testhost process).
+- `StartTestSession` / `StopTestSession` - pre-start testhosts for a set of sources so subsequent
+  runs are faster (requires protocol version 5 or higher).
+- `ProcessTestRunAttachmentsAsync` (on `IVsTestConsoleWrapperAsync`) - post-process attachments
+  produced by a previous run, e.g. merge code coverage files.
 
 ### .NET Implementation
 
