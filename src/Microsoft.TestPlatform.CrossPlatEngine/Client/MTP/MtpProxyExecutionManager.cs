@@ -459,7 +459,16 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() },
             _cancellationTokenSource.Token);
         discoverTask.GetAwaiter().GetResult();
-        completed.Wait(TimeSpan.FromSeconds(3));
+
+        // Wait for the discovery-completion sentinel, honoring cancellation. If it does not arrive within
+        // the window the discovered set may be incomplete, which would make a /TestCaseFilter run execute
+        // the wrong tests, so make that explicit in the logs instead of failing silently.
+        if (!completed.Wait(TimeSpan.FromSeconds(3), _cancellationTokenSource.Token))
+        {
+            EqtTrace.Warning(
+                "MtpProxyExecutionManager.DiscoverSourceTests: discovery for '{0}' did not signal completion within the wait window; a /TestCaseFilter may be evaluated against an incomplete discovery set.",
+                source);
+        }
 
         connection.SendNotification(MtpConstants.ExitMethod, null);
 
@@ -471,27 +480,74 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
     /// <summary>
     /// Builds the property-value lookup a <see cref="TestCaseFilterExpression"/> uses to evaluate a filter
-    /// against a single <see cref="TestCase"/>: the well-known name properties plus every trait (so
-    /// filters such as <c>TestCategory=Fast</c> or <c>Priority=1</c> work on the MTP path).
+    /// against a single <see cref="TestCase"/>. Every property carried on the test case (e.g.
+    /// FullyQualifiedName, DisplayName, Source, CodeFilePath, ...) is exposed by its label, plus the
+    /// <c>Name</c> alias for DisplayName and every trait (so filters such as <c>TestCategory=Fast</c>,
+    /// <c>Priority=1</c> or <c>Source=...</c> behave like they do on the classic path).
     /// </summary>
     private static Func<string, object?> BuildPropertyProvider(TestCase testCase)
     {
-        var properties = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase)
-        {
-            ["FullyQualifiedName"] = new() { testCase.FullyQualifiedName },
-            ["DisplayName"] = new() { testCase.DisplayName ?? testCase.FullyQualifiedName },
-            ["Name"] = new() { testCase.DisplayName ?? testCase.FullyQualifiedName },
-        };
+        var properties = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
 
-        foreach (Trait trait in testCase.Traits)
+        void Add(string key, string? value)
         {
-            if (!properties.TryGetValue(trait.Name, out List<string>? values))
+            if (string.IsNullOrEmpty(key) || value is null)
             {
-                values = new List<string>();
-                properties[trait.Name] = values;
+                return;
             }
 
-            values.Add(trait.Value);
+            if (!properties.TryGetValue(key, out List<string>? values))
+            {
+                values = new List<string>();
+                properties[key] = values;
+            }
+
+            values.Add(value);
+        }
+
+        // Expose all registered properties on the test case by their filter label, so filters can match
+        // against any property the converter populated (FullyQualifiedName, DisplayName, Source,
+        // CodeFilePath, LineNumber, ...) rather than a hard-coded subset that silently evaluates to
+        // "no value" for everything else.
+        foreach (TestProperty property in testCase.Properties)
+        {
+            object? value = testCase.GetPropertyValue(property);
+            switch (value)
+            {
+                case null:
+                    break;
+                case string[] multiValue:
+                    foreach (string item in multiValue)
+                    {
+                        Add(property.Label, item);
+                    }
+
+                    break;
+                default:
+                    Add(property.Label, value.ToString());
+                    break;
+            }
+        }
+
+        // "Name" is the vstest filter alias for the display name; ensure both are always present even if
+        // the property store labelled them differently.
+        string displayName = testCase.DisplayName ?? testCase.FullyQualifiedName;
+        if (!properties.ContainsKey("FullyQualifiedName"))
+        {
+            Add("FullyQualifiedName", testCase.FullyQualifiedName);
+        }
+
+        if (!properties.ContainsKey("DisplayName"))
+        {
+            Add("DisplayName", displayName);
+        }
+
+        Add("Name", displayName);
+
+        // Traits (TestCategory, Priority, custom) are matched by trait name.
+        foreach (Trait trait in testCase.Traits)
+        {
+            Add(trait.Name, trait.Value);
         }
 
         return name => properties.TryGetValue(name, out List<string>? values) ? values.ToArray() : null;
