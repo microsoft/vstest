@@ -87,7 +87,9 @@ Datacollector observes the testhost to collect additional information about the 
 
 While the tests execute, the results are reported back to the runner, aggregated, and forwarded to the client.
 
-The client processes the results and shows them in its UI.
+The client processes the results and shows them in their UI, for example as TestExplorer does it here:
+
+![test-explorer-example.gif](resources/test-explorer-example.gif)
 
 A simplified flow describing the whole process is as follows:
 
