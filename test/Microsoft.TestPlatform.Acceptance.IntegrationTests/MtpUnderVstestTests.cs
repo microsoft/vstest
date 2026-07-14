@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class MtpUnderVstestTests : AcceptanceTestBase
 {
-    // MtpMSTestProject is an MSTest project built as an MTP application (EnableMSTestRunner): two tests
+    // MtpMSTestProject is an MSTest project built as an MTP application (EnableMSTestRunner): three tests
     // pass, one fails, one is skipped.
     private const string MtpApp = "MtpMSTestProject.dll";
 
@@ -189,7 +189,8 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(2, 1, 1);
+        // MtpMSTestProject has five test cases: three pass, one fails, one is skipped.
+        ValidateSummaryStatus(3, 1, 1);
 
         var trxPath = Path.Combine(TempDirectory.Path, trxFileName);
         Assert.IsTrue(File.Exists(trxPath), "Expected a TRX at '{0}'.", trxPath);
