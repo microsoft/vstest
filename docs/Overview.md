@@ -228,6 +228,8 @@ TestPlatform protocol defines a set of JSON request, response and notification m
 
 The protocol assumes that one server serves one tool. There is no support in the protocol to share one server between different tools.
 
+See [Message documentation](#message-documentation) for the format used to describe every message, including a worked [ProtocolVersion request](#protocolversion-request) example.
+
 #### Capabilities
 
 The client, runner + datacollector, and testhost are shipped separately. Each of those components can have a different version and hence a different set of functionality they support. A single number (protocol version) is used to represent the whole set of capabilities that a given component supports. Each newer version includes complete functionality of the previous version. There are no granular capabilities.
@@ -256,6 +258,28 @@ TestPlatformProtocol is defined by a set of requests, responses and notification
 - a request section describing the request payload format
 - a response section describing the response payload format, when the message has a response
 - examples of the JSON sent on the wire
+
+For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Its
+header describes the message, the *Request* section documents the payload both as a C# type and as
+the JSON sent on the wire, and the *Response* section documents the reply the same way:
+
+*Request:*
+
+```json
+{
+    "MessageType": "ProtocolVersion",
+    "Payload": 7
+}
+```
+
+*Response:*
+
+```json
+{
+    "MessageType": "ProtocolVersion",
+    "Payload": 7
+}
+```
 
 ### Basic structures
 
