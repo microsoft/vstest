@@ -31,7 +31,7 @@ This document lists environment variables that are currently handled by VSTest s
 - **Example**: `VSTEST_DIAG_VERBOSITY=Info`
 
 ### VSTEST_LOGFOLDER
-- **Status**: Removed. No current `src\` code reference was found.
+- **Status**: Not used by product code under `src/`; referenced only in `test/` assets.
 - **Previous description**: Specified the folder where test logs should be written.
 - **Example**: `VSTEST_LOGFOLDER=C:\TestLogs`
 
