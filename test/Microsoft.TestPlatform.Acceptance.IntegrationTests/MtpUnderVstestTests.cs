@@ -201,7 +201,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     // /TestCaseFilter must scope an MTP run just like it does on the classic path. MTP has no notion of the
     // vstest filter expression, so vstest.console discovers the app, evaluates the expression against the
     // discovered tests and runs only the matching test-node uids. Before this the filter was silently
-    // ignored and the whole suite ran (2/1/1). The filter here selects only the two passing tests.
+    // ignored and the whole suite ran (X/N/N) where N>0. The filter here selects only the X passing tests.
     [TestMatrix(testHost: Target.Net)]
     public void RunMtpApplicationHonorsTestCaseFilter(RunnerInfo runnerInfo)
     {
@@ -225,7 +225,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     [TestMethod]
     // A /TestCaseFilter that matches nothing must run zero tests on the MTP path, not fall back to running
     // the whole suite. This guards the regression the feature targets: before, a non-matching filter was
-    // silently ignored and every test ran (2/1/1). Here the filter matches no test, so nothing runs.
+    // silently ignored and every test ran (N/N/N) where N>0. Here the filter matches no test, so nothing runs.
     [TestMatrix(testHost: Target.Net)]
     public void RunMtpApplicationHonorsNonMatchingTestCaseFilter(RunnerInfo runnerInfo)
     {

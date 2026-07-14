@@ -501,7 +501,9 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             Add(trait.Name, trait.Value);
         }
 
-        return name => properties.TryGetValue(name, out List<string>? values) ? values.ToArray() : null;
+        return name => properties.TryGetValue(name, out List<string>? values)
+             ? (values.Count == 1 ? values[0] : values.ToArray())
+             : null;
     }
 
     /// <summary>
