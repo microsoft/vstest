@@ -322,7 +322,7 @@ Versions:
 - 2: Changed serialization from a generic bag that described each property and its type, to explicit properties that are serialized without additional type info.
 - 3: Added AttachDebugger message.
 - 4: Added because version 3 did not update the serialization to use, and it will use v1 serialization (bag) rather than explicit properties. Right side should avoid negotiating 3 and downgrade to 2.
-- 5: Added test session support. The TranslationLayer defined `MinimumProtocolVersionWithTestSessionSupport = 5` in `VsTestConsoleRequestSender` for this, but that constant is no longer referenced and the test-session APIs have since been removed from the wrapper; the base `ProtocolVersioning` table in the source still marks this version as `// 5: ???`.
+- 5: Unknown in the core `ProtocolVersioning` table (the source still marks this version as `// 5: ???`). The TranslationLayer defines a private `MinimumProtocolVersionWithTestSessionSupport = 5` in `VsTestConsoleRequestSender`, but the constant is currently unused, so the exact change associated with v5 is unclear from the current source.
 - 6: Added Abort and Cancel with handlers that report the status.
 - 7: Added SkippedDiscoveredSources.
 
