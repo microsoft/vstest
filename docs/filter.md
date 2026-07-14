@@ -47,6 +47,22 @@ Allowed **operators**:
 A helper method `Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities.FilterHelper.Escape`
 is also available by referencing the `Microsoft.VisualStudio.TestPlatform.ObjectModel` NuGet package, which can be used to escape strings programatically.
 
+### Shell escaping
+
+The filter expression is parsed by both your shell and the test platform, so some characters may need shell-specific escaping before VSTest receives them.
+
+On Linux and macOS shells, escape `!` with a backslash when using the `!~` operator:
+
+```shell
+dotnet test --filter FullyQualifiedName\!~IntegrationTests
+```
+
+If a `FullyQualifiedName` value contains a comma, such as a generic type argument list, escape the comma as `%2C` in the filter value:
+
+```shell
+dotnet test --filter "FullyQualifiedName=MyNamespace.MyTestsClass<ParameterType1%2CParameterType2>.MyTestMethod"
+```
+
 Expressions can be joined with boolean operators. The following boolean operators are supported:
 
 * `|` implies a boolean `OR`
