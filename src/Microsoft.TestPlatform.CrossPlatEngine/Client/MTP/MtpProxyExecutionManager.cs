@@ -191,24 +191,39 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     }
 
     /// <summary>
-    /// Flushes any data collector log messages buffered on the run events handler to the run's event
-    /// handler. On the classic path the datacollector's messages are relayed to the console live; on
-    /// this path there is no live pump, so we drain the buffer at the points where new messages have
-    /// arrived (data collector startup and after the run completes).
+    /// Flushes any data collector log and raw messages buffered on the run events handler to the run's
+    /// event handler. On the classic path the datacollector's messages are relayed to the console live; on
+    /// this path there is no live pump, so we drain the buffers at the points where new messages have
+    /// arrived (data collector startup and after the run completes). Both the human-readable log messages
+    /// and the raw (e.g. telemetry) messages are surfaced and cleared, mirroring
+    /// <see cref="ProxyExecutionManagerWithDataCollection"/> on the classic path.
     /// </summary>
     private void SurfaceDataCollectionMessages(IInternalTestRunEventsHandler eventHandler)
     {
-        if (_dataCollectionEventsHandler is null || _dataCollectionEventsHandler.Messages.Count == 0)
+        if (_dataCollectionEventsHandler is null)
         {
             return;
         }
 
-        foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler.Messages)
+        if (_dataCollectionEventsHandler.Messages.Count > 0)
         {
-            eventHandler.HandleLogMessage(message.Item1, message.Item2);
+            foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler.Messages)
+            {
+                eventHandler.HandleLogMessage(message.Item1, message.Item2);
+            }
+
+            _dataCollectionEventsHandler.Messages.Clear();
         }
 
-        _dataCollectionEventsHandler.Messages.Clear();
+        if (_dataCollectionEventsHandler.RawMessages.Count > 0)
+        {
+            foreach (string rawMessage in _dataCollectionEventsHandler.RawMessages)
+            {
+                eventHandler.HandleRawMessage(rawMessage);
+            }
+
+            _dataCollectionEventsHandler.RawMessages.Clear();
+        }
     }
 
     /// <summary>

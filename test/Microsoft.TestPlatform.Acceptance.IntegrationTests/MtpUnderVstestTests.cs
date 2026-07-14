@@ -1,8 +1,10 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -148,9 +150,15 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /Collect:SampleDataCollector", $" /TestAdapterPath:{extensionsPath}");
 
+        // The collector writes its per-test-case source files here and then hands them to the sink with
+        // deleteFile:true, so the sink moves them into the results directory as attachments. Keep this
+        // source directory separate from the results directory so a leftover source file (e.g. if the sink
+        // ever failed to delete it) cannot be mistaken for a produced attachment.
+        var collectorSourceDirectory = Path.Combine(TempDirectory.Path, "collector-source");
+        Directory.CreateDirectory(collectorSourceDirectory);
         var env = new Dictionary<string, string?>
         {
-            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = collectorSourceDirectory,
         };
 
         InvokeVsTest(arguments, env);
@@ -160,15 +168,22 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         // The datacollector lifecycle must be driven end to end even though there is no testhost: the
         // session events, the launched-process notification and the forwarded per-test-case events all
-        // have to reach the out-of-process collector.
+        // have to reach the out-of-process collector. Match the full datacollector message prefix so the
+        // assertions cannot be satisfied by unrelated console output.
         StdOutputContains("Data collector 'SampleDataCollector' message: SessionStarted");
         StdOutputContains("Data collector 'SampleDataCollector' message: TestHostLaunched");
         StdOutputContains("Data collector 'SampleDataCollector' message: SessionEnded");
-        StdOutputContains("TestCaseStarted");
-        StdOutputContains("TestCaseEnded");
+        StdOutputContains("Data collector 'SampleDataCollector' message: TestCaseStarted");
+        StdOutputContains("Data collector 'SampleDataCollector' message: TestCaseEnded");
 
-        // Per-test-case attachments produced through the forwarded TestCaseStart events must be present.
-        var testCaseAttachments = Directory.GetFiles(TempDirectory.Path, "testcasefilename*.txt", SearchOption.AllDirectories);
-        Assert.IsNotEmpty(testCaseAttachments, "Expected per-test-case attachments produced by the out-of-process data collector on the MTP path.");
+        // The collector emits one attachment per test case that reports a start through the forwarded
+        // TestCaseStart events. All four MtpMSTestProject test cases report a start on this path (the
+        // skipped one still surfaces a start node), so four attachments must land in the results
+        // directory. Exclude the collector's own source directory so only the moved attachments are counted.
+        var testCaseAttachments = Directory
+            .GetFiles(TempDirectory.Path, "testcasefilename*.txt", SearchOption.AllDirectories)
+            .Where(file => !file.StartsWith(collectorSourceDirectory, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+        Assert.HasCount(4, testCaseAttachments, "Expected one per-test-case attachment for each MtpMSTestProject test case forwarded on the MTP path.");
     }
 }
