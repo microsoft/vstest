@@ -89,7 +89,7 @@ While the tests execute, the results are reported back to the runner, aggregated
 
 The client processes the results and shows them in their UI, for example as TestExplorer does it here:
 
-![test-explorer-example.gif](resources/test-explorer-example.gif)
+![Visual Studio Test Explorer showing the results of a completed test run](resources/test-explorer-example.gif)
 
 A simplified flow describing the whole process is as follows:
 
@@ -322,7 +322,7 @@ Versions:
 - 2: Changed serialization from a generic bag that described each property and its type, to explicit properties that are serialized without additional type info.
 - 3: Added AttachDebugger message.
 - 4: Added because version 3 did not update the serialization to use, and it will use v1 serialization (bag) rather than explicit properties. Right side should avoid negotiating 3 and downgrade to 2.
-- 5: Added test session support. The TranslationLayer requires at least this version to negotiate test sessions (`MinimumProtocolVersionWithTestSessionSupport = 5` in `VsTestConsoleRequestSender`); the base `ProtocolVersioning` table in the source still marks it as `// 5: ???`.
+- 5: Added test session support. The TranslationLayer defined `MinimumProtocolVersionWithTestSessionSupport = 5` in `VsTestConsoleRequestSender` for this, but that constant is no longer referenced and the test-session APIs have since been removed from the wrapper; the base `ProtocolVersioning` table in the source still marks this version as `// 5: ???`.
 - 6: Added Abort and Cancel with handlers that report the status.
 - 7: Added SkippedDiscoveredSources.
 
@@ -1125,7 +1125,7 @@ public class TestRunCompleteEventArgs
     // Error encountered in the run that is not linked to any test.
     public Exception? Error { get; private set; }
 
-    // Gets the attachment sets associated with the test run. Unlike RunAttachments on the enclosing payload (run-level files such as TRX reports), these are the per-run attachment sets collected during execution.
+    // Gets the attachment sets associated with the test run (for example data-collector output). These are distinct from RunAttachments on the enclosing TestRunCompletePayload, which carries the run-context AttachmentSets (runContextAttachments) sent alongside ExecutionComplete; note that the TRX report itself is produced by the TRX logger on the runner side, not carried here.
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     // Gets the invoked data collectors for the test session.
@@ -1378,7 +1378,7 @@ public class TestRunCompleteEventArgs
     // Error encountered in the run that is not linked to any test.
     public Exception? Error { get; private set; }
 
-    // Gets the attachment sets associated with the test run. Unlike RunAttachments on the enclosing payload (run-level files such as TRX reports), these are the per-run attachment sets collected during execution.
+    // Gets the attachment sets associated with the test run (for example data-collector output). These are distinct from RunAttachments on the enclosing TestRunCompletePayload, which carries the run-context AttachmentSets (runContextAttachments) sent alongside ExecutionComplete; note that the TRX report itself is produced by the TRX logger on the runner side, not carried here.
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     // Gets the invoked data collectors for the test session.
@@ -1889,8 +1889,6 @@ sends protocol messages to it. The main extension points are:
 - `DiscoverTests` - discover tests and receive results through an `ITestDiscoveryEventsHandler`.
 - `RunTests` / `RunTestsWithCustomTestHost` - run tests, optionally hosting the testhost through a
   custom `ITestHostLauncher` (used to attach a debugger or control the testhost process).
-- `StartTestSession` / `StopTestSession` - pre-start testhosts for a set of sources so subsequent
-  runs are faster (requires protocol version 5 or higher).
 - `ProcessTestRunAttachmentsAsync` (on `IVsTestConsoleWrapperAsync`) - post-process attachments
   produced by a previous run, e.g. merge code coverage files.
 
