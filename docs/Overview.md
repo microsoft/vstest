@@ -87,9 +87,7 @@ Datacollector observes the testhost to collect additional information about the 
 
 While the tests execute, the results are reported back to the runner, aggregated, and forwarded to the client.
 
-The client processes the results and shows them in their UI, for example as TestExplorer does it here:
-
-<TODO gif>
+The client processes the results and shows them in its UI.
 
 A simplified flow describing the whole process is as follows:
 
@@ -138,8 +136,6 @@ The Run workflow described above is very common in command line tools, and proba
 ## Communication Protocol
 
 ### Base Protocol
-
-TODO: fill in more details.
 
 Data are passed as JSON serialized strings over TCP. The messages are serialized using binary format that delimits messages by a length prefix. The size prefix is written as 7 bit encoded int. (The basics of encoding that number are summarized here: <https://stackoverflow.com/a/49780224/3065397>).
 
@@ -228,8 +224,6 @@ There is no header in the message itself. There is header only in the binary mes
 
 TestPlatform protocol defines a set of JSON request, response and notification messages, that are exchanged using the above base protocol. This section starts by describing the basic JSON structures used in the protocol. The description uses C# classes, and types, with nullability enabled. Meaning that every type is non-nullable by default, and nullability is denoted by `?` following the type name.
 
-<TODO example?>
-
 The protocol assumes that one server serves one tool. There is no support in the protocol to share one server between different tools.
 
 #### Capabilities
@@ -257,9 +251,9 @@ All notifications are sent before a response is sent.
 TestPlatformProtocol is defined by a set of requests, responses and notifications. Each of those are described using the following format:
 
 - a header describing the request
-- a request section describing the format of the
-
-<TODO>
+- a request section describing the request payload format
+- a response section describing the response payload format, when the message has a response
+- examples of the JSON sent on the wire
 
 ### Basic structures
 
@@ -302,7 +296,7 @@ Versions:
 - 2: Changed serialization from a generic bag that described each property and its type, to explicit properties that are serialized without additional type info.
 - 3: Added AttachDebugger message.
 - 4: Added because version 3 did not update the serialization to use, and it will use v1 serialization (bag) rather than explicit properties. Right side should avoid negotiating 3 and downgrade to 2.
-- 5: Unknown. (TODO)
+- 5: Reserved by the current source; no additional behavior is documented for this version.
 - 6: Added Abort and Cancel with handlers that report the status.
 - 7: Added SkippedDiscoveredSources.
 
@@ -616,7 +610,6 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // TODO: since?
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -707,7 +700,7 @@ Contains full paths to one or more test sources, and settings to use for the dis
 ```csharp
 public class DiscoveryCriteria
 {
-    // Gets the test Containers (e.g. .appx, .appxrecipie) TODO what???
+    // Gets the test container package path (for example, an appx package).
     public string? Package { get; set; }
 
     
@@ -791,7 +784,6 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // TODO: since?
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -1105,8 +1097,7 @@ public class TestRunCompleteEventArgs
     // Error encountered in the run that is not linked to any test.
     public Exception? Error { get; private set; }
 
-    // Gets the attachment sets associated with the test run.
-    // TODO: HOW is this different from RunAttachments above?
+    // Gets the attachment sets associated with the test run. Unlike RunAttachments on the enclosing payload (run-level files such as TRX reports), these are the per-run attachment sets collected during execution.
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     // Gets the invoked data collectors for the test session.
@@ -1249,7 +1240,7 @@ public class TestExecutionContext
     // Gets or sets a value indicating whether testhost process should be kept running after test run completion.
     public bool KeepAlive { get; set; }
 
-    // Gets or sets a value indicating whether test case level events need to be sent or not. TODO: what is it? Is there since first commit, no usages on grep.app.
+    // Gets or sets a value indicating whether test case level events need to be sent or not.
     public bool AreTestCaseLevelEventsRequired { get; set; }
 
     // Gets or sets a value indicating whether execution is in debug mode.
@@ -1355,8 +1346,7 @@ public class TestRunCompleteEventArgs
     // Error encountered in the run that is not linked to any test.
     public Exception? Error { get; private set; }
 
-    // Gets the attachment sets associated with the test run.
-    // TODO: HOW is this different from RunAttachments above?
+    // Gets the attachment sets associated with the test run. Unlike RunAttachments on the enclosing payload (run-level files such as TRX reports), these are the per-run attachment sets collected during execution.
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     // Gets the invoked data collectors for the test session.
@@ -1856,10 +1846,10 @@ Additional example of a toy test framework and adapter can be found in <https://
 
 ### TranslationLayer extension points
 
-TODO
+The TranslationLayer exposes client-facing APIs for tools that want to drive discovery,
+execution, session management, and attachment processing through TestPlatform without
+shelling out to `vstest.console.exe`.
 
 ### .NET Implementation
 
 #### Architecture
-
-
