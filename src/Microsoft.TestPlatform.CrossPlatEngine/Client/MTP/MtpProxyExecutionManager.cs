@@ -392,11 +392,12 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             return;
         }
 
-        EnvironmentVariables ??= new Dictionary<string, string?>();
-        foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
-        {
-            EnvironmentVariables[variable.Key] = variable.Value;
-        }
+EnvironmentVariables ??= new Dictionary<string, string?>(
+    Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
+{
+    EnvironmentVariables[variable.Key] = variable.Value;
+}
     }
 
     private static List<Dictionary<string, object?>> BuildTestsFilter(List<TestCase> tests)
