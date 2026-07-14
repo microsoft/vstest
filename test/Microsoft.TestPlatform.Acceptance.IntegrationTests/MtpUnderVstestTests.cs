@@ -235,8 +235,9 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         InvokeVsTest(arguments, env);
 
-        // The run must complete with the usual summary rather than hang at shutdown.
-        ValidateSummaryStatus(2, 1, 1);
+        // The run must complete with the usual summary rather than hang at shutdown. MtpMSTestProject has
+        // five test cases: three pass, one fails, one is skipped.
+        ValidateSummaryStatus(3, 1, 1);
 
         // The datacollector lifecycle must be driven end to end even though there is no testhost: the
         // session events, the launched-process notification and the forwarded per-test-case events all
@@ -248,14 +249,14 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         StdOutputContains("Data collector 'SampleDataCollector' message: TestCaseStarted");
         StdOutputContains("Data collector 'SampleDataCollector' message: TestCaseEnded");
 
-        // The collector emits one attachment per test case that reports a start through the forwarded
-        // TestCaseStart events. All four MtpMSTestProject test cases report a start on this path (the
-        // skipped one still surfaces a start node), so four attachments must land in the results
-        // directory. Exclude the collector's own source directory so only the moved attachments are counted.
+        // The collector emits one attachment per started test case through the forwarded TestCaseStart
+        // events. All five MtpMSTestProject test cases surface a start on this path (the skipped one still
+        // reports a TestCaseStart), so five attachments must land in the results directory. Exclude the
+        // collector's own source directory so only the moved attachments are counted.
         var testCaseAttachments = Directory
             .GetFiles(TempDirectory.Path, "testcasefilename*.txt", SearchOption.AllDirectories)
             .Where(file => !file.StartsWith(collectorSourceDirectory, StringComparison.OrdinalIgnoreCase))
             .ToList();
-        Assert.HasCount(4, testCaseAttachments, "Expected one per-test-case attachment for each MtpMSTestProject test case forwarded on the MTP path.");
+        Assert.HasCount(5, testCaseAttachments, "Expected one per-test-case attachment for each started MtpMSTestProject test case forwarded on the MTP path.");
     }
 }
