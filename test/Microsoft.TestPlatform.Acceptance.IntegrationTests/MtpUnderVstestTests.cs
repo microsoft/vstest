@@ -187,7 +187,8 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
         InvokeVsTest(arguments);
 
-        ValidateSummaryStatus(2, 1, 1);
+        // The asset runs 5 tests (TestPasses, TestPassesToo, the runsettings-env no-op, TestFails, TestSkipped).
+        ValidateSummaryStatus(3, 1, 1);
 
         var trxPath = Path.Combine(TempDirectory.Path, trxFileName);
         Assert.IsTrue(File.Exists(trxPath), "Expected a TRX at '{0}'.", trxPath);

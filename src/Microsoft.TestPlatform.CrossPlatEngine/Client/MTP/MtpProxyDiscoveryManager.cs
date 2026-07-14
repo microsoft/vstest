@@ -6,8 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-using Jsonite;
-
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -84,58 +82,13 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
     private int DiscoverSource(string source, ITestDiscoveryEventsHandler2 eventHandler)
     {
-        var discovered = new List<TestCase>();
-        var completed = new ManualResetEventSlim(false);
-
-        using var connection = new MtpServerConnection();
-        connection.LogReceived += (level, message) => eventHandler.HandleLogMessage(MtpClientHelpers.MapLevel(level), message);
-        connection.TestNodesUpdated += parameters =>
-        {
-            if (MtpClientHelpers.IsCompletionSentinel(parameters))
-            {
-                completed.Set();
-                return;
-            }
-
-            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
-            {
-                if (MtpTestNodeConverter.IsActionNode(node))
-                {
-                    lock (discovered)
-                    {
-                        discovered.Add(MtpTestNodeConverter.ToTestCase(node, source));
-                    }
-                }
-            }
-        };
-
-        connection.Start(source, environmentVariables: null, MtpClientHelpers.GetConnectionTimeout());
-        connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
-
-        var runId = Guid.NewGuid();
-        var discoverTask = connection.InvokeAsync(
-            MtpConstants.DiscoverTestsMethod,
-            new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() },
-            _cancellationTokenSource.Token);
-
-        // The response indicates the server has finished discovery. Because messages arrive on a
-        // single ordered stream that we read sequentially, every node notification sent before the
-        // response has already been dispatched by the time the response completes.
-        discoverTask.GetAwaiter().GetResult();
-        completed.Wait(TimeSpan.FromSeconds(3));
-
-        List<TestCase> chunk;
-        lock (discovered)
-        {
-            chunk = discovered.ToList();
-        }
+        List<TestCase> chunk = MtpClientHelpers.DiscoverSourceTests(source, eventHandler.HandleLogMessage, _cancellationTokenSource.Token);
 
         if (chunk.Count > 0)
         {
             eventHandler.HandleDiscoveredTests(chunk);
         }
 
-        connection.SendNotification(MtpConstants.ExitMethod, null);
         return chunk.Count;
     }
 }

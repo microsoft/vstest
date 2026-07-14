@@ -415,7 +415,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         var filterExpression = new TestCaseFilterExpression(filterWrapper);
 
-        List<TestCase> discovered = DiscoverSourceTests(source, eventHandler);
+        List<TestCase> discovered = MtpClientHelpers.DiscoverSourceTests(source, eventHandler.HandleLogMessage, _cancellationTokenSource.Token);
 
         var matched = new List<TestCase>();
         foreach (TestCase testCase in discovered)
@@ -427,69 +427,6 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
 
         return matched;
-    }
-
-    /// <summary>
-    /// Runs an MTP discovery pass against <paramref name="source"/> and returns the discovered tests. Used
-    /// to resolve a <c>/TestCaseFilter</c> into a concrete set of tests to run by uid.
-    /// </summary>
-    private List<TestCase> DiscoverSourceTests(string source, IInternalTestRunEventsHandler eventHandler)
-    {
-        var discovered = new List<TestCase>();
-        using var completed = new ManualResetEventSlim(false);
-
-        using var connection = new MtpServerConnection();
-        connection.LogReceived += (level, message) => eventHandler.HandleLogMessage(MtpClientHelpers.MapLevel(level), message);
-        connection.TestNodesUpdated += parameters =>
-        {
-            if (MtpClientHelpers.IsCompletionSentinel(parameters))
-            {
-                completed.Set();
-                return;
-            }
-
-            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
-            {
-                if (MtpTestNodeConverter.IsActionNode(node))
-                {
-                    lock (discovered)
-                    {
-                        discovered.Add(MtpTestNodeConverter.ToTestCase(node, source));
-                    }
-                }
-            }
-        };
-
-        // Discovery only needs to enumerate the tests to resolve the filter; it must not inject the
-        // data-collector profiler environment variables (those belong to the execution pass), so start
-        // with no environment variables, mirroring MtpProxyDiscoveryManager.
-        connection.Start(source, environmentVariables: null, MtpClientHelpers.GetConnectionTimeout());
-        connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
-
-        var runId = Guid.NewGuid();
-        var discoverTask = connection.InvokeAsync(
-            MtpConstants.DiscoverTestsMethod,
-            new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() },
-            _cancellationTokenSource.Token);
-        // The DiscoverTests response indicates the server finished discovery. Because messages arrive on a
-        // single ordered stream that we read sequentially, every node notification sent before the response
-        // has already been dispatched, so 'discovered' is complete once the response returns. Wait briefly
-        // for the trailing completion sentinel (honoring cancellation) purely to drain it; not observing it
-        // does not invalidate the discovered set the filter is evaluated against.
-        discoverTask.GetAwaiter().GetResult();
-        if (!completed.Wait(TimeSpan.FromSeconds(3), _cancellationTokenSource.Token))
-        {
-            EqtTrace.Warning(
-                "MtpProxyExecutionManager.DiscoverSourceTests: discovery for '{0}' did not signal the completion sentinel within the drain window; the /TestCaseFilter is evaluated against the nodes received so far.",
-                source);
-        }
-
-        connection.SendNotification(MtpConstants.ExitMethod, null);
-
-        lock (discovered)
-        {
-            return discovered.ToList();
-        }
     }
 
     /// <summary>
