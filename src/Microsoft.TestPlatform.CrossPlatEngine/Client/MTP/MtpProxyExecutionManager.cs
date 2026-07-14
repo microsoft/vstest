@@ -110,8 +110,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                 {
                     testsToRun = DiscoverAndFilter(source, testRunCriteria.TestCaseFilter!, testRunCriteria.FilterOptions, eventHandler);
 
-                    // The filter matched nothing for this source: run no tests (rather than the whole
-                    // suite). An empty, non-null list flows through as "run exactly these zero tests".
+                    // The filter matched nothing for this source. Skip the source entirely: RunSource
+                    // cannot express "run zero tests" — it only sends the MTP tests filter when the list
+                    // has entries and otherwise omits it, which MTP treats as "run every test". So calling
+                    // RunSource with an empty list would run the whole suite; the continue avoids that.
                     if (testsToRun.Count == 0)
                     {
                         continue;
