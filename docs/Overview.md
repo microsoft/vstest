@@ -640,7 +640,7 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // Added in 17.2.0 (not gated by a protocol version; always serialized when present).
+    // Not gated by a protocol version; always serialized (as an empty object when there is nothing to report).
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -815,7 +815,7 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // Added in 17.2.0 (not gated by a protocol version; always serialized when present).
+    // Not gated by a protocol version; always serialized (as an empty object when there is nothing to report).
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -1273,10 +1273,11 @@ public class TestExecutionContext
     public bool KeepAlive { get; set; }
 
     // Gets or sets a value indicating whether test case level events (TestCaseStart / TestCaseEnd)
-    // need to be raised to data collectors during the run. It is set based on whether any registered
-    // data collector subscribed to per-test-case events; when true a dedicated socket port is opened
-    // for those events (see DataCollectionRequestHandler). The runner-side execution managers currently
-    // always pass false here.
+    // need to be raised to data collectors during the run. The runner-side execution managers
+    // (ProxyExecutionManager, InProcessProxyExecutionManager) currently always pass false here.
+    // The per-test-case data-collection channel is negotiated separately: DataCollectionRequestHandler
+    // opens a dedicated socket port based on the value returned by IDataCollectionManager.SessionStarted,
+    // not based on this flag.
     public bool AreTestCaseLevelEventsRequired { get; set; }
 
     // Gets or sets a value indicating whether execution is in debug mode.
