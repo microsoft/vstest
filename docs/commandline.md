@@ -7,7 +7,8 @@ built-in `vstest.console.exe --Help` output.
 
 Options are case-insensitive and accept either a `/Option` or a `--Option` prefix (for
 example `/Parallel` and `--Parallel` are equivalent). Some options also have a short
-form (for example `/lt` for `/ListTests`). Options that take a value use a colon, for
+form, which accepts a `/` or `-` prefix (for example `/lt` or `-lt` for `/ListTests`, and
+`/e` or `-e` for `/Environment`). Options that take a value use a colon, for
 example `/Settings:test.runsettings`.
 
 > **Using `dotnet test`?** `dotnet test` exposes most of these capabilities through its
@@ -15,7 +16,7 @@ example `/Settings:test.runsettings`.
 > `--results-directory`, `--framework`). See
 > [dotnet test options](https://learn.microsoft.com/dotnet/core/tools/dotnet-test) and
 > [vstest.console.exe options](https://learn.microsoft.com/visualstudio/test/vstest-console-options)
-> for the full, actively maintained reference. To pass runsettings values inline from
+> for the complete option reference. To pass runsettings values inline from
 > `dotnet test`, use the `-- [name]=[value]` syntax described in
 > [RunSettingsArguments.md](./RunSettingsArguments.md).
 
@@ -74,8 +75,10 @@ stopped by an error in the tests, but tests may run slower.
 
 ### `/Platform:<Platform type>`
 
-Target platform architecture to be used for test execution. Valid values are `x86`, `x64`
-and `ARM`.
+Target platform architecture to be used for test execution. Values are parsed
+case-insensitively; valid values are `x86`, `x64`, `ARM`, `ARM64`, `S390x`, `Ppc64le`,
+`RiscV64` and `LoongArch64`. (The built-in `--Help` text historically lists only `x86`,
+`x64` and `ARM`, but the argument processor accepts the full set above.)
 
 ### `/Framework:<Framework Version>`
 
@@ -198,7 +201,9 @@ Display the usage message.
 
 ### `@<file>`
 
-Read a response file for more options. Each option is placed on its own line in the file.
+Read additional options from a response file. The file contents are read and parsed like a
+normal command line: arguments are separated by whitespace (spaces or newlines) and quoting
+is supported, so options may be placed on one line or spread across multiple lines.
 
 ```shell
 vstest.console.exe @options.rsp
