@@ -113,7 +113,8 @@ This document lists environment variables that are currently handled by VSTest s
 - **Example**: `VSTEST_DUMP_FORCEPROCDUMP=1`
 
 ### VSTEST_DUMP_FORCENETDUMP (Removed in 18.5, selection of dumper is automatic.)
-- **Description**: Forced the use of dotnet-dump for crash dump collection. Removed in 18.5; the dump tool is now selected automatically.
+- **Description**: Forces the use of dotnet-dump for crash dump collection.
+- **Values**: Set to any non-empty value to enable
 - **Example**: `VSTEST_DUMP_FORCENETDUMP=1`
 
 ### VSTEST_DUMP_PROCDUMPARGUMENTS
@@ -240,9 +241,8 @@ This document lists environment variables that are currently handled by VSTest s
 ## Windows App Host Variables
 
 ### VSTEST_WINAPPHOST_*
-- **Description**: Various environment variables related to Windows App Host configuration.
+- **Description**: Prefix historically used by `DotnetTestHostManager` when launching the custom Windows app host (`testhost.exe`) to tell it where the .NET runtime lives, e.g. `VSTEST_WINAPPHOST_DOTNET_ROOT` and `VSTEST_WINAPPHOST_DOTNET_ROOT(x86)`. Here "app host" means the native `testhost.exe` launcher, not the Windows App SDK/UWP. Current source sets the standard `DOTNET_ROOT`/`DOTNET_ROOT(x86)`/`DOTNET_ROOT_<ARCH>` variables directly, so the `VSTEST_WINAPPHOST_` prefix is no longer emitted by `src\`.
 - **Pattern**: Variables following the pattern `VSTEST_WINAPPHOST_{VARIABLE_NAME}`
-- **Usage**: Used internally for Windows App Host test execution scenarios
 
 ## Legacy/Experimental Variables
 
