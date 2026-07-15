@@ -112,9 +112,8 @@ This document lists environment variables that are currently handled by VSTest s
 - **Values**: Set to any non-empty value to enable
 - **Example**: `VSTEST_DUMP_FORCEPROCDUMP=1`
 
-### VSTEST_DUMP_FORCENETDUMP
-- **Status**: Removed. No current `src\` code reference was found; dump tool selection is automatic.
-- **Previous description**: Forced the use of dotnet-dump for crash dump collection.
+### VSTEST_DUMP_FORCENETDUMP (Removed in 18.5, selection of dumper is automatic.)
+- **Description**: Forced the use of dotnet-dump for crash dump collection. Removed in 18.5; the dump tool is now selected automatically.
 - **Example**: `VSTEST_DUMP_FORCENETDUMP=1`
 
 ### VSTEST_DUMP_PROCDUMPARGUMENTS
@@ -214,8 +213,7 @@ This document lists environment variables that are currently handled by VSTest s
 ## Configuration and Path Variables
 
 ### VSTEST_CONSOLE_PATH
-- **Status**: Removed. No current `src\` code reference was found.
-- **Previous description**: Specified the path to the vstest.console executable.
+- **Description**: Specifies the path to the vstest.console executable. This variable is read by the .NET SDK's `dotnet test` forwarding app (not by vstest's own `src\`), which is why there is no reference in this repository. It is equivalent to specifying `-p:VSTestConsolePath` when using `dotnet test` with a project.
 - **Example**: `VSTEST_CONSOLE_PATH=C:\Tools\VSTest\vstest.console.exe`
 
 ### VSTEST_IGNORE_DOTNET_ROOT
@@ -242,16 +240,11 @@ This document lists environment variables that are currently handled by VSTest s
 ## Windows App Host Variables
 
 ### VSTEST_WINAPPHOST_*
-- **Status**: Removed or internal to components no longer present in `src\`. No current `src\` code reference was found for the `VSTEST_WINAPPHOST_` prefix.
-- **Previous description**: Various environment variables related to Windows App Host configuration.
+- **Description**: Various environment variables related to Windows App Host configuration.
 - **Pattern**: Variables following the pattern `VSTEST_WINAPPHOST_{VARIABLE_NAME}`
+- **Usage**: Used internally for Windows App Host test execution scenarios
 
 ## Legacy/Experimental Variables
-
-### VSTEST_EXPERIMENTAL_FORWARD_OUTPUT_FEATURE
-- **Description**: Obsolete. The source keeps this name only in a comment documenting that it was replaced by the standard-output capture and forwarding disable flags.
-- **Status**: Replaced by VSTEST_DISABLE_STANDARD_OUTPUT_CAPTURING and VSTEST_DISABLE_STANDARD_OUTPUT_FORWARDING
-- **Note**: This variable is no longer used as the feature is now enabled by default
 
 ### VSTEST_DISABLE_PROTOCOL_3_VERSION_DOWNGRADE
 - **Description**: Disables automatic downgrade to protocol version 3 for compatibility.
