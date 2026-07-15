@@ -258,12 +258,12 @@ All notifications are sent before a response is sent.
 
 TestPlatformProtocol is defined by a set of requests, responses and notifications. Each of those are described using the following format:
 
-- a header describing the request
+- a header describing the message
 - a request section describing the request payload format
 - a response section describing the response payload format, when the message has a response
 - examples of the JSON sent on the wire
 
-For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Because it is exchanged during negotiation, it uses the unversioned message envelope (the `Version` property is only emitted for protocol v2 and above) and therefore omits `Version` from the JSON examples.
+For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Because it is exchanged during negotiation, it uses the unversioned message envelope (the `Version` property is only emitted for protocol v1 and above) and therefore omits `Version` from the JSON examples.
 Its header describes the message, the *Request* section documents the request payload as the JSON sent on
 the wire, and the *Response* section documents the reply the same way:
 
