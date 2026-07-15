@@ -263,9 +263,9 @@ TestPlatformProtocol is defined by a set of requests, responses and notification
 - a response section describing the response payload format, when the message has a response
 - examples of the JSON sent on the wire
 
-For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Because it is exchanged during negotiation, it uses the version 0 message envelope and therefore omits the `Version` property in the JSON examples.
-Its header describes the message, the *Request* section documents the payload both as a C# type and as
-the JSON sent on the wire, and the *Response* section documents the reply the same way:
+For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Because it is exchanged during negotiation, it uses the unversioned message envelope (the `Version` property is only emitted for protocol v2 and above) and therefore omits `Version` from the JSON examples.
+Its header describes the message, the *Request* section documents the request payload as the JSON sent on
+the wire, and the *Response* section documents the reply the same way:
 
 *Request:*
 
@@ -640,7 +640,8 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // Not gated by a protocol version; always serialized (as an empty object when there is nothing to report).
+    // Not gated by a protocol version. This value can be null (for example before extension
+    // discovery has populated TestPluginCache), so its presence on the wire is not guaranteed.
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -815,7 +816,8 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // Not gated by a protocol version; always serialized (as an empty object when there is nothing to report).
+    // Not gated by a protocol version. This value can be null (for example before extension
+    // discovery has populated TestPluginCache), so its presence on the wire is not guaranteed.
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -1129,7 +1131,7 @@ public class TestRunCompleteEventArgs
     // Error encountered in the run that is not linked to any test.
     public Exception? Error { get; private set; }
 
-    // Gets the attachment sets associated with the test run (for example data-collector output). These are distinct from RunAttachments on the enclosing TestRunCompletePayload, which carries the run-context AttachmentSets (runContextAttachments) sent alongside ExecutionComplete; note that the TRX report itself is produced by the TRX logger on the runner side, not carried here.
+    // Gets the attachment sets associated with the test run (for example data-collector output). These are distinct from RunAttachments on the enclosing TestRunCompletePayload, which carries the run-context attachments (runContextAttachments) sent alongside ExecutionComplete.
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     // Gets the invoked data collectors for the test session.
@@ -1380,7 +1382,7 @@ public class TestRunCompleteEventArgs
     // Error encountered in the run that is not linked to any test.
     public Exception? Error { get; private set; }
 
-    // Gets the attachment sets associated with the test run (for example data-collector output). These are distinct from RunAttachments on the enclosing TestRunCompletePayload, which carries the run-context AttachmentSets (runContextAttachments) sent alongside ExecutionComplete; note that the TRX report itself is produced by the TRX logger on the runner side, not carried here.
+    // Gets the attachment sets associated with the test run (for example data-collector output). These are distinct from RunAttachments on the enclosing TestRunCompletePayload, which carries the run-context attachments (runContextAttachments) sent alongside ExecutionComplete.
     public Collection<AttachmentSet> AttachmentSets { get; private set; }
 
     // Gets the invoked data collectors for the test session.
