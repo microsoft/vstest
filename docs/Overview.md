@@ -1273,11 +1273,8 @@ public class TestExecutionContext
     public bool KeepAlive { get; set; }
 
     // Gets or sets a value indicating whether test case level events (TestCaseStart / TestCaseEnd)
-    // need to be raised to data collectors during the run. The runner-side execution managers
-    // (ProxyExecutionManager, InProcessProxyExecutionManager) currently always pass false here.
-    // The per-test-case data-collection channel is negotiated separately: DataCollectionRequestHandler
-    // opens a dedicated socket port based on the value returned by IDataCollectionManager.SessionStarted,
-    // not based on this flag.
+    // are required. The cross-platform execution managers currently always pass false here
+    // (see ProxyExecutionManager and InProcessProxyexecutionManager).
     public bool AreTestCaseLevelEventsRequired { get; set; }
 
     // Gets or sets a value indicating whether execution is in debug mode.
