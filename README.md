@@ -58,11 +58,7 @@ NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shi
 - [Configure a test run (.runsettings)](./docs/configure.md)
 - [Code coverage](./docs/analyze.md)
 - [Diagnostics](./docs/diagnose.md)
-
-### Other
-
 - [Environment Variables](./docs/environment-variables.md)
-- [Roadmap](./docs/releases.md)
 - [Troubleshooting guide](./docs/troubleshooting.md)
 
 ## Building
