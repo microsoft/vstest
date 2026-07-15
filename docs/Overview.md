@@ -640,8 +640,9 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // Not gated by a protocol version. This value can be null (for example before extension
-    // discovery has populated TestPluginCache), so its presence on the wire is not guaranteed.
+    // Introduced as a telemetry data point in v17.2.0 (PR dotnet/vstest#3511); not gated by a
+    // protocol version. Can be null (for example before extension discovery has populated
+    // TestPluginCache), so its presence on the wire is not guaranteed.
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
@@ -816,8 +817,9 @@ public class DiscoveryCompletePayload
     public IList<string>? NotDiscoveredSources { get; set; } = new List<string>();
 
     // Gets or sets the collection of discovered extensions.
-    // Not gated by a protocol version. This value can be null (for example before extension
-    // discovery has populated TestPluginCache), so its presence on the wire is not guaranteed.
+    // Introduced as a telemetry data point in v17.2.0 (PR dotnet/vstest#3511); not gated by a
+    // protocol version. Can be null (for example before extension discovery has populated
+    // TestPluginCache), so its presence on the wire is not guaranteed.
     public Dictionary<string, HashSet<string>>? DiscoveredExtensions { get; set; } = new();
 }
 ```
