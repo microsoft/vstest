@@ -241,7 +241,7 @@ This document lists environment variables that are currently handled by VSTest s
 ## Windows App Host Variables
 
 ### VSTEST_WINAPPHOST_*
-- **Description**: Prefix historically used by `DotnetTestHostManager` when launching the custom Windows app host (`testhost.exe`) to tell it where the .NET runtime lives, e.g. `VSTEST_WINAPPHOST_DOTNET_ROOT` and `VSTEST_WINAPPHOST_DOTNET_ROOT(x86)`. Here "app host" means the native `testhost.exe` launcher, not the Windows App SDK/UWP. Current source sets the standard `DOTNET_ROOT`/`DOTNET_ROOT(x86)`/`DOTNET_ROOT_<ARCH>` variables directly, so the `VSTEST_WINAPPHOST_` prefix is no longer emitted by `src\`.
+- **Description**: Prefix historically read by `DotnetTestHostManager` when launching the custom Windows app host (`testhost.exe`). The .NET SDK set `VSTEST_WINAPPHOST_DOTNET_ROOT` / `VSTEST_WINAPPHOST_DOTNET_ROOT(x86)` to support private-install scenarios; vstest forwarded them (stripping the prefix) as `DOTNET_ROOT` / `DOTNET_ROOT(x86)` so the app host could locate the runtime. Here "app host" means the native `testhost.exe` launcher — this is **not** related to the Windows App SDK, UWP, or .NET MAUI. Current source sets the standard `DOTNET_ROOT` / `DOTNET_ROOT(x86)` / `DOTNET_ROOT_<ARCH>` variables directly, so the `VSTEST_WINAPPHOST_` prefix is no longer emitted by `src\`.
 - **Pattern**: Variables following the pattern `VSTEST_WINAPPHOST_{VARIABLE_NAME}`
 
 ## Legacy/Experimental Variables
