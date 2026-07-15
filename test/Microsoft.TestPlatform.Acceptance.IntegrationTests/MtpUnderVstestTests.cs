@@ -254,9 +254,10 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         // events. All five MtpMSTestProject test cases surface a start on this path (the skipped one still
         // reports a TestCaseStart), so five attachments must land in the results directory. Exclude the
         // collector's own source directory so only the moved attachments are counted.
+        var collectorSourceDirectoryPrefix = collectorSourceDirectory + Path.DirectorySeparatorChar;
         var testCaseAttachments = Directory
             .GetFiles(TempDirectory.Path, "testcasefilename*.txt", SearchOption.AllDirectories)
-            .Where(file => !file.StartsWith(collectorSourceDirectory, StringComparison.OrdinalIgnoreCase))
+            .Where(file => !file.StartsWith(collectorSourceDirectoryPrefix, StringComparison.OrdinalIgnoreCase))
             .ToList();
         Assert.HasCount(5, testCaseAttachments, "Expected one per-test-case attachment for each started MtpMSTestProject test case forwarded on the MTP path.");
     }
