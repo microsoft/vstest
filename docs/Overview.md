@@ -259,8 +259,8 @@ TestPlatformProtocol is defined by a set of requests, responses and notification
 - a response section describing the response payload format, when the message has a response
 - examples of the JSON sent on the wire
 
-For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Its
-header describes the message, the *Request* section documents the payload both as a C# type and as
+For example, the [ProtocolVersion request](#protocolversion-request) below follows this format. Because it is exchanged during negotiation, it uses the version 0 message envelope and therefore omits the `Version` property in the JSON examples.
+Its header describes the message, the *Request* section documents the payload both as a C# type and as
 the JSON sent on the wire, and the *Response* section documents the reply the same way:
 
 *Request:*
