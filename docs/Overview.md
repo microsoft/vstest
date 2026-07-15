@@ -56,6 +56,10 @@
       - [Test Logger](#test-logger)
       - [Runtime Provider](#runtime-provider)
     - [TranslationLayer extension points](#translationlayer-extension-points)
+      - [Public surface of the TranslationLayer project](#public-surface-of-the-translationlayer-project)
+      - [Wrapper operations (IVsTestConsoleWrapper)](#wrapper-operations-ivstestconsolewrapper)
+      - [Callback interfaces you implement (the plug-in points)](#callback-interfaces-you-implement-the-plug-in-points)
+      - [Configuring the runner process (ConsoleParameters)](#configuring-the-runner-process-consoleparameters)
     - [.NET Implementation](#net-implementation)
       - [Architecture](#architecture)
       
@@ -1878,19 +1882,95 @@ Additional example of a toy test framework and adapter can be found in <https://
 
 ### TranslationLayer extension points
 
-The TranslationLayer exposes client-facing APIs for tools that want to drive discovery,
-execution, session management, and attachment processing through TestPlatform without
-shelling out to `vstest.console.exe`. The entry point is `IVsTestConsoleWrapper` (and its
-async counterpart `IVsTestConsoleWrapperAsync`), which wraps a `vstest.console` process and
-sends protocol messages to it. The main extension points are:
+The TranslationLayer (assembly `Microsoft.TestPlatform.VsTestConsole.TranslationLayer`,
+NuGet package `Microsoft.TestPlatform.TranslationLayer`) is the client-facing library that
+tools such as Visual Studio, the Azure DevOps test task, and custom runners use to drive
+TestPlatform programmatically. Instead of shelling out to `vstest.console.exe` and parsing
+its output, a consumer references the library, points it at a `vstest.console` binary, and
+receives strongly-typed callbacks. Internally the wrapper starts the `vstest.console`
+process, opens the socket connection to it, and exchanges the JSON protocol messages
+described earlier in this document; all of that is hidden behind the interfaces below.
 
-- `StartSession` / `EndSession` - start and tear down the wrapped `vstest.console` process.
-- `InitializeExtensions` - register additional adapter/data-collector extension paths.
-- `DiscoverTests` - discover tests and receive results through an `ITestDiscoveryEventsHandler`.
-- `RunTests` / `RunTestsWithCustomTestHost` - run tests, optionally hosting the testhost through a
-  custom `ITestHostLauncher` (used to attach a debugger or control the testhost process).
-- `ProcessTestRunAttachmentsAsync` (on `IVsTestConsoleWrapperAsync`) - post-process attachments
-  produced by a previous run, e.g. merge code coverage files.
+There are two categories of extension point:
+
+1. The **wrapper API** you call to drive an operation (`IVsTestConsoleWrapper` and the
+   public types shipped alongside it).
+2. The **callback interfaces you implement** and pass in, so TestPlatform can call back into
+   your tool as discovery/execution progresses (the handler and launcher interfaces from
+   `Microsoft.VisualStudio.TestPlatform.ObjectModel.Client`).
+
+#### Public surface of the TranslationLayer project
+
+| Type | Kind | Purpose |
+| --- | --- | --- |
+| `IVsTestConsoleWrapper` | interface | Synchronous entry point. Controller for every test operation on the wrapped runner. Derives from `IVsTestConsoleWrapperAsync`. |
+| `IVsTestConsoleWrapperAsync` | interface | Asynchronous counterpart. All of its `*Async` operations are marked `[Obsolete("The async APIs don't work, use the sync API instead.")]`; only `ProcessTestRunAttachmentsAsync` is a supported async-only method. |
+| `VsTestConsoleWrapper` | class | The default implementation. Constructed with the path to `vstest.console` and, optionally, a `ConsoleParameters`. |
+| `ConsoleParameters` | class | Configures how the `vstest.console` process is launched (see below). |
+| `DiscoveryEventsHandleConverter` | class | Adapter that lets an older `ITestDiscoveryEventsHandler` be used where an `ITestDiscoveryEventsHandler2` is required. |
+| `TransationLayerException` | class | Exception type thrown for TranslationLayer-specific failures. |
+
+The `ITranslationLayerRequestSender` / `IProcessManager` interfaces in the project are
+`internal` plumbing (socket request sender and process manager) and are not part of the
+public extension surface.
+
+#### Wrapper operations (`IVsTestConsoleWrapper`)
+
+- `StartSession()` - starts the `vstest.console` process and readies it for requests.
+- `EndSession()` - ends the session and stops the runner process. Also `CancelDiscovery()`,
+  `CancelTestRun()`, and `AbortTestRun()` to interrupt in-flight operations.
+- `InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)` - registers extra
+  extension DLLs (adapters, loggers, data collectors) by full path before discovery/execution.
+- `DiscoverTests(...)` - discovers tests in the given sources. Overloads accept an optional
+  `TestPlatformOptions` and `TestSessionInfo`, and report results through an
+  `ITestDiscoveryEventsHandler` (legacy) or `ITestDiscoveryEventsHandler2`.
+- `RunTests(...)` - runs tests, selected either by `sources` (assemblies) or by an explicit
+  list of `TestCase` objects. Overloads accept `TestPlatformOptions`, a `TestSessionInfo`
+  (to run against a pre-warmed test session), an `ITestRunEventsHandler`, and optionally an
+  `ITelemetryEventsHandler`.
+- `RunTestsWithCustomTestHost(...)` - same as `RunTests`, but the testhost process is
+  launched by a caller-supplied `ITestHostLauncher`. This is how IDEs attach a debugger to
+  the testhost or otherwise control how it is started.
+- `ProcessTestRunAttachmentsAsync(...)` (async only) - post-processes the `AttachmentSet`s
+  produced by a previous run, for example merging code-coverage files. Progress and
+  completion are reported through an `ITestRunAttachmentsProcessingEventsHandler`, and the
+  call honours a `CancellationToken`.
+
+#### Callback interfaces you implement (the plug-in points)
+
+These live in `Microsoft.VisualStudio.TestPlatform.ObjectModel.Client(.Interfaces)`. Your
+tool implements the relevant one and passes an instance to the wrapper operation; TestPlatform
+invokes it as the operation progresses. They all derive from `ITestMessageEventHandler`, which
+provides `HandleRawMessage(string)` and `HandleLogMessage(TestMessageLevel, string?)`.
+
+| Interface | Passed to | Key callbacks |
+| --- | --- | --- |
+| `ITestDiscoveryEventsHandler` | `DiscoverTests` (legacy overload) | `HandleDiscoveredTests`, `HandleDiscoveryComplete(long totalTests, ..., bool isAborted)` |
+| `ITestDiscoveryEventsHandler2` | `DiscoverTests` | `HandleDiscoveredTests`, `HandleDiscoveryComplete(DiscoveryCompleteEventArgs, ...)` (richer completion args) |
+| `ITestRunEventsHandler` | `RunTests`, `RunTestsWithCustomTestHost` | `HandleTestRunStatsChange`, `HandleTestRunComplete`, `LaunchProcessWithDebuggerAttached` |
+| `ITelemetryEventsHandler` | `RunTests` (telemetry overloads) | `HandleTelemetryEvent(TelemetryEvent)` |
+| `ITestRunAttachmentsProcessingEventsHandler` | `ProcessTestRunAttachmentsAsync` | `HandleProcessedAttachmentsChunk`, `HandleTestRunAttachmentsProcessingProgress`, `HandleTestRunAttachmentsProcessingComplete` |
+| `ITestHostLauncher` | `RunTestsWithCustomTestHost` | `IsDebug`, `LaunchTestHost(TestProcessStartInfo, ...)` |
+| `ITestHostLauncher2` : `ITestHostLauncher` | `RunTestsWithCustomTestHost` | adds `AttachDebuggerToProcess(int pid, ...)` for attaching to an already-running testhost |
+| `ITestHostLauncher3` : `ITestHostLauncher2` | `RunTestsWithCustomTestHost` | adds `AttachDebuggerToProcess(AttachDebuggerInfo, CancellationToken)` (carries the target framework so the correct debugger engine is used) |
+
+The launcher hierarchy is versioned rather than modified so that older consumers keep working:
+the wrapper upcasts the `ITestHostLauncher` it is given to `ITestHostLauncher2` / `3` when it
+needs the newer debugger-attach capabilities, and falls back gracefully when they are not
+implemented.
+
+#### Configuring the runner process (`ConsoleParameters`)
+
+`ConsoleParameters` controls how `vstest.console` is started and is another extensibility seam:
+
+- `EnvironmentVariables` / `InheritEnvironmentVariables` - environment for the runner process.
+  By default the entries are merged onto the inherited environment; set
+  `InheritEnvironmentVariables` to `false` to supply the full environment yourself.
+- `TraceLevel` and `LogFilePath` - diagnostic logging for the runner. The setter for
+  `LogFilePath` creates the target directory if needed and quotes the path.
+- The constructor also accepts an `IFileHelper`, allowing the file-system interactions to be
+  substituted (primarily for testing). `PortNumber` and `ParentProcessId` exist but are
+  `internal` and set by the wrapper, so they are not part of the public contract.
 
 ### .NET Implementation
 
