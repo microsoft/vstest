@@ -61,6 +61,7 @@ NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shi
 - [Diagnostics](./docs/diagnose.md)
 - [Environment Variables](./docs/environment-variables.md)
 - [Troubleshooting guide](./docs/troubleshooting.md)
+- Command-line options reference: [vstest.console.exe options](https://learn.microsoft.com/visualstudio/test/vstest-console-options) and [dotnet test options](https://learn.microsoft.com/dotnet/core/tools/dotnet-test)
 
 ## Building
 

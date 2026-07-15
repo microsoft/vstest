@@ -73,6 +73,15 @@ otherwise (test failure, run error, invalid command line, etc.). See
 [Exit codes](./commandline.md#exit-codes) for details, including what happens when no tests
 match.
 
+## Learn more
+
+New to running .NET tests? Start with the official .NET testing documentation:
+
+- [Testing in .NET](https://learn.microsoft.com/dotnet/core/testing/) — overview and getting started
+- [Unit testing with `dotnet test`](https://learn.microsoft.com/dotnet/core/testing/unit-testing-with-dotnet-test)
+- [`dotnet test` command reference](https://learn.microsoft.com/dotnet/core/tools/dotnet-test)
+- [`vstest.console.exe` command-line options](https://learn.microsoft.com/visualstudio/test/vstest-console-options)
+
 ## Next steps
 
 - [Command line options](./commandline.md) — full option reference
@@ -82,3 +91,6 @@ match.
 - [Code coverage](./analyze.md)
 - [Diagnostics](./diagnose.md) / [Troubleshooting](./troubleshooting.md)
 - [Environment variables](./environment-variables.md)
+
+For test platform internals and extensibility, see the [Overview](./Overview.md) and the
+[RFCs](./RFCs).
