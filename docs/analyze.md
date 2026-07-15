@@ -169,10 +169,6 @@ For complete command-line examples, package requirements, report generation, and
 
 ### Analyze coverage with Visual Studio
 
-> **Legacy version note:**
->
-> If you are on older tooling, this feature requires [Visual Studio 2017 15.3.0](https://www.visualstudio.com/vs) or later. Current Visual Studio versions support it out of the box.
-
 Use the `Analyze Code Coverage` context menu available in the `Test Explorer` tool window to start a coverage run.
 
 After the coverage run is complete, a detailed report will be available in the `Code Coverage Results` tool window.
@@ -193,44 +189,6 @@ dotnet test --collect "XPlat Code Coverage"
 In Azure DevOps pipelines you can run tests and collect coverage with the Visual Studio Test task, which wraps `vstest.console.exe`. Enable coverage via the task's `codeCoverageEnabled` input (or pass `/collect:"Code Coverage"` through `otherConsoleOptions`). See [VSTest@2 - Visual Studio Test task](https://learn.microsoft.com/azure/devops/pipelines/tasks/reference/vstest-v2).
 
 Coverage attachments are written under the test run's `TestResults` directory.
-
-### Setup a project (legacy: Visual Studio 2017 / netcoreapp1.1)
-
-> **Legacy guidance:**
->
-> The steps below apply only to older projects that are pinned to Visual Studio 2017
-> and `netcoreapp1.1`. Modern SDK-style projects typically don't need this setup — use
-> `dotnet test --collect` instead (note: `"XPlat Code Coverage"` requires the `coverlet.collector` package).
-> Prefer the commands shown above unless you are constrained to this legacy tooling.
-
-Here's a sample project file, please note the xml entity marked as `Required`. Previously, the `Microsoft.VisualStudio.CodeCoverage` was required, but is now shipped with the SDK.
-
-```xml
-<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>netcoreapp1.1</TargetFramework>
-
-    <!-- Required in both test/product projects. This is a temporary workaround for https://github.com/Microsoft/vstest/issues/800 -->
-    <DebugType>Full</DebugType>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.3.0" />
-    <PackageReference Include="MSTest.TestAdapter" Version="1.1.17" />
-    <PackageReference Include="MSTest.TestFramework" Version="1.1.17" />
-  </ItemGroup>
-
-</Project>
-```
-
-To collect coverage for such a project with the standalone runner:
-
-```shell
-> "%vsinstalldir%\Common7\IDE\Extensions\TestPlatform\vstest.console.exe" --collect:"Code Coverage" --framework:".NETCoreApp,Version=v1.1" d:\testproject\bin\Debug\netcoreapp1.1\testproject.dll
-```
-
-This will generate a `*.coverage` file in the `<Current working directory>\TestResults` directory.
 
 ### Event Log Data Collector
 
