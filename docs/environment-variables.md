@@ -214,7 +214,7 @@ This document lists environment variables that are currently handled by VSTest s
 ## Configuration and Path Variables
 
 ### VSTEST_CONSOLE_PATH
-- **Description**: Specifies the path to the vstest.console executable. This variable is read by the .NET SDK's `dotnet test` forwarding app (not by vstest's own `src\`), which is why there is no reference in this repository. It is equivalent to specifying `-p:VSTestConsolePath` when using `dotnet test` with a project.
+- **Description**: Specifies the path to the vstest.console executable. This variable is read by the .NET SDK's `dotnet test` forwarding app (not by vstest product code under `src/` in this repo), which is why there are no `src/` references here. It is equivalent to specifying `-p:VSTestConsolePath` when using `dotnet test` with a project.
 - **Example**: `VSTEST_CONSOLE_PATH=C:\Tools\VSTest\vstest.console.exe`
 
 ### VSTEST_IGNORE_DOTNET_ROOT
