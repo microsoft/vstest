@@ -179,6 +179,16 @@ This document lists all environment variables that are understood and handled by
 - **Values**: Set to "1" to disable
 - **Example**: `VSTEST_DISABLE_UTF8_CONSOLE_ENCODING=1`
 
+### VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS
+- **Description**: Disables setting the `DOTNET_ROOT` environment variable on non-Windows platforms. `DOTNET_ROOT` is now always set (previously it was set only on Windows when `testhost.exe` was found) so that frameworks such as xUnit v3 can run tests in a child process. Set this flag to restore the previous behavior.
+- **Values**: Set to any non-zero value to disable
+- **Example**: `VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS=1`
+
+### VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING
+- **Description**: Disables turning dynamic code coverage for native code OFF by default. When set, the platform skips adding the default setting that disables native dynamic code coverage.
+- **Values**: Set to any non-zero value to disable
+- **Example**: `VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING=1`
+
 ## Build and MSBuild Integration Variables
 
 ### VSTEST_BUILD_DEBUG
@@ -224,10 +234,25 @@ This document lists all environment variables that are understood and handled by
 - **Default**: "0" (respects DOTNET_ROOT)
 - **Example**: `VSTEST_IGNORE_DOTNET_ROOT=1`
 
+### VSTEST_DOTNET_ROOT_PATH
+- **Description**: Path to the `dotnet` root that the SDK wants the testhost to use. When set (together with `VSTEST_DOTNET_ROOT_ARCHITECTURE`), vstest configures the architecture-specific `DOTNET_ROOT(x86)` / `DOTNET_ROOT_<ARCH>` environment variables for the testhost so it resolves the correct `hostfxr`. Set by the .NET SDK; not typically set by hand.
+- **Example**: `VSTEST_DOTNET_ROOT_PATH=C:\Program Files\dotnet`
+
+### VSTEST_DOTNET_ROOT_ARCHITECTURE
+- **Description**: The target architecture that goes together with `VSTEST_DOTNET_ROOT_PATH`, used to pick the correct architecture-specific `DOTNET_ROOT_<ARCH>` variable for the testhost. Set by the .NET SDK; not typically set by hand.
+- **Example**: `VSTEST_DOTNET_ROOT_ARCHITECTURE=x64`
+
 ### VSTEST_SKIP_FAKES_CONFIGURATION
 - **Description**: Skips Microsoft Fakes configuration during test execution.
 - **Values**: Set to "1" to skip
 - **Example**: `VSTEST_SKIP_FAKES_CONFIGURATION=1`
+
+## Discovery Variables
+
+### VSTEST_BACKGROUND_DISCOVERY
+- **Description**: Hints that a discovery is running in the background (for example the continuous discovery an IDE performs while editing). When set to "1" and no explicit `MaxCpuCount` is configured, the platform reduces the number of cores used for parallel discovery to leave processing power for other tasks. Passed as a run settings environment variable (`RunConfiguration/EnvironmentVariables`) rather than a process environment variable, and set by the host (for example Visual Studio).
+- **Values**: Set to "1" to enable
+- **Example**: `VSTEST_BACKGROUND_DISCOVERY=1`
 
 ## UWP (Universal Windows Platform) Variables
 
