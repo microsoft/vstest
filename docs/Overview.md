@@ -1274,7 +1274,7 @@ public class TestExecutionContext
 
     // Gets or sets a value indicating whether test case level events (TestCaseStart / TestCaseEnd)
     // are required. The cross-platform execution managers currently always pass false here
-    // (see ProxyExecutionManager and InProcessProxyexecutionManager).
+    // (see ProxyExecutionManager and InProcessProxyExecutionManager).
     public bool AreTestCaseLevelEventsRequired { get; set; }
 
     // Gets or sets a value indicating whether execution is in debug mode.
