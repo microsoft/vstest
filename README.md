@@ -52,6 +52,7 @@ NOTE: When adding a new public API, always add it directly to the `PublicAPI.Shi
 
 ### Guides
 
+- [Quickstart](./docs/quickstart.md)
 - [Command line options](./docs/commandline.md)
 - [TestCase filtering](./docs/filter.md)
 - [Passing runsettings from the command line](./docs/RunSettingsArguments.md)
