@@ -22,7 +22,7 @@ package (and with Visual Studio). After restoring/extracting that package, the r
 under the package's `tools/` folder:
 
 - **.NET Framework build** — `tools/net462/Common7/IDE/Extensions/TestPlatform/vstest.console.exe`. Requires .NET Framework (Windows).
-- **.NET build** — the `vstest.console.dll` under the package's .NET `tools/` folder, launched with `dotnet path\to\vstest.console.dll`. Requires a compatible .NET runtime and is cross-platform.
+- **.NET build** — the `vstest.console.dll` under the package's .NET `tools/` folder, launched with `dotnet path/to/vstest.console.dll`. Requires a compatible .NET runtime and is cross-platform.
 
 When you use `dotnet test`, the runner and a matching runtime are already provided by the .NET
 SDK (pinned by your `global.json`), so there is nothing extra to install.
@@ -46,7 +46,7 @@ SDK (pinned by your `global.json`), so there is nothing extra to install.
 You can pass more than one assembly and use wildcards:
 
 ```shell
-vstest.console.exe **\bin\Debug\**\*.Tests.dll
+vstest.console.exe **/bin/Debug/**/*.Tests.dll
 ```
 
 The runner prints a per-test summary and a final total. Test results and any collected

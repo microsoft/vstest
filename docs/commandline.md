@@ -1,9 +1,15 @@
 # vstest.console.exe command line options
 
-This document lists the command line options understood by `vstest.console.exe`. It is
-generated from the argument processors in
-[`src/vstest.console/Processors`](../src/vstest.console/Processors) and mirrors the
-built-in `vstest.console.exe --Help` output.
+This document describes the command line options shown by `vstest.console.exe --Help` — the
+options intended for direct use. It is generated from the argument processors in
+[`src/vstest.console/Processors`](../src/vstest.console/Processors) and mirrors the built-in
+`--Help` output.
+
+`vstest.console.exe` also accepts a number of internal, legacy, or hidden switches that are
+**not** shown by `--Help` (for example `/EnableCodeCoverage`, `/UseVsixExtensions`, and various
+internal switches used by IDEs and the SDK such as `/ListFullyQualifiedTests`,
+`/ListTestsTargetPath`, `/TestSessionCorrelationId` and `/ArtifactsProcessingMode-*`). Those are
+intentionally omitted here.
 
 Options are case-insensitive and accept either a `/Option` or a `--Option` prefix (for
 example `/Parallel` and `--Parallel` are equivalent). Some options also have a short
@@ -27,7 +33,8 @@ vstest.console.exe [TestFileNames] [Options]
 ```
 
 `TestFileNames` are one or more test containers (assemblies or other sources) separated by
-spaces. Wildcards are supported, for example `**\*.Tests.dll`.
+spaces. Wildcards are supported, for example `**/*.Tests.dll`. Use forward slashes (`/`) in
+wildcard patterns so they work on Windows, Linux and macOS.
 
 ## Test selection and filtering
 
@@ -243,13 +250,13 @@ When discovery finds no matching tests the runner prints a **warning** (not an e
 "no tests" condition by itself does not produce an `Error:` line. The message depends on the
 situation:
 
-- A filter matched nothing: `No test matches the given testcase filter '<filter>' in <sources>`.
+- A filter matched nothing: ``No test matches the given testcase filter `<filter>` in <sources>`` (the filter value is shown in backticks).
 - Nothing was discovered from a source: `No test is available in <sources>. Make sure that installed test discoverers & executors, platform & framework version settings are appropriate and try again.` If `/TestAdapterPath` was not provided, a suggestion to specify it is appended.
 - `/Tests:<names>` matched nothing although tests were discovered: `A total of <N> tests were discovered but no test matches the specified selection criteria(<names>). Use right value(s) and try again.`
 
-The exit code is **not uniform** across these cases: a `/Tests` selection that matches nothing
-performs no run and returns `0`, whereas a run that completes with zero results is treated as a
-failure and returns `1`.
+By default this is **not** treated as a failure: the run prints the warning and still returns
+`0`. Set `RunConfiguration.TreatNoTestsAsError` to `true` in a `.runsettings` file to make a run
+that discovers/selects zero tests return `1` instead.
 
 ## See also
 

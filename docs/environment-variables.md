@@ -180,12 +180,12 @@ This document lists environment variables that are currently handled by VSTest s
 
 ### VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS
 - **Description**: Reverts to the older, more conservative way of pointing the testhost at the correct `dotnet` installation. By default (flag unset), when a dotnet root path is known (from `VSTEST_DOTNET_ROOT_PATH`, typically set by `dotnet test`, or derived from `DOTNET_ROOT`), vstest sets the architecture-specific `DOTNET_ROOT_<ARCH>` environment variable for the testhost on every run and platform, so it propagates to the testhost and its child processes (needed, for example, when xUnit v3 runs a separate executable under the testhost). Setting this flag restores the previous behavior of setting `DOTNET_ROOT_<ARCH>` only on Windows after `testhost.exe` is located; older (netcoreapp3.1) testhosts that don't understand `DOTNET_ROOT_<ARCH>` fall back to `DOTNET_ROOT(x86)` / `DOTNET_ROOT`.
-- **Values**: Set to any non-zero value to enable the flag (revert to the old behavior)
+- **Values**: Set to any value other than `0` (for example `1`) to enable the flag and revert to the old behavior. Treated as unset only when absent or exactly `0`.
 - **Example**: `VSTEST_DISABLE_DOTNET_ROOT_ON_NONWINDOWS=1`
 
 ### VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING
 - **Description**: Disables turning dynamic code coverage for native code OFF by default. When set, the platform skips adding the default setting that disables native dynamic code coverage.
-- **Values**: Set to any non-zero value to disable
+- **Values**: Set to any value other than `0` (for example `1`) to enable this flag (skip adding the default setting). Treated as unset only when absent or exactly `0`.
 - **Example**: `VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING=1`
 
 ## Build and MSBuild Integration Variables
@@ -249,7 +249,7 @@ This document lists environment variables that are currently handled by VSTest s
 ## Discovery Variables
 
 ### VSTEST_BACKGROUND_DISCOVERY
-- **Description**: Hints that a discovery is running in the background (for example the continuous discovery an IDE performs while editing). It is typically specified via run settings (`RunConfiguration/EnvironmentVariables`) by the host (for example Visual Studio) and then propagated into the testhost process environment. When set to "1" it has two effects: the platform reduces the number of cores used for parallel discovery when no explicit `MaxCpuCount` is configured (to leave processing power for other tasks), and the testhost process priority is lowered to `BelowNormal`.
+- **Description**: Hints that a discovery is running in the background (for example the continuous discovery an IDE performs while editing). It is typically specified via run settings (`RunConfiguration/EnvironmentVariables`) by the host (for example Visual Studio) and then propagated into the testhost process environment. When set to "1" it has two effects: the platform reduces the number of cores used for parallelism (this applies to both test discovery and execution) when no explicit `MaxCpuCount` is configured, so it leaves processing power for other tasks, and the testhost process priority is lowered to `BelowNormal`.
 - **Values**: Set to "1" to enable
 - **Example**: `VSTEST_BACKGROUND_DISCOVERY=1`
 
