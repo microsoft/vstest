@@ -66,9 +66,11 @@ internal sealed class NamedPipeServer : NamedPipeBase
                 {
                     await InternalLoopAsync(_cancellationToken).ConfigureAwait(false);
                 }
-                catch (OperationCanceledException ex) when (ex.CancellationToken == _cancellationToken)
+                catch (OperationCanceledException) when (_cancellationToken.IsCancellationRequested)
                 {
-                    // We are being cancelled, so we don't need to wait anymore
+                    // We are being cancelled, so we don't need to wait anymore. Match on the token's state
+                    // rather than OperationCanceledException.CancellationToken identity, which is not preserved
+                    // across platforms (Unix surfaces a different token).
                     return;
                 }
             }, cancellationToken);

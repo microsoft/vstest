@@ -149,8 +149,12 @@ internal sealed class TestApplication : IDisposable
                 _testAppPipeConnections.Add(pipeConnection);
             }
         }
-        catch (OperationCanceledException ex) when (ex.CancellationToken == token)
+        catch (OperationCanceledException) when (token.IsCancellationRequested)
         {
+            // Expected during shutdown: the finally block in RunAsync cancels the loop token after the
+            // process exits. Match on the token's state rather than OperationCanceledException.CancellationToken
+            // identity — on Unix the pipe stream surfaces a different token, which previously fell through to
+            // the FailFast below and killed the host process before the run summary was written.
         }
         catch (Exception ex)
         {
