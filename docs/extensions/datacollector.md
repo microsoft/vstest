@@ -64,7 +64,7 @@ public class NewDataCollector : DataCollector
 
     private void Events_TestCaseStart(object? sender, TestCaseStartEventArgs e)
     {
-        logger?.LogWarning(e.Context, "TestCaseStarted " + e.TestCaseName);
+        logger.LogWarning(e.Context, "TestCaseStarted " + e.TestCaseName);
     }
 }
 ```
@@ -139,8 +139,12 @@ Test case level context can be accessed through `TestCaseStartEventArgs.Context`
 ```csharp
 private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
 {
-    // Session level attachment
-    this.dataSink.SendFileAsync(this.context.SessionDataCollectionContext, filename, true);
+    // Session level attachment. environmentContext can be null, so guard before using it.
+    if (this.context is not null)
+    {
+        this.dataSink.SendFileAsync(this.context.SessionDataCollectionContext, filename, true);
+    }
+
     // TestCase level attachment
     this.dataSink.SendFileAsync(e.Context, filename, true);
 }
@@ -149,8 +153,12 @@ private void Events_TestCaseStart(object sender, TestCaseStartEventArgs e)
 ### DataCollectionLogger
 DataCollectors can also log errors or warnings using `DataCollectionLogger`.
 ```csharp
-logger.LogError(this.context.SessionDataCollectionContext, new Exception("my exception"));
-logger.LogWarning(this.context.SessionDataCollectionContext, "my warning");
+// environmentContext can be null, so guard before using the session context.
+if (this.context is not null)
+{
+    logger.LogError(this.context.SessionDataCollectionContext, new Exception("my exception"));
+    logger.LogWarning(this.context.SessionDataCollectionContext, "my warning");
+}
 ```
 
 ### DataCollection Environment Variables
@@ -158,6 +166,8 @@ DataCollectors can choose to specify information about how the test execution en
 E.g. setting up the Environment Variables required by profiler engine for code coverage.
 
 ```csharp
+using System.Collections.Generic;
+
 [DataCollectorFriendlyName("NewDataCollector")]
 [DataCollectorTypeUri("my://new/datacollector")]
 class NewDataCollector : DataCollector, ITestExecutionEnvironmentSpecifier

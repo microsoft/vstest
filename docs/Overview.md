@@ -85,7 +85,7 @@ Testhost receives the request to run tests, and runs them via an appropriate tes
 
 Datacollector observes the testhost to collect additional information about the run when data collection is enabled.
 
-Microsoft.Testing.Platform (MTP) test applications are an emerging .NET 10 path. For those sources, the application hosts itself and TestPlatform drives discovery and execution over the MTP protocol instead of launching a VSTest testhost.
+Microsoft.Testing.Platform (MTP) test applications are an emerging model. For those applications, the application hosts itself and TestPlatform drives discovery and execution over the MTP protocol instead of launching a VSTest testhost.
 
 While the tests execute, the results are reported back to the runner, aggregated, and forwarded to the client.
 
