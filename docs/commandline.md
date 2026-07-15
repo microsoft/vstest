@@ -224,6 +224,33 @@ The port for the socket connection used to receive event messages from the host.
 Process id of the parent process responsible for launching the current process. Used so the
 runner can exit when its parent exits.
 
+## Exit codes
+
+`vstest.console.exe` returns only two exit codes:
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success — the requested operation completed and, for a test run, all executed tests passed. |
+| `1` | Failure — for example one or more tests failed, a run error was reported, the command line was invalid or missing, a test source could not be loaded, or the run was aborted or canceled. |
+
+The process never returns any other value (`Program.Main` returns `0` on success and `1`
+otherwise). When invoked through `dotnet test`, the SDK surfaces a non-zero exit code when
+the run fails in the same way.
+
+### When no tests are found
+
+When discovery finds no matching tests the runner prints a **warning** (not an error), so the
+"no tests" condition by itself does not produce an `Error:` line. The message depends on the
+situation:
+
+- A filter matched nothing: `No test matches the given testcase filter '<filter>' in <sources>`.
+- Nothing was discovered from a source: `No test is available in <sources>. Make sure that installed test discoverers & executors, platform & framework version settings are appropriate and try again.` If `/TestAdapterPath` was not provided, a suggestion to specify it is appended.
+- `/Tests:<names>` matched nothing although tests were discovered: `A total of <N> tests were discovered but no test matches the specified selection criteria(<names>). Use right value(s) and try again.`
+
+The exit code is **not uniform** across these cases: a `/Tests` selection that matches nothing
+performs no run and returns `0`, whereas a run that completes with zero results is treated as a
+failure and returns `1`.
+
 ## See also
 
 - [filter.md](./filter.md) — test case filtering reference
