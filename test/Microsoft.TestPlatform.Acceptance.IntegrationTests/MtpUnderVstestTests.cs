@@ -15,8 +15,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// End-to-end coverage for running a Microsoft.Testing.Platform (MTP) test application under
 /// vstest.console. vstest detects the MTP app from its assembly metadata
 /// (<c>[assembly: AssemblyMetadata("Microsoft.Testing.Platform.Application", "true")]</c>) and drives it
-/// over the MTP JSON-RPC protocol via the MtpTestRuntimeProvider, translating MTP test-node updates back
-/// into vstest results so the console summary and loggers keep working.
+/// over the MTP named-pipe <c>dotnettestcli</c> protocol via the MtpTestRuntimeProvider, translating MTP
+/// test messages back into vstest results so the console summary and loggers keep working.
 /// </summary>
 [TestClass]
 public class MtpUnderVstestTests : AcceptanceTestBase
@@ -31,8 +31,8 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
     [TestMethod]
     // MTP apps are .NET (Core) applications. Pin the testhost axis to .NET so we drive the net11.0 MTP app
-    // from both the .NET Framework and the .NET console (the .NET Framework console exercises the Jsonite
-    // JSON-RPC path; it is Windows-only and skipped elsewhere by the matrix).
+    // from both the .NET Framework and the .NET console (the .NET Framework console exercises the named-pipe
+    // dotnettestcli path; it is Windows-only and skipped elsewhere by the matrix).
     [TestMatrix(testHost: Target.Net)]
     public void RunMtpApplicationExecutesTestsOverMtpProtocol(RunnerInfo runnerInfo)
     {
@@ -168,8 +168,8 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    // A test's captured standard output/error must be surfaced to the loggers. The MTP node carries the
-    // per-test standardOutput/standardError; MtpTestNodeConverter now maps them onto the vstest result so
+    // A test's captured standard output/error must be surfaced to the loggers. The MTP result message carries
+    // the per-test standardOutput/standardError; MtpMessageConverter now maps them onto the vstest result so
     // the console and TRX show them. Before this the markers appeared nowhere. TestPassesToo writes the
     // markers; the run produces a TRX that must contain them.
     [TestMatrix(testHost: Target.Net)]

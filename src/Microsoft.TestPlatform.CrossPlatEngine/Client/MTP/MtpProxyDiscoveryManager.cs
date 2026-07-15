@@ -6,8 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-using Jsonite;
-
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP.PipeProtocol;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -16,8 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
 /// <summary>
 /// An <see cref="IProxyDiscoveryManager"/> that discovers tests by driving a
-/// Microsoft.Testing.Platform (MTP) application over the MTP JSON-RPC protocol instead of the
-/// vstest testhost protocol.
+/// Microsoft.Testing.Platform (MTP) application over the MTP <c>dotnettestcli</c> named-pipe protocol
+/// (<c>--list-tests</c>) instead of the vstest testhost protocol.
 /// </summary>
 internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDisposable
 {
@@ -85,44 +84,26 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
     private int DiscoverSource(string source, ITestDiscoveryEventsHandler2 eventHandler)
     {
         var discovered = new List<TestCase>();
-        var completed = new ManualResetEventSlim(false);
 
-        using var connection = new MtpServerConnection();
-        connection.LogReceived += (level, message) => eventHandler.HandleLogMessage(MtpClientHelpers.MapLevel(level), message);
-        connection.TestNodesUpdated += parameters =>
+        (string fileName, string arguments, string workingDirectory) = MtpLaunch.Resolve(source);
+
+        using var application = new TestApplication(fileName, $"{arguments} --list-tests".TrimStart(), workingDirectory)
         {
-            if (MtpClientHelpers.IsCompletionSentinel(parameters))
+            OnDiscovered = message =>
             {
-                completed.Set();
-                return;
-            }
-
-            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
-            {
-                if (MtpTestNodeConverter.IsActionNode(node))
+                foreach (DiscoveredTestMessage discoveredTest in message.DiscoveredMessages)
                 {
                     lock (discovered)
                     {
-                        discovered.Add(MtpTestNodeConverter.ToTestCase(node, source));
+                        discovered.Add(MtpMessageConverter.ToTestCase(discoveredTest, source));
                     }
                 }
-            }
+
+                return System.Threading.Tasks.Task.CompletedTask;
+            },
         };
 
-        connection.Start(source, environmentVariables: null, MtpClientHelpers.GetConnectionTimeout());
-        connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
-
-        var runId = Guid.NewGuid();
-        var discoverTask = connection.InvokeAsync(
-            MtpConstants.DiscoverTestsMethod,
-            new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() },
-            _cancellationTokenSource.Token);
-
-        // The response indicates the server has finished discovery. Because messages arrive on a
-        // single ordered stream that we read sequentially, every node notification sent before the
-        // response has already been dispatched by the time the response completes.
-        discoverTask.GetAwaiter().GetResult();
-        completed.Wait(TimeSpan.FromSeconds(3));
+        application.RunAsync(afterProcessStartCallback: null, _cancellationTokenSource.Token).GetAwaiter().GetResult();
 
         List<TestCase> chunk;
         lock (discovered)
@@ -135,7 +116,6 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
             eventHandler.HandleDiscoveredTests(chunk);
         }
 
-        connection.SendNotification(MtpConstants.ExitMethod, null);
         return chunk.Count;
     }
 }
