@@ -16,13 +16,18 @@ Most people don't run `vstest.console.exe` directly. Pick the entry point that f
 
 ## Getting the standalone runner
 
-`vstest.console.exe` is not a separate download; it ships inside the
-[`Microsoft.TestPlatform`](https://www.nuget.org/packages/Microsoft.TestPlatform) NuGet
-package (and with Visual Studio). After restoring/extracting that package, the runner lives
-under the package's `tools/` folder:
+`vstest.console` is not a separate download; it ships inside NuGet packages (and with Visual
+Studio). Which package depends on the runtime you need:
 
-- **.NET Framework build** — `tools/net462/Common7/IDE/Extensions/TestPlatform/vstest.console.exe`. Requires .NET Framework (Windows).
-- **.NET build** — the `vstest.console.dll` under the package's .NET `tools/` folder, launched with `dotnet path/to/vstest.console.dll`. Requires a compatible .NET runtime and is cross-platform.
+- **.NET Framework runner (Windows)** — the
+  [`Microsoft.TestPlatform`](https://www.nuget.org/packages/Microsoft.TestPlatform) package.
+  After restoring/extracting it the runner lives at
+  `tools/net462/Common7/IDE/Extensions/TestPlatform/vstest.console.exe` and requires .NET
+  Framework.
+- **Cross-platform .NET runner** — the
+  [`Microsoft.TestPlatform.Portable`](https://www.nuget.org/packages/Microsoft.TestPlatform.Portable)
+  package. It ships `vstest.console.dll` under `tools/net8.0/`, launched with
+  `dotnet path/to/vstest.console.dll`, and requires a compatible .NET runtime.
 
 When you use `dotnet test`, the runner and a matching runtime are already provided by the .NET
 SDK (pinned by your `global.json`), so there is nothing extra to install.
