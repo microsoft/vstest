@@ -253,11 +253,28 @@ that discovers/selects zero tests return `1` instead.
 
 ## Omitted switches
 
-`vstest.console.exe` also accepts a number of internal, legacy, or hidden switches that are
-**not** shown by `--Help` (for example `/EnableCodeCoverage`, `/UseVsixExtensions`, and various
-internal switches used by IDEs and the SDK such as `/ListFullyQualifiedTests`,
-`/ListTestsTargetPath`, `/TestSessionCorrelationId` and `/ArtifactsProcessingMode-*`). Those are
-intentionally omitted here.
+`vstest.console.exe` accepts a number of additional internal, legacy, or hidden switches that
+are not intended for direct use from a shell (they are driven by IDEs, the .NET SDK, or other
+tooling). Most are not shown by `--Help`; `/TestAdapterLoadingStrategy` is the exception — it
+appears in `--Help` but is left out of the reference above because it is an advanced adapter
+option. For completeness, the full set omitted from the reference above is:
+
+| Switch | Purpose |
+| --- | --- |
+| `/EnableCodeCoverage` | Enables the code coverage data collector. Prefer `/Collect:"Code Coverage"`. |
+| `/UseVsixExtensions` | Enables loading of legacy VSIX-installed test adapters. Deprecated. |
+| `/TestAdapterLoadingStrategy` | Controls the order/strategy used to load custom test adapters. |
+| `/DisableAutoFakes` | Disables automatic Microsoft Fakes support. |
+| `/AeDebugger` | Configures the just-in-time (AeDebugger) crash-debugging hook for test hosts. |
+| `/ListFullyQualifiedTests` | Discovers tests and writes their fully qualified names to a file (used with `/ListTestsTargetPath`). |
+| `/ListTestsTargetPath` | Path of the file that `/ListFullyQualifiedTests` writes discovered test names to. |
+| `/TestSessionCorrelationId` | Correlation id used to associate a run with its artifacts across processes. |
+| `/ArtifactsProcessingMode-Collect` | Marks a run so its artifacts are collected for later post-processing. |
+| `/ArtifactsProcessingMode-PostProcess` | Post-processes artifacts collected from earlier runs. |
+| `/ShowDeprecateDotnetVSTestMessage` | Controls whether the `dotnet vstest` deprecation message is shown. |
+| `/RunTests` | Internal command used by design-mode hosts to run the provided tests. |
+| `/TestSource` | Internal command used by design-mode hosts to pass a test source. |
+
 
 ## See also
 
