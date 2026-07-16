@@ -57,8 +57,8 @@
       - [Runtime Provider](#runtime-provider)
     - [TranslationLayer extension points](#translationlayer-extension-points)
       - [Public surface of the TranslationLayer project](#public-surface-of-the-translationlayer-project)
-      - [Wrapper operations (IVsTestConsoleWrapper)](#wrapper-operations-ivstestconsolewrapper)
-      - [Callback interfaces you implement (the plug-in points)](#callback-interfaces-you-implement-the-plug-in-points)
+      - [Usage: driving the wrapper](#usage-driving-the-wrapper)
+      - [Extension points: interfaces you implement](#extension-points-interfaces-you-implement)
       - [Configuring the runner process (ConsoleParameters)](#configuring-the-runner-process-consoleparameters)
     - [.NET Implementation](#net-implementation)
       - [Architecture](#architecture)
@@ -1893,13 +1893,15 @@ receives strongly-typed callbacks. Internally the wrapper starts the `vstest.con
 process, opens the socket connection to it, and exchanges the JSON protocol messages
 described earlier in this document; all of that is hidden behind the interfaces below.
 
-There are two categories of extension point:
+Working with the layer has two distinct sides, and it is worth keeping them separate:
 
-1. The **wrapper API** you call to drive an operation (`IVsTestConsoleWrapper` and the
-   public types shipped alongside it).
-2. The **callback interfaces you implement** and pass in, so TestPlatform can call back into
-   your tool as discovery/execution progresses (the handler and launcher interfaces from
-   `Microsoft.VisualStudio.TestPlatform.ObjectModel.Client`).
+1. **Usage** - you *instantiate* `VsTestConsoleWrapper` and *call* it to drive discovery,
+   execution, and attachment processing. You do not extend `IVsTestConsoleWrapper`; you
+   consume it.
+2. **Extension points** - the callback interfaces you *implement* and hand to the wrapper, so
+   TestPlatform can call back into your tool as an operation progresses (the handler and
+   launcher interfaces from `Microsoft.VisualStudio.TestPlatform.ObjectModel.Client`). These
+   are the actual plug-in points.
 
 #### Public surface of the TranslationLayer project
 
@@ -1916,7 +1918,34 @@ The `ITranslationLayerRequestSender` / `IProcessManager` interfaces in the proje
 `internal` plumbing (socket request sender and process manager) and are not part of the
 public extension surface.
 
-#### Wrapper operations (`IVsTestConsoleWrapper`)
+#### Usage: driving the wrapper
+
+You point the wrapper at a `vstest.console` binary, then call `DiscoverTests` / `RunTests`,
+passing in your own event handler to receive results. A minimal end-to-end example (adapted
+from [`playground/TestPlatform.Playground/Program.cs`](../playground/TestPlatform.Playground/Program.cs)):
+
+```csharp
+// 'console' is the full path to vstest.console(.exe/.dll); 'sources' are the test DLLs.
+var consoleParameters = new ConsoleParameters
+{
+    LogFilePath = Path.Combine(here, "logs", "log.txt"),
+    TraceLevel = TraceLevel.Verbose,
+};
+var options = new TestPlatformOptions { CollectMetrics = true };
+
+// Instantiate the wrapper. Constructing it and calling StartSession() launches vstest.console.
+IVsTestConsoleWrapper wrapper = new VsTestConsoleWrapper(console, consoleParameters);
+
+// Discover: 'discoveryHandler' is YOUR ITestDiscoveryEventsHandler(2) implementation.
+wrapper.DiscoverTests(sources, runSettings, options, testSessionInfo: null, discoveryHandler);
+
+// Run: 'runHandler' is YOUR ITestRunEventsHandler implementation.
+wrapper.RunTests(discoveryHandler.TestCases, runSettings, options, testSessionInfo: null, runHandler);
+
+wrapper.EndSession();
+```
+
+The operations you can call on `IVsTestConsoleWrapper` are:
 
 - `StartSession()` - starts the `vstest.console` process and readies it for requests.
 - `EndSession()` - ends the session and stops the runner process. Also `CancelDiscovery()`,
@@ -1938,12 +1967,13 @@ public extension surface.
   completion are reported through an `ITestRunAttachmentsProcessingEventsHandler`, and the
   call honours a `CancellationToken`.
 
-#### Callback interfaces you implement (the plug-in points)
+#### Extension points: interfaces you implement
 
-These live in `Microsoft.VisualStudio.TestPlatform.ObjectModel.Client(.Interfaces)`. Your
-tool implements the relevant one and passes an instance to the wrapper operation; TestPlatform
-invokes it as the operation progresses. They all derive from `ITestMessageEventHandler`, which
-provides `HandleRawMessage(string)` and `HandleLogMessage(TestMessageLevel, string?)`.
+These live in `Microsoft.VisualStudio.TestPlatform.ObjectModel.Client(.Interfaces)`. This is
+where you plug into the layer: your tool implements the relevant interface and passes an
+instance to the wrapper operation above; TestPlatform invokes it as the operation progresses.
+They all derive from `ITestMessageEventHandler`, which provides `HandleRawMessage(string)` and
+`HandleLogMessage(TestMessageLevel, string?)`.
 
 | Interface | Passed to | Key callbacks |
 | --- | --- | --- |
@@ -1963,7 +1993,8 @@ implemented.
 
 #### Configuring the runner process (`ConsoleParameters`)
 
-`ConsoleParameters` controls how `vstest.console` is started and is another extensibility seam:
+`ConsoleParameters` is a usage-side configuration object that controls how the
+`vstest.console` process is started:
 
 - `EnvironmentVariables` / `InheritEnvironmentVariables` - environment for the runner process.
   By default the entries are merged onto the inherited environment; set
