@@ -446,7 +446,7 @@
   <data name="PlatformArgumentHelp" xml:space="preserve">
     <value>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
-      Valid values are x86, x64 and ARM.</value>
+      Valid values are x86, x64, ARM, ARM64, S390x, Ppc64le, RiscV64 and LoongArch64.</value>
   </data>
   <data name="PlatformTypeRequired" xml:space="preserve">
     <value>The /Platform argument requires the target platform type for the test run to be provided.   Example:  /Platform:x86</value>

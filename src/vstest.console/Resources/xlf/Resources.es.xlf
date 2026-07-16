@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <xliff xmlns="urn:oasis:names:tc:xliff:document:1.2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="1.2" xsi:schemaLocation="urn:oasis:names:tc:xliff:document:1.2 xliff-core-1.2-transitional.xsd">
   <file datatype="xml" source-language="en" original="../Resources.resx" target-language="es">
     <body>
@@ -386,8 +386,8 @@
       <trans-unit id="PlatformArgumentHelp">
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
-      Valid values are x86, x64 and ARM.</source>
-        <target state="translated">--Platform|/Platform:&lt;tipoPlataforma&gt;
+      Valid values are x86, x64, ARM, ARM64, S390x, Ppc64le, RiscV64 and LoongArch64.</source>
+        <target state="needs-review-translation">--Platform|/Platform:&lt;tipoPlataforma&gt;
       Arquitectura de la plataforma de destino que se usará para la ejecución de pruebas. 
       Los valores válidos son x86, x64 y ARM.</target>
         <note />

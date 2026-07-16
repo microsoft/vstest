@@ -82,7 +82,7 @@ don't use a data collector, and don't disable app domains.
 
 Target platform architecture to be used for test execution. Values are parsed
 case-insensitively; valid values are `x86`, `x64`, `ARM`, `ARM64`, `S390x`, `Ppc64le`,
-`RiscV64` and `LoongArch64`. (The built-in `--Help` text only lists `x86`, `x64` and `ARM`.)
+`RiscV64` and `LoongArch64`.
 
 ### `/Framework:<Framework Version>`
 
