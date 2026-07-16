@@ -1,7 +1,7 @@
 # vstest.console.exe command line options
 
 This document describes the command line options intended for direct use — the ones shown by
-`vstest.console.exe --Help`. It is generated from the argument processors in
+`vstest.console.exe --Help`. It is derived from the argument processors in
 [`src/vstest.console/Processors`](../src/vstest.console/Processors) and largely follows the
 built-in `--Help` output. A few advanced or internal switches are left out of the main
 reference and collected in [Omitted switches](#omitted-switches) instead.
