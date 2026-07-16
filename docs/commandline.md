@@ -144,8 +144,7 @@ use `/logger:trx;LogFilePrefix=<prefix>` rather than `LogFileName=<name>` when y
 timestamped file per run — `LogFileName` sets the name explicitly and overwrites the previous
 file, whereas `LogFilePrefix` keeps each run's file. The console logger verbosity can be set
 with `/logger:console;verbosity=<quiet|minimal|normal|detailed>`. See
-[report.md](./report.md) for all logger options and
-[console logger](https://aka.ms/console-logger).
+[report.md](./report.md) for all loggers and their options.
 
 ### `/Collect:<DataCollector FriendlyName>`
 
