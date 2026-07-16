@@ -1,9 +1,10 @@
 # vstest.console.exe command line options
 
-This document describes the command line options shown by `vstest.console.exe --Help` — the
-options intended for direct use. It is generated from the argument processors in
-[`src/vstest.console/Processors`](../src/vstest.console/Processors) and mirrors the built-in
-`--Help` output.
+This document describes the command line options intended for direct use — the ones shown by
+`vstest.console.exe --Help`. It is generated from the argument processors in
+[`src/vstest.console/Processors`](../src/vstest.console/Processors) and largely follows the
+built-in `--Help` output. A few advanced or internal switches are left out of the main
+reference and collected in [Omitted switches](#omitted-switches) instead.
 
 Options are case-insensitive and accept either a `/Option` or a `--Option` prefix (for
 example `/Parallel` and `--Parallel` are equivalent). Some options also have a short
