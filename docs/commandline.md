@@ -255,9 +255,9 @@ that discovers/selects zero tests return `1` instead.
 
 `vstest.console.exe` accepts a number of additional internal, legacy, or hidden switches that
 are not intended for direct use from a shell (they are driven by IDEs, the .NET SDK, or other
-tooling). Most are not shown by `--Help`; `/TestAdapterLoadingStrategy` is the exception — it
-appears in `--Help` but is left out of the reference above because it is an advanced adapter
-option. For completeness, the full set omitted from the reference above is:
+tooling). Some are shown by `--Help` (notably `/TestAdapterLoadingStrategy`) but are left out
+of the reference above because they are advanced options; the rest are not shown by `--Help` at
+all. For completeness, the full set omitted from the reference above is:
 
 | Switch | Purpose |
 | --- | --- |
@@ -266,6 +266,10 @@ option. For completeness, the full set omitted from the reference above is:
 | `/TestAdapterLoadingStrategy` | Controls the order/strategy used to load custom test adapters. |
 | `/DisableAutoFakes` | Disables automatic Microsoft Fakes support. |
 | `/AeDebugger` | Configures the just-in-time (AeDebugger) crash-debugging hook for test hosts. |
+| `/ListDiscoverers` | Lists the installed test discoverers. |
+| `/ListExecutors` | Lists the installed test executors. |
+| `/ListLoggers` | Lists the installed loggers. |
+| `/ListSettingsProviders` | Lists the installed settings providers. |
 | `/ListFullyQualifiedTests` | Discovers tests and writes their fully qualified names to a file (used with `/ListTestsTargetPath`). |
 | `/ListTestsTargetPath` | Path of the file that `/ListFullyQualifiedTests` writes discovered test names to. |
 | `/TestSessionCorrelationId` | Correlation id used to associate a run with its artifacts across processes. |
@@ -274,6 +278,7 @@ option. For completeness, the full set omitted from the reference above is:
 | `/ShowDeprecateDotnetVSTestMessage` | Controls whether the `dotnet vstest` deprecation message is shown. |
 | `/RunTests` | Internal command used by design-mode hosts to run the provided tests. |
 | `/TestSource` | Internal command used by design-mode hosts to pass a test source. |
+
 
 
 ## See also
