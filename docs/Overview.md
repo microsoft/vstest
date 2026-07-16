@@ -1933,14 +1933,16 @@ var consoleParameters = new ConsoleParameters
 };
 var options = new TestPlatformOptions { CollectMetrics = true };
 
-// Instantiate the wrapper. Constructing it and calling StartSession() launches vstest.console.
+// Instantiate the wrapper. The vstest.console process is started lazily on the first
+// operation; you may also call StartSession() explicitly to start it up front.
 IVsTestConsoleWrapper wrapper = new VsTestConsoleWrapper(console, consoleParameters);
 
 // Discover: 'discoveryHandler' is YOUR ITestDiscoveryEventsHandler(2) implementation.
 wrapper.DiscoverTests(sources, runSettings, options, testSessionInfo: null, discoveryHandler);
 
-// Run: 'runHandler' is YOUR ITestRunEventsHandler implementation.
-wrapper.RunTests(discoveryHandler.TestCases, runSettings, options, testSessionInfo: null, runHandler);
+// Run: 'runHandler' is YOUR ITestRunEventsHandler implementation. This runs by sources; you
+// can also run a specific set of TestCase objects that your discovery handler collected.
+wrapper.RunTests(sources, runSettings, options, testSessionInfo: null, runHandler);
 
 wrapper.EndSession();
 ```
