@@ -194,7 +194,7 @@ See [diagnose.md](./diagnose.md) and [troubleshooting.md](./troubleshooting.md) 
 
 ## General
 
-### `/Help` (short form `/?`)
+### `/Help` (short form `/?` or `-?`)
 
 Display the usage message.
 
