@@ -5,12 +5,6 @@ options intended for direct use. It is generated from the argument processors in
 [`src/vstest.console/Processors`](../src/vstest.console/Processors) and mirrors the built-in
 `--Help` output.
 
-`vstest.console.exe` also accepts a number of internal, legacy, or hidden switches that are
-**not** shown by `--Help` (for example `/EnableCodeCoverage`, `/UseVsixExtensions`, and various
-internal switches used by IDEs and the SDK such as `/ListFullyQualifiedTests`,
-`/ListTestsTargetPath`, `/TestSessionCorrelationId` and `/ArtifactsProcessingMode-*`). Those are
-intentionally omitted here.
-
 Options are case-insensitive and accept either a `/Option` or a `--Option` prefix (for
 example `/Parallel` and `--Parallel` are equivalent). Some options also have a short
 form, which accepts a `/` or `-` prefix (for example `/lt` or `-lt` for `/ListTests`, and
@@ -80,18 +74,23 @@ settings file.
 Runs the tests in an isolated process. This makes `vstest.console.exe` less likely to be
 stopped by an error in the tests, but tests may run slower.
 
+In practice most runs already happen in isolation — the main exception is .NET Framework
+test assemblies, which can run inside the runner process when they don't run in parallel,
+don't use a data collector, and don't disable app domains.
+
 ### `/Platform:<Platform type>`
 
 Target platform architecture to be used for test execution. Values are parsed
 case-insensitively; valid values are `x86`, `x64`, `ARM`, `ARM64`, `S390x`, `Ppc64le`,
-`RiscV64` and `LoongArch64`. (The built-in `--Help` text historically lists only `x86`,
-`x64` and `ARM`, but the argument processor accepts the full set above.)
+`RiscV64` and `LoongArch64`. (The built-in `--Help` text only lists `x86`, `x64` and `ARM`.)
 
 ### `/Framework:<Framework Version>`
 
-Target .NET framework version to be used for test execution. Valid values are for example
-`".NETFramework,Version=v4.5.1"` or `".NETCoreApp,Version=v1.0"`. Other supported values
-are `Framework40`, `Framework45`, `FrameworkCore10` and `FrameworkUap10`.
+Target .NET framework version to be used for test execution. Values are parsed with NuGet's
+framework parser, so the common short forms work, for example `net48`, `net6.0` or `net10.0`
+(as well as the long forms `".NETFramework,Version=v4.8"` and `".NETCoreApp,Version=v10.0"`).
+The legacy aliases `Framework40`, `Framework45`, `FrameworkCore10` and `FrameworkUap10` are
+also accepted.
 
 ### `/Environment:<NAME>=<VALUE>` (short form `/e`)
 
@@ -109,20 +108,9 @@ vstest.console.exe MyTests.dll -e:ANOTHER_VARIABLE="VALUE WITH SPACES"
 
 ### `/TestAdapterPath:<path>`
 
-Makes `vstest.console.exe` use custom test adapters from the given path in the test run.
-
-### `/TestAdapterLoadingStrategy:<strategy>`
-
-Affects adapter loading behavior. Supported values (which can be combined):
-
-| Strategy | Behavior |
-| --- | --- |
-| `Explicit` | Only load adapters specified by `/TestAdapterPath` (or the `RunConfiguration.TestAdaptersPaths` node). If no adapter path is specified, the run fails. Implies `/InIsolation`. |
-| `Default` | Load adapters as if the argument was not specified (next to source, provided paths, and the default directory). |
-| `DefaultRuntimeProviders` | Load the default runtime providers shipped with the Test Platform. |
-| `ExtensionsDirectory` | Load adapters inside the `Extensions` folder. |
-| `NextToSource` | Load adapters next to the source. |
-| `Recursive` | Recursively search folders when loading adapters. Requires `Explicit` or `NextToSource`. |
+Makes `vstest.console.exe` use custom test adapters from the given path in the test run. The
+value is a path to a *folder* that contains the adapter assemblies, not a path to a single
+adapter `.dll`.
 
 ## Settings
 
@@ -151,9 +139,13 @@ rules, and shell-escaping guidance.
 ### `/logger:<Logger Uri/FriendlyName>`
 
 Specify a logger for test results. For example, to log results into a Visual Studio Test
-Results File (TRX) use `/logger:trx[;LogFileName=<name>]`. The console logger verbosity can
-be set with `/logger:console;verbosity=<quiet|minimal|normal|detailed>`. More info:
-[console logger](https://aka.ms/console-logger).
+Results File (TRX) use `/logger:trx`. By default the TRX file is named after the test run;
+use `/logger:trx;LogFilePrefix=<prefix>` rather than `LogFileName=<name>` when you want a
+timestamped file per run — `LogFileName` sets the name explicitly and overwrites the previous
+file, whereas `LogFilePrefix` keeps each run's file. The console logger verbosity can be set
+with `/logger:console;verbosity=<quiet|minimal|normal|detailed>`. See
+[report.md](https://github.com/Microsoft/vstest-docs/blob/main/docs/report.md) for all logger
+options and [console logger](https://aka.ms/console-logger).
 
 ### `/Collect:<DataCollector FriendlyName>`
 
@@ -257,6 +249,14 @@ situation:
 By default this is **not** treated as a failure: the run prints the warning and still returns
 `0`. Set `RunConfiguration.TreatNoTestsAsError` to `true` in a `.runsettings` file to make a run
 that discovers/selects zero tests return `1` instead.
+
+## Omitted switches
+
+`vstest.console.exe` also accepts a number of internal, legacy, or hidden switches that are
+**not** shown by `--Help` (for example `/EnableCodeCoverage`, `/UseVsixExtensions`, and various
+internal switches used by IDEs and the SDK such as `/ListFullyQualifiedTests`,
+`/ListTestsTargetPath`, `/TestSessionCorrelationId` and `/ArtifactsProcessingMode-*`). Those are
+intentionally omitted here.
 
 ## See also
 
