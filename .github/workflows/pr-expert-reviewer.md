@@ -12,8 +12,8 @@ on:
 # Skip mechanical bot PRs the expert review adds no value to (and shouldn't spend
 # agent runs on): OneLocBuild localization check-ins (dotnet-bot) and Maestro
 # dependency-flow updates (dotnet-maestro[bot]). Human PRs and manual dispatch still
-# run — on a workflow_dispatch the pull_request fields are empty, so the guard is
-# false and the review runs.
+# run — on a workflow_dispatch the pull_request fields are empty, so the bot/title
+# match is false and this negated guard evaluates to true (so the review runs).
 if: >
   !(
     (
