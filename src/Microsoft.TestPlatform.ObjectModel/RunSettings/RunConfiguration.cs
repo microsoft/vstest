@@ -1059,16 +1059,15 @@ public class RunConfiguration : TestRunSettings
                             // was inferred (true) or pinned by the user (false). Not exposed to the public
                             // run settings schema; read only by the in-box test host manager.
                             XmlRunSettingsUtilities.ThrowOnHasAttributes(reader);
-                            string element = reader.ReadElementContentAsString();
+                            string isTargetPlatformInferredValue = reader.ReadElementContentAsString();
 
-                            bool boolValue;
-                            if (!bool.TryParse(element, out boolValue))
+                            if (!bool.TryParse(isTargetPlatformInferredValue, out bool isTargetPlatformInferred))
                             {
                                 throw new SettingsException(string.Format(CultureInfo.CurrentCulture,
-                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, boolValue, elementName));
+                                    Resources.Resources.InvalidSettingsIncorrectValue, Constants.RunConfigurationSettingsName, isTargetPlatformInferredValue, elementName));
                             }
 
-                            runConfiguration.IsTargetPlatformInferred = boolValue;
+                            runConfiguration.IsTargetPlatformInferred = isTargetPlatformInferred;
                             break;
                         }
 
