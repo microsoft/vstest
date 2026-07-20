@@ -507,7 +507,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                 EqtTrace.Verbose($"DotnetTestHostmanager: Searching muxer for the architecture '{targetArchitecture}', OS '{_platformEnvironment.OperatingSystem}' framework '{_targetFramework}' SDK platform architecture '{_platformEnvironment.Architecture}'");
                 if (forceToX64)
                 {
-                    EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecure, IsDefaultTargetArchitecture '{_isDefaultTargetArchitecture}' OS '{_platformEnvironment.OperatingSystem}' framework '{_targetFramework}'");
+                    EqtTrace.Verbose($"DotnetTestHostmanager: Forcing the search to x64 architecture, IsTargetPlatformInferred '{_isDefaultTargetArchitecture}' OS '{_platformEnvironment.OperatingSystem}' framework '{_targetFramework}'");
                 }
 
                 // Check if DOTNET_ROOT resolution should be bypassed.

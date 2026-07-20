@@ -447,4 +447,36 @@ public class RunConfigurationTests
         Assert.ThrowsExactly<SettingsException>(
                 () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
     }
+
+    [TestMethod]
+    public void RunConfigurationFromXmlThrowsSettingsExceptionIfDisableSharedTestHostIsInvalid()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <DisableSharedTestHost>InvalidValue</DisableSharedTestHost>
+                     </RunConfiguration>
+                </RunSettings>";
+
+        var exception = Assert.ThrowsExactly<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
+        Assert.AreEqual("Invalid settings 'RunConfiguration'.  Invalid value 'InvalidValue' specified for 'DisableSharedTestHost'.", exception.Message);
+    }
+
+    [TestMethod]
+    public void RunConfigurationFromXmlThrowsSettingsExceptionIfSkipDefaultAdaptersIsInvalid()
+    {
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                     <RunConfiguration>
+                       <SkipDefaultAdapters>InvalidValue</SkipDefaultAdapters>
+                     </RunConfiguration>
+                </RunSettings>";
+
+        var exception = Assert.ThrowsExactly<SettingsException>(
+                () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
+        Assert.AreEqual("Invalid settings 'RunConfiguration'.  Invalid value 'InvalidValue' specified for 'SkipDefaultAdapters'.", exception.Message);
+    }
 }
