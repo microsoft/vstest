@@ -444,7 +444,10 @@ public class RunConfigurationTests
                      </RunConfiguration>
                 </RunSettings>";
 
-        Assert.ThrowsExactly<SettingsException>(
+        var exception = Assert.ThrowsExactly<SettingsException>(
                 () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
+
+        // The error must report the actual invalid value the user provided, not the parsed bool default.
+        Assert.Contains("Invalid value 'InvalidValue'", exception.Message);
     }
 }
