@@ -169,7 +169,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         if (parameters?.EnvironmentVariables is { } dataCollectionEnvironmentVariables)
         {
-            EnvironmentVariables ??= new Dictionary<string, string?>();
+            EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
             foreach (KeyValuePair<string, string?> variable in dataCollectionEnvironmentVariables)
             {
                 EnvironmentVariables[variable.Key] = variable.Value;
@@ -417,13 +417,22 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             return;
         }
 
-        EnvironmentVariables ??= new Dictionary<string, string?>(
-            Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+        EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
         foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
         {
             EnvironmentVariables[variable.Key] = variable.Value;
         }
     }
+
+    /// <summary>
+    /// Creates the dictionary used to collect environment variables for the MTP application launch,
+    /// keyed case-insensitively on Windows (matching the classic testhost path) and case-sensitively
+    /// elsewhere, so callers that pass case-variant duplicate keys collapse the same way the classic
+    /// path did before the values reach the ordinal-keyed
+    /// <see cref="MtpServerClientOptions.EnvironmentVariables"/>.
+    /// </summary>
+    private static Dictionary<string, string?> CreateEnvironmentVariablesDictionary()
+        => new(Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
 
     private static IReadOnlyCollection<string> BuildUids(List<TestCase> tests)
         => tests
