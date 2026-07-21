@@ -84,8 +84,8 @@
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <AwesomeAssertionsVersion>8.1.0</AwesomeAssertionsVersion>
     <MicrosoftTestingPlatformVersion>2.1.0</MicrosoftTestingPlatformVersion>
-    <!-- INTERIM: unshipped source-only MTP server-mode client from microsoft/testfx#10085, served from the committed eng/local-mtp-feed. Uniquely versioned to avoid NuGet same-version cache collisions on shared machines. Remove the feed and repin to the published version once #10085 ships to a real feed. -->
-    <MicrosoftTestingPlatformServerClientSourceVersion>2.4.0-dev.20260721161520</MicrosoftTestingPlatformServerClientSourceVersion>
+    <!-- INTERIM: unshipped source-only MTP server-mode client from microsoft/testfx#10085, served from the committed eng/local-mtp-feed. Pinned to the coordinator's canonical uniquely-named drop to avoid NuGet same-version cache collisions on shared machines. Remove the feed and repin to the published version once #10085 ships to a real feed. -->
+    <MicrosoftTestingPlatformServerClientSourceVersion>2.4.0-dev.numberfix</MicrosoftTestingPlatformServerClientSourceVersion>
     <MoqVersion>4.16.1</MoqVersion>
     <!-- For coverage use our own package on latest stable -->
     <MicrosoftCodeCoverageVersion>18.3.0</MicrosoftCodeCoverageVersion>
