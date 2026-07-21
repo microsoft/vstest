@@ -486,20 +486,35 @@ public class IntegrationTestBuild : IntegrationTestBase
         string nugetConfigPath = Path.Combine(root, "NuGet.config");
         var nugetConfig = XDocument.Load(nugetConfigPath);
 
-        var feeds = nugetConfig!
+        var sources = nugetConfig!
             .Element("configuration")!
             .Element("packageSources")!
-            .Descendants("add")
-            .Where(p => p.Attributes().Any(a => a.Name == "key"))
-            .SelectMany(p => p.Attributes())
-            .Where(a => a.Name == "value")
-            .Select(a => a.Value)
+            .Elements("add")
+            .Select(p => (string?)p.Attribute("value"))
+            .Where(v => v is not null)
+            .Select(v => v!)
             .ToList();
 
-        if (feeds.Count == 0)
+        if (sources.Count == 0)
         {
             throw new InvalidOperationException($"No feeds were loaded from '{nugetConfigPath}'.");
         }
+
+        // These sources are passed as --source to a "dotnet restore" of the TestAssets solution, which
+        // transitively restores product projects (e.g. CrossPlatEngine). Two NuGet quirks bite once the
+        // repo has a local-folder source (the interim local-mtp feed) mixed in with the remote https feeds:
+        //   1. A relative --source path is rooted at each restored project's directory (not the current
+        //      directory), so "eng/local-mtp-feed" resolves to "<project>/eng/local-mtp-feed" and NU1301s.
+        //   2. When a local-folder source precedes the remote https sources, NuGet also mis-normalizes the
+        //      https URLs into per-project relative paths ("<project>/https:/host/..."), NU1301ing every feed.
+        // Guard against both: resolve relative local-folder sources to absolute paths, and emit the remote
+        // sources first so all local-folder sources come last. Remote sources (containing "://") keep their
+        // configured order and pass through unchanged.
+        var remote = sources.Where(s => s.Contains("://"));
+        var local = sources
+            .Where(s => !s.Contains("://"))
+            .Select(s => Path.IsPathRooted(s) ? s : Path.GetFullPath(Path.Combine(root, s)));
+        var feeds = remote.Concat(local).ToList();
 
         // --source "value1" --source "value2", including quotes
         var parameters = $"""--source "{string.Join("\" --source \"", feeds)}" """;
