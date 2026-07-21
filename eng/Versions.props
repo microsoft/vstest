@@ -84,6 +84,8 @@
     <!-- Name of the elements must be in sync with test\Microsoft.TestPlatform.TestUtilities\IntegrationTestBase.cs -->
     <AwesomeAssertionsVersion>8.1.0</AwesomeAssertionsVersion>
     <MicrosoftTestingPlatformVersion>2.1.0</MicrosoftTestingPlatformVersion>
+    <!-- INTERIM: unshipped source-only MTP server-mode client. Blocked on microsoft/testfx#10085. -->
+    <MicrosoftTestingPlatformServerClientSourceVersion>2.4.0-dev</MicrosoftTestingPlatformServerClientSourceVersion>
     <MoqVersion>4.16.1</MoqVersion>
     <!-- For coverage use our own package on latest stable -->
     <MicrosoftCodeCoverageVersion>18.3.0</MicrosoftCodeCoverageVersion>
