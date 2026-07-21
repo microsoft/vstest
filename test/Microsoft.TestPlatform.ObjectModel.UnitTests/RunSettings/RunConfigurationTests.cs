@@ -446,8 +446,6 @@ public class RunConfigurationTests
 
         var exception = Assert.ThrowsExactly<SettingsException>(
                 () => XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml));
-
-        // The error must report the actual invalid value the user provided, not the parsed bool default.
-        Assert.Contains("Invalid value 'InvalidValue'", exception.Message);
+        Assert.AreEqual("Invalid settings 'RunConfiguration'.  Invalid value 'InvalidValue' specified for 'IsTargetPlatformInferred'.", exception.Message);
     }
 }
