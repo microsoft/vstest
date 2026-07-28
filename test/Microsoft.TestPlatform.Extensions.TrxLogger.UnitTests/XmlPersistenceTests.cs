@@ -34,6 +34,21 @@ public class XmlPersistenceTests
     }
 
     [TestMethod]
+    public void SaveObjectShouldNotReplaceAdjacentHighAndLowSurrogate()
+    {
+        // 0xd800 immediately followed by 0xdc00 is not two invalid characters - it is the
+        // UTF-16 encoding of U+10000, which the XML spec lists as valid. It must round-trip
+        // unescaped. This case used to be asserted the other way around.
+        XmlPersistence xmlPersistence = new();
+        var node = xmlPersistence.CreateRootElement("TestRun");
+
+        string validSurrogatePair = new(new[] { (char)0xd800, (char)0xdc00 });
+        XmlPersistence.SaveObject(validSurrogatePair, node, null, "dummy");
+
+        Assert.AreEqual(validSurrogatePair, node.InnerXml);
+    }
+
+    [TestMethod]
     public void SaveObjectShouldNotReplaceWellFormedSurrogatePairInElementText()
     {
         // A surrogate pair encodes a character in [#x10000-#x10FFFF], which the XML spec
