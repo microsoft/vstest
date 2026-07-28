@@ -31,7 +31,7 @@ internal sealed class FakeMtpServerClient : IMtpServerClient
 
     public MtpServerCapabilities? Capabilities { get; private set; }
 
-    public Func<string, IDictionary<string, object?>?, CancellationToken, Task<object?>>? ServerRequestHandler { get; set; }
+    public Func<string, IDictionary<string, object?>?, CancellationToken, Task<IDictionary<string, object?>?>>? ServerRequestHandler { get; set; }
 
     /// <summary>Gets a value indicating whether <see cref="ExitAsync"/> was called.</summary>
     public bool ExitCalled { get; private set; }
