@@ -41,6 +41,23 @@ public class UnitTests
         Assert.Fail("should never run");
     }
 
+    // A test whose display name has a UTF-8 byte count greater than its character count: German
+    // umlauts (2 bytes each), Japanese (3 bytes each) and an emoji (4 bytes, 2 chars).
+    //
+    // MTP frames declare Content-Length in bytes, so a client that consumes that number of
+    // characters instead under-reads the frame and desynchronizes the connection from the next
+    // message onward. Test names are user-authored and travel server-to-client on every node update,
+    // which makes them the realistic trigger. Because the corruption only surfaces on the message
+    // *after* the multi-byte one, this test being present is what makes the whole run fail rather
+    // than just this test - which is exactly the guard we want. Keeping a non-ASCII name in the
+    // shared asset means every MTP acceptance scenario (discovery, execution, TRX, blame, data
+    // collectors) exercises the transport with multi-byte content.
+    [TestMethod(DisplayName = "TestGrüße日本語🎉Čau")]
+    public void TestNonAsciiDisplayName()
+    {
+        Assert.AreEqual(2, Add(1, 1));
+    }
+
     // Verifies that environment variables declared in a runsettings RunConfiguration/EnvironmentVariables
     // block are injected into the self-hosted MTP process. The check is opted into by the
     // CHECK_RUNSETTINGS_VAR control variable, which the env-var acceptance test passes as a *process*
