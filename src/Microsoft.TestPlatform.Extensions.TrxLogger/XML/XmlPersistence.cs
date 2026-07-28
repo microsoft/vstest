@@ -675,16 +675,31 @@ internal class XmlPersistence
 
         // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
         // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
-
-        // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
-        // because C# support unicode character in range \u0000 to \uFFFF
+        //
+        // In .NET a string is a sequence of UTF-16 code units, so characters in the
+        // [#x10000-#x10FFFF] (astral) range are represented by a surrogate pair: a high
+        // surrogate (\uD800-\uDBFF) followed by a low surrogate (\uDC00-\uDFFF). Such a
+        // pair is perfectly valid XML and must be preserved as-is, so the pattern below
+        // matches it first (and the evaluator passes it through untouched).
+        //
+        // A *lone* surrogate, on the other hand, is not a valid Unicode scalar value and
+        // is not valid XML - XmlWriter would throw on it - so it still has to be escaped.
+        // That is why we cannot simply add \uD800-\uDFFF to the allowed set: only properly
+        // paired surrogates are allowed through.
         MatchEvaluator evaluator = new(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
-        string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
+        const string invalidChar = @"([\uD800-\uDBFF][\uDC00-\uDFFF])|([^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD])";
         return Regex.Replace(str, invalidChar, evaluator);
     }
 
     private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
     {
+        // A well-formed surrogate pair matched the first alternation: it is valid XML,
+        // return it unchanged.
+        if (match.Groups[1].Success)
+        {
+            return match.Value;
+        }
+
         char x = match.Value[0];
         return $@"\u{(ushort)x:x4}";
     }
