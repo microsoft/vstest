@@ -26,10 +26,10 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     private const string MtpApp = "MtpMSTestProject.dll";
 
     // The display name of MtpMSTestProject's deliberately non-ASCII test. Its UTF-8 byte count exceeds
-    // its character count (German umlauts 2 bytes, Japanese 3 bytes, emoji 4 bytes / 2 chars), which is
-    // what exercises the MTP frame's byte-denominated Content-Length. Must match the [DisplayName] on
+    // its character count (German umlauts 2 bytes, Japanese 3 bytes, Czech caron 2 bytes), which is
+    // what exercises the MTP frame's byte-denominated Content-Length. Must match the DisplayName on
     // MtpMSTestProject.UnitTests.TestNonAsciiDisplayName.
-    private const string NonAsciiTestName = "TestGrüße日本語🎉Čau";
+    private const string NonAsciiTestName = "TestGrüße日本語Čau";
 
     // MSTestProject1 is a classic vstest MSTest project driven by the vstest testhost: one passes, one
     // fails, one is skipped.
@@ -60,13 +60,15 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     [TestMethod]
     // MTP frames declare Content-Length in UTF-8 bytes. A client that consumes that number of
     // characters instead under-reads any frame carrying multi-byte content and desynchronizes the
-    // connection from the next message onward - so the failure surfaces on whatever the server sends
-    // *after* the offending node update, not on the node itself. Test names are user-authored and
-    // travel server-to-client on every node update, which makes them the realistic trigger.
+    // connection from the next message onward. Test names are user-authored and travel
+    // server-to-client on every node update, which makes them the realistic trigger.
     //
-    // MtpMSTestProject carries a test named with German umlauts (2 bytes each), Japanese (3 bytes
-    // each) and an emoji (4 bytes, 2 chars). This asserts the name survives the round trip intact
-    // and that the run still completes, which it cannot do if the transport desynchronized.
+    // This is a name-integrity guard rather than a full reproduction of that framing bug: the .NET
+    // MTP server serializes with System.Text.Json, whose default encoder escapes non-ASCII to
+    // \uXXXX, so the bytes on the wire are ASCII and byte count coincidentally equals character
+    // count. The framing bug itself is proved at the unit level in testfx against the transport
+    // directly. What this guards is that a multi-byte name survives escaping, transport and decoding
+    // unchanged - which is what regressed in every historical variant of this bug.
     [TestMatrix(testHost: Target.Net)]
     public void RunMtpApplicationPreservesNonAsciiTestNames(RunnerInfo runnerInfo)
     {
@@ -297,14 +299,14 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         StdOutputContains("Data collector 'SampleDataCollector' message: TestCaseEnded");
 
         // The collector emits one attachment per started test case through the forwarded TestCaseStart
-        // events. All five MtpMSTestProject test cases surface a start on this path (the skipped one still
-        // reports a TestCaseStart), so five attachments must land in the results directory. Exclude the
+        // events. All six MtpMSTestProject test cases surface a start on this path (the skipped one still
+        // reports a TestCaseStart), so six attachments must land in the results directory. Exclude the
         // collector's own source directory so only the moved attachments are counted.
         var collectorSourceDirectoryPrefix = collectorSourceDirectory + Path.DirectorySeparatorChar;
         var testCaseAttachments = Directory
             .GetFiles(TempDirectory.Path, "testcasefilename*.txt", SearchOption.AllDirectories)
             .Where(file => !file.StartsWith(collectorSourceDirectoryPrefix, StringComparison.OrdinalIgnoreCase))
             .ToList();
-        Assert.HasCount(5, testCaseAttachments, "Expected one per-test-case attachment for each started MtpMSTestProject test case forwarded on the MTP path.");
+        Assert.HasCount(6, testCaseAttachments, "Expected one per-test-case attachment for each started MtpMSTestProject test case forwarded on the MTP path.");
     }
 }

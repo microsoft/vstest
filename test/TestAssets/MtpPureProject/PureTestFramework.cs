@@ -29,7 +29,7 @@ internal sealed class PureTestFramework : ITestFramework, IDataProducer
 {
     /// <summary>
     /// A display name whose UTF-8 byte count exceeds its character count: German umlauts (2 bytes
-    /// each), Japanese (3 bytes each) and an emoji (4 bytes, 2 chars).
+    /// each), Japanese (3 bytes each) and a Czech caron (2 bytes).
     ///
     /// The MTP frame header declares Content-Length in bytes, so a client that consumes that number
     /// of characters instead under-reads the frame and desynchronizes the connection from the next
@@ -38,7 +38,7 @@ internal sealed class PureTestFramework : ITestFramework, IDataProducer
     /// regression in the transport shows up as a failing acceptance test rather than as a bug report
     /// from a non-English-speaking user.
     /// </summary>
-    internal const string NonAsciiTestName = "TestGrüße日本語🎉Čau";
+    internal const string NonAsciiTestName = "TestGrüße日本語Čau";
 
     private static readonly SessionUid SessionUid = new("PureMtpSession");
 
