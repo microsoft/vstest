@@ -20,7 +20,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 /// so the launch/initialize/discover/exit sequence is asserted without starting a real test
 /// application.
 /// </summary>
+/// <remarks>
+/// Not parallelized: these tests swap the process-wide <see cref="MtpServerClientFactory.Launch"/>
+/// seam, so running them alongside another class that does the same would let one class's fake leak
+/// into the other's run.
+/// </remarks>
 [TestClass]
+[DoNotParallelize]
 public class MtpProxyDiscoveryManagerTests
 {
     private const string Source = @"C:\tests\MtpApp.dll";

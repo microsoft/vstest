@@ -285,7 +285,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         InvokeVsTest(arguments, env);
 
         // The run must complete with the usual summary rather than hang at shutdown. MtpMSTestProject has
-        // five test cases: three pass, one fails, one is skipped.
+        // six test cases: four pass, one fails, one is skipped.
         ValidateSummaryStatus(4, 1, 1);
 
         // The datacollector lifecycle must be driven end to end even though there is no testhost: the

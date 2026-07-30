@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
 /// <summary>
@@ -375,8 +377,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         };
 
         // Let the data collector (e.g. code coverage) know the process it should track. The profiler
-        // env vars were already injected via the launch options above.
-        _dataCollectionManager?.TestHostLaunched(client.ProcessId);
+        // env vars were already injected via the launch options above. Capture the id here rather than
+        // reading it again after the exit handshake, when the process may already be gone.
+        int processId = client.ProcessId;
+        _dataCollectionManager?.TestHostLaunched(processId);
 
         try
         {
@@ -396,7 +400,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             MtpServerClientFactory.TryExit(client);
         }
 
-        return client.ProcessId;
+        return processId;
     }
 
     private static IEnumerable<(string Source, List<TestCase>? Tests)> BuildWork(TestRunCriteria criteria)
@@ -462,12 +466,17 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             // executed zero of the tests the user selected, with no error anywhere. Failing here turns
             // that invisible wrong answer into a visible, actionable one. Do not reintroduce a
             // fallback - there is no value that works other than the uid the server itself issued.
+            //
+            // This aborts the whole source rather than skipping the offending test: the caller reports
+            // the failure and marks the run aborted, which is deliberate. Silently running the
+            // addressable subset would recreate the same class of bug in a smaller form, reporting a
+            // partial run as if it were the run the user asked for.
             if (uid.IsNullOrEmpty())
             {
                 throw new TestPlatformException(
                     string.Format(
                         CultureInfo.CurrentCulture,
-                        "Cannot run test '{0}' because it carries no Microsoft.Testing.Platform node uid. The test case was not produced by an MTP discovery, or the uid was lost in transit.",
+                        CrossPlatEngineResources.MtpTestCaseMissingNodeUid,
                         test.DisplayName ?? test.FullyQualifiedName));
             }
 

@@ -305,7 +305,10 @@ public class MtpTestNodeConverterTests
     [TestMethod]
     public void ToTestCaseRejectsOutOfRangeLineNumberInsteadOfWrapping()
     {
-        object[] outOfRange = [(long)int.MaxValue + 1, (long)int.MinValue - 1, 1e18d];
+        // The last entry is float: (float)int.MaxValue rounds *up* to 2147483648f, so a naive
+        // `f <= int.MaxValue` guard lets it through and the cast then saturates - the exact
+        // "plausible-looking wrong answer" the coercion exists to prevent.
+        object[] outOfRange = [(long)int.MaxValue + 1, (long)int.MinValue - 1, 1e18d, 2147483648f];
 
         foreach (object boxed in outOfRange)
         {
@@ -316,7 +319,7 @@ public class MtpTestNodeConverterTests
             Assert.AreEqual(
                 -1,
                 testCase.LineNumber,
-                $"Out-of-range value {boxed} must not be wrapped into a valid-looking line number.");
+                $"Out-of-range value {boxed} ({boxed.GetType().Name}) must not be wrapped into a valid-looking line number.");
         }
     }
 

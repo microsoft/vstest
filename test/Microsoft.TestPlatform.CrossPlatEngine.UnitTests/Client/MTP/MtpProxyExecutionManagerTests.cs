@@ -19,7 +19,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 /// <summary>
 /// Tests that drive <see cref="MtpProxyExecutionManager"/> against a fake MTP server.
 /// </summary>
+/// <remarks>
+/// Not parallelized: these tests swap the process-wide <see cref="MtpServerClientFactory.Launch"/>
+/// seam, so running them alongside another class that does the same would let one class's fake leak
+/// into the other's run.
+/// </remarks>
 [TestClass]
+[DoNotParallelize]
 public class MtpProxyExecutionManagerTests
 {
     private const string Source = @"C:\tests\MtpApp.dll";
@@ -80,6 +86,25 @@ public class MtpProxyExecutionManagerTests
         manager.StartTestRun(CriteriaFor(TestCaseWithoutUid()), _eventHandler.Object);
 
         Assert.IsNull(_client.RunFilterUids, "No run may be requested when the selection cannot be expressed.");
+        _eventHandler.Verify(
+            h => h.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, It.IsAny<string>()),
+            Times.AtLeastOnce);
+    }
+
+    /// <summary>
+    /// The whole source is aborted rather than silently running the addressable subset: reporting a
+    /// partial run as if it were the run the user asked for is the same class of bug this fix exists
+    /// to remove.
+    /// </summary>
+    [TestMethod]
+    public void StartTestRunFailsLoudlyWhenOnlySomeTestsCarryAnMtpUid()
+    {
+        using var manager = new MtpProxyExecutionManager();
+        manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1"), TestCaseWithoutUid()), _eventHandler.Object);
+
+        Assert.IsNull(
+            _client.RunFilterUids,
+            "A selection that cannot be fully expressed must not be partially run.");
         _eventHandler.Verify(
             h => h.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, It.IsAny<string>()),
             Times.AtLeastOnce);

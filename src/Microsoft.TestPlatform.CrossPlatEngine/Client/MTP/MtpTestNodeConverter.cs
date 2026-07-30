@@ -211,7 +211,11 @@ internal static class MtpTestNodeConverter
                 result = (int)d;
                 return true;
 
-            case float f when f is >= int.MinValue and <= int.MaxValue:
+            case float f
+                // (float)int.MaxValue rounds up to 2147483648f, so comparing a float against
+                // int.MaxValue directly lets that value through and the cast then saturates. Widen to
+                // double first so the bound is exact.
+                when (double)f is >= int.MinValue and <= int.MaxValue:
                 result = (int)f;
                 return true;
 

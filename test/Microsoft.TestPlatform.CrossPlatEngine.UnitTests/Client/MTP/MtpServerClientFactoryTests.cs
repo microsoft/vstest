@@ -36,22 +36,24 @@ public class MtpServerClientFactoryTests
     /// <summary>
     /// Cancelling or aborting a run is precisely when the run's token is already cancelled. Exit
     /// must not be tied to it, or the graceful shutdown handshake would be skipped in the one case
-    /// it matters most.
+    /// it matters most. <see cref="MtpServerClientFactory.TryExit"/> takes no token at all, so this
+    /// pins that it supplies an uncancelled, cancelable one of its own; the end-to-end proof that no
+    /// run token is plumbed through lives in the proxy-manager tests.
     /// </summary>
     [TestMethod]
-    public void TryExitDoesNotUseAnAlreadyCancelledRunToken()
+    public void TryExitSuppliesItsOwnUncancelledToken()
     {
         var client = new FakeMtpServerClient();
 
-        using var cancelledRun = new CancellationTokenSource();
-        cancelledRun.Cancel();
-
         MtpServerClientFactory.TryExit(client);
 
-        Assert.IsTrue(client.ExitCalled, "Exit must still be attempted after a cancelled run.");
+        Assert.IsTrue(client.ExitCalled);
         Assert.IsFalse(
             client.ExitToken.IsCancellationRequested,
-            "Exit must not be driven by the run's cancellation token.");
+            "Exit must run on a token that is not already cancelled.");
+        Assert.IsTrue(
+            client.ExitToken.CanBeCanceled,
+            "The token must be cancelable, otherwise the exit timeout could never fire.");
     }
 
     /// <summary>
@@ -81,7 +83,28 @@ public class MtpServerClientFactoryTests
         Assert.IsTrue(client.ExitCalled, "A failing exit must not propagate: the caller disposes the client next.");
     }
 
+    /// <summary>
+    /// The seam must default to the factory's own launcher, not to a test double. Asserting only
+    /// that it is non-null would pass for any delegate, including a fake another test class left
+    /// behind. Instead assert the delegate is implemented inside <see cref="MtpServerClientFactory"/>
+    /// itself - the default is a lambda, so its target lives in a compiler-generated closure nested
+    /// in the factory rather than on the factory type directly.
+    /// </summary>
     [TestMethod]
     public void LaunchDefaultsToTheRealClientLauncher()
-        => Assert.IsNotNull(MtpServerClientFactory.Launch);
+    {
+        Type? declaringType = MtpServerClientFactory.Launch.Method.DeclaringType;
+
+        Assert.IsNotNull(declaringType);
+        Type outermost = declaringType;
+        while (outermost.DeclaringType is { } parent)
+        {
+            outermost = parent;
+        }
+
+        Assert.AreEqual(
+            typeof(MtpServerClientFactory),
+            outermost,
+            "The default seam must be the factory's own launcher, not a test double left behind by another test.");
+    }
 }

@@ -34,9 +34,11 @@ internal sealed class PureTestFramework : ITestFramework, IDataProducer
     /// The MTP frame header declares Content-Length in bytes, so a client that consumes that number
     /// of characters instead under-reads the frame and desynchronizes the connection from the next
     /// message onward. Test names are user-authored and flow server-to-client on every node update,
-    /// which makes this the realistic trigger. Keeping a non-ASCII name in the asset means any
-    /// regression in the transport shows up as a failing acceptance test rather than as a bug report
-    /// from a non-English-speaking user.
+    /// which makes this the realistic trigger.
+    ///
+    /// Note this asset is not currently referenced by any test in the repo - the acceptance coverage
+    /// lives on MtpMSTestProject, which every MTP scenario uses. This name is kept in step with that
+    /// asset so the two stay comparable if this one is ever wired up.
     /// </summary>
     internal const string NonAsciiTestName = "TestGrüße日本語Čau";
 

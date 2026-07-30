@@ -12,7 +12,13 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.MTP;
 
+/// <remarks>
+/// Not parallelized: these tests mutate the process-wide VSTEST_CONNECTION_TIMEOUT environment
+/// variable, which any concurrently running test that reads
+/// <see cref="EnvironmentHelper.GetConnectionTimeout"/> would observe.
+/// </remarks>
 [TestClass]
+[DoNotParallelize]
 public class MtpClientOptionsFactoryTests
 {
     private string? _originalTimeout;
