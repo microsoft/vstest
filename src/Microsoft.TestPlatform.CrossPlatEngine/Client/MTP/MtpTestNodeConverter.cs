@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -163,25 +164,68 @@ internal static class MtpTestNodeConverter
 
             foreach (KeyValuePair<string, object?> property in trait)
             {
-                string value = property.Value as string ?? string.Empty;
-                testCase.Traits.Add(new Trait(property.Key, value));
+                testCase.Traits.Add(new Trait(property.Key, FormatTraitValue(property.Value)));
             }
         }
     }
 
+    /// <summary>
+    /// Renders a trait value as text. Traits are strings on the wire, but the two formatters box
+    /// JSON scalars differently (Jsonite and System.Text.Json can each yield int, long, double or
+    /// bool), so a non-string value here means the server sent a scalar rather than that the value
+    /// is absent. Formatting it invariantly preserves the data; treating it as an empty string
+    /// would silently drop it on one formatter and not the other.
+    /// </summary>
+    private static string FormatTraitValue(object? value)
+        => value switch
+        {
+            null => string.Empty,
+            string text => text,
+            IFormattable formattable => formattable.ToString(null, CultureInfo.InvariantCulture),
+            _ => value.ToString() ?? string.Empty,
+        };
+
     private static string? GetRawString(MtpTestNodeUpdate update, string key)
         => update.Node.TryGetValue(key, out object? value) ? value as string : null;
 
+    /// <summary>
+    /// Coerces a raw node value to <see cref="int"/>. The formatters box JSON numbers differently
+    /// (int, long or double for the same wire value), so the value must be coerced rather than
+    /// cast. Values outside the <see cref="int"/> range are rejected rather than wrapped: a wrapped
+    /// line number is a plausible-looking wrong answer, whereas returning false leaves the caller's
+    /// property at its default and is visibly "not set".
+    /// </summary>
     private static bool TryGetRawInt(MtpTestNodeUpdate update, string key, out int result)
     {
         switch (update.Node.TryGetValue(key, out object? value) ? value : null)
         {
-            case int i: result = i; return true;
-            case long l: result = unchecked((int)l); return true;
-            case double d: result = (int)d; return true;
-            case float f: result = (int)f; return true;
-            case decimal m: result = (int)m; return true;
-            default: result = 0; return false;
+            case int i:
+                result = i;
+                return true;
+
+            case long l when l is >= int.MinValue and <= int.MaxValue:
+                result = (int)l;
+                return true;
+
+            case double d when d is >= int.MinValue and <= int.MaxValue:
+                result = (int)d;
+                return true;
+
+            case float f
+                // (float)int.MaxValue rounds up to 2147483648f, so comparing a float against
+                // int.MaxValue directly lets that value through and the cast then saturates. Widen to
+                // double first so the bound is exact.
+                when (double)f is >= int.MinValue and <= int.MaxValue:
+                result = (int)f;
+                return true;
+
+            case decimal m when m is >= int.MinValue and <= int.MaxValue:
+                result = (int)m;
+                return true;
+
+            default:
+                result = 0;
+                return false;
         }
     }
 }

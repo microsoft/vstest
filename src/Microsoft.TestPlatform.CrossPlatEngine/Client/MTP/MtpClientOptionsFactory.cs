@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
@@ -58,13 +59,10 @@ internal static class MtpClientOptionsFactory
         };
 
     private static TimeSpan GetConnectionTimeout()
-    {
-        // Reuse vstest's connection timeout knob so users can extend it in slow environments.
-        string? value = Environment.GetEnvironmentVariable("VSTEST_CONNECTION_TIMEOUT");
-        return !string.IsNullOrEmpty(value) && int.TryParse(value, out int seconds) && seconds > 0
-            ? TimeSpan.FromSeconds(seconds)
-            : TimeSpan.FromSeconds(90);
-    }
+        // Reuse vstest's shared connection-timeout knob (VSTEST_CONNECTION_TIMEOUT) rather than
+        // re-reading the environment variable here, so the MTP path honours exactly the same
+        // override, default and diagnostics as every other vstest connection.
+        => TimeSpan.FromSeconds(EnvironmentHelper.GetConnectionTimeout());
 
     private static void Trace(MtpClientLogLevel level, string message)
     {

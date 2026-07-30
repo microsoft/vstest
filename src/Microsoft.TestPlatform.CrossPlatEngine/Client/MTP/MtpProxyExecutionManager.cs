@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -17,6 +18,8 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
@@ -312,7 +315,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         HashSet<string> executorUris)
     {
         MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions(EnvironmentVariables);
-        using var client = MtpServerClient.Launch(source, options);
+        using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
         client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
         client.TestNodesUpdated += (_, e) =>
         {
@@ -374,21 +377,30 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         };
 
         // Let the data collector (e.g. code coverage) know the process it should track. The profiler
-        // env vars were already injected via the launch options above.
-        _dataCollectionManager?.TestHostLaunched(client.ProcessId);
+        // env vars were already injected via the launch options above. Capture the id here rather than
+        // reading it again after the exit handshake, when the process may already be gone.
+        int processId = client.ProcessId;
+        _dataCollectionManager?.TestHostLaunched(processId);
 
-        client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+        try
+        {
+            client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
 
-        // Awaiting the run request is sufficient: server-to-client messages arrive on a single ordered
-        // stream that the client reads sequentially and dispatches synchronously, so every node update
-        // has already been delivered by the time the request completes.
-        MtpRunResult runResult = (tests is { Count: > 0 }
-            ? client.RunTestsAsync(BuildUids(tests), _cancellationTokenSource.Token)
-            : client.RunTestsAsync(_cancellationTokenSource.Token)).GetAwaiter().GetResult();
+            // Awaiting the run request is sufficient: server-to-client messages arrive on a single ordered
+            // stream that the client reads sequentially and dispatches synchronously, so every node update
+            // has already been delivered by the time the request completes.
+            MtpRunResult runResult = (tests is { Count: > 0 }
+                ? client.RunTestsAsync(BuildUids(tests), _cancellationTokenSource.Token)
+                : client.RunTestsAsync(_cancellationTokenSource.Token)).GetAwaiter().GetResult();
 
-        CollectAttachments(runResult, attachments);
-        client.ExitAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
-        return client.ProcessId;
+            CollectAttachments(runResult, attachments);
+        }
+        finally
+        {
+            MtpServerClientFactory.TryExit(client);
+        }
+
+        return processId;
     }
 
     private static IEnumerable<(string Source, List<TestCase>? Tests)> BuildWork(TestRunCriteria criteria)
@@ -434,10 +446,45 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     private static Dictionary<string, string?> CreateEnvironmentVariablesDictionary()
         => new(Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
 
+    /// <summary>
+    /// Projects the tests selected for a filtered run onto the MTP node uids the server matches on.
+    /// </summary>
+    /// <exception cref="TestPlatformException">
+    /// A selected test carries no MTP node uid, so the run cannot be expressed.
+    /// </exception>
     private static IReadOnlyCollection<string> BuildUids(List<TestCase> tests)
-        => tests
-            .Select(test => test.GetPropertyValue(MtpTestNodeConverter.MtpUidProperty, test.FullyQualifiedName))
-            .ToList();
+    {
+        var uids = new List<string>(tests.Count);
+        foreach (TestCase test in tests)
+        {
+            string? uid = test.GetPropertyValue<string>(MtpTestNodeConverter.MtpUidProperty, null);
+
+            // The MTP server projects node.Uid alone when it builds a run filter and never reads
+            // DisplayName or any other field, so a TestCase without MTP.TestNode.Uid simply cannot be
+            // addressed. Substituting FullyQualifiedName here (as this method previously did) produces
+            // a filter the server matches nothing against: the run completes "successfully" having
+            // executed zero of the tests the user selected, with no error anywhere. Failing here turns
+            // that invisible wrong answer into a visible, actionable one. Do not reintroduce a
+            // fallback - there is no value that works other than the uid the server itself issued.
+            //
+            // This aborts the whole source rather than skipping the offending test: the caller reports
+            // the failure and marks the run aborted, which is deliberate. Silently running the
+            // addressable subset would recreate the same class of bug in a smaller form, reporting a
+            // partial run as if it were the run the user asked for.
+            if (uid.IsNullOrEmpty())
+            {
+                throw new TestPlatformException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        CrossPlatEngineResources.MtpTestCaseMissingNodeUid,
+                        test.DisplayName ?? test.FullyQualifiedName));
+            }
+
+            uids.Add(uid);
+        }
+
+        return uids;
+    }
 
     private static void CollectAttachments(MtpRunResult runResult, List<AttachmentSet> attachments)
     {

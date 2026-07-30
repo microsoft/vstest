@@ -86,7 +86,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
         var discovered = new List<TestCase>();
 
         MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions();
-        using var client = MtpServerClient.Launch(source, options);
+        using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
         client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
         client.TestNodesUpdated += (_, e) =>
         {
@@ -102,12 +102,19 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
             }
         };
 
-        client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+        try
+        {
+            client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
 
-        // Awaiting the discover request is sufficient: server-to-client messages arrive on a single
-        // ordered stream that the client reads sequentially and dispatches synchronously, so every
-        // node notification has already been delivered by the time the request completes.
-        client.DiscoverTestsAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+            // Awaiting the discover request is sufficient: server-to-client messages arrive on a single
+            // ordered stream that the client reads sequentially and dispatches synchronously, so every
+            // node notification has already been delivered by the time the request completes.
+            client.DiscoverTestsAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+        }
+        finally
+        {
+            MtpServerClientFactory.TryExit(client);
+        }
 
         List<TestCase> chunk;
         lock (discovered)
@@ -120,7 +127,6 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
             eventHandler.HandleDiscoveredTests(chunk);
         }
 
-        client.ExitAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
         return chunk.Count;
     }
 }
