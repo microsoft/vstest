@@ -15,8 +15,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
 public sealed class TestRunDetails
 {
     /// <summary>
-    /// Guards the lazily created run level message lists and <see cref="ResultCollectionList"/>,
-    /// all of which are mutated from multiple threads while tests execute in parallel.
+    /// Guards the run level message lists, which are created on first use, and
+    /// <see cref="ResultCollectionList"/>. All of them are mutated from multiple threads while
+    /// tests execute in parallel.
     /// </summary>
     private readonly object _syncLock = new();
 

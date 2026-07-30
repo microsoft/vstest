@@ -650,7 +650,7 @@ public class TrxLogger : ITestLoggerWithParameters
 
             // We cannot rely on the StartTime for the first test result
             // In case of parallel, first test result is the fastest test and not the one which started first.
-            // Setting Started to DateTime.Now in Initialize will make sure we include the startup cost, which was being ignored earlier.
+            // Setting Started to the time captured in Initialize will make sure we include the startup cost, which was being ignored earlier.
             // This is in parity with the way we set this.testRun.Finished
             testRun.Started = TestRunStartTime;
 
