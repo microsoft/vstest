@@ -667,7 +667,7 @@ internal class XmlPersistence
 
     private static string? RemoveInvalidXmlChar(string? str)
     {
-        if (str == null)
+        if (str is null)
         {
             return null;
         }
