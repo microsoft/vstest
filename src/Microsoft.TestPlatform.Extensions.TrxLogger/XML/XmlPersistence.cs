@@ -10,7 +10,6 @@ using System.Globalization;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Text.RegularExpressions;
 using System.Xml;
 
 using Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel;
@@ -675,19 +674,47 @@ internal class XmlPersistence
 
         // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
         // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        //
+        // In .NET a string is a sequence of UTF-16 code units, so characters in the
+        // [#x10000-#x10FFFF] (astral) range are represented by a surrogate pair: a high
+        // surrogate (\uD800-\uDBFF) followed by a low surrogate (\uDC00-\uDFFF). Such a
+        // pair is perfectly valid XML and must be preserved as-is, so we look ahead with
+        // char.IsSurrogatePair and copy both code units through untouched.
+        //
+        // A *lone* surrogate, on the other hand, is not a valid Unicode scalar value and
+        // is not valid XML - XmlWriter would throw on it - so it still has to be escaped.
+        // That is why we cannot simply treat \uD800-\uDFFF as valid: doing so would trade
+        // a mangled-string bug for a "we emit unparseable XML" bug, which is worse because
+        // it breaks every consumer of the trx at read time. Only properly paired
+        // surrogates are allowed through.
+        StringBuilder? builder = null;
+        for (int i = 0; i < str.Length; i++)
+        {
+            // IsSurrogatePair also covers the end-of-string case, so a high surrogate as
+            // the last character correctly falls through to the invalid branch below.
+            if (char.IsSurrogatePair(str, i))
+            {
+                builder?.Append(str[i]).Append(str[i + 1]);
+                i++;
+                continue;
+            }
 
-        // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
-        // because C# support unicode character in range \u0000 to \uFFFF
-        MatchEvaluator evaluator = new(ReplaceInvalidCharacterWithUniCodeEscapeSequence);
-        string invalidChar = @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD]";
-        return Regex.Replace(str, invalidChar, evaluator);
+            char c = str[i];
+            if (IsValidXmlChar(c))
+            {
+                builder?.Append(c);
+                continue;
+            }
+
+            builder ??= new StringBuilder(str.Length).Append(str, 0, i);
+            builder.Append(@"\u").Append(((ushort)c).ToString("x4", CultureInfo.InvariantCulture));
+        }
+
+        return builder?.ToString() ?? str;
     }
 
-    private static string ReplaceInvalidCharacterWithUniCodeEscapeSequence(Match match)
-    {
-        char x = match.Value[0];
-        return $@"\u{(ushort)x:x4}";
-    }
+    private static bool IsValidXmlChar(char c)
+        => c is '\x09' or '\x0A' or '\x0D' or (>= '\x20' and <= '\uD7FF') or (>= '\uE000' and <= '\uFFFD');
 
     private XmlNode? EnsureLocationExists(XmlElement xml, string location, string? nameSpaceUri)
     {
