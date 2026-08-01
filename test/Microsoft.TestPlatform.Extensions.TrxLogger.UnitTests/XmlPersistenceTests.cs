@@ -19,18 +19,13 @@ public class XmlPersistenceTests
 
         // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] plus
         // well-formed surrogate pairs, which encode [#x10000-#x10FFFF].
-        char[] invalidXmlCharacterArray = new char[5];
-        invalidXmlCharacterArray[0] = (char)0x5;
-        invalidXmlCharacterArray[1] = (char)0xb;
-        invalidXmlCharacterArray[2] = (char)0xf;
-        invalidXmlCharacterArray[3] = (char)0xfffe;
-        invalidXmlCharacterArray[4] = (char)0x0;
+        char[] invalidXmlCharacterArray = [(char)0x5, (char)0xb, (char)0xf, (char)0xfffe, (char)0x0];
 
         string strWithInvalidCharForXml = new(invalidXmlCharacterArray);
         XmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
 
         string expectedResult = "\\u0005\\u000b\\u000f\\ufffe\\u0000";
-        Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
+        Assert.AreEqual(expectedResult, node.InnerXml);
     }
 
     [TestMethod]
@@ -42,7 +37,7 @@ public class XmlPersistenceTests
         XmlPersistence xmlPersistence = new();
         var node = xmlPersistence.CreateRootElement("TestRun");
 
-        string validSurrogatePair = new(new[] { (char)0xd800, (char)0xdc00 });
+        string validSurrogatePair = new([(char)0xd800, (char)0xdc00]);
         XmlPersistence.SaveObject(validSurrogatePair, node, null, "dummy");
 
         Assert.AreEqual(validSurrogatePair, node.InnerXml);
@@ -156,22 +151,18 @@ public class XmlPersistenceTests
         var node = xmlPersistence.CreateRootElement("TestRun");
 
         // we are handling only #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD]
-        char[] validXmlCharacterArray = new char[8];
-        validXmlCharacterArray[0] = (char)0x9;
-        validXmlCharacterArray[1] = (char)0xa;
-        validXmlCharacterArray[2] = (char)0xd;
-        validXmlCharacterArray[3] = (char)0x20;
-        validXmlCharacterArray[4] = (char)0xc123;
-        validXmlCharacterArray[5] = (char)0xe000;
-        validXmlCharacterArray[6] = (char)0xea12;
-        validXmlCharacterArray[7] = (char)0xfffd;
+        char[] validXmlCharacterArray =
+        [
+            (char)0x9, (char)0xa, (char)0xd, (char)0x20,
+            (char)0xc123, (char)0xe000, (char)0xea12, (char)0xfffd,
+        ];
 
         string strWithValidCharForXml = new(validXmlCharacterArray);
 
         XmlPersistence.SaveObject(strWithValidCharForXml, node, null, "dummy");
 
         string expectedResult = "\t\n\r 섣�";
-        Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
+        Assert.AreEqual(expectedResult, node.InnerXml);
     }
 
     [TestMethod]
@@ -182,6 +173,6 @@ public class XmlPersistenceTests
         string strWithInvalidCharForXml = "This string has these \0 \v invalid characters";
         XmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
         string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
-        Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
+        Assert.AreEqual(expectedResult, node.InnerXml);
     }
 }
