@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 /// <see cref="NotSupportedException"/>. Instead it:
 /// <list type="bullet">
 ///   <item><description>
-///     when <c>VSTEST_OPTIN_MTP</c> is enabled, claims MTP sources via
+///     when <c>VSTEST_ENABLE_MTP_TESTHOST</c> is set, claims MTP sources via
 ///     <see cref="ISourceAwareTestRuntimeProvider"/> (source-aware detection using the build-time
 ///     Microsoft.Testing.Platform marker), so it is selected ahead of the generic testhost providers that match
 ///     only by target framework; and
@@ -53,20 +53,6 @@ public class MtpTestRuntimeProvider : ISourceAwareTestRuntimeProvider, IProxyMan
     // The launch-related members are not supported because an MTP application hosts itself; it is never
     // launched as a vstest testhost. Discovery and execution go through the MTP proxy managers instead.
     private const string NotSupportedMessage = "Microsoft.Testing.Platform applications are hosted over the MTP protocol and are not launched as a vstest test host.";
-
-    private readonly IFeatureFlag _featureFlag;
-    private readonly Func<string, bool> _isMicrosoftTestingPlatformApp;
-
-    public MtpTestRuntimeProvider()
-        : this(FeatureFlag.Instance, MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp)
-    {
-    }
-
-    internal MtpTestRuntimeProvider(IFeatureFlag featureFlag, Func<string, bool> isMicrosoftTestingPlatformApp)
-    {
-        _featureFlag = featureFlag;
-        _isMicrosoftTestingPlatformApp = isMicrosoftTestingPlatformApp;
-    }
 
     event EventHandler<HostProviderEventArgs>? ITestRuntimeProvider.HostLaunched
     {
@@ -94,10 +80,7 @@ public class MtpTestRuntimeProvider : ISourceAwareTestRuntimeProvider, IProxyMan
     // application. A mixed set (some MTP, some classic) is split into separate configurations upstream, so each
     // group asked here is homogeneous.
     bool ISourceAwareTestRuntimeProvider.CanExecuteCurrentRunConfiguration(string? runsettingsXml, IEnumerable<string> sources)
-        => CanExecuteCurrentRunConfiguration(sources);
-
-    internal bool CanExecuteCurrentRunConfiguration(IEnumerable<string> sources)
-        => _featureFlag.IsSet(FeatureFlag.VSTEST_OPTIN_MTP) && AllSourcesAreMicrosoftTestingPlatform(sources);
+        => FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_ENABLE_MTP_TESTHOST) && AllSourcesAreMicrosoftTestingPlatform(sources);
 
     void ITestRuntimeProvider.SetCustomLauncher(ITestHostLauncher customLauncher)
     {
@@ -120,7 +103,7 @@ public class MtpTestRuntimeProvider : ISourceAwareTestRuntimeProvider, IProxyMan
     IProxyExecutionManager IProxyManagerFactory.CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager)
         => MtpProxyManagerFactory.CreateExecutionManager(dataCollectionManager);
 
-    private bool AllSourcesAreMicrosoftTestingPlatform(IEnumerable<string> sources)
+    private static bool AllSourcesAreMicrosoftTestingPlatform(IEnumerable<string> sources)
     {
         var any = false;
         foreach (var source in sources)
@@ -129,7 +112,7 @@ public class MtpTestRuntimeProvider : ISourceAwareTestRuntimeProvider, IProxyMan
 
             // The detector never throws: for a null/empty/unreadable source it returns false, which correctly
             // disqualifies the group.
-            if (!_isMicrosoftTestingPlatformApp(source))
+            if (!MicrosoftTestingPlatformDetector.IsMicrosoftTestingPlatformApp(source))
             {
                 return false;
             }

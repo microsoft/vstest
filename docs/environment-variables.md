@@ -127,11 +127,11 @@ This document lists environment variables that are currently handled by VSTest s
 
 ## Feature Control Variables (Opt-in Features)
 
-### VSTEST_OPTIN_MTP
+### VSTEST_ENABLE_MTP_TESTHOST
 - **Description**: Enables the experimental capability to discover and run Microsoft.Testing.Platform (MTP) test applications under VSTest.
 - **Default**: Disabled
 - **Values**: Set to any value other than `0` (for example `1`) to enable
-- **Example**: `VSTEST_OPTIN_MTP=1`
+- **Example**: `VSTEST_ENABLE_MTP_TESTHOST=1`
 
 ## Feature Control Variables (Disable Features)
 
