@@ -125,6 +125,14 @@ This document lists environment variables that are currently handled by VSTest s
 - **Description**: Specifies additional arguments to append to ProcDump command line.
 - **Example**: `VSTEST_DUMP_PROCDUMPADDITIONALARGUMENTS=-r`
 
+## Feature Control Variables (Opt-in Features)
+
+### VSTEST_OPTIN_MTP
+- **Description**: Enables the experimental capability to discover and run Microsoft.Testing.Platform (MTP) test applications under VSTest.
+- **Default**: Disabled
+- **Values**: Set to any value other than `0` (for example `1`) to enable
+- **Example**: `VSTEST_OPTIN_MTP=1`
+
 ## Feature Control Variables (Disable Features)
 
 ### VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING

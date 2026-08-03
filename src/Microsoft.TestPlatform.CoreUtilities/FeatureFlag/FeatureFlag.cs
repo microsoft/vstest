@@ -7,7 +7,11 @@ using System.Collections.Concurrent;
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
 /// <summary>
-/// !!!NEVER USE A FLAG TO ENABLE FUNCTIONALITY!!!
+/// !!!NEVER USE A FLAG TO ENABLE FUNCTIONALITY THAT IS READY TO SHIP!!!
+///
+/// Experimental functionality that must remain hidden can temporarily use a VSTEST_OPTIN_* flag.
+/// Remove the opt-in when the feature becomes the default, and add a VSTEST_DISABLE_* flag only if
+/// a rollback mechanism is still needed.
 ///
 /// The reasoning is:
 ///
@@ -78,7 +82,8 @@ internal partial class FeatureFlag : IFeatureFlag
     // Disable turning dynamic code coverage for native code to OFF by default. Setting this to 1 will skip adding the setting.
     public const string VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING = nameof(VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING);
 
-
+    // Opt in to running Microsoft.Testing.Platform applications under vstest while the integration is experimental.
+    public const string VSTEST_OPTIN_MTP = nameof(VSTEST_OPTIN_MTP);
 
     [Obsolete("Only use this in tests.")]
     internal static void Reset()

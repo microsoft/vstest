@@ -21,6 +21,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class MtpUnderVstestTests : AcceptanceTestBase
 {
+    private const string MtpOptInFeatureFlag = "VSTEST_OPTIN_MTP";
+
     // MtpMSTestProject is an MSTest project built as an MTP application (EnableMSTestRunner): three tests
     // pass, one fails, one is skipped.
     private const string MtpApp = "MtpMSTestProject.dll";
@@ -46,7 +48,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             runnerInfo.InIsolationValue,
             resultsDirectory: TempDirectory.Path);
 
-        InvokeVsTest(arguments);
+        InvokeVsTestWithMtpOptIn(arguments);
 
         ValidateSummaryStatus(3, 1, 1);
     }
@@ -68,7 +70,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             runnerInfo.InIsolationValue,
             resultsDirectory: TempDirectory.Path);
 
-        InvokeVsTest(arguments);
+        InvokeVsTestWithMtpOptIn(arguments);
 
         // Classic 1/1/1 + MTP 3/1/1 aggregated into one run summary.
         ValidateSummaryStatus(4, 2, 2);
@@ -92,7 +94,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:trx;LogFileName={trxFileName}");
 
-        InvokeVsTest(arguments);
+        InvokeVsTestWithMtpOptIn(arguments);
 
         ValidateSummaryStatus(4, 2, 2);
 
@@ -121,7 +123,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, " /Blame");
 
-        InvokeVsTest(arguments);
+        InvokeVsTestWithMtpOptIn(arguments);
 
         ValidateSummaryStatus(3, 1, 1);
     }
@@ -161,7 +163,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             ["CHECK_RUNSETTINGS_VAR"] = "1",
         };
 
-        InvokeVsTest(arguments, env);
+        InvokeVsTestWithMtpOptIn(arguments, env);
 
         // The guarded test passes only if MTP_FROM_RUNSETTINGS reached the host with the runsettings value.
         ValidateSummaryStatus(3, 1, 1);
@@ -187,7 +189,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:trx;LogFileName={trxFileName}");
 
-        InvokeVsTest(arguments);
+        InvokeVsTestWithMtpOptIn(arguments);
 
         // MtpMSTestProject has five test cases: three pass, one fails, one is skipped.
         ValidateSummaryStatus(3, 1, 1);
@@ -234,7 +236,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = collectorSourceDirectory,
         };
 
-        InvokeVsTest(arguments, env);
+        InvokeVsTestWithMtpOptIn(arguments, env);
 
         // The run must complete with the usual summary rather than hang at shutdown. MtpMSTestProject has
         // five test cases: three pass, one fails, one is skipped.
@@ -260,5 +262,12 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             .Where(file => !file.StartsWith(collectorSourceDirectoryPrefix, StringComparison.OrdinalIgnoreCase))
             .ToList();
         Assert.HasCount(5, testCaseAttachments, "Expected one per-test-case attachment for each started MtpMSTestProject test case forwarded on the MTP path.");
+    }
+
+    private void InvokeVsTestWithMtpOptIn(string arguments, Dictionary<string, string?>? environmentVariables = null)
+    {
+        environmentVariables ??= [];
+        environmentVariables[MtpOptInFeatureFlag] = "1";
+        InvokeVsTest(arguments, environmentVariables);
     }
 }
