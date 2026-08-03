@@ -1036,9 +1036,8 @@ public class TrxLoggerTests
         // XmlPersistenceTests covers the sanitizer in isolation, but the thing users report is
         // about the bytes that end up in the .trx. This goes through the whole logger - test
         // result in, real file out, re-parsed from disk - so it would also catch a regression
-        // that lives outside the sanitizer, such as XmlWriterSettings.CheckCharacters being
-        // flipped in PopulateTrxFile or a string reaching the DOM without going through
-        // SaveSimpleData.
+        // that lives outside the sanitizer, such as a string reaching the DOM without going
+        // through SaveSimpleData.
         const string testName = "party \U0001F389 done";
         const string stdOut = "output \U0001F389 here";
 

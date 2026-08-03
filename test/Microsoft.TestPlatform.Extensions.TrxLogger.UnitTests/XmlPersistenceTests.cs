@@ -49,6 +49,11 @@ public class XmlPersistenceTests
         XmlPersistence xmlPersistence = new();
         var node = xmlPersistence.CreateRootElement("TestRun");
 
+        // Unlike the sibling test below, expected here is the input itself, so a row whose
+        // text was mangled in transit would assert sanitize(mangled) == mangled and pass
+        // while proving nothing - U+FFFD is a valid XML character and survives sanitizing.
+        Assert.DoesNotContain("\ufffd", text, "A surrogate pair did not survive the data row transport - this row would assert nothing.");
+
         XmlPersistence.SaveObject(text, node, null, "dummy");
 
         Assert.AreEqual(text, node.InnerXml);
@@ -154,7 +159,9 @@ public class XmlPersistenceTests
     /// for it before the row reaches the test method. U+FFFD is itself a valid XML character,
     /// so every such row would silently degrade into an assertion that proves nothing. Only
     /// well-formed pairs survive the transport, which is why
-    /// <see cref="SaveObjectShouldNotReplaceValidText"/> can inline them.
+    /// <see cref="SaveObjectShouldNotReplaceValidText"/> can inline them - it asserts the same
+    /// way for the same reason, because its expected value is the input and would otherwise go
+    /// vacuous if the transport ever stopped round-tripping them.
     /// </remarks>
     private static string WithLoneSurrogates(string text)
     {
