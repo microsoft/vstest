@@ -21,7 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class MtpUnderVstestTests : AcceptanceTestBase
 {
-    private const string MtpTestHostEnableFeatureFlag = "VSTEST_ENABLE_MTP_TESTHOST";
+    private const string MtpTestHostDisableFeatureFlag = "VSTEST_DISABLE_MTP_TESTHOST";
 
     // MtpMSTestProject is an MSTest project built as an MTP application (EnableMSTestRunner): three tests
     // pass, one fails, one is skipped.
@@ -46,7 +46,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             resultsDirectory: TempDirectory.Path);
         var environmentVariables = new Dictionary<string, string?>
         {
-            [MtpTestHostEnableFeatureFlag] = "0",
+            [MtpTestHostDisableFeatureFlag] = "1",
         };
 
         InvokeVsTest(arguments, environmentVariables);
@@ -291,7 +291,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     private void InvokeVsTestWithMtpTestHostEnabled(string arguments, Dictionary<string, string?>? environmentVariables = null)
     {
         environmentVariables ??= [];
-        environmentVariables[MtpTestHostEnableFeatureFlag] = "1";
+        environmentVariables[MtpTestHostDisableFeatureFlag] = "0";
         InvokeVsTest(arguments, environmentVariables);
     }
 }

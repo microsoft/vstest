@@ -30,7 +30,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 /// <see cref="NotSupportedException"/>. Instead it:
 /// <list type="bullet">
 ///   <item><description>
-///     when <c>VSTEST_ENABLE_MTP_TESTHOST</c> is set, claims MTP sources via
+///     when <c>VSTEST_DISABLE_MTP_TESTHOST</c> is set to <c>0</c>, claims MTP sources via
 ///     <see cref="ISourceAwareTestRuntimeProvider"/> (source-aware detection using the build-time
 ///     Microsoft.Testing.Platform marker), so it is selected ahead of the generic testhost providers that match
 ///     only by target framework; and
@@ -80,7 +80,7 @@ public class MtpTestRuntimeProvider : ISourceAwareTestRuntimeProvider, IProxyMan
     // application. A mixed set (some MTP, some classic) is split into separate configurations upstream, so each
     // group asked here is homogeneous.
     bool ISourceAwareTestRuntimeProvider.CanExecuteCurrentRunConfiguration(string? runsettingsXml, IEnumerable<string> sources)
-        => FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_ENABLE_MTP_TESTHOST) && AllSourcesAreMicrosoftTestingPlatform(sources);
+        => !FeatureFlag.Instance.IsSet(FeatureFlag.VSTEST_DISABLE_MTP_TESTHOST) && AllSourcesAreMicrosoftTestingPlatform(sources);
 
     void ITestRuntimeProvider.SetCustomLauncher(ITestHostLauncher customLauncher)
     {
