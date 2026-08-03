@@ -34,31 +34,56 @@ public class XmlPersistenceTests
     }
 
     [TestMethod]
-    public void SaveObjectShouldNotReplaceAdjacentHighAndLowSurrogate()
+    // A well-formed surrogate pair encodes a character in [#x10000-#x10FFFF], which the XML
+    // spec lists as valid, so it must survive untouched - as must every ordinary BMP
+    // character. Escaping either of those is what this whole area of code got wrong.
+    [DataRow("", DisplayName = "empty string")]
+    [DataRow("Grüße 日本語 Čau", DisplayName = "non-ASCII BMP characters")]
+    [DataRow("party \U0001F389 done", DisplayName = "surrogate pair surrounded by ASCII")]
+    [DataRow("\ud800\udc00", DisplayName = "lowest surrogate pair, U+10000")]
+    [DataRow("\udbff\udfff", DisplayName = "highest surrogate pair, U+10FFFF")]
+    [DataRow("\U0001F389\U0001F389", DisplayName = "two consecutive surrogate pairs")]
+    [DataRow("\U0001F389", DisplayName = "surrogate pair is the entire string")]
+    public void SaveObjectShouldNotReplaceValidText(string text)
     {
-        // 0xd800 immediately followed by 0xdc00 is not two invalid characters - it is the
-        // UTF-16 encoding of U+10000, which the XML spec lists as valid. It must round-trip
-        // unescaped. This case used to be asserted the other way around.
         XmlPersistence xmlPersistence = new();
         var node = xmlPersistence.CreateRootElement("TestRun");
 
-        string validSurrogatePair = new(new[] { (char)0xd800, (char)0xdc00 });
-        XmlPersistence.SaveObject(validSurrogatePair, node, null, "dummy");
+        // Unlike the sibling test below, expected here is the input itself, so a row whose
+        // text was mangled in transit would assert sanitize(mangled) == mangled and pass
+        // while proving nothing - U+FFFD is a valid XML character and survives sanitizing.
+        Assert.DoesNotContain("\ufffd", text, "A surrogate pair did not survive the data row transport - this row would assert nothing.");
 
-        Assert.AreEqual(validSurrogatePair, node.InnerXml);
+        XmlPersistence.SaveObject(text, node, null, "dummy");
+
+        Assert.AreEqual(text, node.InnerXml);
     }
 
     [TestMethod]
-    public void SaveObjectShouldNotReplaceWellFormedSurrogatePairInElementText()
+    // Unlike a pair, a lone surrogate is not a valid Unicode scalar value and is not valid
+    // XML - XmlWriter would throw on it - so it must still be escaped. Allowing all of
+    // \uD800-\uDFFF through would be the naive fix and would trade a mangled-string bug for
+    // an unparseable-trx bug, which is worse because it breaks every consumer of the trx.
+    //
+    // {H} and {L} stand for a lone high and a lone low surrogate. They cannot be written
+    // into the row directly - see WithLoneSurrogates below.
+    [DataRow("a{H}b", @"a\ud800b", DisplayName = "lone high surrogate between valid characters")]
+    [DataRow("a{L}b", @"a\udc00b", DisplayName = "lone low surrogate between valid characters")]
+    [DataRow("{L}b", @"\udc00b", DisplayName = "low surrogate as the first character")]
+    [DataRow("ab{H}", @"ab\ud800", DisplayName = "high surrogate as the last character")]
+    [DataRow("{H}", @"\ud800", DisplayName = "high surrogate is the entire string")]
+    [DataRow("{H}{H}", @"\ud800\ud800", DisplayName = "two consecutive high surrogates")]
+    [DataRow("{L}{L}", @"\udc00\udc00", DisplayName = "two consecutive low surrogates")]
+    [DataRow("{L}{H}", @"\udc00\ud800", DisplayName = "low surrogate followed by high surrogate")]
+    [DataRow("\U0001F389{H}\v{L}", "\U0001F389" + @"\ud800\u000b\udc00", DisplayName = "valid pair, lone surrogates and a control character mixed")]
+    public void SaveObjectShouldReplaceLoneSurrogate(string text, string expected)
     {
-        // A surrogate pair encodes a character in [#x10000-#x10FFFF], which the XML spec
-        // lists as valid, so it must survive untouched. Here U+1F389 (🎉).
         XmlPersistence xmlPersistence = new();
         var node = xmlPersistence.CreateRootElement("TestRun");
 
-        XmlPersistence.SaveObject("party \U0001F389 done", node, null, "dummy");
+        XmlPersistence.SaveObject(WithLoneSurrogates(text), node, null, "dummy");
 
-        Assert.AreEqual("party \U0001F389 done", node.InnerXml);
+        Assert.AreEqual(expected, node.InnerXml);
     }
 
     [TestMethod]
@@ -70,67 +95,6 @@ public class XmlPersistenceTests
         xmlPersistence.SaveObject("party \U0001F389 done", node, "@testName", null);
 
         Assert.AreEqual("party \U0001F389 done", node.GetAttribute("testName"));
-    }
-
-    [TestMethod]
-    public void SaveObjectShouldReplaceLoneHighSurrogate()
-    {
-        // Unlike a pair, a lone high surrogate is not a valid Unicode scalar value and is
-        // not valid XML (XmlWriter would throw on it), so it must still be escaped.
-        XmlPersistence xmlPersistence = new();
-        var node = xmlPersistence.CreateRootElement("TestRun");
-
-        XmlPersistence.SaveObject("a" + (char)0xd800 + "b", node, null, "dummy");
-
-        Assert.AreEqual("a\\ud800b", node.InnerXml);
-    }
-
-    [TestMethod]
-    public void SaveObjectShouldReplaceLoneLowSurrogate()
-    {
-        // A low surrogate that is not preceded by a high surrogate is equally invalid.
-        XmlPersistence xmlPersistence = new();
-        var node = xmlPersistence.CreateRootElement("TestRun");
-
-        XmlPersistence.SaveObject((char)0xdc00 + "b", node, null, "dummy");
-
-        Assert.AreEqual("\\udc00b", node.InnerXml);
-    }
-
-    [TestMethod]
-    public void SaveObjectShouldReplaceHighSurrogateAtEndOfString()
-    {
-        // The pair-matching logic must not read past the end of the string.
-        XmlPersistence xmlPersistence = new();
-        var node = xmlPersistence.CreateRootElement("TestRun");
-
-        XmlPersistence.SaveObject("ab" + (char)0xd800, node, null, "dummy");
-
-        Assert.AreEqual("ab\\ud800", node.InnerXml);
-    }
-
-    [TestMethod]
-    public void SaveObjectShouldHandleMixOfValidPairLoneSurrogateAndInvalidCharacters()
-    {
-        XmlPersistence xmlPersistence = new();
-        var node = xmlPersistence.CreateRootElement("TestRun");
-
-        XmlPersistence.SaveObject("\U0001F389" + (char)0xd800 + "\v" + (char)0xdc00, node, null, "dummy");
-
-        // The pair is preserved; the lone high surrogate, the vertical tab and the
-        // trailing lone low surrogate are all escaped.
-        Assert.AreEqual("\U0001F389\\ud800\\u000b\\udc00", node.InnerXml);
-    }
-
-    [TestMethod]
-    public void SaveObjectShouldNotReplaceNonAsciiBmpCharacters()
-    {
-        XmlPersistence xmlPersistence = new();
-        var node = xmlPersistence.CreateRootElement("TestRun");
-
-        XmlPersistence.SaveObject("Grüße 日本語 Čau", node, null, "dummy");
-
-        Assert.AreEqual("Grüße 日本語 Čau", node.InnerXml);
     }
 
     [TestMethod]
@@ -183,5 +147,26 @@ public class XmlPersistenceTests
         XmlPersistence.SaveObject(strWithInvalidCharForXml, node, null, "dummy");
         string expectedResult = "This string has these \\u0000 \\u000b invalid characters";
         Assert.AreEqual(0, string.Compare(expectedResult, node.InnerXml));
+    }
+
+    /// <summary>
+    /// Substitutes the {H} and {L} placeholders used by <see cref="SaveObjectShouldReplaceLoneSurrogate"/>
+    /// with a lone high and a lone low surrogate respectively.
+    /// </summary>
+    /// <remarks>
+    /// A lone surrogate cannot be written into a <see cref="DataRowAttribute"/> directly: the
+    /// test platform's argument transport is not lone-surrogate safe and substitutes U+FFFD
+    /// for it before the row reaches the test method. U+FFFD is itself a valid XML character,
+    /// so every such row would silently degrade into an assertion that proves nothing. Only
+    /// well-formed pairs survive the transport, which is why
+    /// <see cref="SaveObjectShouldNotReplaceValidText"/> can inline them - it asserts the same
+    /// way for the same reason, because its expected value is the input and would otherwise go
+    /// vacuous if the transport ever stopped round-tripping them.
+    /// </remarks>
+    private static string WithLoneSurrogates(string text)
+    {
+        Assert.DoesNotContain("\ufffd", text, "Lone surrogates must be written as {H} or {L}, a literal one does not survive the data row transport.");
+
+        return text.Replace("{H}", "\ud800").Replace("{L}", "\udc00");
     }
 }
