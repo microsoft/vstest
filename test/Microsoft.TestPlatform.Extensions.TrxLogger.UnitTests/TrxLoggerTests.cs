@@ -1030,6 +1030,44 @@ public class TrxLoggerTests
         File.Delete(logger.TrxFile);
     }
 
+    [TestMethod]
+    public void TrxFileShouldPreserveAstralCharactersInTestNameAndStdOut()
+    {
+        // XmlPersistenceTests covers the sanitizer in isolation, but the thing users report is
+        // about the bytes that end up in the .trx. This goes through the whole logger - test
+        // result in, real file out, re-parsed from disk - so it would also catch a regression
+        // that lives outside the sanitizer, such as XmlWriterSettings.CheckCharacters being
+        // flipped in PopulateTrxFile or a string reaching the DOM without going through
+        // SaveSimpleData.
+        const string testName = "party \U0001F389 done";
+        const string stdOut = "output \U0001F389 here";
+
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "astral.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var pass = CreatePassTestResultEventArgsMock(testName, new List<TestResultMessage> { new(TestResultMessage.StandardOutCategory, stdOut) });
+        _testableTrxLogger.TestResultHandler(new object(), pass.Object);
+        _testableTrxLogger.TestRunCompleteHandler(new object(), CreateTestRunCompleteEventArgs());
+
+        var trxFile = _testableTrxLogger.TrxFile!;
+
+        // The emoji must be in the file as a real character, not as the literal text \ud83c\udf89.
+        var rawTrxContent = File.ReadAllText(trxFile);
+        Assert.Contains(testName, rawTrxContent, "The astral character in the test name was mangled on the way into the trx.");
+        Assert.DoesNotContain(@"\ud83c", rawTrxContent, "The astral character was escaped into literal text instead of being written as-is.");
+
+        // And the file must still be parseable, with the character surviving the round trip
+        // through both an attribute value and element text.
+        using FileStream file = File.OpenRead(trxFile);
+        using XmlReader reader = XmlReader.Create(file);
+        XDocument document = XDocument.Load(reader);
+        var ns = document.Root!.GetDefaultNamespace();
+
+        var resultNode = document.Descendants(ns + "UnitTestResult").First();
+        Assert.AreEqual(testName, resultNode.Attributes("testName").First().Value);
+        Assert.AreEqual(stdOut, resultNode.Descendants(ns + "StdOut").First().Value);
+    }
+
     private void ValidateTestIdAndNameInTrx()
     {
         TestCase testCase = CreateTestCase("TestCase");
