@@ -1068,6 +1068,35 @@ public class TrxLoggerTests
         Assert.AreEqual(stdOut, resultNode.Descendants(ns + "StdOut").First().Value);
     }
 
+    [TestMethod]
+    public void TrxFileShouldRemainParseableWhenTestNameContainsLoneSurrogate()
+    {
+        // The counterpart to the test above, and the reason the fix escapes lone surrogates
+        // instead of simply allowing all of \uD800-\uDFFF through. A lone surrogate is not a
+        // valid Unicode scalar value and XmlWriter throws on one, so escaping it is what keeps
+        // the trx writable and parseable at all. Letting it through would trade a bug that
+        // mangles one string for a bug that breaks every consumer of the file at read time.
+        const string testName = "lone \ud800 surrogate";
+
+        _parameters[TrxLoggerConstants.LogFileNameKey] = "lone-surrogate.trx";
+        _testableTrxLogger.Initialize(_events.Object, _parameters);
+
+        var pass = CreatePassTestResultEventArgsMock(testName);
+        _testableTrxLogger.TestResultHandler(new object(), pass.Object);
+        _testableTrxLogger.TestRunCompleteHandler(new object(), CreateTestRunCompleteEventArgs());
+
+        var trxFile = _testableTrxLogger.TrxFile!;
+        Assert.IsTrue(File.Exists(trxFile), "The trx must still be written when a test name contains a lone surrogate.");
+
+        using FileStream file = File.OpenRead(trxFile);
+        using XmlReader reader = XmlReader.Create(file);
+        XDocument document = XDocument.Load(reader);
+        var ns = document.Root!.GetDefaultNamespace();
+
+        var resultNode = document.Descendants(ns + "UnitTestResult").First();
+        Assert.AreEqual(@"lone \ud800 surrogate", resultNode.Attributes("testName").First().Value);
+    }
+
     private void ValidateTestIdAndNameInTrx()
     {
         TestCase testCase = CreateTestCase("TestCase");
