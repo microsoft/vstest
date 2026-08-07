@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 using Microsoft.VisualStudio.TestPlatform.Common;
+using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -696,5 +697,196 @@ public class CollectArgumentProcessorTests
             "  </DataCollectionRunSettings>",
             "</RunSettings>"), _settingsProvider.ActiveRunSettings!.SettingsXml);
     }
+    #endregion
+
+    #region TryGetCodeCoverageAdapterPath tests
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ReturnsFalse_WhenCcPackageDirectoryDoesNotExist()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsFalse(result);
+            Assert.IsNull(path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ReturnsFalse_WhenNoBuildDirectoryExists()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.0.0"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsFalse(result);
+            Assert.IsNull(path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ReturnsLatestVersion_WhenMultipleVersionsInstalled()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "17.12.0", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.0.0", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_PreReleaseSuffixStripperPicksHigherNumerics()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-preview-1", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // 18.6.0-preview-1 has a higher numeric version (18.6 > 18.5), so it wins even though it's a pre-release.
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-preview-1", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_StableBeatsPreReleaseWhenSameNumerics()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0-preview-1", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // Stable release wins over a pre-release with the same numeric version (NuGet SemVer: pre-release < release).
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryAddCodeCoverageAdapterPath_AddsPathToRunSettings_WhenCcPackageFound()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
+            Directory.CreateDirectory(buildDir);
+
+            var settingsProvider = new TestableRunSettingsProvider();
+            settingsProvider.AddDefaultRunSettings();
+
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
+
+            var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
+            Assert.IsTrue(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryAddCodeCoverageAdapterPath_SkipsInjection_WhenAdapterPathAlreadyPresent()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
+            Directory.CreateDirectory(buildDir);
+
+            var settingsProvider = new TestableRunSettingsProvider();
+            settingsProvider.AddDefaultRunSettings();
+
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
+
+            var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
+            Assert.AreEqual(1, CountOccurrences(xml, buildDir));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryAddCodeCoverageAdapterPath_SkipsInjection_WhenExplicitAdapterPathAlreadySet()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
+            Directory.CreateDirectory(buildDir);
+            var userPath = Path.Combine(tempDir, "my-custom-adapters");
+            Directory.CreateDirectory(userPath);
+
+            var settingsProvider = new TestableRunSettingsProvider();
+            settingsProvider.AddDefaultRunSettings();
+            settingsProvider.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, userPath);
+
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
+
+            var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
+            Assert.IsFalse(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase),
+                "Expected auto-injection to be skipped when the user has already configured adapter paths.");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    private static int CountOccurrences(string text, string pattern)
+    {
+        int count = 0;
+        int index = 0;
+        while ((index = text.IndexOf(pattern, index, StringComparison.OrdinalIgnoreCase)) >= 0)
+        {
+            count++;
+            index += pattern.Length;
+        }
+
+        return count;
+    }
+
     #endregion
 }

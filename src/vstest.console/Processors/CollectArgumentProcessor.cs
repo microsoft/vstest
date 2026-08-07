@@ -116,6 +116,15 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             throw new SettingsException(string.Format(CultureInfo.CurrentCulture, CommandLineResources.CollectWithTestSettingErrorMessage, argument));
         }
         AddDataCollectorToRunSettings(collectArgumentList, _runSettingsManager, _fileHelper, exceptionMessage);
+
+        if (string.Equals(collectArgumentList[0], MicrosoftCodeCoverageConstants.FriendlyName, StringComparison.OrdinalIgnoreCase))
+        {
+            // Auto-discover the Microsoft Code Coverage adapter from the NuGet global packages directory when
+            // --collect:"Code Coverage" is used in DLL mode (where the MSBuild task is never invoked and
+            // VSTestTraceDataCollectorDirectoryPath is never set). This is intentionally scoped to the
+            // --collect CLI path only; --enable-code-coverage relies on the project's MSBuild setup.
+            TryAddCodeCoverageAdapterPath(_runSettingsManager);
+        }
     }
 
     /// <summary>
@@ -291,6 +300,123 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     internal static void AddDataCollectorFriendlyName(string friendlyName)
     {
         EnabledDataCollectors.Add(friendlyName.ToLower(CultureInfo.CurrentCulture));
+    }
+
+    /// <summary>
+    /// Attempts to add the Microsoft Code Coverage adapter path to the run settings by
+    /// auto-discovering the <c>microsoft.codecoverage</c> NuGet package in the global packages directory.
+    /// No-ops silently when the package cannot be found.
+    /// </summary>
+    internal static void TryAddCodeCoverageAdapterPath(IRunSettingsProvider runSettingsManager, string? nugetPackagesOverride = null)
+    {
+        if (!TryGetCodeCoverageAdapterPath(out var ccAdapterPath, nugetPackagesOverride))
+        {
+            EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Microsoft.CodeCoverage package not found in NuGet global packages; skipping auto-injection.");
+            return;
+        }
+
+        var existingPathsRaw = runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath);
+        var existingPaths = existingPathsRaw.IsNullOrEmpty()
+            ? []
+            : existingPathsRaw.Split(';').Where(p => !p.IsNullOrEmpty()).ToList();
+
+        if (existingPaths.Count > 0)
+        {
+            // User explicitly configured adapter paths — don't clobber with auto-discovered NuGet path.
+            return;
+        }
+
+        existingPaths.Add(ccAdapterPath);
+        runSettingsManager.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, string.Join(";", existingPaths));
+        EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Injected Code Coverage adapter path '{0}'.", ccAdapterPath);
+    }
+
+    /// <summary>
+    /// Finds the <c>build/</c> directory of the latest installed <c>microsoft.codecoverage</c>
+    /// NuGet package. Returns <see langword="false"/> when no suitable package is found.
+    /// </summary>
+    internal static bool TryGetCodeCoverageAdapterPath([NotNullWhen(true)] out string? path, string? nugetPackagesOverride = null)
+    {
+        path = null;
+
+        var nugetPackagesPath = nugetPackagesOverride ?? GetNuGetGlobalPackagesPath();
+        if (nugetPackagesPath is null)
+        {
+            return false;
+        }
+
+        var ccPackagePath = Path.Combine(nugetPackagesPath, "microsoft.codecoverage");
+        if (!Directory.Exists(ccPackagePath))
+        {
+            return false;
+        }
+
+        string? bestPath = null;
+        Version? bestVersion = null;
+
+        foreach (var versionDir in Directory.GetDirectories(ccPackagePath))
+        {
+            var buildDir = Path.Combine(versionDir, "build");
+            if (!Directory.Exists(buildDir))
+            {
+                continue;
+            }
+
+            var version = ParseNuGetVersion(Path.GetFileName(versionDir));
+            if (version is null)
+            {
+                continue;
+            }
+
+            if (bestVersion is null || version > bestVersion)
+            {
+                bestVersion = version;
+                bestPath = buildDir;
+            }
+        }
+
+        path = bestPath;
+        return path is not null;
+    }
+
+    private static string? GetNuGetGlobalPackagesPath()
+    {
+        var envPath = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
+        if (!envPath.IsNullOrEmpty())
+        {
+            return envPath;
+        }
+
+        var userProfile = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
+        return userProfile.IsNullOrEmpty() ? null : Path.Combine(userProfile, ".nuget", "packages");
+    }
+
+    private static Version? ParseNuGetVersion(string versionName)
+    {
+        var dashIndex = versionName.IndexOf('-');
+        var isPreRelease = dashIndex >= 0;
+        var versionString = isPreRelease ? versionName.Substring(0, dashIndex) : versionName;
+        if (!Version.TryParse(versionString, out var version))
+        {
+            return null;
+        }
+
+        // Encode stability into the Revision field: stable = int.MaxValue, pre-release = 0.
+        // When the numeric portion differs (e.g. "18.6.0-preview-1" vs "18.5.0"), the higher numeric
+        // version wins as expected. When the numeric portion is identical (e.g. "18.5.0" vs "18.5.0-preview-1"),
+        // the stable release wins — matching NuGet SemVer semantics where pre-releases are less than their
+        // corresponding stable release.
+        return isPreRelease
+            ? new Version(version.Major, version.Minor, version.Build, 0)
+            : new Version(version.Major, version.Minor, version.Build, int.MaxValue);
+    }
+
+    internal static class MicrosoftCodeCoverageConstants
+    {
+        /// <summary>
+        /// Microsoft Code Coverage data collector friendly name.
+        /// </summary>
+        public const string FriendlyName = "Code Coverage";
     }
 
     internal static class CoverletConstants
