@@ -1,5 +1,5 @@
 # Efficiency Improver — vstest Repo Memory
-_Last updated: 2026-08-01_
+_Last updated: 2026-08-08_
 
 ## Build / Test Commands
 - Bootstrap + full build: `./build.sh` (downloads pinned .NET 11 SDK to `.dotnet/`)
@@ -47,7 +47,8 @@ _Last updated: 2026-08-01_
 - **XmlRunSettingsUtilities.ReaderSettings**: property creates new XmlReaderSettings on every call — MEDIUM fix
 - **GetRunConfigurationNode**: called 15+ times per run, each parsing XML — MEDIUM impact
 - **All hot-path allocations**: filter eval, IPC serialization/deserialization — fully optimized in prior runs
-- **Big wins likely only in**: reducing XML parse count (bundle into single pass), testhost R2R compilation
+- **NuGet.Frameworks code**: vendored, out of scope for efficiency changes
+- **MTP bridge** (new code): scanned 2026-08-08 — clean, no hot-path issues
 
 ## Optimization Backlog (sorted by priority)
 | Priority | Area | Opportunity | Notes |
@@ -58,15 +59,16 @@ _Last updated: 2026-08-01_
 ## Backlog Cursor
 - All key hot paths fully scanned (IPC serialization V1+V2, filter eval, discovery aggregator, test run cache, parallel runners)
 - TestRequestManager startup path: fully scanned — XML parsing redundancy is the main finding (MEDIUM)
-- InferHelper, TestPluginCache, FakesUtilities, TestLoggerManager, DiscovererEnumerator: scanned — no high-impact issues found
-- Unexplored: testhost process launch optimization (R2R compilation)
-- **Status after 2026-08-01 scan**: No new HIGH-impact items found. Recent commits (Jul 25–Aug 1) are bug fixes only.
+- MTP bridge code: scanned 2026-08-08 — no issues
+- NuGet.Frameworks: vendored, skip
+- **Status after 2026-08-08 scan**: No new HIGH-impact items found. Recent commits (Aug 1–8) are bug fixes only.
+- Next area to investigate: R2R (Ready-to-Run) compilation for testhost startup (but requires infrastructure change, not code change)
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
 - Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — CLOSED 2026-08-01
-- Issue #16XXX: [efficiency-improver] Monthly Activity 2026-08 — created 2026-08-01 (active)
-- Last run: 2026-08-01 (run ID 30709159430)
+- Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — active, updated 2026-08-08
+- Last run: 2026-08-08 (run ID 31267853095)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
