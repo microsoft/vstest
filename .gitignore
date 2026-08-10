@@ -110,9 +110,6 @@ ehthumbs.db
 
 *.dmp
 *.nupkg
-# Exception: the interim committed local feed for the unshipped source-only MTP client package
-# (Microsoft.Testing.Platform.ServerClient.Source). Remove once microsoft/testfx#10085 ships.
-!eng/local-mtp-feed/*.nupkg
 *.zip
 /src/package/sign/sign.nuget.targets
 

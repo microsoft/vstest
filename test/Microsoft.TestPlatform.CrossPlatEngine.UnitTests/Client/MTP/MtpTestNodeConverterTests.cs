@@ -18,7 +18,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 /// Unit tests for <see cref="MtpTestNodeConverter"/>.
 ///
 /// These pin the "normalized Node shape" contract the retarget onto
-/// Microsoft.Testing.Platform.ServerClient.Source depends on. Both formatter paths (Jsonite on
+/// Microsoft.Testing.Platform.ServerMode.Client.Sources depends on. Both formatter paths (Jsonite on
 /// net462/netstandard2.0, System.Text.Json on .NET) materialize every JSON object as a dictionary
 /// and every array as a collection, but they box numbers differently (int/long/double). The
 /// converter must therefore coerce numerics rather than hard-cast them, and these tests assert that
