@@ -397,14 +397,12 @@ public class HtmlLogger : ITestLoggerWithParameters
     {
         var executionIdProperty = testResult.Properties.FirstOrDefault(property =>
             property.Id.Equals(HtmlLoggerConstants.ExecutionIdPropertyIdentifier));
-        var executionId = Guid.Empty;
 
-        if (executionIdProperty != null)
-        {
-            executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
-        }
+        if (executionIdProperty is null)
+            return Guid.NewGuid();
 
-        return executionId.Equals(Guid.Empty) ? Guid.NewGuid() : executionId;
+        var executionId = testResult.GetPropertyValue(executionIdProperty, Guid.Empty);
+        return executionId == Guid.Empty ? Guid.NewGuid() : executionId;
     }
 
     /// <summary>

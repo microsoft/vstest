@@ -147,21 +147,27 @@ public class TrxLogger : ITestLoggerWithParameters
 
         var isLogFilePrefixParameterExists = parameters.TryGetValue(TrxLoggerConstants.LogFilePrefixKey, out _);
         var isLogFileNameParameterExists = parameters.TryGetValue(TrxLoggerConstants.LogFileNameKey, out _);
-        _warnOnFileOverwrite = parameters.TryGetValue(TrxLoggerConstants.WarnOnFileOverwrite, out string? warnOnOverwriteString)
-            ? bool.TryParse(warnOnOverwriteString, out bool providedValue)
-                ? providedValue
-                // We found the option but could not parse the value.
-                : true
-            // We did not find the option and want to fallback to warning on write, because that was the default before.
-            : true;
+        // Default is true (warn on overwrite). Only opt out when the option is explicitly set to false.
+        if (parameters.TryGetValue(TrxLoggerConstants.WarnOnFileOverwrite, out string? warnOnOverwriteString)
+            && bool.TryParse(warnOnOverwriteString, out bool parsedWarnOnOverwrite))
+        {
+            _warnOnFileOverwrite = parsedWarnOnOverwrite;
+        }
+        else
+        {
+            _warnOnFileOverwrite = true;
+        }
 
-        _treatErrorMessagesAsWarnings = parameters.TryGetValue(TrxLoggerConstants.TreatErrorMessagesAsWarnings, out string? treatErrorMessagesAsWarningsString)
-            ? bool.TryParse(treatErrorMessagesAsWarningsString, out bool treatErrorMessagesAsWarningsValue)
-                ? treatErrorMessagesAsWarningsValue
-                // We found the option but could not parse the value; preserve existing behavior.
-                : false
-            // We did not find the option, default to false to preserve existing behavior.
-            : false;
+        // Default is false. Only treat error messages as warnings when the option is explicitly set to true.
+        if (parameters.TryGetValue(TrxLoggerConstants.TreatErrorMessagesAsWarnings, out string? treatErrorMessagesAsWarningsString)
+            && bool.TryParse(treatErrorMessagesAsWarningsString, out bool parsedTreatAsWarnings))
+        {
+            _treatErrorMessagesAsWarnings = parsedTreatAsWarnings;
+        }
+        else
+        {
+            _treatErrorMessagesAsWarnings = false;
+        }
 
         if (isLogFilePrefixParameterExists && isLogFileNameParameterExists)
         {
@@ -675,16 +681,14 @@ public class TrxLogger : ITestLoggerWithParameters
     private ITestResult? GetTestResult(Guid executionId)
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
-        ITestResult? testResult = null;
 
-        if (executionId != Guid.Empty)
-        {
-            _results.TryGetValue(executionId, out testResult);
+        if (executionId == Guid.Empty)
+            return null;
 
-            if (testResult == null)
-                _innerResults.TryGetValue(executionId, out testResult);
-        }
+        if (_results.TryGetValue(executionId, out var testResult))
+            return testResult;
 
+        _innerResults.TryGetValue(executionId, out testResult);
         return testResult;
     }
 
@@ -846,16 +850,14 @@ public class TrxLogger : ITestLoggerWithParameters
     private TestEntry? GetTestEntry(Guid executionId)
     {
         TPDebug.Assert(IsInitialized, "Logger is not initialized");
-        TestEntry? testEntry = null;
 
-        if (executionId != Guid.Empty)
-        {
-            _entries.TryGetValue(executionId, out testEntry);
+        if (executionId == Guid.Empty)
+            return null;
 
-            if (testEntry == null)
-                _innerTestEntries.TryGetValue(executionId, out testEntry);
-        }
+        if (_entries.TryGetValue(executionId, out var testEntry))
+            return testEntry;
 
+        _innerTestEntries.TryGetValue(executionId, out testEntry);
         return testEntry;
     }
 
