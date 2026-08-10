@@ -22,10 +22,12 @@ public class SocketServer : ICommunicationEndPoint
 {
     private readonly CancellationTokenSource _cancellation;
     private readonly Func<Stream, ICommunicationChannel> _channelFactory;
+    private readonly object _stateSyncObject = new();
 
     private ICommunicationChannel? _channel;
     private TcpListener? _tcpListener;
     private TcpClient? _tcpClient;
+    private int _stopRequested;
     private bool _stopped;
     private string? _endPoint;
 
@@ -60,17 +62,25 @@ public class SocketServer : ICommunicationEndPoint
     {
         try
         {
-            _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
+            lock (_stateSyncObject)
+            {
+                if (_stopRequested != 0)
+                {
+                    throw new ObjectDisposedException(nameof(SocketServer));
+                }
 
-            _tcpListener.Start();
+                _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
 
-            _endPoint = _tcpListener.LocalEndpoint.ToString();
-            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
+                _tcpListener.Start();
 
-            // Serves a single client at the moment. An error in connection, or message loop just
-            // terminates the entire server.
-            _tcpListener.AcceptTcpClientAsync().ContinueWith(t => OnClientConnected(t.Result));
-            return _endPoint;
+                _endPoint = _tcpListener.LocalEndpoint.ToString();
+                EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
+
+                // Serves a single client at the moment. An error in connection, or message loop just
+                // terminates the entire server.
+                _ = AcceptClientAsync();
+                return _endPoint;
+            }
         }
         catch (SocketException ex)
         {
@@ -83,10 +93,54 @@ public class SocketServer : ICommunicationEndPoint
     public void Stop()
     {
         EqtTrace.Info("SocketServer.Stop: Stop server endPoint: {0}", _endPoint);
-        if (!_stopped)
+        lock (_stateSyncObject)
         {
+            if (_stopRequested != 0)
+            {
+                return;
+            }
+
+            _stopRequested = 1;
             EqtTrace.Info("SocketServer.Stop: Cancellation requested. Stopping message loop.");
-            _cancellation.Cancel();
+            try
+            {
+                _cancellation.Cancel();
+            }
+            catch (ObjectDisposedException)
+            {
+                // StopOnError disposed the cancellation source concurrently.
+            }
+
+            _tcpListener?.Stop();
+        }
+    }
+
+    private async Task AcceptClientAsync()
+    {
+        TcpClient? client = null;
+        try
+        {
+            client = await _tcpListener!.AcceptTcpClientAsync().ConfigureAwait(false);
+            lock (_stateSyncObject)
+            {
+                if (_stopRequested != 0)
+                {
+                    client.Close();
+                    return;
+                }
+
+                OnClientConnected(client);
+            }
+        }
+        catch (Exception ex) when (Volatile.Read(ref _stopRequested) != 0 && ex is ObjectDisposedException or SocketException)
+        {
+            EqtTrace.Verbose("SocketServer.AcceptClientAsync: Listener stopped before a client connected.");
+        }
+        catch (Exception ex)
+        {
+            EqtTrace.Error("SocketServer.AcceptClientAsync: Failed to accept a client: {0}", ex);
+            client?.Close();
+            Stop();
         }
     }
 

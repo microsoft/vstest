@@ -13,17 +13,16 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
 
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using Moq;
+
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
 [TestClass]
-[Ignore("Flaky")]
 public class SocketServerTests : SocketTestsBase, IDisposable
 {
     private readonly TcpClient _tcpClient;
     private readonly string _defaultConnection = IPAddress.Loopback.ToString() + ":0";
     private readonly ICommunicationEndPoint _socketServer;
-
-    public TestContext TestContext { get; set; }
 
     public SocketServerTests()
     {
@@ -53,41 +52,55 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     }
 
     [TestMethod]
-    public void SocketServerStopShouldStopListening()
+    public async Task SocketServerStopShouldStopListening()
     {
+        var connected = false;
+        _socketServer.Connected += (sender, eventArgs) => connected = true;
         var connectionInfo = _socketServer.Start(_defaultConnection);
 
         _socketServer.Stop();
 
+        var connectionFailed = false;
         try
         {
-            // This method throws ExtendedSocketException (which is private). It is not possible
-            // to use Assert.ThrowsException in this case.
-            ConnectToServer(connectionInfo.GetIpEndPoint().Port).GetAwaiter().GetResult();
+            await ConnectToServer(connectionInfo.GetIpEndPoint().Port);
         }
         catch (SocketException)
         {
+            connectionFailed = true;
         }
+
+        Assert.IsTrue(connectionFailed);
+        Assert.IsFalse(connected);
+    }
+
+    [TestMethod]
+    public void SocketServerStartShouldThrowAfterStop()
+    {
+        _socketServer.Stop();
+
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _socketServer.Start(_defaultConnection));
     }
 
     [TestMethod]
     public void SocketServerStopShouldCloseClient()
     {
-        ManualResetEvent waitEvent = new(false);
+        using ManualResetEventSlim waitEvent = new(false);
         _socketServer.Disconnected += (s, e) => waitEvent.Set();
         SetupChannel(out ConnectedEventArgs? clientConnected);
 
         _socketServer.Stop();
 
-        waitEvent.WaitOne();
-        Assert.ThrowsExactly<IOException>(() => WriteData(_tcpClient));
+        Assert.IsTrue(waitEvent.Wait(Timeout, TestContext.CancellationToken));
+        Assert.IsTrue(_tcpClient.Client.Poll(Timeout * 1000, SelectMode.SelectRead));
+        Assert.AreEqual(0, _tcpClient.Client.Available);
     }
 
     [TestMethod]
     public void SocketServerStopShouldRaiseClientDisconnectedEventOnClientDisconnection()
     {
         DisconnectedEventArgs? disconnected = null;
-        ManualResetEvent waitEvent = new(false);
+        using ManualResetEventSlim waitEvent = new(false);
         _socketServer.Disconnected += (s, e) =>
         {
             disconnected = e;
@@ -97,7 +110,7 @@ public class SocketServerTests : SocketTestsBase, IDisposable
 
         _socketServer.Stop();
 
-        waitEvent.WaitOne();
+        Assert.IsTrue(waitEvent.Wait(Timeout, TestContext.CancellationToken));
         Assert.IsNotNull(disconnected);
         Assert.IsNull(disconnected.Error);
     }
@@ -105,21 +118,27 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     [TestMethod]
     public void SocketServerStopShouldCloseChannel()
     {
-        var waitEvent = new ManualResetEventSlim(false);
-        var channel = SetupChannel(out ConnectedEventArgs? clientConnected);
-        _socketServer.Disconnected += (s, e) => waitEvent.Set();
+        var channel = new Mock<ICommunicationChannel>();
+        var socketServer = new TestSocketServer(_ => channel.Object);
+        using var waitEvent = new ManualResetEventSlim(false);
+        socketServer.Connected += (sender, eventArgs) => waitEvent.Set();
+        var connectionInfo = socketServer.Start(_defaultConnection);
+        ConnectToServer(connectionInfo.GetIpEndPoint().Port).GetAwaiter().GetResult();
+        Assert.IsTrue(waitEvent.Wait(Timeout, TestContext.CancellationToken));
+        waitEvent.Reset();
+        socketServer.Disconnected += (sender, eventArgs) => waitEvent.Set();
 
-        _socketServer.Stop();
+        socketServer.Stop();
 
-        waitEvent.Wait(TestContext.CancellationToken);
-        Assert.ThrowsExactly<CommunicationException>(() => channel!.Send(Dummydata));
+        Assert.IsTrue(waitEvent.Wait(Timeout, TestContext.CancellationToken));
+        channel.Verify(communicationChannel => communicationChannel.Dispose(), Times.Once);
     }
 
     [TestMethod]
     public void SocketServerShouldRaiseClientDisconnectedEventIfConnectionIsBroken()
     {
         DisconnectedEventArgs? clientDisconnected = null;
-        ManualResetEvent waitEvent = new(false);
+        using ManualResetEventSlim waitEvent = new(false);
         _socketServer.Disconnected += (sender, eventArgs) =>
         {
             clientDisconnected = eventArgs;
@@ -135,8 +154,8 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         // tcpClient.Close() calls tcpClient.Dispose().
         _tcpClient?.Close();
 
-        Assert.IsTrue(waitEvent.WaitOne(1000));
-        Assert.IsTrue(clientDisconnected!.Error is IOException);
+        Assert.IsTrue(waitEvent.Wait(Timeout, TestContext.CancellationToken));
+        Assert.IsNull(clientDisconnected!.Error);
     }
 
     [TestMethod]
@@ -153,7 +172,7 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     {
         ICommunicationChannel? channel = null;
         ConnectedEventArgs? clientConnectedEvent = null;
-        ManualResetEvent waitEvent = new(false);
+        using ManualResetEventSlim waitEvent = new(false);
         _socketServer.Connected += (sender, eventArgs) =>
         {
             clientConnectedEvent = eventArgs;
@@ -164,7 +183,7 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         var connectionInfo = _socketServer.Start(_defaultConnection);
         var port = connectionInfo.GetIpEndPoint().Port;
         ConnectToServer(port).GetAwaiter().GetResult();
-        waitEvent.WaitOne();
+        Assert.IsTrue(waitEvent.Wait(Timeout, TestContext.CancellationToken));
 
         connectedEvent = clientConnectedEvent;
         return channel;
@@ -176,4 +195,6 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
 #pragma warning restore MSTEST0049
     }
+
+    private sealed class TestSocketServer(Func<Stream, ICommunicationChannel> channelFactory) : SocketServer(channelFactory);
 }
