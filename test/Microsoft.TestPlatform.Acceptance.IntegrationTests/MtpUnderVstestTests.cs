@@ -110,7 +110,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
             resultsDirectory: TempDirectory.Path);
         arguments = string.Concat(arguments, $" /logger:trx;LogFileName={trxFileName}");
 
-        InvokeVsTest(arguments);
+        InvokeVsTestWithMtpTestHostEnabled(arguments);
 
         // The run completing at all is the primary assertion: a desynchronized frame corrupts the
         // messages that follow, so the counts would not add up.
