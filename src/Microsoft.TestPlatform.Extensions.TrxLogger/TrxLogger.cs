@@ -126,9 +126,9 @@ public class TrxLogger : ITestLoggerWithParameters
         _innerTestEntries = new ConcurrentDictionary<Guid, TestEntry>();
         _runLevelErrorsAndWarnings = new ConcurrentQueue<RunInfo>();
         LoggerTestRun = null;
-        TotalTestCount = 0;
-        PassedTestCount = 0;
-        FailedTestCount = 0;
+        _totalTestCount = 0;
+        _passedTestCount = 0;
+        _failedTestCount = 0;
         _runLevelStdOut = new ConcurrentQueue<string>();
         TestRunStartTime = DateTime.UtcNow;
 
@@ -231,11 +231,11 @@ public class TrxLogger : ITestLoggerWithParameters
     private int _passedTestCount;
     private int _failedTestCount;
 
-    internal int TotalTestCount { get => _totalTestCount; private set => _totalTestCount = value; }
+    internal int TotalTestCount => _totalTestCount;
 
-    internal int PassedTestCount { get => _passedTestCount; private set => _passedTestCount = value; }
+    internal int PassedTestCount => _passedTestCount;
 
-    internal int FailedTestCount { get => _failedTestCount; private set => _failedTestCount = value; }
+    internal int FailedTestCount => _failedTestCount;
 
     internal int TestResultCount
     {

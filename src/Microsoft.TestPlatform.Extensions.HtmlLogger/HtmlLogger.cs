@@ -87,22 +87,22 @@ public class HtmlLogger : ITestLoggerWithParameters
     /// <summary>
     /// Total passed tests in the test results.
     /// </summary>
-    public int PassedTests { get => _passedTests; private set => _passedTests = value; }
+    public int PassedTests => _passedTests;
 
     /// <summary>
     /// Total failed tests in the test results.
     /// </summary>
-    public int FailedTests { get => _failedTests; private set => _failedTests = value; }
+    public int FailedTests => _failedTests;
 
     /// <summary>
     /// Total tests in the results.
     /// </summary>
-    public int TotalTests { get => _totalTests; private set => _totalTests = value; }
+    public int TotalTests => _totalTests;
 
     /// <summary>
     /// Total skipped tests in the results.
     /// </summary>
-    public int SkippedTests { get => _skippedTests; private set => _skippedTests = value; }
+    public int SkippedTests => _skippedTests;
 
     /// <summary>
     /// Path to the xml file.
@@ -235,8 +235,6 @@ public class HtmlLogger : ITestLoggerWithParameters
                 break;
             case TestOutcome.Skipped:
                 Interlocked.Increment(ref _skippedTests);
-                break;
-            default:
                 break;
         }
 
