@@ -15,13 +15,20 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
     <ProjectReference Include="..\TestAssets\OutOfProcDataCollector\OutOfProcDataCollector.csproj"
-                      ReferenceOutputAssembly="false" />
+                      ReferenceOutputAssembly="false"
+                      OutputItemType="_OutOfProcDataCollector" />
 
     <Content Include="$(RepoRoot)src\datacollector\bin\$(Configuration)\$(TargetFramework)\datacollector*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="$(ArtifactsBinDir)TestAssets\OutOfProcDataCollector\$(Configuration)\netstandard2.0\OutOfProcDataCollector.dll">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
   </ItemGroup>
+
+  <Target Name="CopyOutOfProcDataCollector" AfterTargets="ResolveProjectReferences">
+    <Copy SourceFiles="@(_OutOfProcDataCollector)"
+          DestinationFolder="$(OutDir)"
+          SkipUnchangedFiles="true">
+      <Output TaskParameter="CopiedFiles"
+              ItemName="FileWrites" />
+    </Copy>
+  </Target>
 </Project>
