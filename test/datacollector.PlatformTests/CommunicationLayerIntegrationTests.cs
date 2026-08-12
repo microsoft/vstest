@@ -108,13 +108,21 @@ public class CommunicationLayerIntegrationTests
 
     private static void NotifyTestSessionEnded(int port)
     {
+        Assert.IsGreaterThan(0, port);
+
         var communicationManager = new SocketCommunicationManager();
-        communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
-        Assert.IsTrue(communicationManager.WaitForServerConnection(ProcessExitTimeoutMilliseconds));
-        communicationManager.SendMessage(MessageType.SessionEnd);
-        using var cancellationTokenSource = new CancellationTokenSource(ProcessExitTimeoutMilliseconds);
-        Assert.IsNull(communicationManager.ReceiveMessageAsync(cancellationTokenSource.Token).GetAwaiter().GetResult());
-        Assert.IsFalse(cancellationTokenSource.IsCancellationRequested);
-        communicationManager.StopClient();
+        try
+        {
+            communicationManager.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port));
+            Assert.IsTrue(communicationManager.WaitForServerConnection(ProcessExitTimeoutMilliseconds));
+            communicationManager.SendMessage(MessageType.SessionEnd);
+            using var cancellationTokenSource = new CancellationTokenSource(ProcessExitTimeoutMilliseconds);
+            Assert.IsNull(communicationManager.ReceiveMessageAsync(cancellationTokenSource.Token).GetAwaiter().GetResult());
+            Assert.IsFalse(cancellationTokenSource.IsCancellationRequested);
+        }
+        finally
+        {
+            communicationManager.StopClient();
+        }
     }
 }
