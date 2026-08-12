@@ -21,6 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 public class SocketServer : ICommunicationEndPoint
 {
     private readonly CancellationTokenSource _cancellation;
+    private readonly Func<TcpListener, Task<TcpClient>> _acceptClientAsync;
     private readonly Func<Stream, ICommunicationChannel> _channelFactory;
     private readonly object _stateSyncObject = new();
 
@@ -45,11 +46,19 @@ public class SocketServer : ICommunicationEndPoint
     /// </summary>
     /// <param name="channelFactory">Factory to create communication channel.</param>
     protected SocketServer(Func<Stream, ICommunicationChannel> channelFactory)
+        : this(channelFactory, tcpListener => tcpListener.AcceptTcpClientAsync())
+    {
+    }
+
+    internal SocketServer(
+        Func<Stream, ICommunicationChannel> channelFactory,
+        Func<TcpListener, Task<TcpClient>> acceptClientAsync)
     {
         // Used to cancel the message loop
         _cancellation = new CancellationTokenSource();
 
         _channelFactory = channelFactory;
+        _acceptClientAsync = acceptClientAsync;
     }
 
     /// <inheritdoc />
@@ -62,6 +71,7 @@ public class SocketServer : ICommunicationEndPoint
     {
         try
         {
+            TcpListener tcpListener;
             lock (_stateSyncObject)
             {
                 if (_stopRequested != 0)
@@ -72,15 +82,16 @@ public class SocketServer : ICommunicationEndPoint
                 _tcpListener = new TcpListener(endPoint.GetIpEndPoint());
 
                 _tcpListener.Start();
+                tcpListener = _tcpListener;
 
                 _endPoint = _tcpListener.LocalEndpoint.ToString();
                 EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", _endPoint);
-
-                // Serves a single client at the moment. An error in connection, or message loop just
-                // terminates the entire server.
-                _ = AcceptClientAsync();
-                return _endPoint;
             }
+
+            // Serves a single client at the moment. An error in connection, or message loop just
+            // terminates the entire server.
+            _ = AcceptClientAsync(tcpListener);
+            return _endPoint;
         }
         catch (SocketException ex)
         {
@@ -115,12 +126,12 @@ public class SocketServer : ICommunicationEndPoint
         }
     }
 
-    private async Task AcceptClientAsync()
+    private async Task AcceptClientAsync(TcpListener tcpListener)
     {
         TcpClient? client = null;
         try
         {
-            client = await _tcpListener!.AcceptTcpClientAsync().ConfigureAwait(false);
+            client = await _acceptClientAsync(tcpListener).ConfigureAwait(false);
             lock (_stateSyncObject)
             {
                 if (_stopRequested != 0)
@@ -129,8 +140,10 @@ public class SocketServer : ICommunicationEndPoint
                     return;
                 }
 
-                OnClientConnected(client);
+                _tcpClient = client;
             }
+
+            OnClientConnected(client);
         }
         catch (Exception ex) when (Volatile.Read(ref _stopRequested) != 0 && ex is ObjectDisposedException or SocketException)
         {
@@ -146,21 +159,20 @@ public class SocketServer : ICommunicationEndPoint
 
     private void OnClientConnected(TcpClient client)
     {
-        _tcpClient = client;
-        _tcpClient.Client.NoDelay = true;
+        client.Client.NoDelay = true;
 
         if (Connected == null)
         {
             return;
         }
 
-        _channel = _channelFactory(_tcpClient.GetStream());
+        _channel = _channelFactory(client.GetStream());
         Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketServer: ClientConnected");
 
         EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
 
         // Start the message loop
-        Task.Run(() => _tcpClient.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token)).ConfigureAwait(false);
+        Task.Run(() => client.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token)).ConfigureAwait(false);
     }
 
     /// <summary>

@@ -83,6 +83,54 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     }
 
     [TestMethod]
+    public async Task SocketServerStopShouldNotWaitForConnectedHandlerWhenAcceptCompletesSynchronously()
+    {
+        var channel = new Mock<ICommunicationChannel>();
+        using var tcpClient = new TcpClient();
+        var acceptingListener = new TcpListener(IPAddress.Loopback, 0);
+        acceptingListener.Start();
+        TcpClient acceptedClient;
+        try
+        {
+#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - ConnectAsync CancellationToken overload unavailable on .NET Framework
+            var acceptClientTask = acceptingListener.AcceptTcpClientAsync();
+            await tcpClient.ConnectAsync(IPAddress.Loopback, ((IPEndPoint)acceptingListener.LocalEndpoint).Port);
+            acceptedClient = await acceptClientTask;
+#pragma warning restore MSTEST0049
+        }
+        finally
+        {
+            acceptingListener.Stop();
+        }
+
+        var socketServer = new SocketServer(_ => channel.Object, _ => Task.FromResult(acceptedClient));
+        using var handlerEntered = new ManualResetEventSlim(false);
+        using var releaseHandler = new ManualResetEventSlim(false);
+        socketServer.Connected += (sender, eventArgs) =>
+        {
+            handlerEntered.Set();
+            Assert.IsTrue(releaseHandler.Wait(Timeout, TestContext.CancellationToken));
+        };
+
+        try
+        {
+            var startTask = Task.Run(() => socketServer.Start(_defaultConnection), TestContext.CancellationToken);
+            Assert.IsTrue(handlerEntered.Wait(Timeout, TestContext.CancellationToken));
+
+            var stopTask = Task.Run(socketServer.Stop, TestContext.CancellationToken);
+            Assert.IsTrue(stopTask.Wait(Timeout, TestContext.CancellationToken));
+            releaseHandler.Set();
+            Assert.IsTrue(startTask.Wait(Timeout, TestContext.CancellationToken));
+        }
+        finally
+        {
+            releaseHandler.Set();
+            socketServer.Stop();
+            acceptedClient.Close();
+        }
+    }
+
+    [TestMethod]
     public void SocketServerStopShouldCloseClient()
     {
         using ManualResetEventSlim waitEvent = new(false);
