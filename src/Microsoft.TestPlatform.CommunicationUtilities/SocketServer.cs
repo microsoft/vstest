@@ -131,7 +131,16 @@ public class SocketServer : ICommunicationEndPoint
         TcpClient? client = null;
         try
         {
-            client = await _acceptClientAsync(tcpListener).ConfigureAwait(false);
+            try
+            {
+                client = await _acceptClientAsync(tcpListener).ConfigureAwait(false);
+            }
+            catch (Exception ex) when (Volatile.Read(ref _stopRequested) != 0 && ex is ObjectDisposedException or SocketException or InvalidOperationException)
+            {
+                EqtTrace.Verbose("SocketServer.AcceptClientAsync: Listener stopped before a client connected: {0}", ex);
+                return;
+            }
+
             lock (_stateSyncObject)
             {
                 if (_stopRequested != 0)
@@ -144,10 +153,6 @@ public class SocketServer : ICommunicationEndPoint
             }
 
             OnClientConnected(client);
-        }
-        catch (Exception ex) when (Volatile.Read(ref _stopRequested) != 0 && ex is ObjectDisposedException or SocketException or InvalidOperationException)
-        {
-            EqtTrace.Verbose("SocketServer.AcceptClientAsync: Listener stopped before a client connected.");
         }
         catch (Exception ex)
         {

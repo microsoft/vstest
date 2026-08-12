@@ -86,22 +86,9 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     public async Task SocketServerStopShouldNotWaitForConnectedHandlerWhenAcceptCompletesSynchronously()
     {
         var channel = new Mock<ICommunicationChannel>();
-        using var tcpClient = new TcpClient();
-        var acceptingListener = new TcpListener(IPAddress.Loopback, 0);
-        acceptingListener.Start();
-        TcpClient acceptedClient;
-        try
-        {
-#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - ConnectAsync CancellationToken overload unavailable on .NET Framework
-            var acceptClientTask = acceptingListener.AcceptTcpClientAsync();
-            await tcpClient.ConnectAsync(IPAddress.Loopback, ((IPEndPoint)acceptingListener.LocalEndpoint).Port);
-            acceptedClient = await acceptClientTask;
-#pragma warning restore MSTEST0049
-        }
-        finally
-        {
-            acceptingListener.Stop();
-        }
+        var connectedClients = await CreateConnectedTcpClients();
+        using var tcpClient = connectedClients.Client;
+        using var acceptedClient = connectedClients.AcceptedClient;
 
         var socketServer = new SocketServer(_ => channel.Object, _ => Task.FromResult(acceptedClient));
         using var handlerEntered = new ManualResetEventSlim(false);
@@ -137,6 +124,38 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         {
             socketServer.Stop();
             acceptedClient.Close();
+        }
+    }
+
+    [TestMethod]
+    public async Task SocketServerShouldCloseAcceptedClientWhenChannelFactoryThrowsDuringStop()
+    {
+        var connectedClients = await CreateConnectedTcpClients();
+        using var tcpClient = connectedClients.Client;
+        using var acceptedClient = connectedClients.AcceptedClient;
+        using var channelFactoryCalled = new ManualResetEventSlim(false);
+        SocketServer? socketServer = null;
+        socketServer = new SocketServer(
+            _ =>
+            {
+                socketServer!.Stop();
+                channelFactoryCalled.Set();
+                throw new InvalidOperationException();
+            },
+            _ => Task.FromResult(acceptedClient));
+        socketServer.Connected += (sender, eventArgs) => { };
+
+        try
+        {
+            socketServer.Start(_defaultConnection);
+
+            Assert.IsTrue(channelFactoryCalled.Wait(Timeout, TestContext.CancellationToken));
+            Assert.IsTrue(tcpClient.Client.Poll(Timeout * 1000, SelectMode.SelectRead));
+            Assert.AreEqual(0, tcpClient.Client.Available);
+        }
+        finally
+        {
+            socketServer.Stop();
         }
     }
 
@@ -252,6 +271,31 @@ public class SocketServerTests : SocketTestsBase, IDisposable
 #pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - ConnectAsync CancellationToken overload unavailable on .NET Framework
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
 #pragma warning restore MSTEST0049
+    }
+
+    private static async Task<(TcpClient Client, TcpClient AcceptedClient)> CreateConnectedTcpClients()
+    {
+        var client = new TcpClient();
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        try
+        {
+#pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - overloads unavailable on .NET Framework
+            var acceptClientTask = listener.AcceptTcpClientAsync();
+            await client.ConnectAsync(IPAddress.Loopback, ((IPEndPoint)listener.LocalEndpoint).Port);
+            var acceptedClient = await acceptClientTask;
+#pragma warning restore MSTEST0049
+            return (client, acceptedClient);
+        }
+        catch
+        {
+            client.Close();
+            throw;
+        }
+        finally
+        {
+            listener.Stop();
+        }
     }
 
     private sealed class TestSocketServer(Func<Stream, ICommunicationChannel> channelFactory) : SocketServer(channelFactory);
