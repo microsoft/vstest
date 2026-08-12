@@ -14,8 +14,13 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
+    <ProjectReference Include="..\TestAssets\OutOfProcDataCollector\OutOfProcDataCollector.csproj"
+                      ReferenceOutputAssembly="false" />
 
     <Content Include="$(RepoRoot)src\datacollector\bin\$(Configuration)\$(TargetFramework)\datacollector*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="$(ArtifactsBinDir)TestAssets\OutOfProcDataCollector\$(Configuration)\netstandard2.0\OutOfProcDataCollector.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
