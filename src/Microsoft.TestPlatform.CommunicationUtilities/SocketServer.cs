@@ -145,7 +145,7 @@ public class SocketServer : ICommunicationEndPoint
 
             OnClientConnected(client);
         }
-        catch (Exception ex) when (Volatile.Read(ref _stopRequested) != 0 && ex is ObjectDisposedException or SocketException)
+        catch (Exception ex) when (Volatile.Read(ref _stopRequested) != 0 && ex is ObjectDisposedException or SocketException or InvalidOperationException)
         {
             EqtTrace.Verbose("SocketServer.AcceptClientAsync: Listener stopped before a client connected.");
         }

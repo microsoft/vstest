@@ -105,26 +105,36 @@ public class SocketServerTests : SocketTestsBase, IDisposable
 
         var socketServer = new SocketServer(_ => channel.Object, _ => Task.FromResult(acceptedClient));
         using var handlerEntered = new ManualResetEventSlim(false);
+        using var handlerExited = new ManualResetEventSlim(false);
         using var releaseHandler = new ManualResetEventSlim(false);
         socketServer.Connected += (sender, eventArgs) =>
         {
             handlerEntered.Set();
-            Assert.IsTrue(releaseHandler.Wait(Timeout, TestContext.CancellationToken));
+            releaseHandler.Wait(Timeout * 2, TestContext.CancellationToken);
+            handlerExited.Set();
         };
 
         try
         {
-            var startTask = Task.Run(() => socketServer.Start(_defaultConnection), TestContext.CancellationToken);
-            Assert.IsTrue(handlerEntered.Wait(Timeout, TestContext.CancellationToken));
+            Task<string?> startTask;
+            try
+            {
+                startTask = Task.Run(() => socketServer.Start(_defaultConnection), TestContext.CancellationToken);
+                Assert.IsTrue(handlerEntered.Wait(Timeout, TestContext.CancellationToken));
 
-            var stopTask = Task.Run(socketServer.Stop, TestContext.CancellationToken);
-            Assert.IsTrue(stopTask.Wait(Timeout, TestContext.CancellationToken));
-            releaseHandler.Set();
+                var stopTask = Task.Run(socketServer.Stop, TestContext.CancellationToken);
+                Assert.IsTrue(stopTask.Wait(Timeout, TestContext.CancellationToken));
+            }
+            finally
+            {
+                releaseHandler.Set();
+            }
+
+            Assert.IsTrue(handlerExited.Wait(Timeout, TestContext.CancellationToken));
             Assert.IsTrue(startTask.Wait(Timeout, TestContext.CancellationToken));
         }
         finally
         {
-            releaseHandler.Set();
             socketServer.Stop();
             acceptedClient.Close();
         }
