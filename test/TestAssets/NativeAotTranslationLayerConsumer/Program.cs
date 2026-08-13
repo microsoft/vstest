@@ -11,8 +11,12 @@
 // full call graph.
 
 using System;
+using System.Buffers;
+using System.Text.Json;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -44,4 +48,39 @@ Console.WriteLine($"DiscoveryRequestPayload sources: {string.Join(",", discovery
 var testRunPayload = new TestRunRequestPayload { Sources = ["test.dll"], RunSettings = "<RunSettings/>" };
 Console.WriteLine($"TestRunRequestPayload sources: {string.Join(",", testRunPayload.Sources!)}");
 
-Console.WriteLine("Done — if this published without IL2026/IL3050 warnings, AoT compatibility is verified.");
+var testSessionInfo = new TestSessionInfo();
+var discoveryCriteria = new DiscoveryCriteria(
+    ["test.dll"],
+    frequencyOfDiscoveredTestsEvent: 10,
+    discoveredTestEventTimeout: TimeSpan.FromSeconds(30),
+    runSettings: "<RunSettings/>",
+    testSessionInfo);
+
+var options = new JsonSerializerOptions
+{
+    TypeInfoResolver = TestPlatformJsonContext.Default,
+};
+options.Converters.Add(new TestSessionInfoConverter());
+options.Converters.Add(new DiscoveryCriteriaConverter());
+
+var converter = new DiscoveryCriteriaConverter();
+var buffer = new ArrayBufferWriter<byte>();
+using (var writer = new Utf8JsonWriter(buffer))
+{
+    converter.Write(writer, discoveryCriteria, options);
+}
+
+var reader = new Utf8JsonReader(buffer.WrittenSpan);
+reader.Read();
+var deserializedCriteria = converter.Read(ref reader, typeof(DiscoveryCriteria), options)
+    ?? throw new InvalidOperationException("DiscoveryCriteria deserialization returned null.");
+
+if (deserializedCriteria.TestSessionInfo?.Id != testSessionInfo.Id
+    || deserializedCriteria.FrequencyOfDiscoveredTestsEvent != discoveryCriteria.FrequencyOfDiscoveredTestsEvent
+    || deserializedCriteria.DiscoveredTestEventTimeout != discoveryCriteria.DiscoveredTestEventTimeout
+    || deserializedCriteria.RunSettings != discoveryCriteria.RunSettings)
+{
+    throw new InvalidOperationException("DiscoveryCriteria NativeAOT round trip did not preserve its values.");
+}
+
+Console.WriteLine("NativeAOT serialization round trip succeeded.");

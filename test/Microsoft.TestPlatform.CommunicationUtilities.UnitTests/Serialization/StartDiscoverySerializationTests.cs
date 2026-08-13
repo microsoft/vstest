@@ -173,6 +173,44 @@ public class StartDiscoverySerializationTests
         Assert.AreEqual("Category=Unit", result.TestCaseFilter);
     }
 
+    [TestMethod]
+    public void DeserializePayloadPreservesAdapterMapAndTestSessionInfo()
+    {
+        const string json = """
+            {
+              "Version": 7,
+              "MessageType": "TestDiscovery.Start",
+              "Payload": {
+                "Package": null,
+                "AdapterSourceMap": {
+                  "adapter-one": [ "one.dll" ],
+                  "adapter-two": [ "two.dll", "three.dll" ]
+                },
+                "FrequencyOfDiscoveredTestsEvent": 25,
+                "DiscoveredTestEventTimeout": "00:01:00",
+                "RunSettings": "<RunSettings />",
+                "TestCaseFilter": "Category=Fast",
+                "TestSessionInfo": {
+                  "Id": "7e9bc024-1bed-4ae8-80e8-a4cc947d8d3b"
+                }
+              }
+            }
+            """;
+
+        var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(json));
+        var result = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCriteria>(message);
+
+        Assert.IsNotNull(result);
+        Assert.HasCount(2, result.AdapterSourceMap);
+        CollectionAssert.AreEqual(new[] { "one.dll" }, result.AdapterSourceMap["adapter-one"].ToArray());
+        CollectionAssert.AreEqual(new[] { "two.dll", "three.dll" }, result.AdapterSourceMap["adapter-two"].ToArray());
+        Assert.AreEqual(25, result.FrequencyOfDiscoveredTestsEvent);
+        Assert.AreEqual(TimeSpan.FromMinutes(1), result.DiscoveredTestEventTimeout);
+        Assert.AreEqual("<RunSettings />", result.RunSettings);
+        Assert.AreEqual("Category=Fast", result.TestCaseFilter);
+        Assert.AreEqual(new Guid("7e9bc024-1bed-4ae8-80e8-a4cc947d8d3b"), result.TestSessionInfo?.Id);
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────
 
 }

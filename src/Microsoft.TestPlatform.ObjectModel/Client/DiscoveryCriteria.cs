@@ -149,7 +149,7 @@ public class DiscoveryCriteria
     /// </code>
     /// </summary>
     [DataMember]
-    public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; private set; }
+    public Dictionary<string, IEnumerable<string>> AdapterSourceMap { get; internal set; }
 
     /// <summary>
     /// Gets the frequency of discovered test event.
@@ -161,19 +161,19 @@ public class DiscoveryCriteria
     /// next set of tests, you may get more than 'FrequencyOfDiscoveredTestsEvent'.
     /// </remarks>
     [DataMember]
-    public long FrequencyOfDiscoveredTestsEvent { get; private set; }
+    public long FrequencyOfDiscoveredTestsEvent { get; internal set; }
 
     /// <summary>
     /// Gets the timeout that triggers the discovered test event regardless of cache size.
     /// </summary>
     [DataMember]
-    public TimeSpan DiscoveredTestEventTimeout { get; private set; }
+    public TimeSpan DiscoveredTestEventTimeout { get; internal set; }
 
     /// <summary>
     /// Gets the test settings used for the discovery request.
     /// </summary>
     [DataMember]
-    public string? RunSettings { get; private set; }
+    public string? RunSettings { get; internal set; }
 
     /// <summary>
     /// Gets or sets the criteria for filtering test cases.

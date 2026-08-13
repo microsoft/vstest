@@ -14,8 +14,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serializati
 
 /// <summary>
 /// JSON converter for <see cref="DiscoveryCriteria"/> that skips the computed <c>Sources</c> property
-/// (marked with <c>[IgnoreDataMember]</c>) during serialization and populates <c>AdapterSourceMap</c>
-/// and other private-setter properties via reflection during deserialization.
+/// (marked with <c>[IgnoreDataMember]</c>) during serialization.
 /// </summary>
 internal class DiscoveryCriteriaConverter : JsonConverter<DiscoveryCriteria>
 {
@@ -38,14 +37,13 @@ internal class DiscoveryCriteriaConverter : JsonConverter<DiscoveryCriteria>
         var testCaseFilter = root.TryGetProperty("TestCaseFilter", out var tcf) && tcf.ValueKind != JsonValueKind.Null ? tcf.GetString() : null;
         var testSessionInfo = DeserializeProperty<TestSessionInfo>(root, "TestSessionInfo", options);
 
-        var criteria = new DiscoveryCriteria();
-
-        // Set private-setter properties via reflection.
-        var type = typeof(DiscoveryCriteria);
-        type.GetProperty(nameof(DiscoveryCriteria.AdapterSourceMap))!.SetValue(criteria, adapterSourceMap);
-        type.GetProperty(nameof(DiscoveryCriteria.FrequencyOfDiscoveredTestsEvent))!.SetValue(criteria, frequency);
-        type.GetProperty(nameof(DiscoveryCriteria.DiscoveredTestEventTimeout))!.SetValue(criteria, timeout);
-        type.GetProperty(nameof(DiscoveryCriteria.RunSettings))!.SetValue(criteria, runSettings);
+        var criteria = new DiscoveryCriteria
+        {
+            AdapterSourceMap = adapterSourceMap!,
+            FrequencyOfDiscoveredTestsEvent = frequency,
+            DiscoveredTestEventTimeout = timeout,
+            RunSettings = runSettings,
+        };
 
         criteria.Package = package;
         criteria.TestCaseFilter = testCaseFilter;

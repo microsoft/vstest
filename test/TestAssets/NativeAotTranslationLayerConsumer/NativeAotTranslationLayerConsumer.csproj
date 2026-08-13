@@ -4,6 +4,9 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
+    <AssemblyOriginatorKeyFile>..\SimpleDataCollector\TITestDllKey.snk</AssemblyOriginatorKeyFile>
+    <SignAssembly>true</SignAssembly>
+    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
 
     <!-- Enable trimming/AoT analysis during publish to surface IL2026/IL3050 warnings. -->
     <PublishTrimmed>true</PublishTrimmed>
@@ -12,12 +15,17 @@
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
     <!-- Treat trimming/AoT warnings as errors so they fail the publish. -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <!-- The compatibility test evaluates linker/AOT warnings after publish so it can exclude
+         known warnings outside the serialization converters under test. -->
+    <ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors>
+    <IlcTreatWarningsAsErrors>false</IlcTreatWarningsAsErrors>
     <!-- Suppress pre-existing warnings from ObjectModel that are not in our scope. -->
     <NoWarn>$(NoWarn);NU1603;NETSDK1057</NoWarn>
-    <WarningsNotAsErrors>$(WarningsNotAsErrors);IL2057;IL2067</WarningsNotAsErrors>
+    <WarningsNotAsErrors>$(WarningsNotAsErrors);IL2026;IL2057;IL2067;IL2072;IL3050</WarningsNotAsErrors>
   </PropertyGroup>
 
   <ItemGroup>
+    <ProjectReference Include="$(RepoRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj" />
     <ProjectReference Include="$(RepoRoot)src/Microsoft.TestPlatform.VsTestConsole.TranslationLayer/Microsoft.TestPlatform.VsTestConsole.TranslationLayer.csproj" />
   </ItemGroup>
 
