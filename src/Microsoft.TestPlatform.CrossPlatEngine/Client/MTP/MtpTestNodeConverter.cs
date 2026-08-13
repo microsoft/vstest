@@ -67,8 +67,9 @@ internal static class MtpTestNodeConverter
 
     public static TestCase ToTestCase(MtpTestNodeUpdate update, string source)
     {
-        string uid = update.Uid ?? Guid.NewGuid().ToString();
-        string fullyQualifiedName = GetRawString(update, VsTestFullyQualifiedNameKey) ?? uid;
+        string? uid = update.Uid;
+        string fullyQualifiedName = GetRawString(update, VsTestFullyQualifiedNameKey)
+            ?? (uid is { Length: > 0 } ? uid : Guid.NewGuid().ToString());
         string executorUri = GetRawString(update, VsTestExecutorUriKey) ?? DefaultExecutorUri;
 
         var testCase = new TestCase(fullyQualifiedName, new Uri(executorUri), source)
@@ -76,7 +77,10 @@ internal static class MtpTestNodeConverter
             DisplayName = update.DisplayName ?? fullyQualifiedName,
         };
 
-        testCase.SetPropertyValue(MtpUidProperty, uid);
+        if (uid is { Length: > 0 })
+        {
+            testCase.SetPropertyValue(MtpUidProperty, uid);
+        }
 
         string? file = GetRawString(update, LocationFileKey);
         if (!string.IsNullOrEmpty(file))

@@ -8,6 +8,7 @@ using Microsoft.Testing.Platform.ServerMode.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -61,6 +62,15 @@ public class MtpProxyDiscoveryManagerTests
             },
             parentUid: null);
 
+    private static MtpTestNodeUpdate ActionNodeWithoutUid(string displayName)
+        => new(
+            new Dictionary<string, object?>
+            {
+                ["display-name"] = displayName,
+                ["node-type"] = "action",
+            },
+            parentUid: null);
+
     [TestMethod]
     public void DiscoverTestsReportsDiscoveredActionNodes()
     {
@@ -89,6 +99,37 @@ public class MtpProxyDiscoveryManagerTests
 
         Assert.IsTrue(_client.ExitCalled);
         Assert.IsTrue(_client.Disposed);
+    }
+
+    [TestMethod]
+    public void SelectedRunFailsWhenDiscoveredActionNodeHasNoUid()
+    {
+        _client.NodesToPush = [ActionNodeWithoutUid("MissingUid")];
+
+        List<TestCase>? discovered = null;
+        _eventHandler
+            .Setup(h => h.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback<IEnumerable<TestCase>>(tests => discovered = [.. tests]);
+
+        using (var discoveryManager = new MtpProxyDiscoveryManager())
+        {
+            discoveryManager.DiscoverTests(Criteria(), _eventHandler.Object);
+        }
+
+        Assert.IsNotNull(discovered);
+        Assert.HasCount(1, discovered);
+
+        var runClient = new FakeMtpServerClient();
+        MtpServerClientFactory.Launch = (_, _) => runClient;
+        var runEventHandler = new Mock<IInternalTestRunEventsHandler>();
+
+        using var executionManager = new MtpProxyExecutionManager();
+        executionManager.StartTestRun(new TestRunCriteria(discovered, 1), runEventHandler.Object);
+
+        Assert.IsNull(runClient.RunFilterUids, "No run may be requested for a node the server did not identify.");
+        runEventHandler.Verify(
+            h => h.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()),
+            Times.AtLeastOnce);
     }
 
     /// <summary>
