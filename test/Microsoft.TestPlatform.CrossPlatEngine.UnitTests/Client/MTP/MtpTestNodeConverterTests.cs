@@ -324,6 +324,24 @@ public class MtpTestNodeConverterTests
     }
 
     [TestMethod]
+    public void ToTestCaseRejectsFractionalLineNumberInsteadOfTruncating()
+    {
+        object[] fractionalValues = [42.5d, -13.25f, 7.1m];
+
+        foreach (object boxed in fractionalValues)
+        {
+            TestCase testCase = MtpTestNodeConverter.ToTestCase(
+                Node(("location.file", @"C:\src\MyTest.cs"), ("location.line-start", boxed)),
+                Source);
+
+            Assert.AreEqual(
+                -1,
+                testCase.LineNumber,
+                $"Fractional value {boxed} ({boxed.GetType().Name}) must not be truncated into a valid-looking line number.");
+        }
+    }
+
+    [TestMethod]
     public void ToTestCaseDoesNotThrowOnMalformedTraits()
     {
         TestCase notACollection = MtpTestNodeConverter.ToTestCase(Node(("traits", "nonsense")), Source);

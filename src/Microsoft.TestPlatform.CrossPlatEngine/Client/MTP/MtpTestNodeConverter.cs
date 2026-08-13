@@ -191,9 +191,9 @@ internal static class MtpTestNodeConverter
     /// <summary>
     /// Coerces a raw node value to <see cref="int"/>. The formatters box JSON numbers differently
     /// (int, long or double for the same wire value), so the value must be coerced rather than
-    /// cast. Values outside the <see cref="int"/> range are rejected rather than wrapped: a wrapped
-    /// line number is a plausible-looking wrong answer, whereas returning false leaves the caller's
-    /// property at its default and is visibly "not set".
+    /// cast. Fractional and out-of-range values are rejected rather than truncated or wrapped: a
+    /// changed line number is a plausible-looking wrong answer, whereas returning false leaves the
+    /// caller's property at its default and is visibly "not set".
     /// </summary>
     private static bool TryGetRawInt(MtpTestNodeUpdate update, string key, out int result)
     {
@@ -207,7 +207,9 @@ internal static class MtpTestNodeConverter
                 result = (int)l;
                 return true;
 
-            case double d when d is >= int.MinValue and <= int.MaxValue:
+            case double d
+                when d is >= int.MinValue and <= int.MaxValue
+                && d == Math.Truncate(d):
                 result = (int)d;
                 return true;
 
@@ -215,11 +217,14 @@ internal static class MtpTestNodeConverter
                 // (float)int.MaxValue rounds up to 2147483648f, so comparing a float against
                 // int.MaxValue directly lets that value through and the cast then saturates. Widen to
                 // double first so the bound is exact.
-                when (double)f is >= int.MinValue and <= int.MaxValue:
+                when (double)f is >= int.MinValue and <= int.MaxValue
+                && f == Math.Truncate(f):
                 result = (int)f;
                 return true;
 
-            case decimal m when m is >= int.MinValue and <= int.MaxValue:
+            case decimal m
+                when m is >= int.MinValue and <= int.MaxValue
+                && m == decimal.Truncate(m):
                 result = (int)m;
                 return true;
 
