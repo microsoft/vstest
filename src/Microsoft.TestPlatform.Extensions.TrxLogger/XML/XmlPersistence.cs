@@ -694,7 +694,8 @@ internal class XmlPersistence
             // the last character correctly falls through to the invalid branch below.
             if (char.IsSurrogatePair(str, i))
             {
-                builder?.Append(str[i]).Append(str[i + 1]);
+                // Copy both code units in a single call, they encode one character.
+                builder?.Append(str, i, 2);
                 i++;
                 continue;
             }
@@ -706,7 +707,8 @@ internal class XmlPersistence
                 continue;
             }
 
-            builder ??= new StringBuilder(str.Length).Append(str, 0, i);
+            // The valid prefix we skipped over is copied as part of construction.
+            builder ??= new StringBuilder(str, 0, i, GetInvalidXmlCharBuilderCapacity(str.Length));
             builder.Append(@"\u").Append(((ushort)c).ToString("x4", CultureInfo.InvariantCulture));
         }
 
@@ -715,6 +717,24 @@ internal class XmlPersistence
 
     private static bool IsValidXmlChar(char c)
         => c is '\x09' or '\x0A' or '\x0D' or (>= '\x20' and <= '\uD7FF') or (>= '\uE000' and <= '\uFFFD');
+
+    /// <summary>
+    /// Gets the capacity to give the <see cref="StringBuilder"/> used to escape invalid characters.
+    /// </summary>
+    /// <remarks>
+    /// We only ever allocate the builder because at least one code unit needs escaping, and every
+    /// escaped code unit expands from 1 char to the 6 chars of a \uXXXX sequence, so the original
+    /// length on its own is always too small and would force at least one growth. Reserving 50%
+    /// more covers the realistic case of a handful of invalid characters without over-allocating
+    /// for long strings. The comparison guards against overflowing <see cref="int"/> for very long
+    /// strings. This mirrors TrxReportEngine.GetInvalidXmlCharBuilderCapacity in testfx, which
+    /// solves the identical problem, so the two implementations stay comparable.
+    /// </remarks>
+    private static int GetInvalidXmlCharBuilderCapacity(int length)
+    {
+        int extraCapacity = length / 2;
+        return length <= int.MaxValue - extraCapacity ? length + extraCapacity : length;
+    }
 
     private XmlNode? EnsureLocationExists(XmlElement xml, string location, string? nameSpaceUri)
     {
