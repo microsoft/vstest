@@ -51,7 +51,7 @@ public class NativeAotCompatibilityTests
         var psi = new ProcessStartInfo
         {
             FileName = "dotnet",
-            Arguments = $"publish -r {rid} -v q --nologo",
+            Arguments = $"publish -c Release -r {rid} -v q --nologo",
             WorkingDirectory = TestAssetPath,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
