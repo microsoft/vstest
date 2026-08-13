@@ -406,20 +406,28 @@ internal static class JsoniteConvert
     {
         if (value is not IDictionary<string, object> dict) return null;
         var id = dict.TryGetValue("Id", out var o) && o != null ? Guid.Parse(o.ToString()!) : Guid.NewGuid();
-        return new TestSessionInfo(id);
+        return TestSessionInfoFactory.Create(id);
     }
 
     private static object? DeserializeDiscoveryCriteria(object? value)
     {
         if (value is not IDictionary<string, object> dict) return null;
-        var c = new DiscoveryCriteria();
-        if (dict.TryGetValue("AdapterSourceMap", out var asm) && asm != null) c.AdapterSourceMap = (Dictionary<string, IEnumerable<string>>)ConvertTo(asm, typeof(Dictionary<string, IEnumerable<string>>))!;
-        if (dict.TryGetValue("FrequencyOfDiscoveredTestsEvent", out var f) && f != null) c.FrequencyOfDiscoveredTestsEvent = Convert.ToInt64(f, CultureInfo.InvariantCulture);
-        if (dict.TryGetValue("DiscoveredTestEventTimeout", out var t) && t != null) c.DiscoveredTestEventTimeout = TimeSpan.Parse(t.ToString()!, CultureInfo.InvariantCulture);
-        if (dict.TryGetValue("RunSettings", out var rs) && rs != null) c.RunSettings = rs.ToString();
+        var adapterSourceMap = dict.TryGetValue("AdapterSourceMap", out var asm) && asm != null
+            ? (Dictionary<string, IEnumerable<string>>)ConvertTo(asm, typeof(Dictionary<string, IEnumerable<string>>))!
+            : [];
+        var frequency = dict.TryGetValue("FrequencyOfDiscoveredTestsEvent", out var f) && f != null
+            ? Convert.ToInt64(f, CultureInfo.InvariantCulture)
+            : default;
+        var timeout = dict.TryGetValue("DiscoveredTestEventTimeout", out var t) && t != null
+            ? TimeSpan.Parse(t.ToString()!, CultureInfo.InvariantCulture)
+            : default;
+        var runSettings = dict.TryGetValue("RunSettings", out var rs) && rs != null ? rs.ToString() : null;
+        var testSessionInfo = dict.TryGetValue("TestSessionInfo", out var tsi) && tsi != null
+            ? (TestSessionInfo?)DeserializeTestSessionInfo(tsi)
+            : null;
+        var c = DiscoveryCriteriaFactory.Create(adapterSourceMap, frequency, timeout, runSettings, testSessionInfo);
         if (dict.TryGetValue("Package", out var p) && p != null) c.Package = p.ToString();
         if (dict.TryGetValue("TestCaseFilter", out var tcf) && tcf != null) c.TestCaseFilter = tcf.ToString();
-        if (dict.TryGetValue("TestSessionInfo", out var tsi) && tsi != null) c.TestSessionInfo = (TestSessionInfo?)DeserializeTestSessionInfo(tsi);
         return c;
     }
 
@@ -461,14 +469,14 @@ internal static class JsoniteConvert
             : null;
         if (testCase is not null)
         {
-            return new DataCollectionContext(sessionId, testCase);
+            return CreateDataCollectionContext(sessionId, testCase);
         }
 
         var testExecId = dict.TryGetValue("TestExecId", out var testExecIdValue)
             ? (TestExecId?)DeserializeTestExecId(testExecIdValue)
             : null;
 
-        return new DataCollectionContext(sessionId, testExecId);
+        return CreateDataCollectionContext(sessionId, testExecId);
     }
 
     private static object? DeserializeTestExecutionContext(object? value)
@@ -484,6 +492,28 @@ internal static class JsoniteConvert
         if (dict.TryGetValue("TestCaseFilter", out var fi) && fi != null) c.TestCaseFilter = fi.ToString();
         if (dict.TryGetValue("FilterOptions", out var fo) && fo != null) c.FilterOptions = (FilterOptions?)ConvertTo(fo, typeof(FilterOptions));
         return c;
+    }
+
+    private static DataCollectionContext CreateDataCollectionContext(SessionId sessionId, TestExecId? testExecId)
+    {
+        var constructor = typeof(DataCollectionContext).GetConstructor(
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            [typeof(SessionId), typeof(TestExecId)],
+            modifiers: null)!;
+
+        return (DataCollectionContext)constructor.Invoke([sessionId, testExecId]);
+    }
+
+    private static DataCollectionContext CreateDataCollectionContext(SessionId sessionId, TestCase testCase)
+    {
+        var constructor = typeof(DataCollectionContext).GetConstructor(
+            BindingFlags.Instance | BindingFlags.NonPublic,
+            binder: null,
+            [typeof(SessionId), typeof(TestCase)],
+            modifiers: null)!;
+
+        return (DataCollectionContext)constructor.Invoke([sessionId, testCase]);
     }
 
     private static object? DeserializeTestProcessAttachDebuggerPayload(object? value)

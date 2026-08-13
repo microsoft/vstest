@@ -37,17 +37,15 @@ internal class DiscoveryCriteriaConverter : JsonConverter<DiscoveryCriteria>
         var testCaseFilter = root.TryGetProperty("TestCaseFilter", out var tcf) && tcf.ValueKind != JsonValueKind.Null ? tcf.GetString() : null;
         var testSessionInfo = DeserializeProperty<TestSessionInfo>(root, "TestSessionInfo", options);
 
-        var criteria = new DiscoveryCriteria
-        {
-            AdapterSourceMap = adapterSourceMap!,
-            FrequencyOfDiscoveredTestsEvent = frequency,
-            DiscoveredTestEventTimeout = timeout,
-            RunSettings = runSettings,
-        };
+        var criteria = DiscoveryCriteriaFactory.Create(
+            adapterSourceMap!,
+            frequency,
+            timeout,
+            runSettings,
+            testSessionInfo);
 
         criteria.Package = package;
         criteria.TestCaseFilter = testCaseFilter;
-        criteria.TestSessionInfo = testSessionInfo;
 
         return criteria;
     }

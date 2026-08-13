@@ -31,7 +31,7 @@ internal class TestSessionInfoConverter : JsonConverter<TestSessionInfo>
             ? idProp.GetGuid()
             : Guid.NewGuid();
 
-        return new TestSessionInfo(id);
+        return TestSessionInfoFactory.Create(id);
     }
 
     /// <inheritdoc/>

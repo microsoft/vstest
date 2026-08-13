@@ -211,6 +211,32 @@ public class StartDiscoverySerializationTests
         Assert.AreEqual(new Guid("7e9bc024-1bed-4ae8-80e8-a4cc947d8d3b"), result.TestSessionInfo?.Id);
     }
 
+    [TestMethod]
+    public void DeserializePayloadPreservesEmptyAdapterMap()
+    {
+        const string json = """
+            {
+              "Version": 7,
+              "MessageType": "TestDiscovery.Start",
+              "Payload": {
+                "Package": null,
+                "AdapterSourceMap": {},
+                "FrequencyOfDiscoveredTestsEvent": 25,
+                "DiscoveredTestEventTimeout": "00:01:00",
+                "RunSettings": null,
+                "TestCaseFilter": null,
+                "TestSessionInfo": null
+              }
+            }
+            """;
+
+        var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(json));
+        var result = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCriteria>(message);
+
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result.AdapterSourceMap);
+    }
+
     // ── Helpers ──────────────────────────────────────────────────────────
 
 }
