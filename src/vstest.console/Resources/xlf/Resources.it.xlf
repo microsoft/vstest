@@ -384,10 +384,10 @@
       <trans-unit id="PlatformArgumentHelp">
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
-      Valid values are x86, x64 and ARM.</source>
-        <target state="translated">--Platform|/Platform:&lt;Platform type&gt;
-       Architettura della piattaforma di destinazione da usare per l'esecuzione dei test. 
-       Valori validi: x86, x64 e ARM.</target>
+      Valid values are x86, x64, ARM, ARM64, S390x, Ppc64le, RiscV64 and LoongArch64.</source>
+        <target state="new">--Platform|/Platform:&lt;Platform type&gt;
+      Target platform architecture to be used for test execution. 
+      Valid values are x86, x64, ARM, ARM64, S390x, Ppc64le, RiscV64 and LoongArch64.</target>
         <note />
       </trans-unit>
       <trans-unit id="SwitchToIsolationInMultiTargetingMode">
@@ -398,12 +398,12 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are short names such as net48 and net10.0, or long names such as ".NETFramework,Version=v4.8" and ".NETCoreApp,Version=v10.0".
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
-      Versione di .NET Framework di destinazione da usare per l'esecuzione dei test. 
-      Valori validi: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" e così via.
-      Altri valori supportati: Framework40, Framework45, FrameworkCore10 e FrameworkUap10.</target>
+        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
+      Target .Net Framework version to be used for test execution. 
+      Valid values are short names such as net48 and net10.0, or long names such as ".NETFramework,Version=v4.8" and ".NETCoreApp,Version=v10.0".
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</target>
         <note />
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[Valore];[DumpType]=[Valore]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[Valore];[DumpType]=[Valore]
       Esegue il test in modalità di segnalazione errore. Questa opzione è utile per isolare il test problematico che causa l'arresto anomalo di Test Host.
       Crea nella directory corrente un file di output "Sequence.xml", che
       acquisisce l'ordine di esecuzione del test prima dell'arresto anomalo.
@@ -877,6 +877,7 @@
       Si può anche scegliere di eseguire l'override di questo comportamento predefinito usando alcuni parametri facoltativi:
       CollectAlways: per raccogliere il dump all'uscita anche in assenza di arresto anomalo (true/false) 
       DumpType: per specificare il tipo di dump (mini/full).
+      La raccolta di un dump di arresto anomalo in Windows richiede che procdump.exe e procdump64.exe siano disponibili nel PATH oppure in una directory indicata dalla variabile di ambiente PROCDUMP_PATH. Gli strumenti possono essere scaricati da https://docs.microsoft.com/sysinternals/downloads/procdump.
       Esempio: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
@@ -1168,16 +1169,6 @@
       <trans-unit id="RequestHandlerConnectionTimedOut">
         <source>Waiting for request handler connection timed out after {0} seconds.</source>
         <target state="translated">Timeout dell'attesa della connessione del gestore richieste dopo {0} secondi.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="StartTestSessionTimedOut">
-        <source>Waiting for start test session timed out after {0} seconds.</source>
-        <target state="translated">Timeout dell'attesa dell'avvio della sessione di test dopo {0} secondi.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="StopTestSessionTimedOut">
-        <source>Waiting for stop test session timed out after {0} seconds.</source>
-        <target state="translated">Timeout dell'attesa di arresto della sessione di test dopo {0} secondi.</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorHostingCommunicationChannel">

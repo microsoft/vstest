@@ -384,10 +384,10 @@
       <trans-unit id="PlatformArgumentHelp">
         <source>--Platform|/Platform:&lt;Platform type&gt;
       Target platform architecture to be used for test execution. 
-      Valid values are x86, x64 and ARM.</source>
-        <target state="translated">--Platform|/Platform:&lt;тип_платформы&gt;
-      Архитектура целевой платформы, в которой будут выполняться тесты. 
-      Допустимые значения: x86, x64 и ARM.</target>
+      Valid values are x86, x64, ARM, ARM64, S390x, Ppc64le, RiscV64 and LoongArch64.</source>
+        <target state="new">--Platform|/Platform:&lt;Platform type&gt;
+      Target platform architecture to be used for test execution. 
+      Valid values are x86, x64, ARM, ARM64, S390x, Ppc64le, RiscV64 and LoongArch64.</target>
         <note />
       </trans-unit>
       <trans-unit id="SwitchToIsolationInMultiTargetingMode">
@@ -398,12 +398,12 @@
       <trans-unit id="FrameworkArgumentHelp">
         <source>--Framework|/Framework:&lt;Framework Version&gt;
       Target .Net Framework version to be used for test execution. 
-      Valid values are ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" etc.
+      Valid values are short names such as net48 and net10.0, or long names such as ".NETFramework,Version=v4.8" and ".NETCoreApp,Version=v10.0".
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
-        <target state="translated">--Framework|/Framework:&lt;версия платформы&gt;
-      Целевая версия платформы .NET Framework, используемая для выполнения тестов. 
-      Допустимые значения: ".NETFramework,Version=v4.5.1", ".NETCoreApp,Version=v1.0" и т. п.
-      Другие поддерживаемые значения: Framework40, Framework45, FrameworkCore10 и FrameworkUap10.</target>
+        <target state="new">--Framework|/Framework:&lt;Framework Version&gt;
+      Target .Net Framework version to be used for test execution. 
+      Valid values are short names such as net48 and net10.0, or long names such as ".NETFramework,Version=v4.8" and ".NETCoreApp,Version=v10.0".
+      Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</target>
         <note />
       </trans-unit>
       <trans-unit id="FrameworkVersionRequired">
@@ -868,7 +868,7 @@
       Example: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</source>
-        <target state="needs-review-translation">--Blame|/Blame:[CollectDump];[CollectAlways]=[значение];[DumpType]=[значение]
+        <target state="translated">--Blame|/Blame:[CollectDump];[CollectAlways]=[значение];[DumpType]=[значение]
       Выполняет тест в blame-режиме. Этот вариант помогает изолировать проблемный тест, вызывающий сбой хоста для тестов.
       В текущем каталоге создается выходной файл "Sequence.xml",
       который записывает порядок выполнения теста перед сбоем.
@@ -877,6 +877,7 @@
       Вы также можете переопределить поведение по умолчанию с помощью дополнительных параметров:
       CollectAlways — собирает дамп по завершении даже при отсутствии сбоев (true/false) 
       DumpType — задает тип дампа, mini (мини-дамп) или full (полный).
+      Для создания дампа аварийного дампа в Windows необходимо, чтобы файлы procdump.exe и procdump64.exe находились в одном из каталогов, указанных в переменной окружения PATH, либо в каталоге, на который указывает переменная окружения PROCDUMP_PATH. Эти инструменты можно загрузить по адресу https://docs.microsoft.com/sysinternals/downloads/procdump.
       Пример: /Blame
                /Blame:CollectDump
                /Blame:CollectDump;CollectAlways=true;DumpType=full</target>
@@ -1168,16 +1169,6 @@
       <trans-unit id="RequestHandlerConnectionTimedOut">
         <source>Waiting for request handler connection timed out after {0} seconds.</source>
         <target state="translated">Время ожидания подключения обработчика запросов истекло через {0} с.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="StartTestSessionTimedOut">
-        <source>Waiting for start test session timed out after {0} seconds.</source>
-        <target state="translated">Время ожидания начала тестового сеанса истекло через {0} с.</target>
-        <note />
-      </trans-unit>
-      <trans-unit id="StopTestSessionTimedOut">
-        <source>Waiting for stop test session timed out after {0} seconds.</source>
-        <target state="translated">Время ожидания остановки тестового сеанса истекло через {0} с.</target>
         <note />
       </trans-unit>
       <trans-unit id="ErrorHostingCommunicationChannel">

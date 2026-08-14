@@ -223,9 +223,11 @@ internal abstract class BaseRunTests
                 // instantiated via reflection and its constructor throws. Unwrap that wrapper to the
                 // real exception so callers don't see the reflection noise. Any other exception is
                 // preserved as-is so its concrete type and stack trace are not lost on the way out.
-                Exception realException = ex is TargetInvocationException tie && tie.InnerException is not null
-                    ? tie.InnerException
-                    : ex;
+                Exception realException = ex switch
+                {
+                    TargetInvocationException { InnerException: { } inner } => inner,
+                    _ => ex,
+                };
                 exception = new Exception(realException.Message, realException);
                 isAborted = true;
             }
@@ -409,21 +411,33 @@ internal abstract class BaseRunTests
             // host by default.
             // Same goes if all adapters implement the new test executor interface but at
             // least one of them needs the test platform to attach to the default test host.
-            if (executor.Value is not ITestExecutor2
-                || ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, RunContext))
+            try
             {
-                EqtTrace.Verbose("Attaching to default test host.");
-
-                attachedToTestHost = true;
-#if NET
-                var pid = Environment.ProcessId;
-#else
-                var pid = Process.GetCurrentProcess().Id;
-#endif
-                if (!FrameworkHandle.AttachDebuggerToProcess(pid))
+                if (executor.Value is not ITestExecutor2
+                    || ShouldAttachDebuggerToTestHost(executor, executorUriExtensionTuple, RunContext))
                 {
-                    EqtTrace.Warning(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.AttachDebuggerToDefaultTestHostFailure, pid));
+                    EqtTrace.Verbose("Attaching to default test host.");
+
+                    attachedToTestHost = true;
+#if NET
+                    var pid = Environment.ProcessId;
+#else
+                    var pid = Process.GetCurrentProcess().Id;
+#endif
+                    if (!FrameworkHandle.AttachDebuggerToProcess(pid))
+                    {
+                        EqtTrace.Warning(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.AttachDebuggerToDefaultTestHostFailure, pid));
+                    }
                 }
+            }
+            catch (Exception ex)
+            {
+                // Accessing executor.Value instantiates the executor, which can throw for a rogue
+                // extension (for example one without a parameterless constructor). A failure to
+                // evaluate the debugger-attach condition for one executor must not abort processing
+                // of the remaining executors; the failure is surfaced per-executor in the execution
+                // loop below.
+                EqtTrace.Error("BaseRunTests.RunTestInternalWithExecutors: Failed to evaluate debugger attach for executor {0}: {1}", executorUriExtensionTuple.Item1.AbsoluteUri, ex);
             }
         }
 
