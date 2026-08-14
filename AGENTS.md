@@ -68,9 +68,9 @@ Test categories: Unit (fast, default), Smoke (P0 e2e), Acceptance (full e2e with
 
 ### Wrapper scripts pass arguments literally
 
-`build.cmd`, `test.cmd`, `restore.cmd`, `open-vs.cmd`, `open-code.cmd`, and `eng/RestoreInternal.cmd` invoke PowerShell with `-File`, so everything after the script path reaches `eng/build.ps1` as a literal argument.
+`build.cmd`, `test.cmd`, `restore.cmd`, `open-vs.cmd`, `open-code.cmd`, and `eng/RestoreInternal.cmd` invoke PowerShell with `-File`, so everything after the script path reaches the target script as a literal argument. The first five call `eng/build.ps1`, `eng/RestoreInternal.cmd` calls `eng/common/build.ps1`.
 
-They previously used `-command "& """%~dp0eng\Build.ps1""" %*"`, which spliced `%*` into a string that PowerShell then parsed as source code. That caused two problems, both fixed:
+They previously used the form `-command "& """<script>""" %*"`, which spliced `%*` into a string that PowerShell then parsed as source code. That caused two problems, both fixed:
 
 - `;` in an argument became a statement separator. `./test.cmd -projects "test\A\A.csproj;test\B\B.csproj"` ran `Build.ps1 -projects test\A\A.csproj` and then executed `test\B\B.csproj` as its own statement. On Windows `.csproj` is file-associated with Visual Studio, so every entry after the first opened a full IDE. Three agents ran this form at the same time and opened eighteen instances of Visual Studio.
 - Exit codes collapsed to `1`. `eng/build.ps1` ends with `exit $LastExitCode` to forward the real code, but `-command` discarded it, so `8` (filter matched no tests) and every other code arrived as `1`.
