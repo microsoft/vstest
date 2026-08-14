@@ -145,9 +145,7 @@ internal static class MtpTestNodeConverter
         => state switch
         {
             StatePassed => TestOutcome.Passed,
-            StateFailed => TestOutcome.Failed,
-            StateError => TestOutcome.Failed,
-            StateTimedOut => TestOutcome.Failed,
+            StateFailed or StateError or StateTimedOut => TestOutcome.Failed,
             StateSkipped => TestOutcome.Skipped,
             _ => TestOutcome.None,
         };
