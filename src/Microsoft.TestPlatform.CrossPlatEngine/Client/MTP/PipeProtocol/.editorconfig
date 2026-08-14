@@ -1,7 +1,0 @@
-# Vendored third-party code (YTest.MTP.PipeProtocol). It is maintained upstream and intentionally
-# kept as close to the original as possible, so the repo's StyleCop/analyzer/style rules are not
-# enforced here. Treating it as generated code makes the analyzers skip it; the blanket severity
-# override is a second layer so nothing is promoted to an error by TreatWarningsAsErrors.
-[*.cs]
-generated_code = true
-dotnet_analyzer_diagnostic.severity = none

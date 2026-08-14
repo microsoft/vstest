@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
-using System.Threading.Tasks;
 
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP.PipeProtocol;
+using Microsoft.Testing.Platform.ServerMode.Client;
+
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -17,12 +19,13 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
 /// <summary>
 /// An <see cref="IProxyExecutionManager"/> that runs tests by driving a Microsoft.Testing.Platform
-/// (MTP) application over the MTP <c>dotnettestcli</c> named-pipe protocol instead of the vstest
-/// testhost protocol.
+/// (MTP) application over the MTP JSON-RPC protocol instead of the vstest testhost protocol.
 /// </summary>
 internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDisposable
 {
@@ -61,7 +64,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
     /// <summary>
     /// Environment variables to inject into the MTP application process. Used to pass code coverage
-    /// profiler settings supplied by the data collector and the runsettings environment variables.
+    /// profiler settings supplied by the data collector.
     /// </summary>
     public IDictionary<string, string?>? EnvironmentVariables { get; set; }
 
@@ -169,7 +172,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         if (parameters?.EnvironmentVariables is { } dataCollectionEnvironmentVariables)
         {
-            EnvironmentVariables ??= new Dictionary<string, string?>();
+            EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
             foreach (KeyValuePair<string, string?> variable in dataCollectionEnvironmentVariables)
             {
                 EnvironmentVariables[variable.Key] = variable.Value;
@@ -311,111 +314,90 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         List<AttachmentSet> attachments,
         HashSet<string> executorUris)
     {
-        (string fileName, string baseArguments, string workingDirectory) = MtpLaunch.Resolve(source);
-
-        string arguments = baseArguments;
-        if (tests is { Count: > 0 })
+        MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions(EnvironmentVariables);
+        using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
+        client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
+        client.TestNodesUpdated += (_, e) =>
         {
-            arguments = $"{baseArguments} {BuildUidFilter(tests)}".TrimStart();
-        }
-
-        var mtpArtifacts = new AttachmentSet(new Uri(MtpConstants.DefaultExecutorUri), "Microsoft.Testing.Platform");
-        int processId = 0;
-
-        using var application = new TestApplication(fileName, arguments, workingDirectory, CopyEnvironmentVariables())
-        {
-            OnTestResult = message =>
+            var results = new List<TestResult>();
+            foreach (MtpTestNodeUpdate change in e.Changes)
             {
-                var results = new List<TestResult>();
-
-                foreach (SuccessfulTestResultMessage successful in message.SuccessfulTestMessages)
+                if (!MtpTestNodeConverter.IsActionNode(change))
                 {
-                    // A test entering the in-progress state is our "test started" signal. Forwarding it
-                    // lets per-test-case collectors (e.g. Blame) know which test is in flight, which is
-                    // what makes crash attribution work when the test never reaches a terminal state.
-                    if (MtpMessageConverter.IsInProgress(successful.State))
-                    {
-                        _testCaseEventForwarder?.NotifyTestCaseStart(
-                            MtpMessageConverter.ToTestCase(successful.Uid ?? Guid.NewGuid().ToString(), successful.DisplayName, source));
-                        continue;
-                    }
-
-                    TestResult result = MtpMessageConverter.ToTestResult(successful, source);
-                    _testCaseEventForwarder?.NotifyTestCaseEnd(result);
-                    results.Add(result);
+                    continue;
                 }
 
-                foreach (FailedTestResultMessage failed in message.FailedTestMessages)
+                string? state = change.ExecutionState;
+
+                if (EqtTrace.IsVerboseEnabled)
                 {
-                    TestResult result = MtpMessageConverter.ToTestResult(failed, source);
-                    _testCaseEventForwarder?.NotifyTestCaseEnd(result);
-                    results.Add(result);
+                    EqtTrace.Verbose("MtpProxyExecutionManager: node update uid={0} state={1}", change.Uid, state ?? "(none)");
                 }
 
-                if (results.Count == 0)
+                // A test entering the in-progress state is our "test started" signal. Forwarding it
+                // lets per-test-case collectors (e.g. Blame) know which test is in flight, which is
+                // what makes crash attribution work when the test never reaches a terminal state.
+                if (_testCaseEventForwarder is { } forwarder && MtpTestNodeConverter.IsInProgressState(state))
                 {
-                    return Task.CompletedTask;
+                    forwarder.NotifyTestCaseStart(MtpTestNodeConverter.ToTestCase(change, source));
+                    continue;
                 }
 
-                TestRunStatistics snapshot;
-                lock (aggregate.Lock)
+                if (!MtpTestNodeConverter.IsTerminalState(state))
                 {
-                    foreach (TestResult result in results)
-                    {
-                        aggregate.Add(result);
-                        if (result.TestCase.ExecutorUri is { } uri)
-                        {
-                            executorUris.Add(uri.ToString());
-                        }
-                    }
-
-                    snapshot = aggregate.Snapshot();
+                    continue;
                 }
 
-                eventHandler.HandleTestRunStatsChange(new TestRunChangedEventArgs(snapshot, results, null));
-                return Task.CompletedTask;
-            },
+                TestResult result = MtpTestNodeConverter.ToTestResult(change, source);
+                _testCaseEventForwarder?.NotifyTestCaseEnd(result);
+                results.Add(result);
+            }
 
-            // Files produced by the MTP application itself (e.g. a .coverage file) arrive as file
-            // artifacts. Surface them as a whole-run attachment set, mirroring the classic path where
-            // run-level attachments flow through the run complete payload.
-            OnFileArtifact = message =>
+            if (results.Count == 0)
             {
-                foreach (FileArtifactMessage artifact in message.FileArtifacts)
-                {
-                    if (string.IsNullOrEmpty(artifact.FullPath) || !TryCreateFileUri(artifact.FullPath!, out Uri? fileUri))
-                    {
-                        continue;
-                    }
+                return;
+            }
 
-                    string display = string.IsNullOrEmpty(artifact.DisplayName) ? Path.GetFileName(artifact.FullPath!) : artifact.DisplayName!;
-                    lock (mtpArtifacts)
+            TestRunStatistics snapshot;
+            lock (aggregate.Lock)
+            {
+                foreach (TestResult result in results)
+                {
+                    aggregate.Add(result);
+                    if (result.TestCase.ExecutorUri is { } uri)
                     {
-                        mtpArtifacts.Attachments.Add(new UriDataAttachment(fileUri!, display));
+                        executorUris.Add(uri.ToString());
                     }
                 }
 
-                return Task.CompletedTask;
-            },
+                snapshot = aggregate.Snapshot();
+            }
+
+            eventHandler.HandleTestRunStatsChange(new TestRunChangedEventArgs(snapshot, results, null));
         };
 
-        // Let the data collector (e.g. code coverage) know the process it should track once the MTP
-        // application has started. The profiler env vars were already injected via EnvironmentVariables.
-        Task AfterProcessStart(int pid)
+        // Let the data collector (e.g. code coverage) know the process it should track. The profiler
+        // env vars were already injected via the launch options above. Capture the id here rather than
+        // reading it again after the exit handshake, when the process may already be gone.
+        int processId = client.ProcessId;
+        _dataCollectionManager?.TestHostLaunched(processId);
+
+        try
         {
-            processId = pid;
-            _dataCollectionManager?.TestHostLaunched(pid);
-            return Task.CompletedTask;
+            client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+
+            // Awaiting the run request is sufficient: server-to-client messages arrive on a single ordered
+            // stream that the client reads sequentially and dispatches synchronously, so every node update
+            // has already been delivered by the time the request completes.
+            MtpRunResult runResult = (tests is { Count: > 0 }
+                ? client.RunTestsAsync(BuildUids(tests), _cancellationTokenSource.Token)
+                : client.RunTestsAsync(_cancellationTokenSource.Token)).GetAwaiter().GetResult();
+
+            CollectAttachments(runResult, attachments);
         }
-
-        application.RunAsync(AfterProcessStart, _cancellationTokenSource.Token).GetAwaiter().GetResult();
-
-        if (mtpArtifacts.Attachments.Count > 0)
+        finally
         {
-            lock (attachments)
-            {
-                attachments.Add(mtpArtifacts);
-            }
+            MtpServerClientFactory.TryExit(client);
         }
 
         return processId;
@@ -447,8 +429,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             return;
         }
 
-        EnvironmentVariables ??= new Dictionary<string, string?>(
-            Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+        EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
         foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
         {
             EnvironmentVariables[variable.Key] = variable.Value;
@@ -456,19 +437,87 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     }
 
     /// <summary>
-    /// Snapshots <see cref="EnvironmentVariables"/> into a read-only dictionary for the launcher, or
-    /// returns <see langword="null"/> when there is nothing to inject.
+    /// Creates the dictionary used to collect environment variables for the MTP application launch,
+    /// keyed case-insensitively on Windows (matching the classic testhost path) and case-sensitively
+    /// elsewhere, so callers that pass case-variant duplicate keys collapse the same way the classic
+    /// path did before the values reach the ordinal-keyed
+    /// <see cref="MtpServerClientOptions.EnvironmentVariables"/>.
     /// </summary>
-    private IReadOnlyDictionary<string, string?>? CopyEnvironmentVariables()
-        => EnvironmentVariables is { Count: > 0 }
-            ? new Dictionary<string, string?>(EnvironmentVariables)
-            : null;
+    private static Dictionary<string, string?> CreateEnvironmentVariablesDictionary()
+        => new(Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
 
-    private static string BuildUidFilter(List<TestCase> tests)
+    /// <summary>
+    /// Projects the tests selected for a filtered run onto the MTP node uids the server matches on.
+    /// </summary>
+    /// <exception cref="TestPlatformException">
+    /// A selected test carries no MTP node uid, so the run cannot be expressed.
+    /// </exception>
+    private static IReadOnlyCollection<string> BuildUids(List<TestCase> tests)
     {
-        IEnumerable<string> uids = tests
-            .Select(test => (string)test.GetPropertyValue(MtpMessageConverter.MtpUidProperty, test.FullyQualifiedName));
-        return $"--filter-uid {string.Join(" ", uids)}";
+        var uids = new List<string>(tests.Count);
+        foreach (TestCase test in tests)
+        {
+            string? uid = test.GetPropertyValue<string>(MtpTestNodeConverter.MtpUidProperty, null);
+
+            // The MTP server projects node.Uid alone when it builds a run filter and never reads
+            // DisplayName or any other field, so a TestCase without MTP.TestNode.Uid simply cannot be
+            // addressed. Substituting FullyQualifiedName here (as this method previously did) produces
+            // a filter the server matches nothing against: the run completes "successfully" having
+            // executed zero of the tests the user selected, with no error anywhere. Failing here turns
+            // that invisible wrong answer into a visible, actionable one. Do not reintroduce a
+            // fallback - there is no value that works other than the uid the server itself issued.
+            //
+            // This aborts the whole source rather than skipping the offending test: the caller reports
+            // the failure and marks the run aborted, which is deliberate. Silently running the
+            // addressable subset would recreate the same class of bug in a smaller form, reporting a
+            // partial run as if it were the run the user asked for.
+            if (uid.IsNullOrEmpty())
+            {
+                throw new TestPlatformException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        CrossPlatEngineResources.MtpTestCaseMissingNodeUid,
+                        test.DisplayName ?? test.FullyQualifiedName));
+            }
+
+            uids.Add(uid);
+        }
+
+        return uids;
+    }
+
+    private static void CollectAttachments(MtpRunResult runResult, List<AttachmentSet> attachments)
+    {
+        if (runResult.Artifacts.Count == 0)
+        {
+            return;
+        }
+
+        var set = new AttachmentSet(new Uri(MtpTestNodeConverter.DefaultExecutorUri), "Microsoft.Testing.Platform");
+        foreach (MtpAttachment artifact in runResult.Artifacts)
+        {
+            string? path = artifact.Uri;
+            if (string.IsNullOrEmpty(path))
+            {
+                continue;
+            }
+
+            if (!TryCreateFileUri(path!, out Uri? fileUri))
+            {
+                continue;
+            }
+
+            string display = artifact.DisplayName ?? Path.GetFileName(path!);
+            set.Attachments.Add(new UriDataAttachment(fileUri!, display));
+        }
+
+        if (set.Attachments.Count > 0)
+        {
+            lock (attachments)
+            {
+                attachments.Add(set);
+            }
+        }
     }
 
     private static bool TryCreateFileUri(string path, out Uri? uri)

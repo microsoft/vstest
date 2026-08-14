@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 
-using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP.PipeProtocol;
+using Microsoft.Testing.Platform.ServerMode.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -15,8 +15,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
 /// <summary>
 /// An <see cref="IProxyDiscoveryManager"/> that discovers tests by driving a
-/// Microsoft.Testing.Platform (MTP) application over the MTP <c>dotnettestcli</c> named-pipe protocol
-/// (<c>--list-tests</c>) instead of the vstest testhost protocol.
+/// Microsoft.Testing.Platform (MTP) application over the MTP JSON-RPC protocol instead of the
+/// vstest testhost protocol.
 /// </summary>
 internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDisposable
 {
@@ -85,25 +85,36 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
     {
         var discovered = new List<TestCase>();
 
-        (string fileName, string arguments, string workingDirectory) = MtpLaunch.Resolve(source);
-
-        using var application = new TestApplication(fileName, $"{arguments} --list-tests".TrimStart(), workingDirectory)
+        MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions();
+        using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
+        client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
+        client.TestNodesUpdated += (_, e) =>
         {
-            OnDiscovered = message =>
+            foreach (MtpTestNodeUpdate change in e.Changes)
             {
-                foreach (DiscoveredTestMessage discoveredTest in message.DiscoveredMessages)
+                if (MtpTestNodeConverter.IsActionNode(change))
                 {
                     lock (discovered)
                     {
-                        discovered.Add(MtpMessageConverter.ToTestCase(discoveredTest, source));
+                        discovered.Add(MtpTestNodeConverter.ToTestCase(change, source));
                     }
                 }
-
-                return System.Threading.Tasks.Task.CompletedTask;
-            },
+            }
         };
 
-        application.RunAsync(afterProcessStartCallback: null, _cancellationTokenSource.Token).GetAwaiter().GetResult();
+        try
+        {
+            client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+
+            // Awaiting the discover request is sufficient: server-to-client messages arrive on a single
+            // ordered stream that the client reads sequentially and dispatches synchronously, so every
+            // node notification has already been delivered by the time the request completes.
+            client.DiscoverTestsAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+        }
+        finally
+        {
+            MtpServerClientFactory.TryExit(client);
+        }
 
         List<TestCase> chunk;
         lock (discovered)
