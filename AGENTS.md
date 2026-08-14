@@ -49,6 +49,8 @@ vstest.console (entry point)
 
 CI builds use `-c Release`. Always build with Release config before submitting PRs.
 
+> On Windows, never put `;` (or `|`, `&`, `` ` ``, `$(...)`) in an argument to `build.cmd` / `test.cmd`. See [Build script argument injection](#build-script-argument-injection).
+
 ## Test Structure
 
 Test projects mirror source projects under `test/`:
@@ -62,6 +64,30 @@ src/vstest.console/                         → test/vstest.console.UnitTests/
 Test categories: Unit (fast, default), Smoke (P0 e2e), Acceptance (full e2e with `--integrationTest`).
 
 ## Known Gotchas
+
+### Build script argument injection
+
+`build.cmd` and `test.cmd` splice `%*` unquoted into a `powershell -command` string:
+
+```bat
+powershell -ExecutionPolicy ByPass -NoProfile -command "& """%~dp0eng\Build.ps1""" -test %*"
+```
+
+PowerShell then parses your arguments as source code, and `;` is a statement separator. So this:
+
+```
+./test.cmd -projects "a\a.csproj;b\b.csproj"
+```
+
+runs `Build.ps1 -projects a\a.csproj`, then executes `b\b.csproj` as a separate statement. On Windows `.csproj` is file-associated with Visual Studio, so each extra entry opens a full VS IDE instance. This is not hypothetical — one such command opened six copies of Visual Studio, and three agents doing it at once opened eighteen.
+
+Rules:
+
+- Pass one project name or one wildcard pattern per invocation: `./test.cmd -projects Microsoft.TestPlatform.CoreUtilities.UnitTests`.
+- To cover several projects, use a pattern that matches them, or call the script once per project in a loop.
+- Never pass `;`, `|`, `&`, backtick, or `$(...)` in any argument to these scripts.
+- More generally, never run a `.csproj` / `.sln` path as a command. The path is always an argument: `dotnet test <path>.csproj`, `dotnet build <path>.csproj`.
+- `build.sh` / `test.sh` do not have this problem, but keep argument style consistent across platforms.
 
 ### Binding Redirects
 
