@@ -9,6 +9,7 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Text.RegularExpressions;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
@@ -35,6 +36,14 @@ public class HtmlLogger : ITestLoggerWithParameters
     private readonly XmlObjectSerializer _xmlSerializer;
     private readonly IHtmlTransformer _htmlTransformer;
     private Dictionary<string, string?>? _parametersDictionary;
+
+    // Matches XML 1.0 invalid characters (excluding valid surrogate pairs).
+    // Valid chars per spec: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+    // The pattern allows valid high+low surrogate pairs to pass through unchanged;
+    // lone surrogates are treated as invalid.
+    private static readonly Regex InvalidXmlCharsRegex = new(
+        @"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\uD800-\uDFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?<![\uD800-\uDBFF])[\uDC00-\uDFFF]",
+        RegexOptions.Compiled);
 
     public HtmlLogger()
         : this(new FileHelper(), new HtmlTransformer(), new DataContractSerializer(typeof(TestRunDetails)))
@@ -160,21 +169,11 @@ public class HtmlLogger : ITestLoggerWithParameters
         switch (e.Level)
         {
             case TestMessageLevel.Informational:
-                if (TestRunDetails.RunLevelMessageInformational == null)
-                {
-                    TestRunDetails.RunLevelMessageInformational = new List<string>();
-                }
-
-                TestRunDetails.RunLevelMessageInformational.Add(e.Message);
+                TestRunDetails.AddInformationalMessage(e.Message);
                 break;
             case TestMessageLevel.Warning:
             case TestMessageLevel.Error:
-                if (TestRunDetails.RunLevelMessageErrorAndWarning == null)
-                {
-                    TestRunDetails.RunLevelMessageErrorAndWarning = new List<string>();
-                }
-
-                TestRunDetails.RunLevelMessageErrorAndWarning.Add(e.Message);
+                TestRunDetails.AddErrorOrWarningMessage(e.Message);
                 break;
             default:
                 EqtTrace.Info("htmlLogger.TestMessageHandler: The test message level is unrecognized: {0}",
@@ -195,10 +194,10 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         var testResult = new ObjectModel.TestResult
         {
-            DisplayName = e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName,
-            FullyQualifiedName = e.Result.TestCase.FullyQualifiedName,
-            ErrorStackTrace = e.Result.ErrorStackTrace,
-            ErrorMessage = e.Result.ErrorMessage,
+            DisplayName = RemoveInvalidXmlChars(e.Result.DisplayName ?? e.Result.TestCase.FullyQualifiedName),
+            FullyQualifiedName = RemoveInvalidXmlChars(e.Result.TestCase.FullyQualifiedName),
+            ErrorStackTrace = RemoveInvalidXmlChars(e.Result.ErrorStackTrace),
+            ErrorMessage = RemoveInvalidXmlChars(e.Result.ErrorMessage),
             TestResultId = e.Result.TestCase.Id,
             Duration = GetFormattedDurationString(e.Result.Duration),
             ResultOutcome = e.Result.Outcome
@@ -210,13 +209,19 @@ public class HtmlLogger : ITestLoggerWithParameters
         ResultCollectionDictionary.TryGetValue(e.Result.TestCase.Source, out var testResultCollection);
         if (testResultCollection == null)
         {
-            testResultCollection = new TestResultCollection(e.Result.TestCase.Source)
+            var newTestResultCollection = new TestResultCollection(e.Result.TestCase.Source)
             {
                 ResultList = new List<ObjectModel.TestResult>(),
                 FailedResultList = new List<ObjectModel.TestResult>(),
             };
-            ResultCollectionDictionary.TryAdd(e.Result.TestCase.Source, testResultCollection);
-            TestRunDetails.ResultCollectionList!.Add(testResultCollection);
+
+            // GetOrAdd is atomic: only the thread whose instance was actually stored publishes it
+            // to the result collection list, so no duplicate entries can appear there.
+            testResultCollection = ResultCollectionDictionary.GetOrAdd(e.Result.TestCase.Source, newTestResultCollection);
+            if (ReferenceEquals(testResultCollection, newTestResultCollection))
+            {
+                TestRunDetails.AddResultCollection(testResultCollection);
+            }
         }
 
         Interlocked.Increment(ref _totalTests);
@@ -240,12 +245,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         // Check for parent execution id to store the test results in hierarchical way
         if (parentExecutionId == Guid.Empty)
         {
-            if (e.Result.Outcome == TestOutcome.Failed)
-            {
-                testResultCollection.FailedResultList!.Add(testResult);
-            }
-
-            testResultCollection.ResultList!.Add(testResult);
+            testResultCollection.AddResult(testResult, e.Result.Outcome == TestOutcome.Failed);
         }
         else
         {
@@ -259,9 +259,7 @@ public class HtmlLogger : ITestLoggerWithParameters
 
         if (Results.TryGetValue(parentExecutionId, out var parentTestResult))
         {
-            parentTestResult.InnerTestResults ??= new List<ObjectModel.TestResult>();
-
-            parentTestResult.InnerTestResults.Add(testResult);
+            parentTestResult.AddInnerTestResult(testResult);
         }
     }
 
@@ -453,5 +451,28 @@ public class HtmlLogger : ITestLoggerWithParameters
         }
 
         return time.Count == 0 ? "< 1ms" : string.Join(" ", time);
+    }
+
+    /// <summary>
+    /// Removes characters that are invalid in XML 1.0 from a string.
+    /// </summary>
+    /// <remarks>
+    /// XML 1.0 valid characters: #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD].
+    /// Control characters in the range #x00-#x08, #x0B, #x0C, #x0E-#x1F are not valid and
+    /// will cause <see cref="DataContractSerializer"/> to throw an <see cref="System.Xml.XmlException"/>.
+    /// Invalid characters are replaced with their Unicode escape representation.
+    /// </remarks>
+    private static string? RemoveInvalidXmlChars(string? str)
+    {
+        if (str is null)
+        {
+            return null;
+        }
+
+        // From xml spec (http://www.w3.org/TR/xml/#charsets) valid chars:
+        // #x9 | #xA | #xD | [#x20-#xD7FF] | [#xE000-#xFFFD] | [#x10000-#x10FFFF]
+        // Valid surrogate pairs (representing U+10000–U+10FFFF) are allowed through unchanged;
+        // lone surrogates are replaced with their Unicode escape representation.
+        return InvalidXmlCharsRegex.Replace(str, m => $@"\u{(ushort)m.Value[0]:x4}");
     }
 }

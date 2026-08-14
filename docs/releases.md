@@ -1479,7 +1479,7 @@ See full log [here](https://github.com/microsoft/vstest/compare/v16.5.0-preview-
 * Correct name and link for RFC 17 [#2232](https://github.com/microsoft/vstest/pull/2232)
 
 See full log [here](https://github.com/microsoft/vstest/compare/v16.4.0...v16.5.0)
-See changes since the last preview [here](https://github.com/microsoft/vstest/compare/16.5.0-preview-20200203-01...v16.5.0)
+See changes since the last preview [here](https://github.com/microsoft/vstest/compare/v16.5.0-preview-20200203-01...v16.5.0)
 
 ### Drops
 
@@ -1906,7 +1906,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 
 ### Drops
 
-* TestPlatform vsix: [15.7.2]( https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.7/20180514-03;/TestPlatform.vsix)
+* TestPlatform vsix: [15.7.2](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.7/20180514-03;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.7.2](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.7.2)
 
 ## 15.7.0
@@ -1925,7 +1925,7 @@ See full log [here](https://github.com/Microsoft/vstest/compare/v16.5.0-preview-
 
 ### Drops
 
-* TestPlatform vsix: [15.7.0]( https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.7/20180403-02;/TestPlatform.vsix)
+* TestPlatform vsix: [15.7.0](https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.7/20180403-02;/TestPlatform.vsix)
 * Microsoft.TestPlatform.ObjectModel: [15.7.0](https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/15.7.0)
 
 ## 15.7.0-preview-20180320-02
