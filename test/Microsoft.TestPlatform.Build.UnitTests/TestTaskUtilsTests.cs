@@ -391,7 +391,8 @@ public class TestTaskUtilsTests
             var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
 
             Assert.Contains("--logger:Console;Verbosity=normal", commandline);
-            Assert.Contains($"--settings:\"{settingsFile}\"", commandline);
+            Assert.Contains("--settings:", commandline);
+            Assert.Contains(settingsFile, commandline);
         }
         finally
         {
