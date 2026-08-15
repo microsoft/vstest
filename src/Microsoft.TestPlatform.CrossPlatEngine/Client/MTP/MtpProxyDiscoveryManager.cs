@@ -31,7 +31,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
-        var sources = discoveryCriteria.Sources?.ToList() ?? new List<string>();
+        var sources = discoveryCriteria.Sources?.ToList() ?? [];
         long totalTests = 0;
         bool aborted = false;
 
