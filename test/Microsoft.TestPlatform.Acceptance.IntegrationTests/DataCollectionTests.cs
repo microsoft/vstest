@@ -249,10 +249,9 @@ public class DataCollectionTests : AcceptanceTestBase
 
         var assemblyPaths = GetAssetFullPath("DataDrivenTestProject.dll");
         string runSettings = GetRunsettingsFilePath(TempDirectory.Path);
-        string diagFileName = Path.Combine(TempDirectory.Path, "diaglog.txt");
         var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
         var arguments = PrepareArguments(assemblyPaths, null, runSettings, FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: TempDirectory.Path);
-        arguments = string.Concat(arguments, $" /Diag:{diagFileName}", $" /TestAdapterPath:{extensionsPath}");
+        arguments = string.Concat(arguments, $" /TestAdapterPath:{extensionsPath}");
 
         var env = new Dictionary<string, string?>
         {
