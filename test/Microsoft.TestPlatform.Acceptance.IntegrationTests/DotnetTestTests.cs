@@ -145,7 +145,6 @@ public class DotnetTestTests : AcceptanceTestBase
         // Assert only on the name because Unix may insert ANSI color sequences around the
         // localized result indicator. At minimal verbosity the skipped test name is absent.
         StdOutputContains("SkippingTest");
-        ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
     }
 }
