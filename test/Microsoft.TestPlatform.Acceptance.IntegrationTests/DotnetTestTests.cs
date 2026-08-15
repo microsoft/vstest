@@ -141,10 +141,10 @@ public class DotnetTestTests : AcceptanceTestBase
             $@"""{projectPath}"" --settings ""{runsettingsPath}"" -tl:off /p:VSTestUseMSBuildOutput=false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}",
             workingDirectory: Path.GetDirectoryName(projectPath));
 
-        // At normal verbosity the console logger prints individual passed test names.
+        // At normal verbosity the console logger prints individual skipped test names.
         // Assert only on the name because Unix may insert ANSI color sequences around the
-        // localized result indicator. At minimal verbosity the passing test name is absent.
-        StdOutputContains("PassingTest");
+        // localized result indicator. At minimal verbosity the skipped test name is absent.
+        StdOutputContains("SkippingTest");
         ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
     }
