@@ -7,6 +7,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Security;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
@@ -312,8 +313,9 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         // Ask the run settings first, so a run that already has adapter paths pays no file system cost.
         // An entry only counts when it is an actual path, a node holding nothing but whitespace is not
         // a configured path.
-        var existingPathsRaw = runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath);
-        if (!existingPathsRaw.IsNullOrWhiteSpace() && existingPathsRaw.Split(';').Any(p => !p.IsNullOrWhiteSpace()))
+        var existingPaths = TestAdapterPathArgumentExecutor.SplitPaths(
+            runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath));
+        if (existingPaths.Any(p => !p.IsNullOrWhiteSpace()))
         {
             // User explicitly configured adapter paths — don't clobber with auto-discovered NuGet path.
             return;
@@ -321,7 +323,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
         if (!TryGetCodeCoverageAdapterPath(out var ccAdapterPath, nugetPackagesOverride))
         {
-            EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Microsoft.CodeCoverage package not found in NuGet global packages; skipping auto-injection.");
+            EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Code Coverage adapter path not found; skipping auto-injection.");
             return;
         }
 
@@ -341,7 +343,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         {
             path = FindCodeCoverageAdapterPath(nugetPackagesOverride);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or SecurityException)
         {
             // Auto-discovery is best effort. A packages folder we are not allowed to read, a transient
             // IO error, or an unusable NUGET_PACKAGES value must not take down the whole run.
