@@ -616,4 +616,47 @@ public class EnableLoggersArgumentProcessorTests
 
         Assert.AreEqual(expectedSettingsXml, _runSettingsManager.ActiveRunSettings?.SettingsXml);
     }
+
+    [TestMethod]
+    public void ExecutorInitializeShouldPreserveExistingLoggerAttributesAndEnableTheLogger()
+    {
+        // Naming a logger on the command line enables it, but must not drop the attributes that
+        // only the settings file knows about.
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger friendlyName=""console"" codeBase=""c:\temp\custom.dll"" enabled=""False"">
+                        <Configuration>
+                          <Verbosity>normal</Verbosity>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+        var runSettings = new RunSettings();
+        runSettings.LoadSettingsXml(settingsXml);
+        _runSettingsManager.SetActiveRunSettings(runSettings);
+
+        var executor = new EnableLoggerArgumentExecutor(_runSettingsManager);
+        executor.Initialize("console");
+
+        string expectedSettingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-16""?>
+<RunSettings>
+  <LoggerRunSettings>
+    <Loggers>
+      <Logger friendlyName=""console"" codeBase=""c:\temp\custom.dll"" enabled=""True"">
+        <Configuration>
+          <Verbosity>normal</Verbosity>
+        </Configuration>
+      </Logger>
+    </Loggers>
+  </LoggerRunSettings>
+</RunSettings>";
+
+        Assert.AreEqual(expectedSettingsXml, _runSettingsManager.ActiveRunSettings?.SettingsXml);
+    }
 }

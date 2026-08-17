@@ -258,6 +258,9 @@ internal static class TestTaskUtils
 
     private static bool HasConsoleLoggerVerbosity(string settingsFile)
     {
+        // XDocument.Load resolves the path as a URI, so a malformed path throws UriFormatException
+        // (and ArgumentException on .NET Framework), neither of which derive from the exceptions
+        // caught below. File.Exists never throws, so it keeps a bad path from failing the build.
         if (!File.Exists(settingsFile))
         {
             return false;
@@ -328,11 +331,22 @@ internal static class TestTaskUtils
                         continue;
                     }
 
-                    foreach (var element in logger.Descendants())
+                    // Verbosity only counts as configured when it sits directly under Configuration,
+                    // which is where the console logger reads it from. Searching the whole subtree
+                    // would also match a Verbosity element belonging to some other logger's schema.
+                    foreach (var configuration in logger.Elements())
                     {
-                        if (element.Name.LocalName.Equals("Verbosity", StringComparison.OrdinalIgnoreCase))
+                        if (!configuration.Name.LocalName.Equals("Configuration", StringComparison.OrdinalIgnoreCase))
                         {
-                            return true;
+                            continue;
+                        }
+
+                        foreach (var element in configuration.Elements())
+                        {
+                            if (element.Name.LocalName.Equals("Verbosity", StringComparison.OrdinalIgnoreCase))
+                            {
+                                return true;
+                            }
                         }
                     }
                 }

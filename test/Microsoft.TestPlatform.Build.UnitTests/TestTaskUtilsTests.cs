@@ -348,6 +348,73 @@ public class TestTaskUtilsTests
     }
 
     [TestMethod]
+    public void CreateArgumentShouldNotInjectVerbosityWhenConfigurationElementCasingDiffers()
+    {
+        var settingsFile = CreateRunSettings("""
+            <RunSettings>
+              <LoggerRunSettings>
+                <Loggers>
+                  <Logger friendlyName="console">
+                    <configuration>
+                      <verbosity>normal</verbosity>
+                    </configuration>
+                  </Logger>
+                </Loggers>
+              </LoggerRunSettings>
+            </RunSettings>
+            """);
+
+        try
+        {
+            _vsTestTask.VSTestVerbosity = "minimal";
+            _vsTestTask.VSTestSetting = settingsFile;
+
+            var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+            Assert.DoesNotMatchRegex(new Regex("(--logger:Console;Verbosity=)"), commandline);
+            Assert.Contains("--logger:Console", commandline);
+        }
+        finally
+        {
+            File.Delete(settingsFile);
+        }
+    }
+
+    [TestMethod]
+    public void CreateArgumentShouldInjectVerbosityWhenVerbosityIsNotDirectlyUnderConfiguration()
+    {
+        // The console logger only reads Configuration/Verbosity. A Verbosity element that belongs
+        // to some other block under Logger must not suppress the MSBuild-derived verbosity.
+        var settingsFile = CreateRunSettings("""
+            <RunSettings>
+              <LoggerRunSettings>
+                <Loggers>
+                  <Logger friendlyName="console">
+                    <PluginOptions>
+                      <Verbosity>normal</Verbosity>
+                    </PluginOptions>
+                  </Logger>
+                </Loggers>
+              </LoggerRunSettings>
+            </RunSettings>
+            """);
+
+        try
+        {
+            _vsTestTask.VSTestVerbosity = "quiet";
+            _vsTestTask.VSTestSetting = settingsFile;
+
+            var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+            Assert.Contains("--logger:Console;Verbosity=quiet", commandline);
+        }
+        finally
+        {
+            File.Delete(settingsFile);
+        }
+    }
+
+    [TestMethod]
     public void CreateArgumentShouldInjectVerbosityWhenSettingsDoNotConfigureConsoleVerbosity()
     {
         var settingsFile = CreateRunSettings("""
