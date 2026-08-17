@@ -13,10 +13,10 @@
     <PublishAot>true</PublishAot>
     <!-- Report per-warning details, not just assembly-level roll-ups. -->
     <TrimmerSingleWarn>false</TrimmerSingleWarn>
-    <!-- Treat trimming/AoT warnings as errors so they fail the publish. -->
+    <!-- Compiler warnings fail the build. Trimming/AoT warnings deliberately do not: the publish has
+         to succeed so the compatibility test can read the warning list and assert on the subset that
+         comes from the serialization converters, ignoring the pre-existing ones elsewhere. -->
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <!-- The compatibility test evaluates linker/AOT warnings after publish so it can exclude
-         known warnings outside the serialization converters under test. -->
     <ILLinkTreatWarningsAsErrors>false</ILLinkTreatWarningsAsErrors>
     <IlcTreatWarningsAsErrors>false</IlcTreatWarningsAsErrors>
     <!-- Suppress pre-existing warnings from ObjectModel that are not in our scope. -->

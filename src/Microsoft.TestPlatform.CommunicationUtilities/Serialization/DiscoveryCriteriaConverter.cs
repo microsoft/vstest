@@ -29,7 +29,10 @@ internal class DiscoveryCriteriaConverter : JsonConverter<DiscoveryCriteria>
         using var doc = JsonDocument.ParseValue(ref reader);
         var root = doc.RootElement;
 
-        var adapterSourceMap = DeserializeProperty<Dictionary<string, IEnumerable<string>>>(root, "AdapterSourceMap", options);
+        // A payload that omits AdapterSourceMap, or sets it to null, still has to produce a usable
+        // DiscoveryCriteria — DiscoveryCriteria.Sources reads AdapterSourceMap.Values.
+        var adapterSourceMap = DeserializeProperty<Dictionary<string, IEnumerable<string>>>(root, "AdapterSourceMap", options)
+            ?? [];
         var frequency = DeserializeProperty<long>(root, "FrequencyOfDiscoveredTestsEvent", options);
         var timeout = DeserializeProperty<TimeSpan>(root, "DiscoveredTestEventTimeout", options);
         var runSettings = root.TryGetProperty("RunSettings", out var rs) && rs.ValueKind != JsonValueKind.Null ? rs.GetString() : null;
@@ -38,7 +41,7 @@ internal class DiscoveryCriteriaConverter : JsonConverter<DiscoveryCriteria>
         var testSessionInfo = DeserializeProperty<TestSessionInfo>(root, "TestSessionInfo", options);
 
         var criteria = DiscoveryCriteriaFactory.Create(
-            adapterSourceMap!,
+            adapterSourceMap,
             frequency,
             timeout,
             runSettings,

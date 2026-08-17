@@ -237,6 +237,48 @@ public class StartDiscoverySerializationTests
         Assert.IsEmpty(result.AdapterSourceMap);
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────
+    [TestMethod]
+    public void DeserializePayloadWithoutAdapterSourceMapProducesEmptyAdapterMap()
+    {
+        const string json = """
+            {
+              "Version": 7,
+              "MessageType": "TestDiscovery.Start",
+              "Payload": {
+                "FrequencyOfDiscoveredTestsEvent": 25,
+                "DiscoveredTestEventTimeout": "00:01:00"
+              }
+            }
+            """;
 
+        var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(json));
+        var result = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCriteria>(message);
+
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result.AdapterSourceMap);
+        Assert.IsEmpty(result.Sources);
+    }
+
+    [TestMethod]
+    public void DeserializePayloadWithNullAdapterSourceMapProducesEmptyAdapterMap()
+    {
+        const string json = """
+            {
+              "Version": 7,
+              "MessageType": "TestDiscovery.Start",
+              "Payload": {
+                "AdapterSourceMap": null,
+                "FrequencyOfDiscoveredTestsEvent": 25,
+                "DiscoveredTestEventTimeout": "00:01:00"
+              }
+            }
+            """;
+
+        var message = JsonDataSerializer.Instance.DeserializeMessage(Minify(json));
+        var result = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCriteria>(message);
+
+        Assert.IsNotNull(result);
+        Assert.IsEmpty(result.AdapterSourceMap);
+        Assert.IsEmpty(result.Sources);
+    }
 }

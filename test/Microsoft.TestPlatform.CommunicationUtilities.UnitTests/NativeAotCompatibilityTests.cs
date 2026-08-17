@@ -113,7 +113,9 @@ public class NativeAotCompatibilityTests
         var executableName = OperatingSystem.IsWindows()
             ? "NativeAotTranslationLayerConsumer.exe"
             : "NativeAotTranslationLayerConsumer";
-        var executablePath = Path.Combine(
+        // Normalize — Process.Start measures the path as given, so leaving the ".." segments in
+        // makes it exceed MAX_PATH on longer checkout paths and fail with "filename too long".
+        var executablePath = Path.GetFullPath(Path.Combine(
             TestAssetPath,
             "..",
             "..",
@@ -126,7 +128,10 @@ public class NativeAotCompatibilityTests
             "net8.0",
             rid,
             "publish",
-            executableName);
+            executableName));
+
+        Assert.IsTrue(File.Exists(executablePath), $"Published NativeAOT consumer not found at: {executablePath}");
+
         var runOutputBuilder = new StringBuilder();
         var runPsi = new ProcessStartInfo
         {
