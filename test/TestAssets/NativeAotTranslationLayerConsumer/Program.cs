@@ -3,20 +3,18 @@
 
 // Minimal consumer of the TranslationLayer API surface to exercise code paths
 // that must be AoT-safe. This app is published with PublishAot=true by the
-// NativeAotCompatibilityTests integration test — any IL2026/IL3050 linker
-// warnings will fail the publish and surface as test failures.
+// NativeAotCompatibilityTests integration test, which reads the IL warnings the
+// publish reports and asserts that none of them come from the serialization code.
 //
 // The app doesn't need to actually run against a vstest.console instance; it
 // just needs to reference enough API surface for the linker to analyze the
 // full call graph.
 
 using System;
-using System.Buffers;
-using System.Text.Json;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Serialization;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 
@@ -56,23 +54,12 @@ var discoveryCriteria = new DiscoveryCriteria(
     runSettings: "<RunSettings/>",
     testSessionInfo);
 
-var options = new JsonSerializerOptions
-{
-    TypeInfoResolver = TestPlatformJsonContext.Default,
-};
-options.Converters.Add(new TestSessionInfoConverter());
-options.Converters.Add(new DiscoveryCriteriaConverter());
-
-var converter = new DiscoveryCriteriaConverter();
-var buffer = new ArrayBufferWriter<byte>();
-using (var writer = new Utf8JsonWriter(buffer))
-{
-    converter.Write(writer, discoveryCriteria, options);
-}
-
-var reader = new Utf8JsonReader(buffer.WrittenSpan);
-reader.Read();
-var deserializedCriteria = converter.Read(ref reader, typeof(DiscoveryCriteria), options)
+// Round trip through the public serializer entry point, the same one vstest.console and testhost
+// use on the wire. It reaches TestPlatformJsonContext and the internal converters underneath, so
+// the linker still analyzes them, and this consumer needs no access to internals.
+var serialized = JsonDataSerializer.Instance.SerializePayload(MessageType.StartDiscovery, discoveryCriteria);
+var message = JsonDataSerializer.Instance.DeserializeMessage(serialized);
+var deserializedCriteria = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCriteria>(message)
     ?? throw new InvalidOperationException("DiscoveryCriteria deserialization returned null.");
 
 if (deserializedCriteria.TestSessionInfo?.Id != testSessionInfo.Id

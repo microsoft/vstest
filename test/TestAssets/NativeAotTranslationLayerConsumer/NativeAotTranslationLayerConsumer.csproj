@@ -4,9 +4,6 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <AssemblyOriginatorKeyFile>..\SimpleDataCollector\TITestDllKey.snk</AssemblyOriginatorKeyFile>
-    <SignAssembly>true</SignAssembly>
-    <PublicSign Condition="'$(OS)' != 'Windows_NT'">true</PublicSign>
 
     <!-- Enable trimming/AoT analysis during publish to surface IL2026/IL3050 warnings. -->
     <PublishTrimmed>true</PublishTrimmed>
