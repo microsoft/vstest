@@ -2,7 +2,23 @@
 description: Weekly automated link checker that finds and fixes broken links in documentation files
 on:
   schedule: weekly on Friday
-permissions: read-all
+permissions:
+  actions: read
+  attestations: read
+  checks: read
+  contents: read
+  copilot-requests: write
+  deployments: read
+  discussions: read
+  issues: read
+  models: read
+  packages: read
+  pages: read
+  pull-requests: read
+  repository-projects: read
+  security-events: read
+  statuses: read
+  vulnerability-alerts: read
 timeout-minutes: 60
 network:
   allowed:
@@ -43,8 +59,8 @@ steps:
         echo "Checking $file..."
         # Extract markdown links [text](url)
         grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' >> /tmp/gh-aw/agent/all-links.txt 2>/dev/null || true
-        # Extract plain HTTP(S) URLs
-        grep -oP 'https?://[^\s<>"]+' "$file" >> /tmp/gh-aw/agent/all-links.txt 2>/dev/null || true
+        # Extract plain HTTP(S) URLs from non-markdown-link text to avoid duplicates/trailing ')'
+        sed -E 's/\[[^]]+\]\(([^)]+)\)/ /g' "$file" | grep -oP 'https?://[^\s<>"]+' | awk '{ if (index($0,"(") == 0) sub(/\)$/, "", $0); print }' >> /tmp/gh-aw/agent/all-links.txt 2>/dev/null || true
       done
 
       # Remove duplicates and sort

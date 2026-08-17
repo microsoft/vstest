@@ -26,6 +26,15 @@ Sprawdź, czy:
 {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="NetFrameworkTestsNotSupportedOnNonWindows">
+        <source>Running .NET Framework tests is supported on Windows only.
+
+Running .NET Framework tests on this operating system relied on Mono, which is no longer supported. To run these tests, run them on Windows, or change the test project to target .NET instead of .NET Framework.</source>
+        <target state="translated">Uruchamianie testów platformy .NET Framework jest obsługiwane tylko w systemie Windows.
+
+Uruchamianie testów platformy .NET Framework w tym systemie operacyjnym opiera się na platformie Mono, która nie jest już obsługiwana. Aby uruchomić te testy, uruchom je w systemie Windows lub zmień projekt testowy na docelowy .NET zamiast .NET Framework.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToFindDepsFile">
         <source>Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</source>
         <target state="translated">Nie można znaleźć elementu {0}. Upewnij się, że projekt testowy ma odwołanie nuget do pakietu „Microsoft.NET.Test.Sdk”.</target>

@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -15,8 +16,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class LoggerTests : AcceptanceTestBase
 {
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -36,8 +36,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: Net)]
     public void HtmlLoggerWithFriendlyNameShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -57,8 +56,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: Net)]
     public void HtmlLoggerWithFriendlyNameContainsExpectedContent(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -85,7 +83,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -105,8 +103,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerWithLogFilePrefixShouldGenerateMultipleTrx(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -126,7 +123,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void HtmlLoggerWithExecutorUriShouldProperlyOverwriteFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -146,8 +143,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedIfNoTestsExecutedAndTreatNoTestsAsErrorIsTrue(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -169,8 +165,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerResultSummaryOutcomeValueShouldNotChangeIfNoTestsExecutedAndTreatNoTestsAsErrorIsFalse(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -185,6 +180,62 @@ public class LoggerTests : AcceptanceTestBase
         arguments = string.Concat(arguments, " -- RunConfiguration.TreatNoTestsAsError=false");
 
         InvokeVsTest(arguments);
+
+        string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
+
+        Assert.AreEqual("Completed", outcomeValue);
+    }
+
+    [TestMethod]
+    [TestMatrix(testHost: Net)]
+    public void TrxLoggerResultSummaryOutcomeValueShouldBeFailedWhenDataCollectorLogsError(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPath = GetSampleTestAssembly();
+        var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
+        var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
+
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /TestCaseFilter:PassingTest");
+        arguments = string.Concat(arguments, $" /Collect:SampleDataCollector");
+        arguments = string.Concat(arguments, $" /TestAdapterPath:{extensionsPath}");
+        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath}\"");
+
+        var env = new Dictionary<string, string?>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+        };
+
+        InvokeVsTest(arguments, env);
+
+        string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
+
+        Assert.AreEqual("Failed", outcomeValue);
+    }
+
+    [TestMethod]
+    [TestMatrix(testHost: Net)]
+    public void TrxLoggerResultSummaryOutcomeValueShouldBeCompletedWhenDataCollectorLogsErrorAndTreatErrorMessagesAsWarningsIsTrue(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var assemblyPath = GetSampleTestAssembly();
+        var extensionsPath = Path.GetDirectoryName(GetTestDllForFramework("OutOfProcDataCollector.dll", "netstandard2.0"));
+        var trxFilePath = Path.Combine(TempDirectory.Path, "TrxLogger.trx");
+
+        var arguments = PrepareArguments(assemblyPath, null, null, FrameworkArgValue, runnerInfo.InIsolationValue, TempDirectory.Path);
+        arguments = string.Concat(arguments, $" /TestCaseFilter:PassingTest");
+        arguments = string.Concat(arguments, $" /Collect:SampleDataCollector");
+        arguments = string.Concat(arguments, $" /TestAdapterPath:{extensionsPath}");
+        arguments = string.Concat(arguments, $" /logger:\"trx;LogFileName={trxFilePath};TreatErrorMessagesAsWarnings=true\"");
+
+        var env = new Dictionary<string, string?>
+        {
+            ["TEST_ASSET_SAMPLE_COLLECTOR_PATH"] = TempDirectory.Path,
+        };
+
+        InvokeVsTest(arguments, env);
 
         string? outcomeValue = GetElementAttributeValueFromTrx(trxFilePath, "ResultSummary", "outcome");
 
@@ -256,8 +307,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerShouldNotDoubleCountDataDrivenTestResults(RunnerInfo runnerInfo)
     {
         // Regression test for https://github.com/microsoft/vstest/issues/15643
@@ -288,8 +338,7 @@ public class LoggerTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void TrxLoggerShouldPlaceTrxFileInSubdirectoryWhenLogFileNameContainsPath(RunnerInfo runnerInfo)
     {
         // Regression test for https://github.com/microsoft/vstest/issues/15271

@@ -16,10 +16,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class ExecutionTests : AcceptanceTestBase
 {
-    //TODO: It looks like the first 3 tests would be useful to multiply by all 3 test frameworks, should we make the test even more generic, or duplicate them?
     [TestMethod]
+    // Compatibility matrix includes the .NET Framework runner/testhost, which is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
-    [MSTestCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Adapter)]
     public void RunMultipleTestAssemblies(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -35,8 +35,9 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Compatibility matrix includes the .NET Framework runner/testhost, which is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
-    [TestHostCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.TestHost)]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -52,8 +53,9 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // Compatibility matrix includes the .NET Framework runner/testhost, which is not available on Linux/macOS.
     [TestCategory("Windows-Review")]
-    [RunnerCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.VSTestConsole)]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations2(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -67,10 +69,8 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [TestCategory("Smoke")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true, useVsixRunner: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void RunMultipleMSTestAssembliesOnVstestConsoleAndTesthostCombinations3(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -87,8 +87,7 @@ public class ExecutionTests : AcceptanceTestBase
     // the two respective versions together (e.g. latest xunit and latest mstest), but does using two different test
     // frameworks have any added value over using 2 mstest dlls?
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void RunMultipleTestAssembliesWithoutTestAdapterPath(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -107,7 +106,7 @@ public class ExecutionTests : AcceptanceTestBase
     // and after --arch feature implementation we won't find correct muxer on CI.
     [TestCategory("Windows")]
     [TestMethod]
-    [MSTestCompatibilityDataSource]
+    [CompatibilityMatrix(CompatScenario.Adapter)]
     public void RunMultipleTestAssembliesInParallel(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -134,8 +133,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void TestSessionTimeOutTests(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -156,8 +154,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void WorkingDirectoryIsSourceDirectory(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -173,8 +170,11 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    // Asserts the testhost-specific stack overflow message; the .NET Framework variant requires the
+    // .NET Framework testhost, which is only available on Windows.
+    [TestCategory("Windows-Review")]
+    [TestMatrix(testHost: NetFx)]
+    [TestMatrix(testHost: Net)]
     public void StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -198,8 +198,11 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
-    [NetCoreTargetFrameworkDataSource]
+    // Asserts the testhost-specific unhandled exception message; the .NET Framework variant requires the
+    // .NET Framework testhost, which is only available on Windows.
+    [TestCategory("Windows-Review")]
+    [TestMatrix(testHost: NetFx)]
+    [TestMatrix(testHost: Net)]
     public void UnhandleExceptionExceptionShouldBeLoggedToDiagLogFile(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -221,7 +224,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: NetFx)]
     public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenIncompatibleX86andX64Dll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -243,7 +246,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: NetFx)]
     public void NoIncompatibleSourcesWarningShouldBeDisplayedInTheConsoleWhenGivenSingleX86Dll(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -263,7 +266,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: NetFx)]
     public void IncompatibleSourcesWarningShouldBeDisplayedInTheConsoleOnlyWhenRunningIn32BitOS(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -292,8 +295,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void ExitCodeShouldReturnOneWhenTreatNoTestsAsErrorParameterSetToTrueAndNoTestMatchesFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -312,8 +314,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void ExitCodeShouldReturnZeroWhenTreatNoTestsAsErrorParameterSetToFalseAndNoTestMatchesFilter(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -332,7 +333,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: NetFx)]
     public void ExitCodeShouldNotDependOnTreatNoTestsAsErrorTrueValueWhenThereAreAnyTestsToRun(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -350,7 +351,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     [TestCategory("Windows")]
-    [NetFullTargetFrameworkDataSource]
+    [TestMatrix(testHost: NetFx)]
     public void ExitCodeShouldNotDependOnFailTreatNoTestsAsErrorFalseValueWhenThereAreAnyTestsToRun(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -366,8 +367,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
-    [NetFullTargetFrameworkDataSource(inIsolation: true, inProcess: true)]
+    [TestMatrix(testHost: Net)]
     public void ExecuteTestsShouldSucceedWhenAtLeastOneDllFindsRuntimeProvider(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
@@ -388,8 +388,32 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    [TestMatrix(testHost: Net)]
+    public void ExplicitConsoleLoggerActivatesWhenRequestedByName(RunnerInfo runnerInfo)
+    {
+        // The built-in console logger is activated by the composition root (TestRequestManager) handing
+        // over a pre-built instance with the parsed CommandLineOptions injected, instead of being
+        // reflection-activated, and it no longer has a parameterless constructor. When the user asks for
+        // it explicitly with /logger:console it is registered in run settings by assembly-qualified name
+        // (UpdateConsoleLoggerIfExists) with no URI, so it goes through the assembly-qualified-name
+        // activation path. This is the path that broke when the parameterless constructor was removed, so
+        // this test guards that regression end-to-end. The pass/fail/skip summary asserted below is
+        // printed by the console logger itself, so a passing assertion proves it activated and ran.
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var testDll = GetAssetFullPath("MSTestProject1.dll");
+
+        var arguments = PrepareArguments(testDll, GetTestAdapterPath(), string.Empty, framework: string.Empty, _testEnvironment.InIsolationValue, resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /logger:\"console;verbosity=normal\"");
+        InvokeVsTest(arguments);
+
+        ValidateSummaryStatus(1, 1, 1);
+        ExitCodeEquals(1); // failing test in MSTestProject1
+    }
+
+    [TestMethod]
     // This is a built-in assembly filter test. It changes with vstest.version, so testing against 1 version of console is enough.
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunXunitTestsWhenProvidingAllDllsInBin(RunnerInfo runnerInfo)
     {
         // This is the default filter of AzDo VSTest task:
@@ -414,7 +438,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     // This is a built-in assembly filter test. It changes with vstest.version, so testing against 1 version of console is enough.
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunMstestTestsWhenProvidingAllDllsInBin(RunnerInfo runnerInfo)
     {
         // This is the default filter of AzDo VSTest task:
@@ -440,7 +464,7 @@ public class ExecutionTests : AcceptanceTestBase
 
     [TestMethod]
     // This is a built-in assembly filter test. It changes with vstest.version, so testing against 1 version of console is enough.
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunNunitTestsWhenProvidingAllDllsInBin(RunnerInfo runnerInfo)
     {
         // This is the default filter of AzDo VSTest task:
@@ -465,7 +489,7 @@ public class ExecutionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
+    [TestMatrix(console: Net, testHost: Net)]
     public void RunTestsWhenProvidingJustPlatformDllsFailsTheRun(RunnerInfo runnerInfo)
     {
         // This is the default filter of AzDo VSTest task:

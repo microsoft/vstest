@@ -26,6 +26,15 @@ Verify that:
 {0}</target>
         <note />
       </trans-unit>
+      <trans-unit id="NetFrameworkTestsNotSupportedOnNonWindows">
+        <source>Running .NET Framework tests is supported on Windows only.
+
+Running .NET Framework tests on this operating system relied on Mono, which is no longer supported. To run these tests, run them on Windows, or change the test project to target .NET instead of .NET Framework.</source>
+        <target state="translated">.NET Framework testlerinin çalıştırılması yalnızca Windows'da desteklenir.
+
+Bu işletim sisteminde .NET Framework testlerinin çalıştırılması, artık desteklenmeyen Mono'ya dayanıyordu. Bu testleri çalıştırmak için, bunları Windows'da çalıştırın veya test projesini .NET Framework yerine .NET'i hedefleyecek şekilde değiştirin.</target>
+        <note />
+      </trans-unit>
       <trans-unit id="UnableToFindDepsFile">
         <source>Unable to find {0}. Make sure test project has a nuget reference of package "Microsoft.NET.Test.Sdk".</source>
         <target state="translated">{0} bulunamıyor. Test projesinin "Microsoft.NET.Test.Sdk" paketinde nuget başvurusu olduğundan emin olun.</target>
