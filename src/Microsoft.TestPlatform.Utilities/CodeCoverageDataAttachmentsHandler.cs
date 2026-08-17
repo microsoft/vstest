@@ -129,9 +129,14 @@ public class CodeCoverageDataAttachmentsHandler : IDataCollectorAttachmentProces
 
         TPDebug.Assert(s_mergeOperationEnumValues != null);
 
-        if (s_mergeMethodInfo.Invoke(s_classInstance, [files[0], files, s_mergeOperationEnumValues.GetValue(0)!, true, cancellationToken]) is not Task<IList<string>> task)
+        var mergeResult = s_mergeMethodInfo.Invoke(s_classInstance, [files[0], files, s_mergeOperationEnumValues.GetValue(0)!, true, cancellationToken]);
+        if (mergeResult is not Task<IList<string>> task)
         {
-            EqtTrace.Error("CodeCoverageDataCollectorAttachmentsHandler: Failed to merge code coverage files.");
+            EqtTrace.Error(
+                "CodeCoverageDataCollectorAttachmentsHandler: Failed to merge code coverage files. Expected {0} to return {1} but it returned {2}.",
+                MergeMethodName,
+                typeof(Task<IList<string>>),
+                mergeResult?.GetType());
             return files;
         }
 

@@ -469,14 +469,14 @@ internal static class JsoniteConvert
             : null;
         if (testCase is not null)
         {
-            return CreateDataCollectionContext(sessionId, testCase);
+            return new DataCollectionContext(sessionId, testCase);
         }
 
         var testExecId = dict.TryGetValue("TestExecId", out var testExecIdValue)
             ? (TestExecId?)DeserializeTestExecId(testExecIdValue)
             : null;
 
-        return CreateDataCollectionContext(sessionId, testExecId);
+        return new DataCollectionContext(sessionId, testExecId);
     }
 
     private static object? DeserializeTestExecutionContext(object? value)
@@ -492,28 +492,6 @@ internal static class JsoniteConvert
         if (dict.TryGetValue("TestCaseFilter", out var fi) && fi != null) c.TestCaseFilter = fi.ToString();
         if (dict.TryGetValue("FilterOptions", out var fo) && fo != null) c.FilterOptions = (FilterOptions?)ConvertTo(fo, typeof(FilterOptions));
         return c;
-    }
-
-    private static DataCollectionContext CreateDataCollectionContext(SessionId sessionId, TestExecId? testExecId)
-    {
-        var constructor = typeof(DataCollectionContext).GetConstructor(
-            BindingFlags.Instance | BindingFlags.NonPublic,
-            binder: null,
-            [typeof(SessionId), typeof(TestExecId)],
-            modifiers: null)!;
-
-        return (DataCollectionContext)constructor.Invoke([sessionId, testExecId]);
-    }
-
-    private static DataCollectionContext CreateDataCollectionContext(SessionId sessionId, TestCase testCase)
-    {
-        var constructor = typeof(DataCollectionContext).GetConstructor(
-            BindingFlags.Instance | BindingFlags.NonPublic,
-            binder: null,
-            [typeof(SessionId), typeof(TestCase)],
-            modifiers: null)!;
-
-        return (DataCollectionContext)constructor.Invoke([sessionId, testCase]);
     }
 
     private static object? DeserializeTestProcessAttachDebuggerPayload(object? value)
