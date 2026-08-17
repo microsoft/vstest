@@ -111,17 +111,19 @@ public class DotnetTestTests : AcceptanceTestBase
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void RunDotnetTestWithCLIRunSettingsContainingBackslashes(RunnerInfo runnerInfo)
     {
-        // Regression test for https://github.com/microsoft/vstest/issues/15043
-        // VSTestCLIRunSettings was string[] which MSBuild treated as ITaskItem[],
-        // causing backslash normalization on Unix. The fix changes it to string.
+        // Regression test for https://github.com/microsoft/vstest/issues/15043.
+        // VSTestCLIRunSettings used to be string[], which MSBuild binds as ITaskItem[] and normalizes
+        // backslashes to forward slashes on Unix. This runs on Linux and macOS too, which is where the
+        // bug reproduces; CreateArgumentShouldPreserveBackslashesInCLIRunSettings covers the same code
+        // path deterministically without needing a full dotnet test run.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("BackslashParameterTestProject.csproj", runnerInfo.TargetFramework);
         InvokeDotnetTest(
-            $@"{projectPath} -tl:off /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} -- TestRunParameters.Parameter(name=\""pattern\"", value=\""Namespace\.Class\b\"")",
+            $@"{projectPath} --logger:""Console;Verbosity=normal"" -tl:off /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion} -- TestRunParameters.Parameter(name=\""pattern\"", value=\""Namespace\.Class\b\"")",
             workingDirectory: Path.GetDirectoryName(projectPath));
 
+        ValidateSummaryStatus(1, 0, 0);
         ExitCodeEquals(0);
-        StdOutputContains("Passed!");
     }
 }

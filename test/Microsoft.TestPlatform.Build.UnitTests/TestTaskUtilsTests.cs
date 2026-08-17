@@ -74,6 +74,53 @@ public class TestTaskUtilsTests
     }
 
     [TestMethod]
+    public void CreateArgumentShouldSplitCLIRunSettingsOnSemicolon()
+    {
+        // dotnet test joins the arguments that follow "--" with a semicolon before it sets the
+        // VSTestCLIRunSettings property, so semicolon separated input has to keep working.
+        const string arg1 = "RunConfiguration.ResultsDirectory=Path having Space";
+        const string arg2 = "MSTest.DeploymentEnabled";
+
+        _vsTestTask.VSTestCLIRunSettings = $"{arg1};{arg2}";
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        Assert.Contains(" -- ", commandline);
+        Assert.Contains($"\"{arg1}\"", commandline);
+        Assert.Contains($"{arg2}", commandline);
+    }
+
+    [TestMethod]
+    public void CreateArgumentShouldNotKeepCarriageReturnWhenCLIRunSettingsAreSeparatedByCrLf()
+    {
+        const string arg1 = "MSTest.DeploymentEnabled";
+        const string arg2 = "MSTest.MapInconclusiveToFailed";
+
+        _vsTestTask.VSTestCLIRunSettings = $"{arg1}\r\n{arg2}";
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        Assert.Contains(" -- ", commandline);
+        Assert.Contains($" {arg1} ", commandline);
+        Assert.Contains($" {arg2}", commandline);
+        Assert.DoesNotContain("\r", commandline);
+    }
+
+    [TestMethod]
+    [DataRow("")]
+    [DataRow("   ")]
+    [DataRow(";")]
+    [DataRow("\n")]
+    public void CreateArgumentShouldNotAppendSeparatorWhenCLIRunSettingsAreEmpty(string cliRunSettings)
+    {
+        _vsTestTask.VSTestCLIRunSettings = cliRunSettings;
+
+        var commandline = TestTaskUtils.CreateCommandLineArguments(_vsTestTask);
+
+        Assert.DoesNotEndWith("--", commandline.TrimEnd(), $"Command line should not end with a lone '--'. Got: {commandline}");
+    }
+
+    [TestMethod]
     public void CreateArgumentShouldPassResultsDirectoryCorrectly()
     {
         const string resultsDirectoryValue = @"C:\tmp\Results Directory";

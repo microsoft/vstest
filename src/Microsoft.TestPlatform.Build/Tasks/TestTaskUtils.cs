@@ -227,23 +227,47 @@ internal static class TestTaskUtils
         builder.AppendSwitchIfNotNull("--testSessionCorrelationId:", task.VSTestSessionCorrelationId);
 
         // VSTestCLIRunSettings should be last argument as vstest.console ignore options after "--" (CLIRunSettings option).
-        // The type is string (not string[]) to prevent MSBuild's ITaskItem path normalization from converting
-        // backslashes to forward slashes on Unix (e.g. in regex patterns like "namespace =~ /Abc\.Space1/").
+        // The type is string (not string[]) so that MSBuild does not bind it as ITaskItem[], which normalizes
+        // backslashes to forward slashes on Unix and corrupts values such as "NUnit.Where=namespace =~ /Abc\.Space1/".
         // Multiple settings are separated by newlines or semicolons.
-        if (task.VSTestCLIRunSettings != null)
+        var cliRunSettings = SplitCLIRunSettings(task.VSTestCLIRunSettings);
+        if (cliRunSettings.Count > 0)
         {
             builder.AppendSwitch("--");
-            foreach (var arg in task.VSTestCLIRunSettings.Split(['\n', ';'], StringSplitOptions.RemoveEmptyEntries))
+            foreach (var arg in cliRunSettings)
             {
-                var trimmed = arg.Trim();
-                if (!StringUtils.IsNullOrEmpty(trimmed))
-                {
-                    builder.AppendSwitchIfNotNull(string.Empty, trimmed);
-                }
+                builder.AppendSwitchIfNotNull(string.Empty, arg);
             }
         }
 
         return builder.ToString();
+    }
+
+    /// <summary>
+    /// Splits the value of VSTestCLIRunSettings into the individual settings to forward to vstest.console.
+    /// </summary>
+    /// <remarks>
+    /// Entries are separated by newlines or semicolons. Empty and whitespace-only entries are dropped so that
+    /// an unset or blank value does not append a lone "--" to the command line.
+    /// </remarks>
+    internal static List<string> SplitCLIRunSettings(string? value)
+    {
+        var settings = new List<string>();
+        if (StringUtils.IsNullOrWhiteSpace(value))
+        {
+            return settings;
+        }
+
+        foreach (var entry in value.Split(['\r', '\n', ';'], StringSplitOptions.RemoveEmptyEntries))
+        {
+            var trimmed = entry.Trim();
+            if (!StringUtils.IsNullOrEmpty(trimmed))
+            {
+                settings.Add(trimmed);
+            }
+        }
+
+        return settings;
     }
 
     /// <summary>
