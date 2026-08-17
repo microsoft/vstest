@@ -659,4 +659,48 @@ public class EnableLoggersArgumentProcessorTests
 
         Assert.AreEqual(expectedSettingsXml, _runSettingsManager.ActiveRunSettings?.SettingsXml);
     }
+
+    [TestMethod]
+    public void ExecutorInitializeShouldPreserveExistingConfigurationWhenLoggerIsIdentifiedByUri()
+    {
+        // A settings file may identify the console logger by uri instead of friendlyName. The
+        // existing entry has to be reused in that form too, so the Configuration survives and we
+        // do not end up with a second console logger entry.
+        string settingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-8""?>
+                <RunSettings>
+                  <LoggerRunSettings>
+                    <Loggers>
+                      <Logger uri=""logger://Microsoft/TestPlatform/ConsoleLogger/v1"" enabled=""True"">
+                        <Configuration>
+                          <Verbosity>normal</Verbosity>
+                        </Configuration>
+                      </Logger>
+                    </Loggers>
+                  </LoggerRunSettings>
+                </RunSettings>";
+
+        var runSettings = new RunSettings();
+        runSettings.LoadSettingsXml(settingsXml);
+        _runSettingsManager.SetActiveRunSettings(runSettings);
+
+        var executor = new EnableLoggerArgumentExecutor(_runSettingsManager);
+        executor.Initialize("logger://Microsoft/TestPlatform/ConsoleLogger/v1");
+
+        string expectedSettingsXml =
+            @"<?xml version=""1.0"" encoding=""utf-16""?>
+<RunSettings>
+  <LoggerRunSettings>
+    <Loggers>
+      <Logger uri=""logger://microsoft/TestPlatform/ConsoleLogger/v1"" enabled=""True"">
+        <Configuration>
+          <Verbosity>normal</Verbosity>
+        </Configuration>
+      </Logger>
+    </Loggers>
+  </LoggerRunSettings>
+</RunSettings>";
+
+        Assert.AreEqual(expectedSettingsXml, _runSettingsManager.ActiveRunSettings?.SettingsXml);
+    }
 }
