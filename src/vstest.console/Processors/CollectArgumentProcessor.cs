@@ -353,6 +353,8 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
         string? bestPath = null;
         Version? bestVersion = null;
+        string? bestPreRelease = null;
+        string bestDirectoryName = string.Empty;
 
         foreach (var versionDir in Directory.GetDirectories(ccPackagePath))
         {
@@ -362,15 +364,18 @@ internal class CollectArgumentExecutor : IArgumentExecutor
                 continue;
             }
 
-            var version = ParseNuGetVersion(Path.GetFileName(versionDir));
-            if (version is null)
+            var directoryName = Path.GetFileName(versionDir);
+            if (!TryParseNuGetVersion(directoryName, out var version, out var preRelease))
             {
                 continue;
             }
 
-            if (bestVersion is null || version > bestVersion)
+            if (bestVersion is null
+                || CompareNuGetVersions(version, preRelease, directoryName, bestVersion, bestPreRelease, bestDirectoryName) > 0)
             {
                 bestVersion = version;
+                bestPreRelease = preRelease;
+                bestDirectoryName = directoryName;
                 bestPath = buildDir;
             }
         }
@@ -391,24 +396,93 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         return userProfile.IsNullOrEmpty() ? null : Path.Combine(userProfile, ".nuget", "packages");
     }
 
-    private static Version? ParseNuGetVersion(string versionName)
+    /// <summary>
+    /// Splits a NuGet package folder name into its numeric version and pre-release label,
+    /// e.g. <c>18.5.0-preview-1</c> into <c>18.5.0</c> and <c>preview-1</c>. Build metadata
+    /// (anything after <c>+</c>) is ignored, as it does not take part in version ordering.
+    /// </summary>
+    private static bool TryParseNuGetVersion(string versionName, [NotNullWhen(true)] out Version? version, out string? preReleaseLabel)
     {
-        var dashIndex = versionName.IndexOf('-');
-        var isPreRelease = dashIndex >= 0;
-        var versionString = isPreRelease ? versionName.Substring(0, dashIndex) : versionName;
-        if (!Version.TryParse(versionString, out var version))
+        version = null;
+        preReleaseLabel = null;
+
+        var metadataIndex = versionName.IndexOf('+');
+        var numericPart = metadataIndex >= 0 ? versionName.Substring(0, metadataIndex) : versionName;
+
+        var dashIndex = numericPart.IndexOf('-');
+        if (dashIndex >= 0)
         {
-            return null;
+            preReleaseLabel = numericPart.Substring(dashIndex + 1);
+            numericPart = numericPart.Substring(0, dashIndex);
         }
 
-        // Encode stability into the Revision field: stable = int.MaxValue, pre-release = 0.
-        // When the numeric portion differs (e.g. "18.6.0-preview-1" vs "18.5.0"), the higher numeric
-        // version wins as expected. When the numeric portion is identical (e.g. "18.5.0" vs "18.5.0-preview-1"),
-        // the stable release wins — matching NuGet SemVer semantics where pre-releases are less than their
-        // corresponding stable release.
-        return isPreRelease
-            ? new Version(version.Major, version.Minor, version.Build, 0)
-            : new Version(version.Major, version.Minor, version.Build, int.MaxValue);
+        return Version.TryParse(numericPart, out version);
+    }
+
+    /// <summary>
+    /// Orders two package versions the way NuGet does: by numeric version first, then a pre-release
+    /// sorts below the stable release with the same numeric version, then by pre-release label per
+    /// SemVer 2.0. Equal candidates fall back to an ordinal comparison of the folder name so the
+    /// winner never depends on the order <see cref="Directory.GetDirectories(string)"/> happens to
+    /// return directories in.
+    /// </summary>
+    private static int CompareNuGetVersions(
+        Version left, string? leftPreRelease, string leftName,
+        Version right, string? rightPreRelease, string rightName)
+    {
+        var versionComparison = left.CompareTo(right);
+        if (versionComparison != 0)
+        {
+            return versionComparison;
+        }
+
+        if (leftPreRelease is null || rightPreRelease is null)
+        {
+            return (leftPreRelease, rightPreRelease) switch
+            {
+                (null, not null) => 1,
+                (not null, null) => -1,
+                _ => string.CompareOrdinal(leftName, rightName),
+            };
+        }
+
+        var preReleaseComparison = ComparePreReleaseLabels(leftPreRelease, rightPreRelease);
+        return preReleaseComparison != 0
+            ? preReleaseComparison
+            : string.CompareOrdinal(leftName, rightName);
+    }
+
+    private static int ComparePreReleaseLabels(string left, string right)
+    {
+        var leftIdentifiers = left.Split('.');
+        var rightIdentifiers = right.Split('.');
+
+        for (int i = 0; i < Math.Min(leftIdentifiers.Length, rightIdentifiers.Length); i++)
+        {
+            var comparison = ComparePreReleaseIdentifiers(leftIdentifiers[i], rightIdentifiers[i]);
+            if (comparison != 0)
+            {
+                return comparison;
+            }
+        }
+
+        // When every shared identifier is equal, the label with more identifiers is the higher one.
+        return leftIdentifiers.Length.CompareTo(rightIdentifiers.Length);
+    }
+
+    private static int ComparePreReleaseIdentifiers(string left, string right)
+    {
+        var leftIsNumeric = int.TryParse(left, NumberStyles.None, CultureInfo.InvariantCulture, out var leftNumber);
+        var rightIsNumeric = int.TryParse(right, NumberStyles.None, CultureInfo.InvariantCulture, out var rightNumber);
+
+        return (leftIsNumeric, rightIsNumeric) switch
+        {
+            (true, true) => leftNumber.CompareTo(rightNumber),
+            // SemVer 2.0: numeric identifiers always sort below alphanumeric ones.
+            (true, false) => -1,
+            (false, true) => 1,
+            _ => string.CompareOrdinal(left, right),
+        };
     }
 
     internal static class MicrosoftCodeCoverageConstants

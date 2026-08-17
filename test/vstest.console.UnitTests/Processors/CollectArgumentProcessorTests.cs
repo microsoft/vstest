@@ -760,7 +760,7 @@ public class CollectArgumentProcessorTests
     }
 
     [TestMethod]
-    public void TryGetCodeCoverageAdapterPath_PreReleaseSuffixStripperPicksHigherNumerics()
+    public void TryGetCodeCoverageAdapterPath_PicksHigherNumericVersion_EvenWhenItIsPreRelease()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
@@ -794,6 +794,117 @@ public class CollectArgumentProcessorTests
             Assert.IsTrue(result);
             // Stable release wins over a pre-release with the same numeric version (NuGet SemVer: pre-release < release).
             Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_PicksHigherPreRelease_WhenOnlyPreReleasesWithSameNumericsAreInstalled()
+    {
+        // Two pre-releases of the same numeric version are a tie on numerics alone, so the winner used
+        // to depend on the order the file system returned the directories in. Create them in both orders
+        // and require the same answer.
+        foreach (var creationOrder in new[] { new[] { "18.6.0-preview-1", "18.6.0-preview-2" }, new[] { "18.6.0-preview-2", "18.6.0-preview-1" } })
+        {
+            var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+            try
+            {
+                foreach (var version in creationOrder)
+                {
+                    Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", version, "build"));
+                }
+
+                bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+                Assert.IsTrue(result);
+                Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-preview-2", "build"), StringComparison.OrdinalIgnoreCase),
+                    $"Expected 18.6.0-preview-2 to win regardless of creation order, but got '{path}'.");
+            }
+            finally
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ComparesDottedPreReleaseIdentifiersNumerically()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-rc.2", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-rc.10", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // SemVer 2.0 compares dot-separated numeric identifiers as numbers, so rc.10 > rc.2.
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-rc.10", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ComparesAllFourVersionComponents()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0.1", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0.2", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0.2", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_DoesNotThrow_WhenVersionDirectoryHasTwoComponents()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_IgnoresBuildMetadata()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-preview-1", "build"));
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0+abc123", "build"));
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // Build metadata takes no part in ordering, so "18.6.0+abc123" is the stable 18.6.0 and beats the pre-release.
+            Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0+abc123", "build"), StringComparison.OrdinalIgnoreCase));
         }
         finally
         {
