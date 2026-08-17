@@ -138,8 +138,11 @@ public class DotnetTestTests : AcceptanceTestBase
             """);
 
         InvokeDotnetTest(
-            $@"""{projectPath}"" --settings ""{runsettingsPath}"" -tl:off /p:VSTestUseMSBuildOutput=false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}",
+            $@"""{projectPath}"" --settings ""{runsettingsPath}"" -tl:off /p:VSTestNoLogo=false /p:VSTestUseMSBuildOutput=false /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}",
             workingDirectory: Path.GetDirectoryName(projectPath));
+
+        // ensure our dev version is used
+        StdOutputContains(GetFinalVersion(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion));
 
         // At normal verbosity the console logger prints individual skipped test names.
         // Assert only on the name because Unix may insert ANSI color sequences around the
