@@ -600,8 +600,8 @@ public class TestRequestSender : ITestRequestSender
                 case MessageType.AttachDebugger:
                     var testProcessAttachDebuggerPayload = _dataSerializer.DeserializePayload<TestProcessAttachDebuggerPayload>(message);
                     TPDebug.Assert(testProcessAttachDebuggerPayload is not null, "testProcessAttachDebuggerPayload is null");
-                    AttachDebuggerInfo attachDebugerInfo = MessageConverter.ConvertToAttachDebuggerInfo(testProcessAttachDebuggerPayload);
-                    bool result = testRunEventsHandler.AttachDebuggerToProcess(attachDebugerInfo);
+                    AttachDebuggerInfo attachDebuggerInfo = MessageConverter.ConvertToAttachDebuggerInfo(testProcessAttachDebuggerPayload);
+                    bool result = testRunEventsHandler.AttachDebuggerToProcess(attachDebuggerInfo);
 
                     var resultMessage = _dataSerializer.SerializePayload(
                         MessageType.AttachDebuggerCallback,
