@@ -38,10 +38,11 @@
        because the MSBuild sub-invocation with Properties="TargetFramework=..." violates the project isolation contract.
        As a trade-off, msCoverageSourceRootsMapping_* files are not generated in graph build mode.
        For builds using -isolateProjects without -graphBuild, use $(DisableMsCoverageReferencedPathMaps)=true as an escape hatch. -->
-  <Target Condition="'$(NETCoreSdkVersion)' != '' and '$(DisableMsCoverageReferencedPathMaps)' != 'true' and '$(IsGraphBuild)' != 'true'" Name="MsCoverageReferencedPathMaps" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" >
+  <Target Condition="'$(NETCoreSdkVersion)' != '' and '$(DisableMsCoverageReferencedPathMaps)' != 'true' and '$(DesignTimeBuild)' != 'true' and '$(IsGraphBuild)' != 'true'" Name="MsCoverageReferencedPathMaps" BeforeTargets="CoreCompile" DependsOnTargets="ResolveProjectReferences" >
     <MSBuild Projects="@(AnnotatedProjects->'%(FullPath)')"
              Targets="$(_msCoverageSourceRootTargetName)"
              Properties="TargetFramework=%(AnnotatedProjects.NearestTargetFramework)"
+             BuildInParallel="true"
              SkipNonexistentTargets="true">
       <Output TaskParameter="TargetOutputs"
               ItemName="_msCoverageLocalTopLevelSourceRoot" />

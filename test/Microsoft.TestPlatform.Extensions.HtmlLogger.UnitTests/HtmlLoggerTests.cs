@@ -6,6 +6,8 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger;
 using Microsoft.VisualStudio.TestPlatform.Extensions.HtmlLogger.ObjectModel;
@@ -34,6 +36,8 @@ public class HtmlLoggerTests
     private readonly Mock<IFileHelper> _mockFileHelper;
     private readonly Mock<XmlObjectSerializer> _mockXmlSerializer;
     private readonly Mock<IHtmlTransformer> _mockHtmlTransformer;
+
+    public TestContext TestContext { get; set; }
 
     public HtmlLoggerTests()
     {
@@ -246,6 +250,50 @@ public class HtmlLoggerTests
         Assert.AreEqual("fully", result.FullyQualifiedName);
         Assert.AreEqual("abc/def.dll", resultCollectionList.First().Source);
         Assert.AreEqual("1s", result.Duration);
+    }
+
+    [TestMethod]
+    public void TestResultHandlerShouldSanitizeInvalidXmlCharsInDisplayName()
+    {
+        // Characters like \x01 (SOH) are invalid in XML 1.0 and would cause DataContractSerializer to throw.
+        var testCase = CreateTestCase("Pass1");
+        testCase.FullyQualifiedName = "fully";
+        testCase.Source = "abc/def.dll";
+
+        var testResult = new ObjectModel.TestResult(testCase)
+        {
+            DisplayName = "TestMethod(\x01value)",
+            ErrorMessage = "error\x02message",
+            ErrorStackTrace = "stack\x03trace",
+        };
+
+        _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(testResult).Object);
+
+        var result = _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First();
+
+        Assert.AreEqual(@"TestMethod(\u0001value)", result.DisplayName);
+        Assert.AreEqual(@"error\u0002message", result.ErrorMessage);
+        Assert.AreEqual(@"stack\u0003trace", result.ErrorStackTrace);
+    }
+
+    [TestMethod]
+    public void TestResultHandlerShouldPreserveValidSurrogatePairsInDisplayName()
+    {
+        // Valid surrogate pairs (e.g. emoji U+1F600 = 😀) are valid XML 1.0 chars and must NOT be mangled.
+        var testCase = CreateTestCase("Pass1");
+        testCase.FullyQualifiedName = "fully";
+        testCase.Source = "abc/def.dll";
+
+        var testResult = new ObjectModel.TestResult(testCase)
+        {
+            DisplayName = "Test(😀)",  // 😀 is U+1F600, encoded as surrogate pair \uD83D\uDE00
+        };
+
+        _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(testResult).Object);
+
+        var result = _htmlLogger.TestRunDetails!.ResultCollectionList!.First().ResultList!.First();
+
+        Assert.AreEqual("Test(😀)", result.DisplayName, "Valid surrogate pairs should pass through unchanged.");
     }
 
     [TestMethod]
@@ -631,6 +679,61 @@ public class HtmlLoggerTests
         Assert.IsNotNull(_htmlLogger.XmlFilePath);
         Assert.Contains("[1].xml", _htmlLogger.XmlFilePath);
         _mockFileHelper.Verify(x => x.GetStream(It.IsAny<string>(), FileMode.CreateNew, FileAccess.Write, FileShare.None), Times.AtLeast(2));
+    }
+
+    [TestMethod]
+    public void TestResultHandlerShouldCreateExactlyOneResultCollectionPerSourceUnderConcurrency()
+    {
+        const int threadCount = 10;
+        const int testsPerThread = 50;
+        var barrier = new Barrier(threadCount);
+
+        var tasks = Enumerable.Range(0, threadCount).Select(t => Task.Run(() =>
+        {
+            barrier.SignalAndWait(TestContext.CancellationToken);
+            for (int i = 0; i < testsPerThread; i++)
+            {
+                var testCase = CreateTestCase($"TestCase_{t}_{i}");
+                testCase.Source = "abc.dll";
+                var result = new ObjectModel.TestResult(testCase)
+                {
+                    Outcome = i % 2 == 0 ? TestOutcome.Passed : TestOutcome.Failed
+                };
+                _htmlLogger.TestResultHandler(new object(), new Mock<TestResultEventArgs>(result).Object);
+            }
+        }, TestContext.CancellationToken)).ToArray();
+
+        Task.WaitAll(tasks, TestContext.CancellationToken);
+
+        var resultCollectionList = _htmlLogger.TestRunDetails!.ResultCollectionList!;
+        Assert.HasCount(1, resultCollectionList, "Only one result collection should be created per source");
+        Assert.HasCount(threadCount * testsPerThread, resultCollectionList[0].ResultList!,
+            "No result should be lost under concurrent updates");
+        Assert.HasCount(threadCount * (testsPerThread / 2), resultCollectionList[0].FailedResultList!,
+            "No failed result should be lost under concurrent updates");
+    }
+
+    [TestMethod]
+    public void TestMessageHandlerShouldNotLoseMessagesUnderConcurrency()
+    {
+        const int threadCount = 10;
+        const int messagesPerThread = 100;
+        var barrier = new Barrier(threadCount);
+
+        var tasks = Enumerable.Range(0, threadCount).Select(t => Task.Run(() =>
+        {
+            barrier.SignalAndWait(TestContext.CancellationToken);
+            for (int i = 0; i < messagesPerThread; i++)
+            {
+                _htmlLogger.TestMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Informational, $"info_{t}_{i}"));
+                _htmlLogger.TestMessageHandler(new object(), new TestRunMessageEventArgs(TestMessageLevel.Error, $"error_{t}_{i}"));
+            }
+        }, TestContext.CancellationToken)).ToArray();
+
+        Task.WaitAll(tasks, TestContext.CancellationToken);
+
+        Assert.HasCount(threadCount * messagesPerThread, _htmlLogger.TestRunDetails!.RunLevelMessageInformational!);
+        Assert.HasCount(threadCount * messagesPerThread, _htmlLogger.TestRunDetails.RunLevelMessageErrorAndWarning!);
     }
 
     private static TestCase CreateTestCase(string testCaseName)
