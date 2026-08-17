@@ -30,14 +30,21 @@ public partial class ProcessHelper : IProcessHelper
     // case nor the rare grandchild-keeps-the-pipe-open case adds latency. See the Exited handler.
     private const int CleanExitErrorDrainTimeout = 500;
 
-    // Processes we deliberately killed (e.g. when aborting or cleaning up a run). Their abnormal exit code is
-    // expected and is not a crash, so the exit handler must not spend the long stderr-drain budget on them -
-    // that would make aborting a run from an IDE slow whenever a grandchild process (e.g. a browser driver)
-    // keeps the stderr pipe open. ConditionalWeakTable holds only weak references to the processes, so entries
-    // disappear when a process is collected and nothing has to be removed explicitly.
-    private readonly ConditionalWeakTable<Process, object> _deliberatelyTerminatedProcesses = new();
-    private readonly object _deliberatelyTerminatedProcessesLock = new();
-    private static readonly object DeliberateTerminationMarker = new();
+    // Processes we asked to kill (e.g. when aborting or cleaning up a run). When such a kill lands, the abnormal
+    // exit code is expected and is not a crash, so the exit handler must not spend the long stderr-drain budget
+    // on it - that would make aborting a run from an IDE slow whenever a grandchild process (e.g. a browser
+    // driver) keeps the stderr pipe open. This records only that we asked; whether the kill actually terminated
+    // the process is decided from the exit code, see WasTerminatedByOurKill. ConditionalWeakTable holds only weak
+    // references to the processes, so entries disappear when a process is collected and nothing has to be removed
+    // explicitly.
+    private readonly ConditionalWeakTable<Process, object> _killRequestedProcesses = new();
+    private readonly object _killRequestedProcessesLock = new();
+    private static readonly object KillRequestedMarker = new();
+
+    // Exit code a process is left with when Process.Kill() terminates it: Kill calls TerminateProcess(handle, -1)
+    // on Windows, and sends SIGKILL on Unix, which .NET reports as 128 + signal number.
+    private const int WindowsKillExitCode = -1;
+    private const int UnixSigKillExitCode = 128 + 9;
 
 #if !NET
     private readonly IEnvironment _environment;
@@ -222,11 +229,12 @@ public partial class ProcessHelper : IProcessHelper
                                         if (!p.HasExited)
                                         {
                                             // We are force-killing a process that overran the exit budget (e.g. a
-                                            // grandchild keeps it hanging). Record it as a deliberate termination -
-                                            // exactly like TerminateProcess does - BEFORE killing, so the stderr
-                                            // drain below uses the short abort budget instead of treating our own
-                                            // kill as a crash and waiting the generous 5s budget unnecessarily.
-                                            MarkDeliberatelyTerminated(p);
+                                            // grandchild keeps it hanging). Record the request - exactly like
+                                            // TerminateProcess does - BEFORE killing, so the stderr drain below uses
+                                            // the short abort budget instead of treating our own kill as a crash and
+                                            // waiting the generous 5s budget unnecessarily. Recording it does not by
+                                            // itself shorten the budget; see WasTerminatedByOurKill.
+                                            MarkKillRequested(p);
                                             p.Kill();
                                         }
                                     }
@@ -263,12 +271,15 @@ public partial class ProcessHelper : IProcessHelper
                         //
                         // This drain budget is intentionally separate from (and far more generous than) the
                         // process-exit budget above, and the generous part is only spent when the process crashed -
-                        // i.e. it exited abnormally on its own. A clean exit, or a process we deliberately killed
+                        // i.e. it exited abnormally on its own. A clean exit, or a process our own kill terminated
                         // (e.g. aborting a run from an IDE), gets only a short grace period so we never add latency
                         // to those cases - in particular we must not hang for seconds on abort when a grandchild
                         // process keeps the stderr pipe open and EOF never arrives. In every case the wait returns
                         // as soon as EOF is observed, so a process that exits and drains promptly pays almost nothing.
-                        var errorDrainTimeout = GetErrorDrainTimeout(DidProcessExitCleanly(p), WasDeliberatelyTerminated(p));
+                        var exitCode = GetExitCodeOrNull(p);
+                        var errorDrainTimeout = GetErrorDrainTimeout(
+                            exitedCleanly: exitCode == 0,
+                            deliberatelyTerminated: WasTerminatedByOurKill(WasKillRequested(p), exitCode));
                         await WaitForErrorStreamToDrainAsync(errorStreamClosed, errorDrainTimeout).ConfigureAwait(false);
                     }
 
@@ -324,21 +335,20 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <summary>
-    /// Returns <see langword="true"/> when the process has exited with a zero exit code. A non-zero exit code
-    /// (a crash) - or an exit code that cannot be retrieved - is treated as not-clean so the caller waits the
-    /// longer stderr drain budget and does not truncate potentially important crash output.
+    /// Returns the exit code of a process that has exited, or <see langword="null"/> when it has not exited or the
+    /// exit code cannot be retrieved (e.g. the process handle is gone). Callers treat a <see langword="null"/> exit
+    /// code as a crash, so the redirected stderr gets the longer budget to drain and potentially important crash
+    /// output is not truncated.
     /// </summary>
-    private static bool DidProcessExitCleanly(Process process)
+    private static int? GetExitCodeOrNull(Process process)
     {
         try
         {
-            return process.HasExited && process.ExitCode == 0;
+            return process.HasExited ? process.ExitCode : null;
         }
         catch
         {
-            // If the exit code is not retrievable (e.g. the process handle is gone), assume a crash so we
-            // give the redirected stderr the longer budget to drain.
-            return false;
+            return null;
         }
     }
 
@@ -351,22 +361,37 @@ public partial class ProcessHelper : IProcessHelper
     internal static int GetErrorDrainTimeout(bool exitedCleanly, bool deliberatelyTerminated)
         => exitedCleanly || deliberatelyTerminated ? CleanExitErrorDrainTimeout : CrashErrorDrainTimeout;
 
-    private void MarkDeliberatelyTerminated(Process process)
+    /// <summary>
+    /// Returns <see langword="true"/> when an exit is the result of a kill we asked for, so the exit handler can
+    /// give it the short abort budget instead of the generous crash budget.
+    /// <para>
+    /// Having asked is not enough on its own. We check <see cref="Process.HasExited"/> and then call
+    /// <see cref="Process.Kill()"/>, and the process can crash on its own in between - in which case the kill
+    /// never lands (on .NET it silently does nothing, on .NET Framework it throws) and the exit we are looking at
+    /// is a real crash. Requiring the exit code that our kill leaves behind means such a crash keeps the generous
+    /// budget and its late callstack is not truncated. An exit code we could not retrieve (<see langword="null"/>)
+    /// is treated the same way, for the same reason.
+    /// </para>
+    /// </summary>
+    internal static bool WasTerminatedByOurKill(bool killRequested, int? exitCode)
+        => killRequested && exitCode is WindowsKillExitCode or UnixSigKillExitCode;
+
+    private void MarkKillRequested(Process process)
     {
-        lock (_deliberatelyTerminatedProcessesLock)
+        lock (_killRequestedProcessesLock)
         {
-            if (!_deliberatelyTerminatedProcesses.TryGetValue(process, out _))
+            if (!_killRequestedProcesses.TryGetValue(process, out _))
             {
-                _deliberatelyTerminatedProcesses.Add(process, DeliberateTerminationMarker);
+                _killRequestedProcesses.Add(process, KillRequestedMarker);
             }
         }
     }
 
-    private bool WasDeliberatelyTerminated(Process process)
+    private bool WasKillRequested(Process process)
     {
-        lock (_deliberatelyTerminatedProcessesLock)
+        lock (_killRequestedProcessesLock)
         {
-            return _deliberatelyTerminatedProcesses.TryGetValue(process, out _);
+            return _killRequestedProcesses.TryGetValue(process, out _);
         }
     }
 
@@ -443,11 +468,13 @@ public partial class ProcessHelper : IProcessHelper
         {
             if (process is Process proc && !proc.HasExited)
             {
-                // Killing a still-running process on purpose (abort/cleanup): record it so the exit handler
-                // treats the resulting abnormal exit as an abort (short stderr drain), not a crash (long
-                // stderr drain). A process that exits on its own is never recorded here, so a genuine crash
-                // still gets the generous budget.
-                MarkDeliberatelyTerminated(proc);
+                // Killing a still-running process on purpose (abort/cleanup): record the request BEFORE the kill,
+                // so the exit handler - which can run at any moment from here on - cannot miss it. Recording it
+                // does not by itself shorten the stderr drain: the exit handler treats the exit as an abort only
+                // when the exit code is the one our kill leaves behind. So a process that crashes on its own
+                // between the check above and the kill is still treated as a crash and gets the generous budget,
+                // and a process that exits on its own without us asking never gets here at all.
+                MarkKillRequested(proc);
                 proc.Kill();
             }
         }

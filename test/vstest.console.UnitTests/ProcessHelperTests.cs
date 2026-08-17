@@ -139,4 +139,71 @@ public class ProcessHelperTests
         Assert.AreEqual(cleanExit, aborted, "A deliberately terminated process must use the short (clean-exit) budget.");
         Assert.AreEqual(cleanExit, cleanAndAborted, "A clean, deliberately terminated process must use the short budget.");
     }
+
+    // Exit code a process is left with when Process.Kill() terminates it: TerminateProcess(handle, -1) on
+    // Windows, and 128 + SIGKILL on Unix.
+    private const int WindowsKillExitCode = -1;
+    private const int UnixSigKillExitCode = 137;
+
+    // Windows STATUS_STACK_OVERFLOW - what a test host that blew its stack exits with. This is the crash whose
+    // callstack the drain budget exists to capture.
+    private const int StackOverflowExitCode = unchecked((int)0xC00000FD);
+
+    [TestMethod]
+    public void WasTerminatedByOurKillShouldBeTrueWhenTheKillLanded()
+    {
+        // We asked to kill the process and the exit code is the one Process.Kill() leaves behind, so this exit
+        // is our abort and must get the short drain budget.
+        Assert.IsTrue(
+            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: WindowsKillExitCode),
+            "A process killed on Windows exits with -1 and must count as deliberately terminated.");
+        Assert.IsTrue(
+            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: UnixSigKillExitCode),
+            "A process killed on Unix exits with 128 + SIGKILL and must count as deliberately terminated.");
+    }
+
+    [TestMethod]
+    public void WasTerminatedByOurKillShouldBeFalseWhenTheProcessCrashedInsideTheKillRaceWindow()
+    {
+        // TerminateProcess checks HasExited and then calls Kill, and the process can crash on its own in
+        // between. The kill then never lands - on .NET it silently does nothing, on .NET Framework it throws -
+        // and the exit we are looking at is a real crash carrying a real callstack. Having asked to kill must
+        // therefore not be enough to shorten the drain, or that callstack gets truncated.
+        Assert.IsFalse(
+            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: StackOverflowExitCode),
+            "A process that crashed between the HasExited check and the kill must still count as a crash.");
+
+        var timeout = ProcessHelper.GetErrorDrainTimeout(
+            exitedCleanly: false,
+            deliberatelyTerminated: ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: StackOverflowExitCode));
+        var crashTimeout = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, deliberatelyTerminated: false);
+
+        Assert.AreEqual(
+            crashTimeout,
+            timeout,
+            "A crash that happened while we were asking for a kill must keep the generous crash drain budget.");
+    }
+
+    [TestMethod]
+    public void WasTerminatedByOurKillShouldBeFalseWhenTheExitCodeIsUnavailable()
+    {
+        // We could not read the exit code, so we cannot tell whether our kill landed. Assume it did not, so the
+        // stderr keeps the generous budget rather than being cut short.
+        Assert.IsFalse(
+            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: null),
+            "An unretrievable exit code must not be treated as our kill.");
+    }
+
+    [TestMethod]
+    public void WasTerminatedByOurKillShouldBeFalseWhenWeNeverAskedToKill()
+    {
+        // A process that exits with the kill exit code on its own was not killed by us - it crashed, or chose
+        // that exit code - and must get the generous budget.
+        Assert.IsFalse(
+            ProcessHelper.WasTerminatedByOurKill(killRequested: false, exitCode: WindowsKillExitCode),
+            "Without a kill request the exit is not ours, whatever the exit code is.");
+        Assert.IsFalse(
+            ProcessHelper.WasTerminatedByOurKill(killRequested: false, exitCode: StackOverflowExitCode),
+            "A crash we did not cause must count as a crash.");
+    }
 }
