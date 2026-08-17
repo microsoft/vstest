@@ -986,6 +986,52 @@ public class CollectArgumentProcessorTests
         }
     }
 
+    [TestMethod]
+    public void TryAddCodeCoverageAdapterPath_Injects_WhenExistingAdapterPathsNodeIsOnlyWhitespace()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
+            Directory.CreateDirectory(buildDir);
+
+            // Formatted run settings hold a newline and indentation inside the node. XmlDocument
+            // drops that whitespace, so the node reads as empty, and discovery must still run.
+            string runsettingsString = string.Join(Environment.NewLine,
+                "<RunSettings>",
+                "  <RunConfiguration>",
+                "    <TestAdaptersPaths>",
+                "    </TestAdaptersPaths>",
+                "  </RunConfiguration>",
+                "</RunSettings>");
+            var runsettings = new RunSettings();
+            runsettings.LoadSettingsXml(runsettingsString);
+            var settingsProvider = new TestableRunSettingsProvider();
+            settingsProvider.SetActiveRunSettings(runsettings);
+
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
+
+            var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
+            Assert.IsTrue(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase),
+                "Expected auto-injection when the existing TestAdaptersPaths node holds only whitespace.");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ReturnsFalse_WhenNuGetPackagesPathIsUnusable()
+    {
+        // Path.Combine rejects invalid path characters on .NET Framework. Auto-discovery is best
+        // effort, so an unusable NUGET_PACKAGES value must report "not found" instead of throwing.
+        bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: "|:invalid\0path");
+
+        Assert.IsFalse(result);
+        Assert.IsNull(path);
+    }
+
     private static int CountOccurrences(string text, string pattern)
     {
         int count = 0;

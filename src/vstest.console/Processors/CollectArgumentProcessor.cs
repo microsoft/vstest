@@ -309,25 +309,23 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     /// </summary>
     internal static void TryAddCodeCoverageAdapterPath(IRunSettingsProvider runSettingsManager, string? nugetPackagesOverride = null)
     {
+        // Ask the run settings first, so a run that already has adapter paths pays no file system cost.
+        // An entry only counts when it is an actual path, a node holding nothing but whitespace is not
+        // a configured path.
+        var existingPathsRaw = runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath);
+        if (!existingPathsRaw.IsNullOrWhiteSpace() && existingPathsRaw.Split(';').Any(p => !p.IsNullOrWhiteSpace()))
+        {
+            // User explicitly configured adapter paths — don't clobber with auto-discovered NuGet path.
+            return;
+        }
+
         if (!TryGetCodeCoverageAdapterPath(out var ccAdapterPath, nugetPackagesOverride))
         {
             EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Microsoft.CodeCoverage package not found in NuGet global packages; skipping auto-injection.");
             return;
         }
 
-        var existingPathsRaw = runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath);
-        var existingPaths = existingPathsRaw.IsNullOrEmpty()
-            ? []
-            : existingPathsRaw.Split(';').Where(p => !p.IsNullOrEmpty()).ToList();
-
-        if (existingPaths.Count > 0)
-        {
-            // User explicitly configured adapter paths — don't clobber with auto-discovered NuGet path.
-            return;
-        }
-
-        existingPaths.Add(ccAdapterPath);
-        runSettingsManager.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, string.Join(";", existingPaths));
+        runSettingsManager.UpdateRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath, ccAdapterPath);
         EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Injected Code Coverage adapter path '{0}'.", ccAdapterPath);
     }
 
@@ -339,16 +337,32 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     {
         path = null;
 
+        try
+        {
+            path = FindCodeCoverageAdapterPath(nugetPackagesOverride);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+        {
+            // Auto-discovery is best effort. A packages folder we are not allowed to read, a transient
+            // IO error, or an unusable NUGET_PACKAGES value must not take down the whole run.
+            EqtTrace.Verbose("CollectArgumentExecutor.TryGetCodeCoverageAdapterPath: Could not inspect the NuGet global packages folder: {0}", ex);
+        }
+
+        return path is not null;
+    }
+
+    private static string? FindCodeCoverageAdapterPath(string? nugetPackagesOverride)
+    {
         var nugetPackagesPath = nugetPackagesOverride ?? GetNuGetGlobalPackagesPath();
         if (nugetPackagesPath is null)
         {
-            return false;
+            return null;
         }
 
         var ccPackagePath = Path.Combine(nugetPackagesPath, "microsoft.codecoverage");
         if (!Directory.Exists(ccPackagePath))
         {
-            return false;
+            return null;
         }
 
         string? bestPath = null;
@@ -380,8 +394,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
             }
         }
 
-        path = bestPath;
-        return path is not null;
+        return bestPath;
     }
 
     private static string? GetNuGetGlobalPackagesPath()
