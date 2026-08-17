@@ -12,9 +12,15 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- This target is required to enable /collect:"Code Coverage" in "dotnet publish" scenarios with "dotnet vstest".
-       E.g: Release pipelines where the user/project NuGet cache is not available on the target machine.
-       Artifacts already supplied by the project publish are excluded so this package cannot replace newer versions. -->
+  <!-- Makes /collect:"Code Coverage" work with "dotnet vstest" against a published folder, for example a
+       release pipeline where the project's NuGet cache is not available on the machine. The package layout
+       carries files that nothing else publishes, such as CodeCoverage\CodeCoverage.exe, so they are added here.
+
+       The target runs after ComputeFilesToPublish, so whatever the project itself publishes is already in
+       ResolvedFileToPublish. Package files whose RelativePath is already present are dropped and the
+       project's own copy stays. That is what keeps the newer Microsoft.CodeCoverage.* assemblies coming from
+       Microsoft.Testing.Extensions.CodeCoverage. Nothing here inspects PackageReference, so it makes no
+       difference whether that package is referenced directly or pulled in transitively. -->
   <Target Name="CopyTraceDataCollectorArtifacts" AfterTargets="ComputeFilesToPublish">
 
     <ItemGroup>
