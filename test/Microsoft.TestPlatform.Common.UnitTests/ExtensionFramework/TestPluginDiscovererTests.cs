@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
@@ -11,6 +13,7 @@ using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -23,6 +26,32 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 [TestClass]
 public class TestPluginDiscovererTests
 {
+    private readonly List<TestRunMessageEventArgs> _messages = new();
+
+    [TestInitialize]
+    public void Initialize()
+    {
+        TestSessionMessageLogger.Instance.TestRunMessage += OnTestRunMessage;
+    }
+
+    [TestCleanup]
+    public void Cleanup()
+    {
+        // The logger is a process wide singleton, so drop the whole instance to make sure the handler
+        // above does not observe messages from the tests that run after this one.
+        TestSessionMessageLogger.Instance.TestRunMessage -= OnTestRunMessage;
+        TestSessionMessageLogger.Instance = null;
+    }
+
+    private void OnTestRunMessage(object? sender, TestRunMessageEventArgs e) => _messages.Add(e);
+
+    /// <summary>
+    /// TestPluginDiscoverer remembers the files it failed on for the lifetime of the process, so every test
+    /// that wants to observe a failure needs a file name no other test has used.
+    /// </summary>
+    private static string GetPathOfMissingExtension()
+        => Path.Combine(Path.GetTempPath(), $"missing{Guid.NewGuid():N}.TestAdapter.dll");
+
     [TestMethod]
     public void GetTestExtensionsInformationShouldNotThrowOnALoadException()
     {
@@ -133,7 +162,106 @@ public class TestPluginDiscovererTests
         _ = TestPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions);
     }
 
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnWhenAFileCannotBeLoaded()
+    {
+        var missingExtension = GetPathOfMissingExtension();
+
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string> { missingExtension });
+
+        var warning = _messages.SingleOrDefault(m => m.Level == TestMessageLevel.Warning && m.Message.Contains(missingExtension));
+        Assert.IsNotNull(warning, $"Expected a warning naming '{missingExtension}', got: {string.Join(", ", _messages.Select(m => m.Message))}");
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnAboutTheSameFileOnlyOnce()
+    {
+        var missingExtension = GetPathOfMissingExtension();
+        var pathToExtensions = new List<string> { missingExtension };
+
+        // The same file is scanned once per extension type, the user should hear about it once.
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(pathToExtensions);
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestDiscovererPluginInformation, ITestDiscoverer>(pathToExtensions);
+
+        Assert.ContainsSingle(_messages.Where(m => m.Message.Contains(missingExtension)));
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldNotWarnAboutSpeculativelyProbedExtensions()
+    {
+        // With no extension paths the discoverer probes for the two C++ UWP adapters, which are missing
+        // everywhere except UWP. Warning about those would put two warnings on every run.
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string>());
+
+        Assert.IsEmpty(_messages);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsFromAssemblyShouldWarnAndKeepTheTypesThatLoadedOnReflectionTypeLoadException()
+    {
+        var filePath = GetPathOfMissingExtension();
+        var assembly = new PartiallyLoadedAssembly(typeof(ValidDiscoverer), null);
+        var pluginInfos = new Dictionary<string, TestDiscovererPluginInformation>();
+
+        TestPluginDiscoverer.GetTestExtensionsFromAssembly<TestDiscovererPluginInformation, ITestDiscoverer>(assembly, pluginInfos, filePath);
+
+        // The types that did load are still discovered, half an adapter is better than none.
+        var expected = new TestDiscovererPluginInformation(typeof(ValidDiscoverer));
+        Assert.IsTrue(pluginInfos.ContainsKey(expected.IdentifierData!));
+
+        // And the user is told, instead of only finding out by re-running with /diag.
+        var warning = _messages.SingleOrDefault(m => m.Level == TestMessageLevel.Warning && m.Message.Contains(filePath));
+        Assert.IsNotNull(warning, $"Expected a warning naming '{filePath}', got: {string.Join(", ", _messages.Select(m => m.Message))}");
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsFromAssemblyShouldWarnOnceButKeepScanningTheAssembly()
+    {
+        var filePath = GetPathOfMissingExtension();
+        var assembly = new PartiallyLoadedAssembly(typeof(ValidDiscoverer), null);
+        var firstScan = new Dictionary<string, TestDiscovererPluginInformation>();
+        var secondScan = new Dictionary<string, TestDiscovererPluginInformation>();
+
+        TestPluginDiscoverer.GetTestExtensionsFromAssembly<TestDiscovererPluginInformation, ITestDiscoverer>(assembly, firstScan, filePath);
+        TestPluginDiscoverer.GetTestExtensionsFromAssembly<TestDiscovererPluginInformation, ITestDiscoverer>(assembly, secondScan, filePath);
+
+        Assert.ContainsSingle(_messages.Where(m => m.Message.Contains(filePath)));
+
+        // Reporting once must not mean scanning once, the partially loaded assembly still has to be scanned
+        // for every extension type.
+        var expected = new TestDiscovererPluginInformation(typeof(ValidDiscoverer));
+        Assert.IsTrue(secondScan.ContainsKey(expected.IdentifierData!));
+    }
+
     #region Implementations
+
+    /// <summary>
+    /// An assembly that loaded but whose types did not, the way a real adapter behaves when one of its
+    /// dependencies is missing. <see cref="ReflectionTypeLoadException.Types"/> holds null for every type
+    /// that failed, which is what makes discovery silently return fewer extensions than the file declares.
+    /// </summary>
+    private sealed class PartiallyLoadedAssembly : Assembly
+    {
+        private readonly Type?[] _loadedTypes;
+
+        public PartiallyLoadedAssembly(params Type?[] loadedTypes) => _loadedTypes = loadedTypes;
+
+        public override string FullName => "PartiallyLoadedAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+
+        public override Type[] GetTypes()
+            => throw new ReflectionTypeLoadException(
+                _loadedTypes,
+                new Exception[] { new FileNotFoundException("Could not load file or assembly 'Microsoft.Bcl.AsyncInterfaces, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'. The system cannot find the file specified.") });
+
+        public override Type? GetType(string name, bool throwOnError, bool ignoreCase) => null;
+
+        // These have to hand back an Attribute[], the reflection helpers cast the result back to one.
+        public override object[] GetCustomAttributes(bool inherit) => Array.Empty<Attribute>();
+
+        public override object[] GetCustomAttributes(Type attributeType, bool inherit) => Array.Empty<Attribute>();
+
+        public override bool IsDefined(Type attributeType, bool inherit) => false;
+    }
 
     #region Discoverers
 
