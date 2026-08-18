@@ -35,6 +35,10 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// This prevents <see cref="RecordResult"/> from sending a duplicate end event while
     /// allowing another execution with the same ID to use the result safety net.
     /// </summary>
+    /// <remarks>
+    /// Pairing uses reference equality, so <see cref="RecordEnd"/> and <see cref="RecordResult"/>
+    /// must receive the same <see cref="TestCase"/> instance for an execution.
+    /// </remarks>
     private readonly Dictionary<TestCase, int> _testCaseEndCalledMap;
 
     private readonly object _testCaseInProgressSyncObject = new();
@@ -170,35 +174,18 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
 
         _testCaseEventsHandler!.SendTestCaseEnd(testCase, outcome);
 
+        if (explicitEnd)
+        {
+            _testCaseEndCalledMap[testCase] = _testCaseEndCalledMap.TryGetValue(testCase, out int endCount) ? endCount + 1 : 1;
+        }
+
         if (count == 1)
         {
             _testCaseInProgressMap.Remove(testCase.Id);
-            RemovePendingEnds(testCase.Id);
         }
         else
         {
             _testCaseInProgressMap[testCase.Id] = count - 1;
-            if (explicitEnd)
-            {
-                _testCaseEndCalledMap[testCase] = _testCaseEndCalledMap.TryGetValue(testCase, out int endCount) ? endCount + 1 : 1;
-            }
-        }
-    }
-
-    private void RemovePendingEnds(Guid testCaseId)
-    {
-        var completedTestCases = new List<TestCase>();
-        foreach (TestCase testCase in _testCaseEndCalledMap.Keys)
-        {
-            if (testCase.Id == testCaseId)
-            {
-                completedTestCases.Add(testCase);
-            }
-        }
-
-        foreach (TestCase testCase in completedTestCases)
-        {
-            _testCaseEndCalledMap.Remove(testCase);
         }
     }
 

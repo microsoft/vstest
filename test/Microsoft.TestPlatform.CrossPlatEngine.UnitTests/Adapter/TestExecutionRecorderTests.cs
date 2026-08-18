@@ -321,5 +321,34 @@ public class TestExecutionRecorderTests
             Times.Once);
     }
 
+    [TestMethod]
+    public void RecordResultShouldNotConsumeNewExecutionAfterSharedIdCountReachedZero()
+    {
+        var firstTestCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
+        var secondTestCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
+        var thirdTestCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
+        var firstResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(firstTestCase) { Outcome = TestOutcome.Passed };
+        var secondResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(secondTestCase) { Outcome = TestOutcome.Failed };
+        var thirdResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(thirdTestCase) { Outcome = TestOutcome.Skipped };
+
+        _testRecorderWithTestEventsHandler.RecordStart(firstTestCase);
+        _testRecorderWithTestEventsHandler.RecordStart(secondTestCase);
+        _testRecorderWithTestEventsHandler.RecordEnd(firstTestCase, TestOutcome.Passed);
+        _testRecorderWithTestEventsHandler.RecordResult(secondResult);
+        _testRecorderWithTestEventsHandler.RecordStart(thirdTestCase);
+        _testRecorderWithTestEventsHandler.RecordResult(firstResult);
+        _testRecorderWithTestEventsHandler.RecordResult(thirdResult);
+
+        _mockTestCaseEventsHandler.Verify(
+            x => x.SendTestCaseEnd(It.Is<TestCase>(testCase => ReferenceEquals(testCase, firstTestCase)), TestOutcome.Passed),
+            Times.Once);
+        _mockTestCaseEventsHandler.Verify(
+            x => x.SendTestCaseEnd(It.Is<TestCase>(testCase => ReferenceEquals(testCase, secondTestCase)), TestOutcome.Failed),
+            Times.Once);
+        _mockTestCaseEventsHandler.Verify(
+            x => x.SendTestCaseEnd(It.Is<TestCase>(testCase => ReferenceEquals(testCase, thirdTestCase)), TestOutcome.Skipped),
+            Times.Once);
+    }
+
     #endregion
 }
