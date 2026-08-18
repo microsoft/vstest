@@ -76,6 +76,21 @@ public class TestTaskUtilsTests
     }
 
     [TestMethod]
+    [DataRow(typeof(VSTestTask))]
+    [DataRow(typeof(VSTestTask2))]
+    public void VSTestCLIRunSettingsMustBindAsStringToSurviveUnixPathNormalization(Type taskType)
+    {
+        // MSBuild expands an array task parameter into ITaskItem instances, and ITaskItem.ItemSpec
+        // rewrites \ to / on Unix. That silently corrupted run settings containing backslashes, for
+        // example regex patterns (https://github.com/microsoft/vstest/issues/15043). A scalar string
+        // parameter is expanded as text and keeps the value intact, so the type must stay string.
+        var property = taskType.GetProperty(nameof(ITestTask.VSTestCLIRunSettings));
+
+        Assert.IsNotNull(property);
+        Assert.AreEqual(typeof(string), property.PropertyType);
+    }
+
+    [TestMethod]
     public void CreateArgumentShouldSplitCLIRunSettingsOnSemicolon()
     {
         // dotnet test joins the arguments that follow "--" with a semicolon before it sets the
