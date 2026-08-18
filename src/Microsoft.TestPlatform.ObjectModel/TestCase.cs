@@ -19,6 +19,31 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 [DataContract]
 public sealed class TestCase : TestObject
 {
+    /// <summary>
+    /// Opt-out escape hatch. Set to <c>sha1</c> to keep generating the legacy SHA1 based test ids.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// Moving to xxHash128 changes the id of every test, which is a breaking change for anything
+    /// that stored those ids - most notably Azure DevOps Test Case work item association. Prior
+    /// investigation indicates Azure DevOps keys test identity on the test name and container
+    /// rather than on this id, but until that is confirmed end to end this switch lets an affected
+    /// user roll back without downgrading the whole test platform.
+    /// </para>
+    /// <para>
+    /// This is deliberately an algorithm selector rather than a boolean, so a future scheme can be
+    /// added without inventing a second switch. It is read once, because the id has to be stable
+    /// for the lifetime of the process.
+    /// </para>
+    /// </remarks>
+    internal const string TestCaseIdAlgorithmEnvironmentVariable = "VSTEST_TESTCASE_ID_ALGORITHM";
+
+    private static readonly bool UseLegacySha1TestIds =
+        string.Equals(
+            Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable),
+            "sha1",
+            StringComparison.OrdinalIgnoreCase);
+
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
     private string? _displayName;
@@ -201,7 +226,14 @@ public sealed class TestCase : TestObject
         // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
         testcaseFullName += GetFullyQualifiedName();
 
-        return EqtHash.GuidFromString(testcaseFullName);
+        if (UseLegacySha1TestIds)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete - deliberate, this is the legacy opt-out path.
+            return EqtHash.GuidFromString(testcaseFullName);
+#pragma warning restore CS0618
+        }
+
+        return EqtHash.GuidFromString2(testcaseFullName);
     }
 
     private void SetVariableAndResetId<T>(ref T variable, T value)

@@ -1,29 +1,36 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
-using System.Security.Cryptography;
 using System.Text;
+
+using Microsoft.TestPlatform.Hashing;
 
 namespace Microsoft.TestPlatform.AdapterUtilities;
 
 /// <summary>
-/// Used to generate id for tests, using SHA1.
+/// Used to generate id for tests, using xxHash128.
 /// </summary>
-[Obsolete("TestIdProvider is deprecated and will be removed because it uses SHA1, a cryptographic hash, for a non-cryptographic purpose. Migrate to TestIdProvider2, which uses xxHash128 and produces a versioned RFC 9562 version 8 UUID.")]
-public class TestIdProvider
+/// <remarks>
+/// This is the replacement for <see cref="TestIdProvider"/>, which uses SHA1. SHA1 is a
+/// cryptographic hash being used for a non-cryptographic purpose; it is slower than necessary and
+/// its presence trips security tooling. The ids produced here are RFC 9562 version 8 UUIDs that
+/// carry the version of the hashing scheme, so a future change to the algorithm is detectable
+/// from the id itself.
+/// </remarks>
+public class TestIdProvider2
 {
     private Guid _id = Guid.Empty;
     private byte[]? _hash;
 
-    private readonly SHA1 _sha;
+    private readonly XxHash128 _hasher;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TestIdProvider"/> class.
+    /// Initializes a new instance of the <see cref="TestIdProvider2"/> class.
     /// </summary>
-    public TestIdProvider()
+    public TestIdProvider2()
     {
-        _sha = SHA1.Create();
+        _hasher = new XxHash128();
     }
 
     /// <summary>
@@ -40,9 +47,9 @@ public class TestIdProvider
         }
         _ = str ?? throw new ArgumentNullException(nameof(str));
 
-        var bytes = Encoding.Unicode.GetBytes(str);
+        byte[] bytes = Encoding.Unicode.GetBytes(str);
 
-        _sha.TransformBlock(bytes, 0, bytes.Length, null, 0);
+        _hasher.Append(bytes);
     }
 
     /// <summary>
@@ -64,7 +71,7 @@ public class TestIdProvider
             return;
         }
 
-        _sha.TransformBlock(bytes, 0, bytes.Length, null, 0);
+        _hasher.Append(bytes);
     }
 
     /// <summary>
@@ -77,16 +84,9 @@ public class TestIdProvider
     /// </remarks>
     public byte[] GetHash()
     {
-        if (_hash != null)
-        {
-            return _hash;
-        }
+        _hash ??= _hasher.GetCurrentHash();
 
-        // Finalize the hash. We don't have any more data so we provide empty.
-        _sha.TransformFinalBlock(Array.Empty<byte>(), 0, 0);
-        _hash = _sha.Hash;
-
-        return _hash!;
+        return _hash;
     }
 
     /// <summary>
@@ -104,15 +104,10 @@ public class TestIdProvider
             return _id;
         }
 
-#if NET
-        var hashSlice = GetHash().AsSpan().Slice(0, 16);
-        _id = new Guid(hashSlice);
-#else
-        // create from span?
-        var toGuid = new byte[16];
-        Array.Copy(GetHash(), toGuid, 16);
-        _id = new Guid(toGuid);
-#endif
+        // VersionedGuidFromHash mutates what it is given, and GetHash() hands out the cached array,
+        // so hand it a copy to keep GetHash() honest for callers that call it themselves.
+        byte[] hash = (byte[])GetHash().Clone();
+        _id = TestIdGuid.VersionedGuidFromHash(hash, TestIdGuid.CurrentHashVersion);
 
         return _id;
     }
