@@ -120,10 +120,8 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
         if (string.Equals(collectArgumentList[0], MicrosoftCodeCoverageConstants.FriendlyName, StringComparison.OrdinalIgnoreCase))
         {
-            // Auto-discover the Microsoft Code Coverage adapter from the NuGet global packages directory when
-            // --collect:"Code Coverage" is used in DLL mode (where the MSBuild task is never invoked and
-            // VSTestTraceDataCollectorDirectoryPath is never set). This is intentionally scoped to the
-            // --collect CLI path only; --enable-code-coverage relies on the project's MSBuild setup.
+            // In DLL mode the MSBuild task never runs, so VSTestTraceDataCollectorDirectoryPath is not set.
+            // Discover the adapter from NuGet instead. Scoped to --collect; --enable-code-coverage uses MSBuild.
             TryAddCodeCoverageAdapterPath(_runSettingsManager);
         }
     }
@@ -304,20 +302,16 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     }
 
     /// <summary>
-    /// Attempts to add the Microsoft Code Coverage adapter path to the run settings by
-    /// auto-discovering the <c>microsoft.codecoverage</c> NuGet package in the global packages directory.
-    /// No-ops silently when the package cannot be found.
+    /// Adds the Microsoft Code Coverage adapter path to the run settings, discovered from the
+    /// <c>microsoft.codecoverage</c> NuGet package. Does nothing when the package cannot be found.
     /// </summary>
     internal static void TryAddCodeCoverageAdapterPath(IRunSettingsProvider runSettingsManager, string? nugetPackagesOverride = null)
     {
-        // Ask the run settings first, so a run that already has adapter paths pays no file system cost.
-        // An entry only counts when it is an actual path, a node holding nothing but whitespace is not
-        // a configured path.
+        // A run that already has adapter paths does no discovery. A whitespace-only node counts as unset.
         var existingPaths = TestAdapterPathArgumentExecutor.SplitPaths(
             runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath));
         if (existingPaths.Any(p => !p.IsNullOrWhiteSpace()))
         {
-            // User explicitly configured adapter paths — don't clobber with auto-discovered NuGet path.
             return;
         }
 
@@ -345,8 +339,7 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or NotSupportedException or SecurityException)
         {
-            // Auto-discovery is best effort. A packages folder we are not allowed to read, a transient
-            // IO error, or an unusable NUGET_PACKAGES value must not take down the whole run.
+            // Discovery is best effort; a packages folder we cannot read must not fail the run.
             EqtTrace.Verbose("CollectArgumentExecutor.TryGetCodeCoverageAdapterPath: Could not inspect the NuGet global packages folder: {0}", ex);
         }
 
@@ -412,9 +405,8 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     }
 
     /// <summary>
-    /// Splits a NuGet package folder name into its numeric version and pre-release label,
-    /// e.g. <c>18.5.0-preview-1</c> into <c>18.5.0</c> and <c>preview-1</c>. Build metadata
-    /// (anything after <c>+</c>) is ignored, as it does not take part in version ordering.
+    /// Splits a NuGet folder name into numeric version and pre-release label, e.g. <c>18.5.0-preview-1</c>
+    /// into <c>18.5.0</c> and <c>preview-1</c>. Build metadata after <c>+</c> is ignored for ordering.
     /// </summary>
     private static bool TryParseNuGetVersion(string versionName, [NotNullWhen(true)] out Version? version, out string? preReleaseLabel)
     {
@@ -435,11 +427,9 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     }
 
     /// <summary>
-    /// Orders two package versions the way NuGet does: by numeric version first, then a pre-release
-    /// sorts below the stable release with the same numeric version, then by pre-release label per
-    /// SemVer 2.0. Equal candidates fall back to an ordinal comparison of the folder name so the
-    /// winner never depends on the order <see cref="Directory.GetDirectories(string)"/> happens to
-    /// return directories in.
+    /// Orders two package versions the way NuGet does: numeric version first, then a pre-release below the
+    /// stable release with the same numeric version, then the pre-release label per SemVer 2.0. Equal
+    /// candidates fall back to the folder name so the result does not depend on directory order.
     /// </summary>
     private static int CompareNuGetVersions(
         Version left, string? leftPreRelease, string leftName,
