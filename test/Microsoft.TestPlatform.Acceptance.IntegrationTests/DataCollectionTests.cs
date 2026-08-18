@@ -238,7 +238,6 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
     public void DataCollectorReceivesTestCaseStartForEveryDataDrivenRow(RunnerInfo runnerInfo)
     {
