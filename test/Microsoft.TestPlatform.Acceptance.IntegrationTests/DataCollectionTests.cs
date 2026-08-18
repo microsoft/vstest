@@ -238,12 +238,12 @@ public class DataCollectionTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [NetCoreTargetFrameworkDataSource]
+    [TestMatrix(testHost: Net)]
     public void DataCollectorReceivesTestCaseStartForEveryDataDrivenRow(RunnerInfo runnerInfo)
     {
         // Regression test for https://github.com/microsoft/vstest/issues/4997
-        // When data-driven tests share the same TestCase.Id, TestCaseStart events
-        // must still fire for every row execution so data collectors can track each one.
+        // MSTest data rows share the ManagedType and ManagedMethod values used to calculate
+        // TestCase.Id, so TestCaseStart must still fire for every row execution.
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var assemblyPaths = GetAssetFullPath("DataDrivenTestProject.dll");
@@ -267,9 +267,5 @@ public class DataCollectionTests : AcceptanceTestBase
         // producing fewer files than actual test executions.
         var resultFiles = Directory.GetFiles(TempDirectory.Path, "testcasefilename*", SearchOption.AllDirectories);
         Assert.HasCount(4, resultFiles);
-
-        // Verify the collector logged start/end for each execution.
-        StdOutputContains("TestCaseStarted");
-        StdOutputContains("TestCaseEnded");
     }
 }

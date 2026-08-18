@@ -4,12 +4,14 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Runtime.CompilerServices;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Execution;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 
@@ -29,23 +31,14 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     private readonly Dictionary<Guid, int> _testCaseInProgressMap;
 
     /// <summary>
-    /// Tracks test case IDs for which <see cref="RecordEnd"/> has been called at least once
-    /// while the entry is still in progress (count &gt; 0). Used to suppress the
-    /// <see cref="RecordResult"/> safety-net in nested data-driven scenarios: once an
-    /// explicit RecordEnd fires for an ID, subsequent RecordResult calls must not send a
-    /// spurious extra TestCaseEnd that would consume the parent's pending count slot.
-    /// The ID is removed when the last in-progress count reaches zero.
-    /// <para>
-    /// <b>Known limitation:</b> suppression is ID-scoped, not per-invocation. If an adapter
-    /// calls <see cref="RecordEnd"/> for some rows sharing the same <see cref="TestCase.Id"/>
-    /// but relies on the <see cref="RecordResult"/> safety-net for others, those latter rows
-    /// will have their safety-net suppressed. In practice this is not a concern because
-    /// real adapters apply <see cref="RecordEnd"/> uniformly across all rows with the same ID.
-    /// </para>
+    /// Tracks explicit end events that have not yet been paired with a result.
+    /// This prevents <see cref="RecordResult"/> from sending a duplicate end event while
+    /// allowing another execution with the same ID to use the result safety net.
     /// </summary>
-    private readonly HashSet<Guid> _testCaseEndCalledSet;
+    private readonly Dictionary<TestCase, int> _testCaseEndCalledMap;
 
     private readonly object _testCaseInProgressSyncObject = new();
+    private readonly bool _disableMultipleTestCaseEvents;
 
     /// <summary>
     /// Initializes a new instance of the <see cref="TestExecutionRecorder"/> class.
@@ -53,10 +46,16 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <param name="testCaseEventsHandler"> The test Case Events Handler. </param>
     /// <param name="testRunCache"> The test run cache.  </param>
     public TestExecutionRecorder(ITestCaseEventsHandler? testCaseEventsHandler, ITestRunCache testRunCache)
+        : this(testCaseEventsHandler, testRunCache, FeatureFlag.Instance)
+    {
+    }
+
+    internal TestExecutionRecorder(ITestCaseEventsHandler? testCaseEventsHandler, ITestRunCache testRunCache, IFeatureFlag featureFlag)
     {
         _testRunCache = testRunCache;
         _testCaseEventsHandler = testCaseEventsHandler;
         _attachmentSets = new List<AttachmentSet>();
+        _disableMultipleTestCaseEvents = featureFlag.IsSet(FeatureFlag.VSTEST_DISABLE_MULTIPLE_TESTCASE_EVENTS);
 
         // As a framework guideline, we should get events in this order:
         // 1. Test Case Start.
@@ -65,7 +64,7 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         // If that is not that case.
         // If Test Adapters don't send the events in the above order, Test Case Results are cached till the Test Case End event is received.
         _testCaseInProgressMap = new Dictionary<Guid, int>();
-        _testCaseEndCalledSet = new HashSet<Guid>();
+        _testCaseEndCalledMap = new Dictionary<TestCase, int>(TestCaseReferenceComparer.Instance);
     }
 
     /// <summary>
@@ -93,11 +92,13 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
-                // Track the number of in-progress starts for this test case ID.
-                // Data-driven tests may call RecordStart multiple times with the same ID
-                // (when rows share the same fully-qualified name), so we must forward
-                // every start rather than deduplicating by ID.
-                _testCaseInProgressMap[testCase.Id] = _testCaseInProgressMap.TryGetValue(testCase.Id, out int count) ? count + 1 : 1;
+                bool isAlreadyInProgress = _testCaseInProgressMap.TryGetValue(testCase.Id, out int count);
+                if (_disableMultipleTestCaseEvents && isAlreadyInProgress)
+                {
+                    return;
+                }
+
+                _testCaseInProgressMap[testCase.Id] = isAlreadyInProgress ? count + 1 : 1;
                 _testCaseEventsHandler.SendTestCaseStart(testCase);
             }
         }
@@ -116,24 +117,20 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
-                // Safety net: send TestCaseEnd in case RecordEnd was not called.
-                // Guard: skip if RecordEnd was already called for this ID (indicated by presence in
-                // _testCaseEndCalledSet) to avoid consuming a count slot belonging to a parent or
-                // sibling in a nested data-driven scenario where all rows share the same TestCase.Id.
-                if (_testCaseInProgressMap.TryGetValue(testResult.TestCase.Id, out int count)
-                    && count > 0
-                    && !_testCaseEndCalledSet.Contains(testResult.TestCase.Id))
+                if (_testCaseEndCalledMap.TryGetValue(testResult.TestCase, out int endCount))
                 {
-                    _testCaseEventsHandler.SendTestCaseEnd(testResult.TestCase, testResult.Outcome);
-
-                    if (count == 1)
+                    if (endCount == 1)
                     {
-                        _testCaseInProgressMap.Remove(testResult.TestCase.Id);
+                        _testCaseEndCalledMap.Remove(testResult.TestCase);
                     }
                     else
                     {
-                        _testCaseInProgressMap[testResult.TestCase.Id] = count - 1;
+                        _testCaseEndCalledMap[testResult.TestCase] = endCount - 1;
                     }
+                }
+                else
+                {
+                    SendTestCaseEnd(testResult.TestCase, testResult.Outcome, explicitEnd: false);
                 }
             }
 
@@ -159,30 +156,59 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
         {
             lock (_testCaseInProgressSyncObject)
             {
-                // TestCaseEnd must always be preceded by TestCaseStart for a given test case id.
-                // Use the reference count to ensure we send exactly one End for each Start.
-                if (_testCaseInProgressMap.TryGetValue(testCase.Id, out int count) && count > 0)
-                {
-                    // Mark that RecordEnd was called for this ID while it is still in progress.
-                    // This suppresses the RecordResult safety-net for any subsequent Result calls
-                    // that share the same ID (e.g., row results in a nested data-driven test).
-                    _testCaseEndCalledSet.Add(testCase.Id);
-
-                    _testCaseEventsHandler.SendTestCaseEnd(testCase, outcome);
-
-                    // Decrement the count; remove both tracking entries when there are no more in-progress starts.
-                    if (count == 1)
-                    {
-                        _testCaseInProgressMap.Remove(testCase.Id);
-                        _testCaseEndCalledSet.Remove(testCase.Id);
-                    }
-                    else
-                    {
-                        _testCaseInProgressMap[testCase.Id] = count - 1;
-                    }
-                }
+                SendTestCaseEnd(testCase, outcome, explicitEnd: true);
             }
         }
+    }
+
+    private void SendTestCaseEnd(TestCase testCase, TestOutcome outcome, bool explicitEnd)
+    {
+        if (!_testCaseInProgressMap.TryGetValue(testCase.Id, out int count))
+        {
+            return;
+        }
+
+        _testCaseEventsHandler!.SendTestCaseEnd(testCase, outcome);
+
+        if (count == 1)
+        {
+            _testCaseInProgressMap.Remove(testCase.Id);
+            RemovePendingEnds(testCase.Id);
+        }
+        else
+        {
+            _testCaseInProgressMap[testCase.Id] = count - 1;
+            if (explicitEnd)
+            {
+                _testCaseEndCalledMap[testCase] = _testCaseEndCalledMap.TryGetValue(testCase, out int endCount) ? endCount + 1 : 1;
+            }
+        }
+    }
+
+    private void RemovePendingEnds(Guid testCaseId)
+    {
+        var completedTestCases = new List<TestCase>();
+        foreach (TestCase testCase in _testCaseEndCalledMap.Keys)
+        {
+            if (testCase.Id == testCaseId)
+            {
+                completedTestCases.Add(testCase);
+            }
+        }
+
+        foreach (TestCase testCase in completedTestCases)
+        {
+            _testCaseEndCalledMap.Remove(testCase);
+        }
+    }
+
+    private sealed class TestCaseReferenceComparer : IEqualityComparer<TestCase>
+    {
+        public static readonly TestCaseReferenceComparer Instance = new();
+
+        public bool Equals(TestCase? x, TestCase? y) => ReferenceEquals(x, y);
+
+        public int GetHashCode(TestCase obj) => RuntimeHelpers.GetHashCode(obj);
     }
 
     /// <summary>

@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -168,6 +169,24 @@ public class TestExecutionRecorderTests
     }
 
     [TestMethod]
+    public void RecordStartAndRecordEndShouldDeduplicateEventsWhenMultipleTestCaseEventsAreDisabled()
+    {
+        var featureFlag = new Mock<IFeatureFlag>();
+        featureFlag
+            .Setup(x => x.IsSet(FeatureFlag.VSTEST_DISABLE_MULTIPLE_TESTCASE_EVENTS))
+            .Returns(true);
+        var testRecorder = new TestExecutionRecorder(_mockTestCaseEventsHandler.Object, _testableTestRunCache, featureFlag.Object);
+
+        testRecorder.RecordStart(_testCase);
+        testRecorder.RecordStart(_testCase);
+        testRecorder.RecordEnd(_testCase, TestOutcome.Passed);
+        testRecorder.RecordEnd(_testCase, TestOutcome.Passed);
+
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Once);
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Once);
+    }
+
+    [TestMethod]
     public void RecordStartAndRecordEndShouldSendEventsForNestedDataDrivenTestsWithSameId()
     {
         // Simulate a data-driven scenario where the parent test and its row executions
@@ -259,6 +278,47 @@ public class TestExecutionRecorderTests
         // A third End from the RecordResult safety-net would indicate the regression is present.
         _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(2));
         _mockTestCaseEventsHandler.Verify(x => x.SendTestResult(_testResult), Times.Once);
+    }
+
+    [TestMethod]
+    public void RecordResultShouldSendTestCaseEndWhenExecutionsWithSameIdMixExplicitAndImplicitEnds()
+    {
+        _testResult.Outcome = TestOutcome.Passed;
+
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);
+        _testRecorderWithTestEventsHandler.RecordResult(_testResult);
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);
+        _testRecorderWithTestEventsHandler.RecordResult(_testResult);
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);
+        _testRecorderWithTestEventsHandler.RecordResult(_testResult);
+
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Exactly(3));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(3));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestResult(_testResult), Times.Exactly(3));
+    }
+
+    [TestMethod]
+    public void RecordResultShouldPairExplicitEndWithCorrectExecutionWhenSameIdEventsInterleave()
+    {
+        var firstTestCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
+        var secondTestCase = new TestCase("A.C.M", new Uri("executor://dummy"), "A");
+        var firstResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(firstTestCase) { Outcome = TestOutcome.Passed };
+        var secondResult = new Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult(secondTestCase) { Outcome = TestOutcome.Failed };
+
+        _testRecorderWithTestEventsHandler.RecordStart(firstTestCase);
+        _testRecorderWithTestEventsHandler.RecordStart(secondTestCase);
+        _testRecorderWithTestEventsHandler.RecordEnd(firstTestCase, TestOutcome.Passed);
+        _testRecorderWithTestEventsHandler.RecordResult(secondResult);
+        _testRecorderWithTestEventsHandler.RecordResult(firstResult);
+
+        _mockTestCaseEventsHandler.Verify(
+            x => x.SendTestCaseEnd(It.Is<TestCase>(testCase => ReferenceEquals(testCase, firstTestCase)), TestOutcome.Passed),
+            Times.Once);
+        _mockTestCaseEventsHandler.Verify(
+            x => x.SendTestCaseEnd(It.Is<TestCase>(testCase => ReferenceEquals(testCase, secondTestCase)), TestOutcome.Failed),
+            Times.Once);
     }
 
     #endregion
