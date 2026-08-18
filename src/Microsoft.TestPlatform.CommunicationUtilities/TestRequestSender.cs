@@ -847,12 +847,10 @@ public class TestRequestSender : ITestRequestSender
 
 internal class MessageConverter
 {
-    internal static AttachDebuggerInfo ConvertToAttachDebuggerInfo(TestProcessAttachDebuggerPayload attachDebuggerPayload)
-    {
-        return new AttachDebuggerInfo
+    internal static AttachDebuggerInfo ConvertToAttachDebuggerInfo(TestProcessAttachDebuggerPayload attachDebuggerPayload) =>
+        new()
         {
             ProcessId = attachDebuggerPayload.ProcessID,
             TargetFramework = attachDebuggerPayload.TargetFramework,
         };
-    }
 }
