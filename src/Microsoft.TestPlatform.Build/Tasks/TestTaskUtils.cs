@@ -366,6 +366,10 @@ internal static class TestTaskUtils
     /// <remarks>
     /// Entries are separated by newlines or semicolons. Empty and whitespace-only entries are dropped so that
     /// an unset or blank value does not append a lone "--" to the command line.
+    /// A single setting cannot contain a semicolon of its own. MSBuild unescapes the property before it
+    /// reaches this scalar string parameter, so %3B arrives as a plain semicolon and is split here, while
+    /// the former string[] parameter kept it as one entry. That escape route is gone on purpose, the array
+    /// form rewrote backslashes to forward slashes on Unix, which broke every setting holding a regex.
     /// </remarks>
     internal static List<string> SplitCLIRunSettings(string? value)
     {
