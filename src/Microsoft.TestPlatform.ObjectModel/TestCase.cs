@@ -24,25 +24,26 @@ public sealed class TestCase : TestObject
     /// </summary>
     /// <remarks>
     /// <para>
-    /// Moving to xxHash128 changes the id of every test, which is a breaking change for anything
-    /// that stored those ids - most notably Azure DevOps Test Case work item association. Prior
-    /// investigation indicates Azure DevOps keys test identity on the test name and container
-    /// rather than on this id, but until that is confirmed end to end this switch lets an affected
-    /// user roll back without downgrading the whole test platform.
+    /// Moving to xxHash128 changes the id of every test whose id is computed by the platform, which
+    /// is a breaking change for anything that stored those ids - most notably Azure DevOps Test Case
+    /// work item association. Prior investigation indicates Azure DevOps keys test identity on the
+    /// test name and container rather than on this id, but until that is confirmed end to end this
+    /// switch lets an affected user roll back without downgrading the whole test platform.
     /// </para>
     /// <para>
     /// This is deliberately an algorithm selector rather than a boolean, so a future scheme can be
-    /// added without inventing a second switch. It is read once, because the id has to be stable
-    /// for the lifetime of the process.
+    /// added without inventing a second switch.
     /// </para>
     /// </remarks>
     internal const string TestCaseIdAlgorithmEnvironmentVariable = "VSTEST_TESTCASE_ID_ALGORITHM";
 
-    private static readonly bool UseLegacySha1TestIds =
-        string.Equals(
-            Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable),
-            "sha1",
-            StringComparison.OrdinalIgnoreCase);
+    /// <summary>
+    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the legacy
+    /// SHA1 based ids.
+    /// </summary>
+    internal const string LegacySha1AlgorithmName = "sha1";
+
+    private static bool? s_useLegacySha1TestIds;
 
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
@@ -190,6 +191,29 @@ public sealed class TestCase : TestObject
             return TestCaseProperties.Properties.Concat(base.Properties);
         }
     }
+
+    /// <summary>
+    /// Whether to fall back to the legacy SHA1 based test ids.
+    /// </summary>
+    /// <remarks>
+    /// Read lazily rather than in a static initializer, so the value is not baked in at type load
+    /// time. Type load happens at an arbitrary, hard to predict point, which made the behaviour
+    /// depend on when the type happened to be touched and made it impossible to exercise this
+    /// switch from a test. The result is then cached, because an id has to stay stable for the
+    /// lifetime of the process. Two threads racing here both compute the same value, so the race
+    /// is benign and does not need a lock.
+    /// </remarks>
+    private static bool UseLegacySha1TestIds
+        => s_useLegacySha1TestIds ??= string.Equals(
+            Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable),
+            LegacySha1AlgorithmName,
+            StringComparison.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Clears the cached <see cref="UseLegacySha1TestIds"/> value so the environment variable is
+    /// read again. For tests only - production code must not change algorithm mid-process.
+    /// </summary>
+    internal static void ResetTestIdAlgorithmCache() => s_useLegacySha1TestIds = null;
 
     /// <summary>
     /// Creates a Id of TestCase

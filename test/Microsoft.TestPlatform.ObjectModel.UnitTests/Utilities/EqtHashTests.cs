@@ -19,6 +19,24 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 [TestClass]
 public class EqtHashTests
 {
+    private string? _originalAlgorithm;
+
+    // TestCase_Id_UsesTheXxHash128Algorithm asserts the default algorithm, so make sure an ambient
+    // VSTEST_TESTCASE_ID_ALGORITHM on the developer's machine cannot flip it.
+    [TestInitialize]
+    public void ForceDefaultTestIdAlgorithm()
+    {
+        _originalAlgorithm = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable);
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, null);
+        TestCase.ResetTestIdAlgorithmCache();
+    }
+
+    [TestCleanup]
+    public void RestoreTestIdAlgorithm()
+    {
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, _originalAlgorithm);
+        TestCase.ResetTestIdAlgorithmCache();
+    }
     [TestMethod]
     [DataRow("", "19aa06d3-0147-88d8-a001-c324468d497f")]
     [DataRow("abc", "1dcae961-3d3c-87ca-8340-2c89fa0d3198")]
