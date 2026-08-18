@@ -26,25 +26,21 @@ public partial class ProcessHelper : IProcessHelper
     // so a late-delivered crash callstack (e.g. "Stack overflow.") is not dropped. See the Exited handler.
     private const int CrashErrorDrainTimeout = 5000;
 
-    // Bounded time (ms) we wait for stderr to drain after a clean exit, kept short so neither the common
-    // case nor the rare grandchild-keeps-the-pipe-open case adds latency. See the Exited handler.
-    private const int CleanExitErrorDrainTimeout = 500;
+    // Bounded time (ms) we wait for stderr to drain after an exit we are not interested in diagnosing, kept
+    // short so neither the common case nor the rare grandchild-keeps-the-pipe-open case adds latency.
+    private const int NonCrashErrorDrainTimeout = 500;
 
-    // Processes we asked to kill (e.g. when aborting or cleaning up a run). When such a kill lands, the abnormal
-    // exit code is expected and is not a crash, so the exit handler must not spend the long stderr-drain budget
-    // on it - that would make aborting a run from an IDE slow whenever a grandchild process (e.g. a browser
-    // driver) keeps the stderr pipe open. This records only that we asked; whether the kill actually terminated
-    // the process is decided from the exit code, see WasTerminatedByOurKill. ConditionalWeakTable holds only weak
-    // references to the processes, so entries disappear when a process is collected and nothing has to be removed
-    // explicitly.
-    private readonly ConditionalWeakTable<Process, object> _killRequestedProcesses = new();
-    private readonly object _killRequestedProcessesLock = new();
-    private static readonly object KillRequestedMarker = new();
+    // Bounded time (ms) we still give stderr once we decide to tear the process down. Not zero, because the
+    // output is often already sitting in the pipe and costs nothing to pick up, but short enough that an abort
+    // stays responsive even when a grandchild process (e.g. a browser driver) keeps the pipe open forever.
+    private const int TearDownErrorDrainTimeout = 100;
 
-    // Exit code a process is left with when Process.Kill() terminates it: Kill calls TerminateProcess(handle, -1)
-    // on Windows, and sends SIGKILL on Unix, which .NET reports as 128 + signal number.
-    private const int WindowsKillExitCode = -1;
-    private const int UnixSigKillExitCode = 128 + 9;
+    // Per-process signal that we are deliberately tearing the process down (aborting or cleaning up a run),
+    // rather than observing it die on its own. Cancelling it cuts the stderr drain short - including a drain
+    // that is already in flight, which is what keeps aborting a run from an IDE responsive. ConditionalWeakTable
+    // holds only weak references to the processes, so entries disappear when a process is collected and nothing
+    // has to be removed explicitly.
+    private readonly ConditionalWeakTable<Process, CancellationTokenSource> _tearDownSignals = new();
 
 #if !NET
     private readonly IEnvironment _environment;
@@ -153,8 +149,9 @@ public partial class ProcessHelper : IProcessHelper
             // Completed once the redirected stderr stream reaches EOF (signaled by a null Data event,
             // which is raised after all stderr lines have been handed to errorCallback). This is
             // the only reliable signal that the asynchronously-collected error output is complete:
-            // neither WaitForExit(timeout) nor WaitForExitAsync guarantees the ErrorDataReceived
-            // callbacks have run. The exit handler below awaits (bounded) on this before reading.
+            // neither WaitForExit(timeout) nor WaitForExitAsync(token) is guaranteed to observe EOF, because
+            // the latter stops waiting for it as soon as its token is cancelled. The exit handler below awaits
+            // (bounded) on this before reading.
             TaskCompletionSource<bool>? errorStreamClosed = null;
             if (errorCallback != null)
             {
@@ -163,12 +160,14 @@ public partial class ProcessHelper : IProcessHelper
                 errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
                 process.ErrorDataReceived += (sender, args) =>
                 {
+                    errorCallback(sender as Process, args.Data);
+
+                    // Signal EOF only after the last callback has been delivered, so anyone who observes this
+                    // is guaranteed to see the complete error output.
                     if (args.Data is null)
                     {
                         errorStreamClosed.TrySetResult(true);
                     }
-
-                    errorCallback(sender as Process, args.Data);
                 };
             }
 
@@ -190,10 +189,11 @@ public partial class ProcessHelper : IProcessHelper
                             // issues, discussions and documentations.
                             //
                             // On .NET 5 and later we use WaitForExitAsync to give the child process (and any
-                            // grandchild) some time to exit. NOTE: WaitForExitAsync only waits for the process
-                            // to exit; it does NOT guarantee that the asynchronous Output/ErrorDataReceived
-                            // callbacks have finished delivering. The bounded stderr drain after this block
-                            // ensures the captured error output is complete before exitCallBack reads it.
+                            // grandchild) some time to exit. NOTE: WaitForExitAsync does wait for the redirected
+                            // Output/Error streams to reach EOF, but only for as long as its token allows - once
+                            // the token is cancelled it stops waiting for them. The bounded stderr drain after
+                            // this block is what gives a crashed process a longer, separate budget to deliver its
+                            // callstack.
                             //
                             // For older frameworks, the solution is more tricky but it seems we can get the expected
                             // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
@@ -229,12 +229,11 @@ public partial class ProcessHelper : IProcessHelper
                                         if (!p.HasExited)
                                         {
                                             // We are force-killing a process that overran the exit budget (e.g. a
-                                            // grandchild keeps it hanging). Record the request - exactly like
-                                            // TerminateProcess does - BEFORE killing, so the stderr drain below uses
-                                            // the short abort budget instead of treating our own kill as a crash and
-                                            // waiting the generous 5s budget unnecessarily. Recording it does not by
-                                            // itself shorten the budget; see WasTerminatedByOurKill.
-                                            MarkKillRequested(p);
+                                            // grandchild keeps it hanging). Signal the teardown - exactly like
+                                            // TerminateProcess does - BEFORE killing, so the stderr drain below
+                                            // uses the short teardown budget instead of treating our own kill as
+                                            // a crash and waiting the generous budget unnecessarily.
+                                            SignalTearDown(p);
                                             p.Kill();
                                         }
                                     }
@@ -259,8 +258,6 @@ public partial class ProcessHelper : IProcessHelper
                         // The process has exited. Asynchronously wait (bounded) for the redirected stderr to reach
                         // EOF so that asynchronously-collected error output (e.g. a testhost crash callstack such as
                         // "Stack overflow.") is complete before the exit callback consumes it.
-                        // WaitForExit(timeout)/WaitForExitAsync do not guarantee the ErrorDataReceived callbacks
-                        // have run.
                         //
                         // We await rather than block here on purpose: the crash callstack can be delivered to
                         // ErrorDataReceived noticeably late under load (e.g. thread-pool starvation while many test
@@ -270,17 +267,16 @@ public partial class ProcessHelper : IProcessHelper
                         // RunTestsShouldThrowOnStackOverflowException flaky.
                         //
                         // This drain budget is intentionally separate from (and far more generous than) the
-                        // process-exit budget above, and the generous part is only spent when the process crashed -
-                        // i.e. it exited abnormally on its own. A clean exit, or a process our own kill terminated
-                        // (e.g. aborting a run from an IDE), gets only a short grace period so we never add latency
-                        // to those cases - in particular we must not hang for seconds on abort when a grandchild
-                        // process keeps the stderr pipe open and EOF never arrives. In every case the wait returns
-                        // as soon as EOF is observed, so a process that exits and drains promptly pays almost nothing.
-                        var exitCode = GetExitCodeOrNull(p);
-                        var errorDrainTimeout = GetErrorDrainTimeout(
-                            exitedCleanly: exitCode == 0,
-                            deliberatelyTerminated: WasTerminatedByOurKill(WasKillRequested(p), exitCode));
-                        await WaitForErrorStreamToDrainAsync(errorStreamClosed, errorDrainTimeout).ConfigureAwait(false);
+                        // process-exit budget above, and the generous part is only spent on a crash - an abnormal
+                        // exit of a process we were not already tearing down. A clean exit gets a short grace
+                        // period, and a process we are tearing down (aborting or cleaning up a run) gets less
+                        // still, because there the priority is to get out of the way rather than to diagnose.
+                        // The teardown signal is a cancellation, so asking to tear down also cuts short a drain
+                        // that is already in flight. In every case the wait returns as soon as EOF is observed, so
+                        // a process that exits and drains promptly pays almost nothing.
+                        var tearDown = GetTearDownToken(p);
+                        var errorDrainTimeout = GetErrorDrainTimeout(exitedCleanly: ExitedCleanly(p), tearingDown: tearDown.IsCancellationRequested);
+                        await WaitForErrorStreamToDrainAsync(errorStreamClosed, errorDrainTimeout, tearDown, TearDownErrorDrainTimeout).ConfigureAwait(false);
                     }
 
                     // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
@@ -311,12 +307,21 @@ public partial class ProcessHelper : IProcessHelper
     /// output is complete - before it is consumed by the exit callback. It returns immediately when there is
     /// no redirected error stream, when the timeout is not positive, or when the stream has already drained
     /// (the common case), and is otherwise bounded by the timeout (e.g. a grandchild process keeps the pipe
-    /// open), so the caller can never hang. It deliberately does not
-    /// block the calling thread while waiting, so it does not consume a thread-pool thread that the pending
-    /// <see cref="Process.ErrorDataReceived"/> callback may itself need in order to deliver EOF under
-    /// thread-pool starvation.
+    /// open), so the caller can never hang. It deliberately does not block the calling thread while waiting,
+    /// so it does not consume a thread-pool thread that the pending <see cref="Process.ErrorDataReceived"/>
+    /// callback may itself need in order to deliver EOF under thread-pool starvation.
+    /// <para>
+    /// When <paramref name="tearDown"/> is signaled we are no longer diagnosing the process but getting out of
+    /// its way (aborting or cleaning up a run), so the remaining wait collapses to
+    /// <paramref name="tearDownTimeoutMilliseconds"/>. That applies to a wait that is already in flight too,
+    /// which is what keeps an abort responsive when a long crash budget is already being spent.
+    /// </para>
     /// </summary>
-    internal static async Task WaitForErrorStreamToDrainAsync(TaskCompletionSource<bool>? errorStreamClosed, int timeoutMilliseconds)
+    internal static async Task WaitForErrorStreamToDrainAsync(
+        TaskCompletionSource<bool>? errorStreamClosed,
+        int timeoutMilliseconds,
+        CancellationToken tearDown = default,
+        int tearDownTimeoutMilliseconds = 0)
     {
         if (errorStreamClosed is null || timeoutMilliseconds <= 0 || errorStreamClosed.Task.IsCompleted)
         {
@@ -324,6 +329,25 @@ public partial class ProcessHelper : IProcessHelper
         }
 
         using var timeoutCancellation = new CancellationTokenSource();
+
+        // Registered rather than awaited alongside the others, so a teardown that arrives mid-wait shortens the
+        // budget instead of being noticed only after the original one has been spent. Disposed before
+        // timeoutCancellation (reverse declaration order), so the callback cannot run against a disposed source.
+        using var tearDownRegistration = tearDown.CanBeCanceled
+            ? tearDown.Register(() =>
+            {
+                try
+                {
+                    timeoutCancellation.CancelAfter(tearDownTimeoutMilliseconds);
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The wait already finished and disposed its timeout; there is nothing left to shorten.
+                }
+            })
+            : default;
+
+        // Cancelling the delay leaves it in the canceled - not faulted - state, so it never needs to be observed.
         var delayTask = Task.Delay(timeoutMilliseconds, timeoutCancellation.Token);
         var completedTask = await Task.WhenAny(errorStreamClosed.Task, delayTask).ConfigureAwait(false);
 
@@ -335,65 +359,65 @@ public partial class ProcessHelper : IProcessHelper
     }
 
     /// <summary>
-    /// Returns the exit code of a process that has exited, or <see langword="null"/> when it has not exited or the
-    /// exit code cannot be retrieved (e.g. the process handle is gone). Callers treat a <see langword="null"/> exit
-    /// code as a crash, so the redirected stderr gets the longer budget to drain and potentially important crash
-    /// output is not truncated.
+    /// Returns whether a process exited with code 0. A process whose exit code cannot be retrieved (e.g. it was
+    /// disposed while the exit was being handled) is reported as not clean, so a possible crash keeps the
+    /// generous stderr budget rather than being cut short. Deciding that we are tearing the process down is a
+    /// separate, explicit signal, so this does not have to guess at intent.
     /// </summary>
-    private static int? GetExitCodeOrNull(Process process)
+    private static bool ExitedCleanly(Process process)
     {
         try
         {
-            return process.HasExited ? process.ExitCode : null;
+            return process.HasExited && process.ExitCode == 0;
         }
         catch
         {
-            return null;
+            return false;
         }
     }
 
     /// <summary>
-    /// Picks the bounded time we are willing to wait for the redirected stderr to reach EOF. A genuine crash
-    /// (an abnormal exit we did not cause) gets the generous budget so a late-delivered crash callstack is
-    /// captured; a clean exit, or a process we deliberately killed (an abort/cleanup), gets only the short
-    /// budget so we never add latency to those cases.
+    /// Picks the bounded time we are willing to wait for the redirected stderr to reach EOF.
+    /// <list type="bullet">
+    /// <item>A process we are tearing down (aborting or cleaning up a run) gets the shortest budget: we are no
+    /// longer diagnosing it, we are getting out of its way, and a grandchild process (e.g. a browser driver)
+    /// that keeps the pipe open must not be able to stall the abort.</item>
+    /// <item>A clean exit gets a short grace period, because there is normally nothing left to collect.</item>
+    /// <item>A crash - an abnormal exit of a process we were not tearing down - gets the generous budget, so a
+    /// late-delivered crash callstack such as "Stack overflow." is captured rather than truncated.</item>
+    /// </list>
     /// </summary>
-    internal static int GetErrorDrainTimeout(bool exitedCleanly, bool deliberatelyTerminated)
-        => exitedCleanly || deliberatelyTerminated ? CleanExitErrorDrainTimeout : CrashErrorDrainTimeout;
+    internal static int GetErrorDrainTimeout(bool exitedCleanly, bool tearingDown)
+        => tearingDown ? TearDownErrorDrainTimeout
+        : exitedCleanly ? NonCrashErrorDrainTimeout
+        : CrashErrorDrainTimeout;
 
     /// <summary>
-    /// Returns <see langword="true"/> when an exit is the result of a kill we asked for, so the exit handler can
-    /// give it the short abort budget instead of the generous crash budget.
-    /// <para>
-    /// Having asked is not enough on its own. We check <see cref="Process.HasExited"/> and then call
-    /// <see cref="Process.Kill()"/>, and the process can crash on its own in between - in which case the kill
-    /// never lands (on .NET it silently does nothing, on .NET Framework it throws) and the exit we are looking at
-    /// is a real crash. Requiring the exit code that our kill leaves behind means such a crash keeps the generous
-    /// budget and its late callstack is not truncated. An exit code we could not retrieve (<see langword="null"/>)
-    /// is treated the same way, for the same reason.
-    /// </para>
+    /// Signals that we are deliberately tearing <paramref name="process"/> down, so its stderr drain is cut
+    /// short. Safe to call more than once, and safe to call for a process this helper did not launch.
     /// </summary>
-    internal static bool WasTerminatedByOurKill(bool killRequested, int? exitCode)
-        => killRequested && exitCode is WindowsKillExitCode or UnixSigKillExitCode;
-
-    private void MarkKillRequested(Process process)
+    private void SignalTearDown(Process process)
     {
-        lock (_killRequestedProcessesLock)
+        try
         {
-            if (!_killRequestedProcesses.TryGetValue(process, out _))
-            {
-                _killRequestedProcesses.Add(process, KillRequestedMarker);
-            }
+            GetTearDownSource(process).Cancel();
+        }
+        catch
+        {
+            // Cancel surfaces whatever the registered callbacks threw. Failing to shorten a drain is not worth
+            // failing the teardown the caller actually asked for. (EqtTrace is not available in this assembly.)
         }
     }
 
-    private bool WasKillRequested(Process process)
-    {
-        lock (_killRequestedProcessesLock)
-        {
-            return _killRequestedProcesses.TryGetValue(process, out _);
-        }
-    }
+    /// <summary>
+    /// Returns the teardown token for <paramref name="process"/>, already signaled when we asked to tear the
+    /// process down before it exited.
+    /// </summary>
+    private CancellationToken GetTearDownToken(Process process)
+        => GetTearDownSource(process).Token;
+
+    private CancellationTokenSource GetTearDownSource(Process process)
+        => _tearDownSignals.GetValue(process, static _ => new CancellationTokenSource());
 
     /// <inheritdoc/>
     public string? GetCurrentProcessFileName()
@@ -464,17 +488,21 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public void TerminateProcess(object? process)
     {
+        if (process is not Process proc)
+        {
+            return;
+        }
+
+        // We are tearing this process down on purpose (abort/cleanup), so we are no longer interested in
+        // diagnosing it. Signal that BEFORE the kill, so the exit handler - which can run at any moment from
+        // here on - cannot miss it, and signal it even when the process has already exited, so a stderr drain
+        // that is already in flight for an earlier crash is cut short instead of holding up the abort.
+        SignalTearDown(proc);
+
         try
         {
-            if (process is Process proc && !proc.HasExited)
+            if (!proc.HasExited)
             {
-                // Killing a still-running process on purpose (abort/cleanup): record the request BEFORE the kill,
-                // so the exit handler - which can run at any moment from here on - cannot miss it. Recording it
-                // does not by itself shorten the stderr drain: the exit handler treats the exit as an abort only
-                // when the exit code is the one our kill leaves behind. So a process that crashes on its own
-                // between the check above and the kill is still treated as a crash and gets the generous budget,
-                // and a process that exits on its own without us asking never gets here at all.
-                MarkKillRequested(proc);
                 proc.Kill();
             }
         }

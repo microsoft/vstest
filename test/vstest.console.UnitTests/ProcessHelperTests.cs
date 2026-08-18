@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System.Diagnostics;
+using System.Threading;
 using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -22,6 +23,12 @@ public class ProcessHelperTests
 {
     private const int BudgetMs = 500;
 
+    // The drain's token means "we are tearing this process down", which is unrelated to test cancellation, so
+    // tests that do not exercise teardown pass a token that is never signaled rather than
+    // TestContext.CancellationToken.
+    private static readonly CancellationTokenSource NoTearDownSource = new();
+    private static CancellationToken NoTearDown => NoTearDownSource.Token;
+
     [TestMethod]
     public async Task WaitForErrorStreamToDrainShouldReturnOnceTheErrorStreamCloses()
     {
@@ -31,7 +38,7 @@ public class ProcessHelperTests
         // crash callstack) and not block to the timeout.
         var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
-        var drainTask = ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
+        var drainTask = ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000, NoTearDown);
         Assert.IsFalse(drainTask.IsCompleted, "The wait must still be in progress before the error stream drains.");
 
         // The late ErrorDataReceived EOF finally arrives; the wait must observe it and return promptly. The
@@ -59,7 +66,7 @@ public class ProcessHelperTests
         errorStreamClosed.TrySetResult(true);
 
         var stopwatch = Stopwatch.StartNew();
-        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000);
+        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 5000, NoTearDown);
         stopwatch.Stop();
 
         Assert.IsLessThan(
@@ -75,7 +82,7 @@ public class ProcessHelperTests
         var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var stopwatch = Stopwatch.StartNew();
-        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, BudgetMs);
+        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, BudgetMs, NoTearDown);
         stopwatch.Stop();
 
         Assert.IsFalse(errorStreamClosed.Task.IsCompleted, "Precondition: the stream never closes in this test.");
@@ -97,7 +104,7 @@ public class ProcessHelperTests
         var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
 
         var stopwatch = Stopwatch.StartNew();
-        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 0);
+        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed, timeoutMilliseconds: 0, NoTearDown);
         stopwatch.Stop();
 
         Assert.IsFalse(errorStreamClosed.Task.IsCompleted);
@@ -111,7 +118,7 @@ public class ProcessHelperTests
     public async Task WaitForErrorStreamToDrainShouldReturnImmediatelyWhenThereIsNoErrorStream()
     {
         var stopwatch = Stopwatch.StartNew();
-        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed: null, BudgetMs);
+        await ProcessHelper.WaitForErrorStreamToDrainAsync(errorStreamClosed: null, BudgetMs, NoTearDown);
         stopwatch.Stop();
 
         Assert.IsLessThan(
@@ -123,87 +130,100 @@ public class ProcessHelperTests
     [TestMethod]
     public void GetErrorDrainTimeoutShouldUseTheGenerousBudgetOnlyForACrash()
     {
-        // A crash is an abnormal exit we did not cause: not a clean exit and not something we killed.
-        var crash = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, deliberatelyTerminated: false);
-        var cleanExit = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: true, deliberatelyTerminated: false);
-        var aborted = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, deliberatelyTerminated: true);
-        var cleanAndAborted = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: true, deliberatelyTerminated: true);
+        // A crash is an abnormal exit of a process we were not tearing down.
+        var crash = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, tearingDown: false);
+        var cleanExit = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: true, tearingDown: false);
+        var tearDown = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, tearingDown: true);
+        var cleanTearDown = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: true, tearingDown: true);
 
         Assert.IsGreaterThan(
             cleanExit,
             crash,
             "A crash must wait longer for stderr to drain than a clean exit, so a late crash callstack is captured.");
 
-        // A process we deliberately killed (e.g. aborting from an IDE) must drain as fast as a clean exit, so
-        // an abort never hangs for seconds when a grandchild keeps the stderr pipe open.
-        Assert.AreEqual(cleanExit, aborted, "A deliberately terminated process must use the short (clean-exit) budget.");
-        Assert.AreEqual(cleanExit, cleanAndAborted, "A clean, deliberately terminated process must use the short budget.");
-    }
-
-    // Exit code a process is left with when Process.Kill() terminates it: TerminateProcess(handle, -1) on
-    // Windows, and 128 + SIGKILL on Unix.
-    private const int WindowsKillExitCode = -1;
-    private const int UnixSigKillExitCode = 137;
-
-    // Windows STATUS_STACK_OVERFLOW - what a test host that blew its stack exits with. This is the crash whose
-    // callstack the drain budget exists to capture.
-    private const int StackOverflowExitCode = unchecked((int)0xC00000FD);
-
-    [TestMethod]
-    public void WasTerminatedByOurKillShouldBeTrueWhenTheKillLanded()
-    {
-        // We asked to kill the process and the exit code is the one Process.Kill() leaves behind, so this exit
-        // is our abort and must get the short drain budget.
-        Assert.IsTrue(
-            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: WindowsKillExitCode),
-            "A process killed on Windows exits with -1 and must count as deliberately terminated.");
-        Assert.IsTrue(
-            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: UnixSigKillExitCode),
-            "A process killed on Unix exits with 128 + SIGKILL and must count as deliberately terminated.");
-    }
-
-    [TestMethod]
-    public void WasTerminatedByOurKillShouldBeFalseWhenTheProcessCrashedInsideTheKillRaceWindow()
-    {
-        // TerminateProcess checks HasExited and then calls Kill, and the process can crash on its own in
-        // between. The kill then never lands - on .NET it silently does nothing, on .NET Framework it throws -
-        // and the exit we are looking at is a real crash carrying a real callstack. Having asked to kill must
-        // therefore not be enough to shorten the drain, or that callstack gets truncated.
-        Assert.IsFalse(
-            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: StackOverflowExitCode),
-            "A process that crashed between the HasExited check and the kill must still count as a crash.");
-
-        var timeout = ProcessHelper.GetErrorDrainTimeout(
-            exitedCleanly: false,
-            deliberatelyTerminated: ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: StackOverflowExitCode));
-        var crashTimeout = ProcessHelper.GetErrorDrainTimeout(exitedCleanly: false, deliberatelyTerminated: false);
-
+        // A process we are tearing down (e.g. aborting from an IDE) must drain fastest of all, so an abort never
+        // stalls for seconds when a grandchild keeps the stderr pipe open.
+        Assert.IsLessThan(
+            cleanExit,
+            tearDown,
+            "A process we are tearing down must use a shorter budget than even a clean exit.");
         Assert.AreEqual(
-            crashTimeout,
-            timeout,
-            "A crash that happened while we were asking for a kill must keep the generous crash drain budget.");
+            tearDown,
+            cleanTearDown,
+            "Tearing down decides the budget on its own; the exit code cannot make it wait longer.");
     }
 
     [TestMethod]
-    public void WasTerminatedByOurKillShouldBeFalseWhenTheExitCodeIsUnavailable()
+    public async Task WaitForErrorStreamToDrainShouldBeCutShortWhenTearDownIsSignaledUpFront()
     {
-        // We could not read the exit code, so we cannot tell whether our kill landed. Assume it did not, so the
-        // stderr keeps the generous budget rather than being cut short.
-        Assert.IsFalse(
-            ProcessHelper.WasTerminatedByOurKill(killRequested: true, exitCode: null),
-            "An unretrievable exit code must not be treated as our kill.");
+        // We already asked to tear the process down before its exit was handled (the abort/cleanup case). EOF
+        // never arrives because a grandchild keeps the pipe open, so only the short teardown budget may be spent
+        // even though the caller passed the generous crash budget.
+        var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var tearDown = new CancellationTokenSource();
+        tearDown.Cancel();
+
+        var stopwatch = Stopwatch.StartNew();
+        await ProcessHelper.WaitForErrorStreamToDrainAsync(
+            errorStreamClosed,
+            timeoutMilliseconds: 30000,
+            tearDown.Token,
+            tearDownTimeoutMilliseconds: 100);
+        stopwatch.Stop();
+
+        Assert.IsFalse(errorStreamClosed.Task.IsCompleted, "Precondition: the stream never closes in this test.");
+        Assert.IsLessThan(
+            5000L,
+            stopwatch.ElapsedMilliseconds,
+            $"An already-signaled teardown must collapse the budget, not spend it (took {stopwatch.ElapsedMilliseconds} ms).");
     }
 
     [TestMethod]
-    public void WasTerminatedByOurKillShouldBeFalseWhenWeNeverAskedToKill()
+    public async Task WaitForErrorStreamToDrainShouldBeCutShortWhenTearDownArrivesWhileWaiting()
     {
-        // A process that exits with the kill exit code on its own was not killed by us - it crashed, or chose
-        // that exit code - and must get the generous budget.
-        Assert.IsFalse(
-            ProcessHelper.WasTerminatedByOurKill(killRequested: false, exitCode: WindowsKillExitCode),
-            "Without a kill request the exit is not ours, whatever the exit code is.");
-        Assert.IsFalse(
-            ProcessHelper.WasTerminatedByOurKill(killRequested: false, exitCode: StackOverflowExitCode),
-            "A crash we did not cause must count as a crash.");
+        // The process crashed, so we started spending the generous budget, and only then did the user abort.
+        // The wait must react to that instead of running the crash budget to completion - this is what makes
+        // aborting a run from an IDE responsive.
+        var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var tearDown = new CancellationTokenSource();
+
+        var stopwatch = Stopwatch.StartNew();
+        var drainTask = ProcessHelper.WaitForErrorStreamToDrainAsync(
+            errorStreamClosed,
+            timeoutMilliseconds: 30000,
+            tearDown.Token,
+            tearDownTimeoutMilliseconds: 100);
+        Assert.IsFalse(drainTask.IsCompleted, "The wait must be in progress before the teardown is signaled.");
+
+        tearDown.Cancel();
+        await drainTask;
+        stopwatch.Stop();
+
+        Assert.IsFalse(errorStreamClosed.Task.IsCompleted, "Precondition: the stream never closes in this test.");
+        Assert.IsLessThan(
+            5000L,
+            stopwatch.ElapsedMilliseconds,
+            $"A teardown signaled mid-wait must cut the wait short (took {stopwatch.ElapsedMilliseconds} ms).");
+    }
+
+    [TestMethod]
+    public async Task WaitForErrorStreamToDrainShouldStillCaptureOutputThatArrivesDuringTearDown()
+    {
+        // Tearing down shortens the wait but does not make it give up instantly: stderr that is already sitting
+        // in the pipe costs nothing to pick up, and dropping it would replace a real error with a blank one.
+        var errorStreamClosed = new TaskCompletionSource<bool>(TaskCreationOptions.RunContinuationsAsynchronously);
+        using var tearDown = new CancellationTokenSource();
+        tearDown.Cancel();
+
+        var drainTask = ProcessHelper.WaitForErrorStreamToDrainAsync(
+            errorStreamClosed,
+            timeoutMilliseconds: 30000,
+            tearDown.Token,
+            tearDownTimeoutMilliseconds: 5000);
+
+        errorStreamClosed.TrySetResult(true);
+        await drainTask;
+
+        Assert.IsTrue(errorStreamClosed.Task.IsCompleted, "EOF that arrives within the teardown budget must still be observed.");
     }
 }
