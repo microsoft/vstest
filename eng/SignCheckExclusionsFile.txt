@@ -1,0 +1,12 @@
+;; Exclusions for SignCheck.
+;; Format: FILE_PATTERNS;PARENT_FILES;COMMENT
+;; https://github.com/dotnet/arcade/blob/main/src/Microsoft.DotNet.SignCheckLibrary/Verification/Exclusion.cs
+
+;; IntelliTraceCollection.cab comes from the Microsoft.Internal.Intellitrace package and is signed by
+;; Microsoft. SignCheck reads the signature offset and size from the wrong place in the cabinet reserved
+;; area and reports every signed cab as unsigned.
+;;
+;; Delete this file once the Arcade version in global.json contains the fix, and close #16389.
+;; Bug: https://github.com/dotnet/arcade/issues/17362
+;; Fix: https://github.com/dotnet/arcade/pull/17363
+IntelliTraceCollection.cab;;Signed by Microsoft, SignCheck misparses signed cabs, dotnet/arcade#17362
