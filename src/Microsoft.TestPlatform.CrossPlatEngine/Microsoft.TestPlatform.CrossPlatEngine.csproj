@@ -68,6 +68,11 @@
     <AdditionalFiles Include="PublicAPI/$(TargetFramework)/PublicAPI.Unshipped.txt" />
   </ItemGroup>
   <ItemGroup>
+    <!-- The MTP path builds TestCases in the runner, so it must derive the test id from exactly the
+         same seed ObjectModel would. Shared source keeps that composition in one place. -->
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/TestIdSeed.cs" LinkBase="Hashing" />
+  </ItemGroup>
+  <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 

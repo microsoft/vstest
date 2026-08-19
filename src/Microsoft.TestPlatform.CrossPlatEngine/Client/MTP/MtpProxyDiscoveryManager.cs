@@ -10,6 +10,7 @@ using Microsoft.Testing.Platform.ServerMode.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
@@ -22,6 +23,18 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
 
+    /// <summary>
+    /// The test id algorithm declared for this run in runsettings, or <see langword="null"/> when the
+    /// run does not declare one and the runner's own environment should decide.
+    /// </summary>
+    /// <remarks>
+    /// The classic path reads this from the testhost's environment, which runsettings
+    /// <c>RunConfiguration/EnvironmentVariables</c> populates. MTP nodes are converted into test
+    /// cases here, in the runner, which does not receive those variables, so the declared value has
+    /// to be read from the runsettings directly and passed to the converter.
+    /// </remarks>
+    private bool? _useLegacySha1TestIds;
+
     public void Initialize(bool skipDefaultAdapters)
     {
     }
@@ -31,6 +44,9 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
+        _useLegacySha1TestIds = MtpTestNodeConverter.ResolveUseLegacySha1TestIds(
+            InferRunSettingsHelper.GetEnvironmentVariables(discoveryCriteria.RunSettings));
+
         var sources = discoveryCriteria.Sources?.ToList() ?? new List<string>();
         long totalTests = 0;
         bool aborted = false;
@@ -96,7 +112,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
                 {
                     lock (discovered)
                     {
-                        discovered.Add(MtpTestNodeConverter.ToTestCase(change, source));
+                        discovered.Add(MtpTestNodeConverter.ToTestCase(change, source, _useLegacySha1TestIds));
                     }
                 }
             }

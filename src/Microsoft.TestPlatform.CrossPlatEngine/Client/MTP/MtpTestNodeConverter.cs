@@ -6,7 +6,9 @@ using System.Collections.Generic;
 using System.Globalization;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
@@ -41,6 +43,13 @@ internal static class MtpTestNodeConverter
     private const string VsTestFullyQualifiedNameKey = "vstest.TestCase.FullyQualifiedName";
     private const string VsTestExecutorUriKey = "vstest.original-executor-uri";
 
+    // Opt-out selecting the legacy SHA1 test id algorithm. On the classic path this is read from the
+    // testhost's own environment, which picks up runsettings RunConfiguration/EnvironmentVariables.
+    // MTP applications are their own host and their nodes are converted here, in the runner, so the
+    // runner has to read the declared value itself and pass the choice to the test case.
+    private const string TestCaseIdAlgorithmVariable = "VSTEST_TESTCASE_ID_ALGORITHM";
+    private const string LegacySha1AlgorithmName = "sha1";
+
     // Execution states (MTP wire values).
     private const string StateInProgress = "in-progress";
     private const string StatePassed = "passed";
@@ -65,7 +74,37 @@ internal static class MtpTestNodeConverter
     public static bool IsActionNode(MtpTestNodeUpdate update)
         => update.NodeType is ActionNodeType;
 
+    /// <summary>
+    /// Resolves whether the legacy SHA1 test id algorithm was requested for this run, from the
+    /// environment variables declared in runsettings <c>RunConfiguration/EnvironmentVariables</c>.
+    /// </summary>
+    /// <remarks>
+    /// Returns <see langword="null"/> when the run does not declare the variable, so the test case
+    /// falls back to the runner's own environment and the classic default. Declaring it explicitly
+    /// wins, so a runsettings value overrides an inherited one rather than silently agreeing with it.
+    /// </remarks>
+    public static bool? ResolveUseLegacySha1TestIds(IDictionary<string, string?>? runSettingsEnvironmentVariables)
+    {
+        if (runSettingsEnvironmentVariables is null)
+        {
+            return null;
+        }
+
+        foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
+        {
+            if (string.Equals(variable.Key, TestCaseIdAlgorithmVariable, StringComparison.OrdinalIgnoreCase))
+            {
+                return string.Equals(variable.Value, LegacySha1AlgorithmName, StringComparison.OrdinalIgnoreCase);
+            }
+        }
+
+        return null;
+    }
+
     public static TestCase ToTestCase(MtpTestNodeUpdate update, string source)
+        => ToTestCase(update, source, useLegacySha1TestIds: null);
+
+    public static TestCase ToTestCase(MtpTestNodeUpdate update, string source, bool? useLegacySha1TestIds)
     {
         string? uid = update.Uid;
         string fullyQualifiedName = GetRawString(update, VsTestFullyQualifiedNameKey)
@@ -93,12 +132,33 @@ internal static class MtpTestNodeConverter
         }
 
         AddTraits(update, testCase);
+
+        // Deliberately last: setting FullyQualifiedName or Source resets the default id, so assigning
+        // it earlier could be silently undone by a later assignment.
+        //
+        // Only the legacy algorithm needs an explicit assignment. Leaving the id alone otherwise lets
+        // TestCase compute it lazily, exactly as it does on the classic path, so the default stays in
+        // one place. The seed is composed with TestIdSeed, from the test case's own properties rather
+        // than the raw wire values, because this must hash precisely the bytes TestCase would have
+        // hashed itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and
+        // host, so the raw string and the parsed uri do not necessarily render the same).
+        if (useLegacySha1TestIds == true)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete - deliberate, this is the legacy opt-out path.
+            testCase.Id = EqtHash.GuidFromString(
+                TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName));
+#pragma warning restore CS0618
+        }
+
         return testCase;
     }
 
     public static TestResult ToTestResult(MtpTestNodeUpdate update, string source)
+        => ToTestResult(update, source, useLegacySha1TestIds: null);
+
+    public static TestResult ToTestResult(MtpTestNodeUpdate update, string source, bool? useLegacySha1TestIds)
     {
-        var testCase = ToTestCase(update, source);
+        var testCase = ToTestCase(update, source, useLegacySha1TestIds);
 
         var result = new TestResult(testCase)
         {

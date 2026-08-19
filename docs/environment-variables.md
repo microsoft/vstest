@@ -254,6 +254,15 @@ This document lists environment variables that are currently handled by VSTest s
 
 ## Discovery Variables
 
+### VSTEST_TESTCASE_ID_ALGORITHM
+- **Description**: Selects the algorithm used to compute `TestCase.Id`, the GUID that identifies a test. The default is xxHash128, which produces an [RFC 9562](https://www.rfc-editor.org/rfc/rfc9562.html#name-uuid-version-8) version 8 UUID carrying a 4-bit hash-scheme version in its first nibble. Set to `sha1` to fall back to the previous SHA1 based ids. Any other value, including an empty one, selects the default.
+- **Values**: `sha1` (case-insensitive) selects the legacy algorithm; anything else means the default
+- **Default**: unset, meaning xxHash128
+- **Example**: `VSTEST_TESTCASE_ID_ALGORITHM=sha1`
+- **Usage**: An escape hatch for anything that stored the old ids. This only affects tests whose id the platform computes; adapters that assign `TestCase.Id` themselves, such as MSTest v3 and v4, produce the same ids either way.
+- **Scope**: Read once per process, on first use, then cached, because a test's id has to stay stable for the lifetime of a run.
+- **Note**: The value has to be visible to the process that *computes* the id. Setting it in the shell always works. Setting it in run settings (`RunConfiguration/EnvironmentVariables`) also works on both paths: on the classic path those variables are applied to the testhost, which is where ids are computed, and on the Microsoft.Testing.Platform path vstest.console reads the declared value itself, because there the test cases are built in the runner rather than in a testhost.
+
 ### VSTEST_BACKGROUND_DISCOVERY
 - **Description**: Hints that a discovery is running in the background (for example the continuous discovery an IDE performs while editing). It is typically specified via run settings (`RunConfiguration/EnvironmentVariables`) by the host (for example Visual Studio) and then propagated into the testhost process environment. When set to "1" it has two effects: the platform reduces the number of cores used for parallelism (this applies to both test discovery and execution) when no explicit `MaxCpuCount` is configured, so it leaves processing power for other tasks, and the testhost process priority is lowered to `BelowNormal`.
 - **Values**: Set to "1" to enable

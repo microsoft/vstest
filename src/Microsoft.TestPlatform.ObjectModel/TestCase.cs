@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 
+using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -219,38 +220,25 @@ public sealed class TestCase : TestObject
     /// Creates a Id of TestCase
     /// </summary>
     /// <returns>Guid test id</returns>
-    private Guid GetTestId()
+    private Guid GetTestId() => GetTestId(UseLegacySha1TestIds);
+
+    /// <summary>
+    /// Creates a Id of TestCase using the given algorithm.
+    /// </summary>
+    /// <returns>Guid test id</returns>
+    private Guid GetTestId(bool useLegacySha1)
     {
-        // To generate id hash "ExecutorUri + source + Name";
+        // To generate id hash "ExecutorUri + source + Name". The composition lives in TestIdSeed
+        // because the Microsoft.Testing.Platform path has to reproduce it exactly from the runner
+        // process, where a TestCase is built rather than computed. If ManagedType and ManagedMethod
+        // properties are filled then the id is based on those, which is what GetFullyQualifiedName
+        // resolves.
+        // ExecutorUri is passed as text rather than concatenated directly: the original expression
+        // concatenated the Uri object, which renders a null as empty, and a test case built through
+        // the serialization constructor can still be missing it.
+        string testcaseFullName = TestIdSeed.Compose(ExecutorUri?.ToString(), Source, GetFullyQualifiedName());
 
-        // If source is a file name then just use the filename for the identifier since the
-        // file might have moved between discovery and execution (in appx mode for example)
-        // This is not elegant because the Source contents should be a black box to the framework.
-        // For example in the database adapter case this is not a file path.
-        string source = Source;
-
-        // As discussed with team, we found no scenario for netcore, & fullclr where the Source is not present where ID is generated,
-        // which means we would always use FileName to generate ID. In cases where somehow Source Path contained garbage character the API Path.GetFileName()
-        // we are simply returning original input.
-        // For UWP where source during discovery, & during execution can be on different machine, in such case we should always use Path.GetFileName()
-        try
-        {
-            // If source name is malformed, GetFileName API will throw exception, so use same input malformed string to generate ID
-            source = Path.GetFileName(source);
-        }
-        catch
-        {
-            // do nothing
-        }
-
-        // We still need to handle parameters in the case of a Theory or TestGroup of test cases that are only
-        // distinguished by parameters.
-        var testcaseFullName = ExecutorUri + source;
-
-        // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
-        testcaseFullName += GetFullyQualifiedName();
-
-        if (UseLegacySha1TestIds)
+        if (useLegacySha1)
         {
 #pragma warning disable CS0618 // Type or member is obsolete - deliberate, this is the legacy opt-out path.
             return EqtHash.GuidFromString(testcaseFullName);

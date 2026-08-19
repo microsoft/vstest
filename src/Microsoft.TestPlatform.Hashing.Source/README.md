@@ -3,6 +3,8 @@
 Shared source (not a NuGet package, not a separate assembly). The files here are compiled
 directly into `Microsoft.TestPlatform.ObjectModel` and `Microsoft.TestPlatform.AdapterUtilities`
 as `internal` types, following the same pattern as `src/Microsoft.TestPlatform.Filter.Source`.
+`TestIdSeed.cs` is additionally compiled into `Microsoft.TestPlatform.CrossPlatEngine`, which has
+to reproduce the id of a test case from the runner process on the Microsoft.Testing.Platform path.
 
 ## What is here
 
@@ -12,6 +14,7 @@ as `internal` types, following the same pattern as `src/Microsoft.TestPlatform.F
 | `XxHashShared.cs` | `dotnet/runtime` — `src/libraries/System.IO.Hashing/src/System/IO/Hashing/XxHashShared.cs` |
 | `BitOperations.cs` | polyfill of `System.Numerics.BitOperations` for target frameworks that lack it |
 | `TestIdGuid.cs` | vstest-authored — turns a 128-bit hash into an RFC 9562 version 8 UUID |
+| `TestIdSeed.cs` | vstest-authored — composes the string a test case id is hashed from |
 
 `XxHash128.cs` and `XxHashShared.cs` were vendored via [microsoft/testfx][testfx-hashing],
 which vendors them from `dotnet/runtime`. Both upstreams are MIT licensed.
