@@ -187,9 +187,9 @@
         <target state="translated">datacollector mit dem Anzeigenamen "{0}" wurde nicht gefunden.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToLoadAdapaterFile">
-        <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
-        <target state="translated">Fehler beim Laden von Erweiterungen aus der Datei "{0}". Verwenden Sie "/diag", um weitere Informationen zu erhalten.</target>
+      <trans-unit id="FailedToLoadExtensionFile">
+        <source>Failed to load extensions from file '{0}'. Reason: {1}</source>
+        <target state="new">Failed to load extensions from file '{0}'. Reason: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="AccessDenied">

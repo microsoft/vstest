@@ -11,6 +11,7 @@ using System.Xml;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -131,6 +132,72 @@ public class TestPluginDiscovererTests
         _ = TestPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions);
 
         _ = TestPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnWhenAnExtensionCannotBeLoaded()
+    {
+        var extension = GetPathToExtensionThatCannotBeLoaded();
+
+        var messages = CaptureSessionMessages(
+            () => TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string> { extension }));
+
+        var message = messages.Single();
+        Assert.AreEqual(TestMessageLevel.Warning, message.Level);
+        Assert.Contains(extension, message.Message);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnOnlyOnceForTheSameExtension()
+    {
+        var extension = GetPathToExtensionThatCannotBeLoaded();
+
+        var messages = CaptureSessionMessages(() =>
+        {
+            var paths = new List<string> { extension };
+
+            // The same file is scanned once per extension type we look for, the user should hear about it once.
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(paths);
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestDiscovererPluginInformation, ITestDiscoverer>(paths);
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestExecutorPluginInformation, ITestExecutor>(paths);
+        });
+
+        Assert.ContainsSingle(messages);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldNotWarnWhenProbingForKnownExtensions()
+    {
+        // With no extension paths we probe for a few well known extensions that are usually not present,
+        // failing to load those is expected and must stay invisible to the user.
+        var messages = CaptureSessionMessages(
+            () => TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string>()));
+
+        Assert.IsEmpty(messages);
+    }
+
+    /// <summary>
+    /// A file that is guaranteed to not be loadable, and that no other test has reported yet.
+    /// </summary>
+    private static string GetPathToExtensionThatCannotBeLoaded()
+        => $"ThisExtensionCannotBeLoaded{Guid.NewGuid():N}.dll";
+
+    private static List<TestRunMessageEventArgs> CaptureSessionMessages(Action action)
+    {
+        var messages = new List<TestRunMessageEventArgs>();
+        void OnTestRunMessage(object? sender, TestRunMessageEventArgs args) => messages.Add(args);
+
+        TestSessionMessageLogger.Instance.TestRunMessage += OnTestRunMessage;
+        try
+        {
+            action();
+        }
+        finally
+        {
+            TestSessionMessageLogger.Instance.TestRunMessage -= OnTestRunMessage;
+        }
+
+        return messages;
     }
 
     #region Implementations

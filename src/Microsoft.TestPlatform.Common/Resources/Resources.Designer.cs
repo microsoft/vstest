@@ -205,11 +205,11 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.Resources {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Failed to load extensions from file &apos;{0}&apos;. Please use /diag for more information..
+        ///   Looks up a localized string similar to Failed to load extensions from file &apos;{0}&apos;. Reason: {1}.
         /// </summary>
-        internal static string FailedToLoadAdapaterFile {
+        internal static string FailedToLoadExtensionFile {
             get {
-                return ResourceManager.GetString("FailedToLoadAdapaterFile", resourceCulture);
+                return ResourceManager.GetString("FailedToLoadExtensionFile", resourceCulture);
             }
         }
         
