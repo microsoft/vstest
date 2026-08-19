@@ -28,9 +28,17 @@ internal static class TestPluginDiscoverer
 
     /// <summary>
     /// Files we already told the user about, so that a file that fails for every extension type is
-    /// reported once per run instead of once per scan.
+    /// reported once per run instead of once per scan. <see cref="TestPluginCache.ClearExtensions"/>
+    /// empties it, which is what makes this once per run rather than once per process: the runner clears
+    /// the extension cache before every discovery or run request, so an editor that keeps the runner alive
+    /// for hours still hears about a broken extension on each request, and the set cannot grow past the
+    /// files of a single request.
+    ///
+    /// Paths are compared ignoring case. On Windows two spellings of the same path are the same file and
+    /// warning about both would be a duplicate the user cannot act on. Elsewhere they can be two files,
+    /// but the only cost of merging them is one warning less about a file that is broken anyway.
     /// </summary>
-    private static readonly ConcurrentDictionary<string, byte> ReportedFiles = new();
+    private static readonly ConcurrentDictionary<string, byte> ReportedFiles = new(StringComparer.OrdinalIgnoreCase);
 
     /// <summary>
     /// Extensions that are probed speculatively when no other extension was found, see <see cref="AddKnownExtensions"/>.
@@ -103,6 +111,13 @@ internal static class TestPluginDiscoverer
             EqtTrace.Warning("TestPluginDiscoverer: Failed to report the load failure of file '{0}'. Error: {1}", file, e);
         }
     }
+
+    /// <summary>
+    /// Forgets which files were already reported, so the next request reports them again. Called when the
+    /// extension cache is cleared, because extensions are then discovered from scratch and a failure the
+    /// user was told about before the clear is news again.
+    /// </summary>
+    internal static void ClearReportedFiles() => ReportedFiles.Clear();
 
     /// <summary>
     /// Gets test extension information from the given collection of files.

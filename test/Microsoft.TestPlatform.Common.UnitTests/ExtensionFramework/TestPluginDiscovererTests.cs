@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
@@ -41,16 +42,22 @@ public class TestPluginDiscovererTests
         // above does not observe messages from the tests that run after this one.
         TestSessionMessageLogger.Instance.TestRunMessage -= OnTestRunMessage;
         TestSessionMessageLogger.Instance = null;
+
+        // So does the plugin cache, and one of the tests below clears it.
+        TestPluginCacheHelper.ResetExtensionsCache();
     }
 
     private void OnTestRunMessage(object? sender, TestRunMessageEventArgs e) => _messages.Add(e);
 
     /// <summary>
-    /// TestPluginDiscoverer remembers the files it failed on for the lifetime of the process, so every test
-    /// that wants to observe a failure needs a file name no other test has used.
+    /// TestPluginDiscoverer remembers the files it failed on until the extension cache is cleared, so every
+    /// test that wants to observe a failure needs a file name no other test has used.
     /// </summary>
     private static string GetPathOfMissingExtension()
         => Path.Combine(Path.GetTempPath(), $"missing{Guid.NewGuid():N}.TestAdapter.dll");
+
+    private IEnumerable<TestRunMessageEventArgs> MessagesAbout(string file)
+        => _messages.Where(m => m.Message.IndexOf(file, StringComparison.OrdinalIgnoreCase) >= 0);
 
     [TestMethod]
     public void GetTestExtensionsInformationShouldNotThrowOnALoadException()
@@ -184,6 +191,39 @@ public class TestPluginDiscovererTests
         _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestDiscovererPluginInformation, ITestDiscoverer>(pathToExtensions);
 
         Assert.ContainsSingle(_messages.Where(m => m.Message.Contains(missingExtension)));
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnAboutTheSameFileOnlyOnceWhenTheCasingDiffers()
+    {
+        var missingExtension = GetPathOfMissingExtension();
+
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(
+            new List<string> { missingExtension });
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(
+            new List<string> { missingExtension.ToUpperInvariant() });
+
+        // On Windows those two paths are the same file, and a second warning about it tells the user nothing
+        // they cannot already see in the first.
+        Assert.ContainsSingle(MessagesAbout(missingExtension));
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnAgainAfterTheExtensionCacheIsCleared()
+    {
+        var missingExtension = GetPathOfMissingExtension();
+        var pathToExtensions = new List<string> { missingExtension };
+
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(pathToExtensions);
+
+        // This is what the runner does before every discovery or run request. Reporting once per run has to
+        // mean once per run even in an editor that keeps the runner alive across many of them, otherwise the
+        // user is told about a broken extension once and never again.
+        TestPluginCache.Instance.ClearExtensions();
+
+        _ = TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(pathToExtensions);
+
+        Assert.HasCount(2, MessagesAbout(missingExtension).ToList());
     }
 
     [TestMethod]
