@@ -1023,7 +1023,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
                             testHostPath = Path.Combine(testhostPackage.Path, testHostPath);
                         }
                         _hostPackageVersion = testhostPackage.Version;
-                        IsVersionCheckRequired = !_hostPackageVersion.StartsWith("15.0.0");
+                        IsVersionCheckRequired = !_hostPackageVersion.StartsWith("15.0.0", StringComparison.Ordinal);
                         EqtTrace.Verbose("DotnetTestHostmanager: Relative path of testhost.dll with respect to package folder is {0}", testHostPath);
                     }
 #else
