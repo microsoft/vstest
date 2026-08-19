@@ -46,7 +46,7 @@ internal static class TestPluginDiscoverer
 
         var pluginInfos = new Dictionary<string, TPluginInfo>();
 
-        // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
+        // C++ UWP adapters do not follow TestAdapter naming convention, so making this exception
         var probeForKnownExtensions = !extensionPaths.Any();
         if (probeForKnownExtensions)
         {
