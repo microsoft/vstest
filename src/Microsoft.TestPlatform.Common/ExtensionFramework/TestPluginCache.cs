@@ -472,7 +472,7 @@ public class TestPluginCache
         // BUT for some unknown reason the point 10 is not working as explained.
         // Satellite resolution should fallback to the NeutralResourcesLanguageAttribute
         // that we set to en-US but don't and we fail with FileNotFoundException.
-        _ = Resources.Resources.FailedToLoadAdapaterFile;
+        _ = Resources.Resources.FailedToLoadExtensionFile;
 
         IList<string> resolutionPaths = extensionAssembly.IsNullOrEmpty()
             ? GetDefaultResolutionPaths()
