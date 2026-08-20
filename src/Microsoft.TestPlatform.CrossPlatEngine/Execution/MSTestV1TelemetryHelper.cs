@@ -67,14 +67,8 @@ internal class MsTestV1TelemetryHelper
                 key = $"{testResult.TestCase.ExecutorUri.AbsoluteUri}.count";
             }
 
-            if (adapterTelemetry.ContainsKey(key))
-            {
-                adapterTelemetry[key]++;
-            }
-            else
-            {
-                adapterTelemetry[key] = 1;
-            }
+            adapterTelemetry.TryGetValue(key, out var count);
+            adapterTelemetry[key] = count + 1;
         }
     }
 }
