@@ -20,6 +20,7 @@ namespace vstest.console.UnitTests.Processors;
 [TestClass]
 public class EnableCodeCoverageArgumentProcessorTests
 {
+    private readonly CommandLineOptions _commandLineOptions = new();
     private readonly TestableRunSettingsProvider _settingsProvider;
     private readonly EnableCodeCoverageArgumentExecutor _executor;
 
@@ -34,7 +35,7 @@ public class EnableCodeCoverageArgumentProcessorTests
     public EnableCodeCoverageArgumentProcessorTests()
     {
         _settingsProvider = new TestableRunSettingsProvider();
-        _executor = new EnableCodeCoverageArgumentExecutor(CommandLineOptions.Instance, _settingsProvider,
+        _executor = new EnableCodeCoverageArgumentExecutor(_commandLineOptions, _settingsProvider,
             new Mock<IFileHelper>().Object);
         CollectArgumentExecutor.EnabledDataCollectors.Clear();
     }
@@ -42,14 +43,14 @@ public class EnableCodeCoverageArgumentProcessorTests
     [TestMethod]
     public void GetMetadataShouldReturnEnableCodeCoverageArgumentProcessorCapabilities()
     {
-        var processor = new EnableCodeCoverageArgumentProcessor(new TestableRunSettingsProvider());
+        var processor = new EnableCodeCoverageArgumentProcessor(_commandLineOptions, new TestableRunSettingsProvider());
         Assert.IsTrue(processor.Metadata.Value is EnableCodeCoverageArgumentProcessorCapabilities);
     }
 
     [TestMethod]
     public void GetExecuterShouldReturnEnableCodeCoverageArgumentProcessorCapabilities()
     {
-        var processor = new EnableCodeCoverageArgumentProcessor(new TestableRunSettingsProvider());
+        var processor = new EnableCodeCoverageArgumentProcessor(_commandLineOptions, new TestableRunSettingsProvider());
         Assert.IsTrue(processor.Executor!.Value is EnableCodeCoverageArgumentExecutor);
     }
 
@@ -81,11 +82,11 @@ public class EnableCodeCoverageArgumentProcessorTests
         runsettings.LoadSettingsXml(runsettingsString);
         _settingsProvider.SetActiveRunSettings(runsettings);
 
-        CommandLineOptions.Instance.EnableCodeCoverage = false;
+        _commandLineOptions.EnableCodeCoverage = false;
 
         _executor.Initialize(string.Empty);
 
-        Assert.IsTrue(CommandLineOptions.Instance.EnableCodeCoverage,
+        Assert.IsTrue(_commandLineOptions.EnableCodeCoverage,
             "/EnableCoverage should set CommandLineOption.EnableCodeCoverage to true");
     }
 

@@ -44,19 +44,11 @@ internal class CommandLineOptions
     /// </summary>
     private readonly TimeSpan _defaultRetrievalTimeout = new(0, 0, 0, 1, 500);
 
-    private static CommandLineOptions? s_instance;
-
     private List<string> _sources = new();
 
     private Architecture _architecture;
 
     private Framework? _frameworkVersion;
-
-    /// <summary>
-    /// Gets the instance.
-    /// </summary>
-    internal static CommandLineOptions Instance
-        => s_instance ??= new CommandLineOptions();
 
     /// <summary>
     /// Default constructor.
@@ -282,7 +274,7 @@ internal class CommandLineOptions
             // Get matching files from file pattern parser
             matchingFiles = FilePatternParser.GetMatchingFiles(source);
         }
-        catch (TestSourceException ex) when (source.StartsWith("-") || source.StartsWith("/"))
+        catch (TestSourceException ex) when (source.StartsWith("-", StringComparison.Ordinal) || source.StartsWith("/", StringComparison.Ordinal))
         {
             throw new TestSourceException(
                 string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidArgument, source), ex);
@@ -290,14 +282,6 @@ internal class CommandLineOptions
         // Add the matching files to source list
         var filteredFiles = KnownPlatformSourceFilter.FilterKnownPlatformSources(matchingFiles);
         _sources = _sources.Union(filteredFiles).ToList();
-    }
-
-    /// <summary>
-    /// Resets the options. Clears the sources.
-    /// </summary>
-    internal static void Reset()
-    {
-        s_instance = null;
     }
 
 }

@@ -4,11 +4,12 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Threading;
 
-using Jsonite;
+using Microsoft.Testing.Platform.ServerMode.Client;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
@@ -16,6 +17,9 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfa
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
@@ -36,6 +40,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     private readonly IProxyDataCollectionManager? _dataCollectionManager;
 
     private readonly DataCollectionRunEventsHandler? _dataCollectionEventsHandler;
+
+    /// <summary>
+    /// Forwards per-test-case started/ended notifications (observed from the MTP application) to the
+    /// out-of-process datacollector. Created only when a data collector asks for test-case-level
+    /// events (e.g. Blame); left null for code coverage or when data collection is off.
+    /// </summary>
+    private MtpDataCollectionForwarder? _testCaseEventForwarder;
 
     private bool _isInitialized;
 
@@ -72,6 +83,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         int processId = 0;
         bool aborted = false;
 
+        // Inject environment variables declared in the runsettings RunConfiguration/EnvironmentVariables
+        // into the MTP application launch. On the classic path ProxyOperationManager reads these from the
+        // runsettings and passes them to the testhost process; the MTP application is its own host, so we
+        // apply them here. Done before BeforeTestRun so datacollector-provided profiler variables merge on
+        // top and win on collision (matching the classic ordering).
+        ApplyRunSettingsEnvironmentVariables(testRunCriteria.TestRunSettings);
+
         BeforeTestRun(eventHandler);
 
         foreach (var (source, tests) in BuildWork(testRunCriteria))
@@ -98,6 +116,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
 
         AfterTestRun(attachments, invokedDataCollectors);
+
+        // Surface the data collector messages produced during the run and at session end (e.g.
+        // per-test-case notifications, warnings/errors, the Blame sequence-file path, disposal). They
+        // are buffered on the run events handler while the run is in flight and delivered during the
+        // AfterTestRunEnd exchange; the classic path relays them live, so on this path we flush them
+        // once the run is done. Without this they are silently dropped.
+        SurfaceDataCollectionMessages(eventHandler);
 
         TestRunStatistics finalStats = aggregate.Snapshot();
         var completeArgs = new TestRunCompleteEventArgs(
@@ -147,20 +172,69 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         if (parameters?.EnvironmentVariables is { } dataCollectionEnvironmentVariables)
         {
-            EnvironmentVariables ??= new Dictionary<string, string?>();
+            EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
             foreach (KeyValuePair<string, string?> variable in dataCollectionEnvironmentVariables)
             {
                 EnvironmentVariables[variable.Key] = variable.Value;
             }
         }
 
-        // Surface any messages the data collector produced while starting up.
-        foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler!.Messages)
+        // If a data collector needs per-test-case events (e.g. Blame tracks the currently running
+        // test to attribute crashes), it opens a socket and returns its port. In the classic path
+        // testhost connects to it; under MTP there is no testhost, so we connect from here and
+        // forward the started/ended notifications we observe from the MTP application. A port of 0
+        // means no collector needs these events (e.g. code coverage) and we do nothing.
+        if (parameters?.DataCollectionEventsPort > 0)
         {
-            eventHandler.HandleLogMessage(message.Item1, message.Item2);
+            _testCaseEventForwarder = new MtpDataCollectionForwarder();
+            if (!_testCaseEventForwarder.Connect(parameters.DataCollectionEventsPort))
+            {
+                eventHandler.HandleLogMessage(
+                    ObjectModel.Logging.TestMessageLevel.Warning,
+                    "Could not connect to the data collector for per-test-case events; collectors that rely on them (such as Blame) may not function for this Microsoft.Testing.Platform run.");
+                _testCaseEventForwarder.Dispose();
+                _testCaseEventForwarder = null;
+            }
         }
 
-        _dataCollectionEventsHandler.Messages.Clear();
+        // Surface any messages the data collector produced while starting up.
+        SurfaceDataCollectionMessages(eventHandler);
+    }
+
+    /// <summary>
+    /// Flushes any data collector log and raw messages buffered on the run events handler to the run's
+    /// event handler. On the classic path the datacollector's messages are relayed to the console live; on
+    /// this path there is no live pump, so we drain the buffers at the points where new messages have
+    /// arrived (data collector startup and after the run completes). Both the human-readable log messages
+    /// and the raw (e.g. telemetry) messages are surfaced and cleared, mirroring
+    /// <see cref="ProxyExecutionManagerWithDataCollection"/> on the classic path.
+    /// </summary>
+    private void SurfaceDataCollectionMessages(IInternalTestRunEventsHandler eventHandler)
+    {
+        if (_dataCollectionEventsHandler is null)
+        {
+            return;
+        }
+
+        if (_dataCollectionEventsHandler.Messages.Count > 0)
+        {
+            foreach (var (level, message) in _dataCollectionEventsHandler.Messages)
+            {
+                eventHandler.HandleLogMessage(level, message);
+            }
+
+            _dataCollectionEventsHandler.Messages.Clear();
+        }
+
+        if (_dataCollectionEventsHandler.RawMessages.Count > 0)
+        {
+            foreach (string rawMessage in _dataCollectionEventsHandler.RawMessages)
+            {
+                eventHandler.HandleRawMessage(rawMessage);
+            }
+
+            _dataCollectionEventsHandler.RawMessages.Clear();
+        }
     }
 
     /// <summary>
@@ -173,6 +247,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         {
             return;
         }
+
+        // Signal end-of-stream on the test-case event channel so the datacollector's wait on it
+        // completes promptly instead of blocking until the connection timeout (~90s).
+        _testCaseEventForwarder?.NotifySessionEnd();
 
         DataCollectionResult result = _dataCollectionManager.AfterTestRunEnd(
             _cancellationTokenSource.IsCancellationRequested,
@@ -202,6 +280,15 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     {
         try
         {
+            _testCaseEventForwarder?.Dispose();
+        }
+        catch
+        {
+            // ignore
+        }
+
+        try
+        {
             _dataCollectionManager?.Dispose();
         }
         catch
@@ -227,32 +314,43 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         List<AttachmentSet> attachments,
         HashSet<string> executorUris)
     {
-        var completed = new ManualResetEventSlim(false);
-
-        using var connection = new MtpServerConnection();
-        connection.LogReceived += (level, message) => eventHandler.HandleLogMessage(MtpClientHelpers.MapLevel(level), message);
-        connection.TestNodesUpdated += parameters =>
+        MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions(EnvironmentVariables);
+        using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
+        client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
+        client.TestNodesUpdated += (_, e) =>
         {
-            if (MtpClientHelpers.IsCompletionSentinel(parameters))
-            {
-                completed.Set();
-                return;
-            }
-
             var results = new List<TestResult>();
-            foreach (JsonObject node in MtpClientHelpers.EnumerateNodes(parameters))
+            foreach (MtpTestNodeUpdate change in e.Changes)
             {
-                if (!MtpTestNodeConverter.IsActionNode(node))
+                if (!MtpTestNodeConverter.IsActionNode(change))
                 {
                     continue;
                 }
 
-                if (!MtpTestNodeConverter.IsTerminalState(MtpTestNodeConverter.GetExecutionState(node)))
+                string? state = change.ExecutionState;
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose("MtpProxyExecutionManager: node update uid={0} state={1}", change.Uid, state ?? "(none)");
+                }
+
+                // A test entering the in-progress state is our "test started" signal. Forwarding it
+                // lets per-test-case collectors (e.g. Blame) know which test is in flight, which is
+                // what makes crash attribution work when the test never reaches a terminal state.
+                if (_testCaseEventForwarder is { } forwarder && MtpTestNodeConverter.IsInProgressState(state))
+                {
+                    forwarder.NotifyTestCaseStart(MtpTestNodeConverter.ToTestCase(change, source));
+                    continue;
+                }
+
+                if (!MtpTestNodeConverter.IsTerminalState(state))
                 {
                     continue;
                 }
 
-                results.Add(MtpTestNodeConverter.ToTestResult(node, source));
+                TestResult result = MtpTestNodeConverter.ToTestResult(change, source);
+                _testCaseEventForwarder?.NotifyTestCaseEnd(result);
+                results.Add(result);
             }
 
             if (results.Count == 0)
@@ -278,28 +376,31 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             eventHandler.HandleTestRunStatsChange(new TestRunChangedEventArgs(snapshot, results, null));
         };
 
-        connection.Start(source, EnvironmentVariables, MtpClientHelpers.GetConnectionTimeout());
-
         // Let the data collector (e.g. code coverage) know the process it should track. The profiler
-        // env vars were already injected via EnvironmentVariables above.
-        _dataCollectionManager?.TestHostLaunched(connection.ProcessId);
+        // env vars were already injected via the launch options above. Capture the id here rather than
+        // reading it again after the exit handshake, when the process may already be gone.
+        int processId = client.ProcessId;
+        _dataCollectionManager?.TestHostLaunched(processId);
 
-        connection.InvokeAsync(MtpConstants.InitializeMethod, MtpClientHelpers.InitializeParameters(), _cancellationTokenSource.Token).GetAwaiter().GetResult();
-
-        var runId = Guid.NewGuid();
-        var runParameters = new Dictionary<string, object?> { [MtpConstants.RunIdParameter] = runId.ToString() };
-        if (tests is { Count: > 0 })
+        try
         {
-            runParameters[MtpConstants.TestsParameter] = BuildTestsFilter(tests);
+            client.InitializeAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
+
+            // Awaiting the run request is sufficient: server-to-client messages arrive on a single ordered
+            // stream that the client reads sequentially and dispatches synchronously, so every node update
+            // has already been delivered by the time the request completes.
+            MtpRunResult runResult = (tests is { Count: > 0 }
+                ? client.RunTestsAsync(BuildUids(tests), _cancellationTokenSource.Token)
+                : client.RunTestsAsync(_cancellationTokenSource.Token)).GetAwaiter().GetResult();
+
+            CollectAttachments(runResult, attachments);
+        }
+        finally
+        {
+            MtpServerClientFactory.TryExit(client);
         }
 
-        var runTask = connection.InvokeAsync(MtpConstants.RunTestsMethod, runParameters, _cancellationTokenSource.Token);
-        object? response = runTask.GetAwaiter().GetResult();
-        completed.Wait(TimeSpan.FromSeconds(3));
-
-        CollectAttachments(response, attachments);
-        connection.SendNotification(MtpConstants.ExitMethod, null);
-        return connection.ProcessId;
+        return processId;
     }
 
     private static IEnumerable<(string Source, List<TestCase>? Tests)> BuildWork(TestRunCriteria criteria)
@@ -315,34 +416,87 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             .Select(source => (source, (List<TestCase>?)null));
     }
 
-    private static List<Dictionary<string, object?>> BuildTestsFilter(List<TestCase> tests)
-        => tests
-            .Select(test => new Dictionary<string, object?>
-            {
-                [MtpConstants.Uid] = test.GetPropertyValue(MtpTestNodeConverter.MtpUidProperty, test.FullyQualifiedName),
-                [MtpConstants.DisplayName] = test.DisplayName,
-            })
-            .ToList();
-
-    private static void CollectAttachments(object? response, List<AttachmentSet> attachments)
+    /// <summary>
+    /// Reads the environment variables declared in the runsettings
+    /// <c>RunConfiguration/EnvironmentVariables</c> and merges them into <see cref="EnvironmentVariables"/>
+    /// so they are applied to the MTP application launch.
+    /// </summary>
+    private void ApplyRunSettingsEnvironmentVariables(string? runSettings)
     {
-        if (MtpJson.AsObject(response) is not JsonObject responseObject
-            || !responseObject.TryGetValue(MtpConstants.AttachmentsProperty, out object? attachmentsValue)
-            || attachmentsValue is not JsonArray attachmentArray)
+        Dictionary<string, string?>? runSettingsEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
+        if (runSettingsEnvironmentVariables is null || runSettingsEnvironmentVariables.Count == 0)
         {
             return;
         }
 
-        var set = new AttachmentSet(new Uri(MtpConstants.DefaultExecutorUri), "Microsoft.Testing.Platform");
-        foreach (object? attachmentObject in attachmentArray)
+        EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
+        foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
         {
-            if (attachmentObject is not JsonObject attachment)
+            EnvironmentVariables[variable.Key] = variable.Value;
+        }
+    }
+
+    /// <summary>
+    /// Creates the dictionary used to collect environment variables for the MTP application launch,
+    /// keyed case-insensitively on Windows (matching the classic testhost path) and case-sensitively
+    /// elsewhere, so callers that pass case-variant duplicate keys collapse the same way the classic
+    /// path did before the values reach the ordinal-keyed
+    /// <see cref="MtpServerClientOptions.EnvironmentVariables"/>.
+    /// </summary>
+    private static Dictionary<string, string?> CreateEnvironmentVariablesDictionary()
+        => new(Environment.OSVersion.Platform == PlatformID.Win32NT ? StringComparer.OrdinalIgnoreCase : StringComparer.Ordinal);
+
+    /// <summary>
+    /// Projects the tests selected for a filtered run onto the MTP node uids the server matches on.
+    /// </summary>
+    /// <exception cref="TestPlatformException">
+    /// A selected test carries no MTP node uid, so the run cannot be expressed.
+    /// </exception>
+    private static IReadOnlyCollection<string> BuildUids(List<TestCase> tests)
+    {
+        var uids = new List<string>(tests.Count);
+        foreach (TestCase test in tests)
+        {
+            string? uid = test.GetPropertyValue<string>(MtpTestNodeConverter.MtpUidProperty, null);
+
+            // The MTP server projects node.Uid alone when it builds a run filter and never reads
+            // DisplayName or any other field, so a TestCase without MTP.TestNode.Uid simply cannot be
+            // addressed. Substituting FullyQualifiedName here (as this method previously did) produces
+            // a filter the server matches nothing against: the run completes "successfully" having
+            // executed zero of the tests the user selected, with no error anywhere. Failing here turns
+            // that invisible wrong answer into a visible, actionable one. Do not reintroduce a
+            // fallback - there is no value that works other than the uid the server itself issued.
+            //
+            // This aborts the whole source rather than skipping the offending test: the caller reports
+            // the failure and marks the run aborted, which is deliberate. Silently running the
+            // addressable subset would recreate the same class of bug in a smaller form, reporting a
+            // partial run as if it were the run the user asked for.
+            if (uid.IsNullOrEmpty())
             {
-                continue;
+                throw new TestPlatformException(
+                    string.Format(
+                        CultureInfo.CurrentCulture,
+                        CrossPlatEngineResources.MtpTestCaseMissingNodeUid,
+                        test.DisplayName ?? test.FullyQualifiedName));
             }
 
-            string? path = GetStringProperty(attachment, MtpConstants.AttachmentUriProperty)
-                ?? GetStringProperty(attachment, MtpConstants.AttachmentPathProperty);
+            uids.Add(uid);
+        }
+
+        return uids;
+    }
+
+    private static void CollectAttachments(MtpRunResult runResult, List<AttachmentSet> attachments)
+    {
+        if (runResult.Artifacts.Count == 0)
+        {
+            return;
+        }
+
+        var set = new AttachmentSet(new Uri(MtpTestNodeConverter.DefaultExecutorUri), "Microsoft.Testing.Platform");
+        foreach (MtpAttachment artifact in runResult.Artifacts)
+        {
+            string? path = artifact.Uri;
             if (string.IsNullOrEmpty(path))
             {
                 continue;
@@ -353,7 +507,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                 continue;
             }
 
-            string display = GetStringProperty(attachment, MtpConstants.DisplayName) ?? Path.GetFileName(path!);
+            string display = artifact.DisplayName ?? Path.GetFileName(path!);
             set.Attachments.Add(new UriDataAttachment(fileUri!, display));
         }
 
@@ -365,9 +519,6 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             }
         }
     }
-
-    private static string? GetStringProperty(JsonObject element, string name)
-        => element.TryGetValue(name, out object? value) && value is string text ? text : null;
 
     private static bool TryCreateFileUri(string path, out Uri? uri)
     {

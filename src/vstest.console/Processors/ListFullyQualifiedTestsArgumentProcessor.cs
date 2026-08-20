@@ -8,7 +8,6 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Filtering;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
@@ -33,10 +32,14 @@ internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
     private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly CommandLineOptions _commandLineOptions;
+    private readonly ITestRequestManager _testRequestManager;
 
-    public ListFullyQualifiedTestsArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    public ListFullyQualifiedTestsArgumentProcessor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider, ITestRequestManager testRequestManager)
     {
+        _commandLineOptions = commandLineOptions;
         _runSettingsProvider = runSettingsProvider;
+        _testRequestManager = testRequestManager;
     }
 
     /// <summary>
@@ -53,9 +56,9 @@ internal class ListFullyQualifiedTestsArgumentProcessor : IArgumentProcessor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ListFullyQualifiedTestsArgumentExecutor(
-                CommandLineOptions.Instance,
+                _commandLineOptions,
                 _runSettingsProvider,
-                TestRequestManager.Instance));
+                _testRequestManager));
 
         set => _executor = value;
     }

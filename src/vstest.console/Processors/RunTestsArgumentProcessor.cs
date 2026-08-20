@@ -6,7 +6,6 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
@@ -27,10 +26,14 @@ internal class RunTestsArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
     private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly CommandLineOptions _commandLineOptions;
+    private readonly ITestRequestManager _testRequestManager;
 
-    public RunTestsArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    public RunTestsArgumentProcessor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider, ITestRequestManager testRequestManager)
     {
+        _commandLineOptions = commandLineOptions;
         _runSettingsProvider = runSettingsProvider;
+        _testRequestManager = testRequestManager;
     }
 
     public Lazy<IArgumentProcessorCapabilities> Metadata
@@ -41,10 +44,10 @@ internal class RunTestsArgumentProcessor : IArgumentProcessor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new RunTestsArgumentExecutor(
-                CommandLineOptions.Instance,
+                _commandLineOptions,
                 _runSettingsProvider,
-                TestRequestManager.Instance,
-                new ArtifactProcessingManager(CommandLineOptions.Instance.TestSessionCorrelationId),
+                _testRequestManager,
+                new ArtifactProcessingManager(_commandLineOptions.TestSessionCorrelationId),
                 ConsoleOutput.Instance));
 
         set => _executor = value;
@@ -230,7 +233,7 @@ internal class RunTestsArgumentExecutor : IArgumentExecutor
                 s_numberOfExecutedTests = e.TestRunStatistics!.ExecutedTests;
 
                 // Indicate the user to use test adapter path command if there are no tests found
-                if (!testsFoundInAnySource && !CommandLineOptions.Instance.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
+                if (!testsFoundInAnySource && !_commandLineOptions.TestAdapterPathsSet && _commandLineOptions.TestCaseFilterValue == null)
                 {
                     _output.Warning(false, CommandLineResources.SuggestTestAdapterPathIfNoTestsIsFound);
                 }

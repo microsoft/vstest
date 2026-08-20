@@ -30,10 +30,12 @@ internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
     private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly CommandLineOptions _commandLineOptions;
     private readonly IRunSettingsHelper _runSettingsHelper;
 
-    public CliRunSettingsArgumentProcessor(IRunSettingsProvider runSettingsProvider, IRunSettingsHelper runSettingsHelper)
+    public CliRunSettingsArgumentProcessor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider, IRunSettingsHelper runSettingsHelper)
     {
+        _commandLineOptions = commandLineOptions;
         _runSettingsProvider = runSettingsProvider;
         _runSettingsHelper = runSettingsHelper;
     }
@@ -51,7 +53,7 @@ internal class CliRunSettingsArgumentProcessor : IArgumentProcessor
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new CliRunSettingsArgumentExecutor(_runSettingsProvider, CommandLineOptions.Instance, _runSettingsHelper));
+            new CliRunSettingsArgumentExecutor(_runSettingsProvider, _commandLineOptions, _runSettingsHelper));
 
         set => _executor = value;
     }
@@ -134,7 +136,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             // but does not end with ") we start merging the params
             if (arg.StartsWith("TestRunParameters", StringComparison.OrdinalIgnoreCase))
             {
-                if (arg.EndsWith("\")"))
+                if (arg.EndsWith("\")", StringComparison.Ordinal))
                 {
                     // this parameter is complete
                     mergedArgs.Add(arg);
@@ -159,7 +161,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
             }
 
             // once we detect the end we add the whole parameter to the args
-            if (merge && arg.EndsWith("\")"))
+            if (merge && arg.EndsWith("\")", StringComparison.Ordinal))
             {
                 mergedArgs.Add(mergedArg);
                 mergedArg = string.Empty;
@@ -186,7 +188,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
                 continue;
             }
 
-            var indexOfSeparator = arg.IndexOf("=");
+            var indexOfSeparator = arg.IndexOf("=", StringComparison.Ordinal);
 
             if (indexOfSeparator <= 0 || indexOfSeparator >= arg.Length - 1)
             {
@@ -217,7 +219,7 @@ internal class CliRunSettingsArgumentExecutor : IArgumentsExecutor
 
         var match = runSettingsProvider.GetTestRunParameterNodeMatch(node);
 
-        if (string.Compare(match.Value, node) == 0)
+        if (string.Equals(match.Value, node, StringComparison.Ordinal))
         {
             runSettingsProvider.UpdateTestRunParameterSettingsNode(match);
             return true;

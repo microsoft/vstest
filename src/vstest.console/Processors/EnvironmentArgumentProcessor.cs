@@ -29,16 +29,18 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
     private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly CommandLineOptions _commandLineOptions;
 
-    public EnvironmentArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    public EnvironmentArgumentProcessor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider)
     {
+        _commandLineOptions = commandLineOptions;
         _runSettingsProvider = runSettingsProvider;
     }
 
     public Lazy<IArgumentExecutor>? Executor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
-            new ArgumentExecutor(CommandLineOptions.Instance, _runSettingsProvider, ConsoleOutput.Instance));
+            new ArgumentExecutor(_commandLineOptions, _runSettingsProvider, ConsoleOutput.Instance));
 
         set => _executor = value;
     }
@@ -98,8 +100,8 @@ internal class EnvironmentArgumentProcessor : IArgumentProcessor
 
             if (key.Contains("="))
             {
-                value = key.Substring(key.IndexOf("=") + 1);
-                key = key.Substring(0, key.IndexOf("="));
+                value = key.Substring(key.IndexOf("=", StringComparison.Ordinal) + 1);
+                key = key.Substring(0, key.IndexOf("=", StringComparison.Ordinal));
             }
 
             var node = _runSettingsProvider.QueryRunSettingsNode($"RunConfiguration.EnvironmentVariables.{key}");

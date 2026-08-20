@@ -7,7 +7,6 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.Client.RequestHelper;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
-using Microsoft.VisualStudio.TestPlatform.CommandLine.TestPlatformHelpers;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -36,10 +35,14 @@ internal class ListTestsArgumentProcessor : IArgumentProcessor
     private Lazy<IArgumentProcessorCapabilities>? _metadata;
     private Lazy<IArgumentExecutor>? _executor;
     private readonly IRunSettingsProvider _runSettingsProvider;
+    private readonly CommandLineOptions _commandLineOptions;
+    private readonly ITestRequestManager _testRequestManager;
 
-    public ListTestsArgumentProcessor(IRunSettingsProvider runSettingsProvider)
+    public ListTestsArgumentProcessor(CommandLineOptions commandLineOptions, IRunSettingsProvider runSettingsProvider, ITestRequestManager testRequestManager)
     {
+        _commandLineOptions = commandLineOptions;
         _runSettingsProvider = runSettingsProvider;
+        _testRequestManager = testRequestManager;
     }
 
     /// <summary>
@@ -56,9 +59,9 @@ internal class ListTestsArgumentProcessor : IArgumentProcessor
     {
         get => _executor ??= new Lazy<IArgumentExecutor>(() =>
             new ListTestsArgumentExecutor(
-                CommandLineOptions.Instance,
+                _commandLineOptions,
                 _runSettingsProvider,
-                TestRequestManager.Instance));
+                _testRequestManager));
 
         set => _executor = value;
     }
