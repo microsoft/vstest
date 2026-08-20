@@ -10,6 +10,7 @@ using System.Linq;
 using System.Threading;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.TestPlatform.Hashing;
 
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
@@ -72,7 +73,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     /// The test id algorithm declared for this run in runsettings, or <see langword="null"/> when the
     /// run does not declare one and the runner's own environment should decide.
     /// </summary>
-    private bool? _useLegacySha1TestIds;
+    private TestCaseIdAlgorithm? _testCaseIdAlgorithm;
 
     public void Initialize(bool skipDefaultAdapters) => _isInitialized = true;
 
@@ -345,7 +346,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                 // what makes crash attribution work when the test never reaches a terminal state.
                 if (_testCaseEventForwarder is { } forwarder && MtpTestNodeConverter.IsInProgressState(state))
                 {
-                    forwarder.NotifyTestCaseStart(MtpTestNodeConverter.ToTestCase(change, source, _useLegacySha1TestIds));
+                    forwarder.NotifyTestCaseStart(MtpTestNodeConverter.ToTestCase(change, source, _testCaseIdAlgorithm));
                     continue;
                 }
 
@@ -354,7 +355,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                     continue;
                 }
 
-                TestResult result = MtpTestNodeConverter.ToTestResult(change, source, _useLegacySha1TestIds);
+                TestResult result = MtpTestNodeConverter.ToTestResult(change, source, _testCaseIdAlgorithm);
                 _testCaseEventForwarder?.NotifyTestCaseEnd(result);
                 results.Add(result);
             }
@@ -438,7 +439,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         // The test id algorithm opt-out is read by TestCase in whichever process builds the test case.
         // Here that is the runner, which does not receive these variables, so capture the declared
         // choice and pass it explicitly when converting nodes.
-        _useLegacySha1TestIds = MtpTestNodeConverter.ResolveUseLegacySha1TestIds(runSettingsEnvironmentVariables);
+        _testCaseIdAlgorithm = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(runSettingsEnvironmentVariables);
 
         EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
         foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)

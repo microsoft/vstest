@@ -10,7 +10,10 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// <summary>
 /// Used to generate id for tests, using SHA1.
 /// </summary>
-[Obsolete("TestIdProvider is deprecated and will be removed because it uses SHA1, a cryptographic hash, for a non-cryptographic purpose. Migrate to TestIdProvider2, which uses xxHash128 and produces a versioned RFC 9562 version 8 UUID.")]
+/// <remarks>
+/// This is the algorithm test case ids are computed with by default. See <see cref="TestIdProvider2"/>
+/// for the xxHash128 based successor, which is available but not yet the default.
+/// </remarks>
 public class TestIdProvider
 {
     private Guid _id = Guid.Empty;

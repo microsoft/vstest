@@ -21,30 +21,38 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 public sealed class TestCase : TestObject
 {
     /// <summary>
-    /// Opt-out escape hatch. Set to <c>sha1</c> to keep generating the legacy SHA1 based test ids.
+    /// Selects the algorithm used to compute <see cref="Id"/>. Set to <c>xxhash128</c> to opt in to
+    /// the new ids, or to <c>sha1</c> to pin the legacy ones.
     /// </summary>
     /// <remarks>
     /// <para>
+    /// The algorithm is <see cref="TestCaseIdAlgorithmResolver.Default"/> unless this says otherwise.
     /// Moving to xxHash128 changes the id of every test whose id is computed by the platform, which
     /// is a breaking change for anything that stored those ids - most notably Azure DevOps Test Case
-    /// work item association. Prior investigation indicates Azure DevOps keys test identity on the
-    /// test name and container rather than on this id, but until that is confirmed end to end this
-    /// switch lets an affected user roll back without downgrading the whole test platform.
+    /// work item association. It is therefore introduced as opt-in first, so that a release exists in
+    /// which the new algorithm can be evaluated against real data without changing anyone's ids, and
+    /// becomes the default only in a later release.
     /// </para>
     /// <para>
-    /// This is deliberately an algorithm selector rather than a boolean, so a future scheme can be
-    /// added without inventing a second switch.
+    /// See <see cref="TestCaseIdAlgorithmResolver"/> for why this is an algorithm selector rather
+    /// than a boolean.
     /// </para>
     /// </remarks>
-    internal const string TestCaseIdAlgorithmEnvironmentVariable = "VSTEST_TESTCASE_ID_ALGORITHM";
+    internal const string TestCaseIdAlgorithmEnvironmentVariable = TestCaseIdAlgorithmResolver.EnvironmentVariableName;
 
     /// <summary>
     /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the legacy
     /// SHA1 based ids.
     /// </summary>
-    internal const string LegacySha1AlgorithmName = "sha1";
+    internal const string LegacySha1AlgorithmName = TestCaseIdAlgorithmResolver.Sha1Name;
 
-    private static bool? s_useLegacySha1TestIds;
+    /// <summary>
+    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the xxHash128
+    /// based ids.
+    /// </summary>
+    internal const string XxHash128AlgorithmName = TestCaseIdAlgorithmResolver.XxHash128Name;
+
+    private static TestCaseIdAlgorithm? s_idAlgorithm;
 
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
@@ -194,7 +202,7 @@ public sealed class TestCase : TestObject
     }
 
     /// <summary>
-    /// Whether to fall back to the legacy SHA1 based test ids.
+    /// The algorithm used to compute test case ids in this process.
     /// </summary>
     /// <remarks>
     /// Read lazily rather than in a static initializer, so the value is not baked in at type load
@@ -204,29 +212,27 @@ public sealed class TestCase : TestObject
     /// lifetime of the process. Two threads racing here both compute the same value, so the race
     /// is benign and does not need a lock.
     /// </remarks>
-    private static bool UseLegacySha1TestIds
-        => s_useLegacySha1TestIds ??= string.Equals(
-            Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable),
-            LegacySha1AlgorithmName,
-            StringComparison.OrdinalIgnoreCase);
+    private static TestCaseIdAlgorithm IdAlgorithm
+        => s_idAlgorithm ??= TestCaseIdAlgorithmResolver.Resolve(
+            Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable));
 
     /// <summary>
-    /// Clears the cached <see cref="UseLegacySha1TestIds"/> value so the environment variable is
+    /// Clears the cached <see cref="IdAlgorithm"/> value so the environment variable is
     /// read again. For tests only - production code must not change algorithm mid-process.
     /// </summary>
-    internal static void ResetTestIdAlgorithmCache() => s_useLegacySha1TestIds = null;
+    internal static void ResetTestIdAlgorithmCache() => s_idAlgorithm = null;
 
     /// <summary>
     /// Creates a Id of TestCase
     /// </summary>
     /// <returns>Guid test id</returns>
-    private Guid GetTestId() => GetTestId(UseLegacySha1TestIds);
+    private Guid GetTestId() => GetTestId(IdAlgorithm);
 
     /// <summary>
     /// Creates a Id of TestCase using the given algorithm.
     /// </summary>
     /// <returns>Guid test id</returns>
-    private Guid GetTestId(bool useLegacySha1)
+    private Guid GetTestId(TestCaseIdAlgorithm algorithm)
     {
         // To generate id hash "ExecutorUri + source + Name". The composition lives in TestIdSeed
         // because the Microsoft.Testing.Platform path has to reproduce it exactly from the runner
@@ -238,14 +244,11 @@ public sealed class TestCase : TestObject
         // the serialization constructor can still be missing it.
         string testcaseFullName = TestIdSeed.Compose(ExecutorUri?.ToString(), Source, GetFullyQualifiedName());
 
-        if (useLegacySha1)
+        return algorithm switch
         {
-#pragma warning disable CS0618 // Type or member is obsolete - deliberate, this is the legacy opt-out path.
-            return EqtHash.GuidFromString(testcaseFullName);
-#pragma warning restore CS0618
-        }
-
-        return EqtHash.GuidFromString2(testcaseFullName);
+            TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(testcaseFullName),
+            _ => EqtHash.GuidFromString(testcaseFullName),
+        };
     }
 
     private void SetVariableAndResetId<T>(ref T variable, T value)

@@ -9,7 +9,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 /// <summary>
-/// Covers the <c>VSTEST_TESTCASE_ID_ALGORITHM</c> opt-out that selects the legacy SHA1 test ids.
+/// Covers the <c>VSTEST_TESTCASE_ID_ALGORITHM</c> switch that selects which algorithm computes
+/// <see cref="TestCase.Id"/>.
 /// </summary>
 /// <remarks>
 /// These tests mutate a process wide environment variable and the cached algorithm choice, so each
@@ -26,25 +27,46 @@ public class TestCaseIdAlgorithmTests
     private static TestCase CreateTestCase()
         => new("sampleTestClass.sampleTestCase", new Uri("executor://sampleTestExecutor"), "sampleTest.dll");
 
+    /// <summary>
+    /// The default algorithm, asserted on its own rather than only implied by the tests below.
+    /// </summary>
+    /// <remarks>
+    /// xxHash128 ships available but not default, so this release changes no id at all. Flipping the
+    /// default is the entire behavioural change of a later release, and this test is what makes that
+    /// flip impossible to make by accident: it fails unless the default is also changed here
+    /// deliberately, at which point the flip has been stated in two places that have to agree.
+    /// </remarks>
     [TestMethod]
-    public void TestCaseIdUsesXxHash128WhenEnvironmentVariableIsNotSet()
-        => RunWithAlgorithm(null, () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
+    public void TestCaseIdUsesSha1WhenEnvironmentVariableIsNotSet()
+        => RunWithAlgorithm(null, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
 
     [TestMethod]
     [DataRow("sha1")]
     [DataRow("SHA1")]
     [DataRow("Sha1")]
-    public void TestCaseIdUsesLegacySha1WhenEnvironmentVariableIsSet(string value)
+    public void TestCaseIdUsesSha1WhenSha1IsSelected(string value)
         => RunWithAlgorithm(value, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
 
     [TestMethod]
-    [DataRow("")]
     [DataRow("xxhash128")]
+    [DataRow("XXHASH128")]
+    [DataRow("XxHash128")]
+    public void TestCaseIdUsesXxHash128WhenXxHash128IsSelected(string value)
+        => RunWithAlgorithm(value, () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
+
+    /// <summary>
+    /// An unrecognized value falls back to the default rather than failing the run. This is read on
+    /// the way to computing an id, where there is nowhere sensible to surface an error, and failing
+    /// a whole run over a typo in an opt-in switch would be a worse outcome than ignoring it.
+    /// </summary>
+    [TestMethod]
+    [DataRow("")]
     [DataRow("sha")]
     [DataRow("sha256")]
+    [DataRow("xxhash")]
     [DataRow("nonsense")]
-    public void TestCaseIdUsesXxHash128ForAnyOtherEnvironmentVariableValue(string value)
-        => RunWithAlgorithm(value, () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
+    public void TestCaseIdUsesTheDefaultForAnyUnrecognizedEnvironmentVariableValue(string value)
+        => RunWithAlgorithm(value, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
 
     [TestMethod]
     public void TestCaseIdAlgorithmIsReadLazilyRatherThanAtTypeLoad()
@@ -53,21 +75,21 @@ public class TestCaseIdAlgorithmTests
         // baked in the wrong answer by this point; a lazy read picks the new value up.
         _ = CreateTestCase().Id;
 
-        RunWithAlgorithm("sha1", () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
+        RunWithAlgorithm("xxhash128", () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
     }
 
     [TestMethod]
     public void TestCaseIdAlgorithmIsCachedSoIdsStayStableWithinAProcess()
     {
-        RunWithAlgorithm("sha1", () =>
+        RunWithAlgorithm("xxhash128", () =>
         {
-            Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString());
+            Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString());
 
             // Changing the variable after the choice has been made must not change ids, otherwise
             // the same test could get two different ids within one run.
             Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, null);
 
-            Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString());
+            Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString());
         });
     }
 

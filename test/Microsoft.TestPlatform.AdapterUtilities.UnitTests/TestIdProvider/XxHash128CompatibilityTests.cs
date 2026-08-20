@@ -10,7 +10,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 /// <summary>
 /// Pins the ids produced by <see cref="AdapterUtilities.TestIdProvider2"/>, the xxHash128 based
-/// replacement for the SHA1 based <see cref="AdapterUtilities.TestIdProvider"/>.
+/// successor to the SHA1 based <see cref="AdapterUtilities.TestIdProvider"/>.
 /// </summary>
 /// <remarks>
 /// <para>

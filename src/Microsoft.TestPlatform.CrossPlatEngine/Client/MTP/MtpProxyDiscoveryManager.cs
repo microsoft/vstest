@@ -7,6 +7,7 @@ using System.Linq;
 using System.Threading;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
@@ -33,7 +34,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
     /// cases here, in the runner, which does not receive those variables, so the declared value has
     /// to be read from the runsettings directly and passed to the converter.
     /// </remarks>
-    private bool? _useLegacySha1TestIds;
+    private TestCaseIdAlgorithm? _testCaseIdAlgorithm;
 
     public void Initialize(bool skipDefaultAdapters)
     {
@@ -44,7 +45,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
-        _useLegacySha1TestIds = MtpTestNodeConverter.ResolveUseLegacySha1TestIds(
+        _testCaseIdAlgorithm = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(
             InferRunSettingsHelper.GetEnvironmentVariables(discoveryCriteria.RunSettings));
 
         var sources = discoveryCriteria.Sources?.ToList() ?? new List<string>();
@@ -112,7 +113,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
                 {
                     lock (discovered)
                     {
-                        discovered.Add(MtpTestNodeConverter.ToTestCase(change, source, _useLegacySha1TestIds));
+                        discovered.Add(MtpTestNodeConverter.ToTestCase(change, source, _testCaseIdAlgorithm));
                     }
                 }
             }

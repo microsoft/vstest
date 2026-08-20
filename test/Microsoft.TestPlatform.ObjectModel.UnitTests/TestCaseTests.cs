@@ -41,7 +41,7 @@ public class TestCaseTests
     [TestMethod]
     public void TestCaseIdIfNotSetExplicitlyShouldReturnGuidBasedOnSourceAndName()
     {
-        Assert.AreEqual("1ea84a1f-f791-8103-bfda-9cccaca2037f", _testCase.Id.ToString());
+        Assert.AreEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString());
     }
 
     [TestMethod]
@@ -49,7 +49,7 @@ public class TestCaseTests
     {
         _testCase.FullyQualifiedName = "sampleTestClass1.sampleTestCase1";
 
-        Assert.AreEqual("165d77ed-486f-8261-84a4-a7c64c0b7f7c", _testCase.Id.ToString());
+        Assert.AreEqual("6f86dd1c-7130-a1ae-8e7f-02e7de898a43", _testCase.Id.ToString());
     }
 
     [TestMethod]
@@ -57,7 +57,7 @@ public class TestCaseTests
     {
         _testCase.Source = "sampleTest1.dll";
 
-        Assert.AreEqual("1a06771c-9944-8faf-b370-aaf2e70304dd", _testCase.Id.ToString());
+        Assert.AreEqual("22843fee-70ea-4cf4-37cd-5061b4c47a8a", _testCase.Id.ToString());
     }
 
     [TestMethod]

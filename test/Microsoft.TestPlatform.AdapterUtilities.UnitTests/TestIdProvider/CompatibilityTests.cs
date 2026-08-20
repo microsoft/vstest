@@ -9,11 +9,11 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 /// <summary>
-/// Pins the legacy SHA1 based test id algorithm. See XxHash128CompatibilityTests for the
-/// equivalent vectors covering the current xxHash128 based algorithm.
+/// Pins the SHA1 based test id algorithm, which is the one test ids are computed with by default.
+/// See XxHash128CompatibilityTests for the equivalent vectors covering its xxHash128 based
+/// successor, which is available but not yet the default.
 /// </summary>
 [TestClass]
-[Obsolete("Tests the obsolete SHA1 based TestIdProvider. Kept so the legacy opt-out path stays pinned.")]
 public class CompatibilityTests
 {
     [TestMethod]

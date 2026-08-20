@@ -43,12 +43,10 @@ internal static class MtpTestNodeConverter
     private const string VsTestFullyQualifiedNameKey = "vstest.TestCase.FullyQualifiedName";
     private const string VsTestExecutorUriKey = "vstest.original-executor-uri";
 
-    // Opt-out selecting the legacy SHA1 test id algorithm. On the classic path this is read from the
-    // testhost's own environment, which picks up runsettings RunConfiguration/EnvironmentVariables.
-    // MTP applications are their own host and their nodes are converted here, in the runner, so the
+    // Selects the test id algorithm. On the classic path this is read from the testhost's own
+    // environment, which picks up runsettings RunConfiguration/EnvironmentVariables. MTP
+    // applications are their own host and their nodes are converted here, in the runner, so the
     // runner has to read the declared value itself and pass the choice to the test case.
-    private const string TestCaseIdAlgorithmVariable = "VSTEST_TESTCASE_ID_ALGORITHM";
-    private const string LegacySha1AlgorithmName = "sha1";
 
     // Execution states (MTP wire values).
     private const string StateInProgress = "in-progress";
@@ -75,36 +73,21 @@ internal static class MtpTestNodeConverter
         => update.NodeType is ActionNodeType;
 
     /// <summary>
-    /// Resolves whether the legacy SHA1 test id algorithm was requested for this run, from the
-    /// environment variables declared in runsettings <c>RunConfiguration/EnvironmentVariables</c>.
+    /// Resolves the test id algorithm requested for this run, from the environment variables
+    /// declared in runsettings <c>RunConfiguration/EnvironmentVariables</c>.
     /// </summary>
     /// <remarks>
     /// Returns <see langword="null"/> when the run does not declare the variable, so the test case
     /// falls back to the runner's own environment and the classic default. Declaring it explicitly
     /// wins, so a runsettings value overrides an inherited one rather than silently agreeing with it.
     /// </remarks>
-    public static bool? ResolveUseLegacySha1TestIds(IDictionary<string, string?>? runSettingsEnvironmentVariables)
-    {
-        if (runSettingsEnvironmentVariables is null)
-        {
-            return null;
-        }
-
-        foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
-        {
-            if (string.Equals(variable.Key, TestCaseIdAlgorithmVariable, StringComparison.OrdinalIgnoreCase))
-            {
-                return string.Equals(variable.Value, LegacySha1AlgorithmName, StringComparison.OrdinalIgnoreCase);
-            }
-        }
-
-        return null;
-    }
+    public static TestCaseIdAlgorithm? ResolveTestCaseIdAlgorithm(IDictionary<string, string?>? runSettingsEnvironmentVariables)
+        => TestCaseIdAlgorithmResolver.ResolveDeclared(runSettingsEnvironmentVariables);
 
     public static TestCase ToTestCase(MtpTestNodeUpdate update, string source)
-        => ToTestCase(update, source, useLegacySha1TestIds: null);
+        => ToTestCase(update, source, testCaseIdAlgorithm: null);
 
-    public static TestCase ToTestCase(MtpTestNodeUpdate update, string source, bool? useLegacySha1TestIds)
+    public static TestCase ToTestCase(MtpTestNodeUpdate update, string source, TestCaseIdAlgorithm? testCaseIdAlgorithm)
     {
         string? uid = update.Uid;
         string fullyQualifiedName = GetRawString(update, VsTestFullyQualifiedNameKey)
@@ -136,29 +119,32 @@ internal static class MtpTestNodeConverter
         // Deliberately last: setting FullyQualifiedName or Source resets the default id, so assigning
         // it earlier could be silently undone by a later assignment.
         //
-        // Only the legacy algorithm needs an explicit assignment. Leaving the id alone otherwise lets
-        // TestCase compute it lazily, exactly as it does on the classic path, so the default stays in
-        // one place. The seed is composed with TestIdSeed, from the test case's own properties rather
-        // than the raw wire values, because this must hash precisely the bytes TestCase would have
-        // hashed itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and
-        // host, so the raw string and the parsed uri do not necessarily render the same).
-        if (useLegacySha1TestIds == true)
+        // Only a run that declared an algorithm needs an explicit assignment. Leaving the id alone
+        // otherwise lets TestCase compute it lazily, exactly as it does on the classic path, so the
+        // default stays in one place and this does not have to be revisited when the default moves.
+        // The seed is composed with TestIdSeed, from the test case's own properties rather than the
+        // raw wire values, because this must hash precisely the bytes TestCase would have hashed
+        // itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and host, so
+        // the raw string and the parsed uri do not necessarily render the same).
+        if (testCaseIdAlgorithm is { } algorithm)
         {
-#pragma warning disable CS0618 // Type or member is obsolete - deliberate, this is the legacy opt-out path.
-            testCase.Id = EqtHash.GuidFromString(
-                TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName));
-#pragma warning restore CS0618
+            string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName);
+            testCase.Id = algorithm switch
+            {
+                TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(seed),
+                _ => EqtHash.GuidFromString(seed),
+            };
         }
 
         return testCase;
     }
 
     public static TestResult ToTestResult(MtpTestNodeUpdate update, string source)
-        => ToTestResult(update, source, useLegacySha1TestIds: null);
+        => ToTestResult(update, source, testCaseIdAlgorithm: null);
 
-    public static TestResult ToTestResult(MtpTestNodeUpdate update, string source, bool? useLegacySha1TestIds)
+    public static TestResult ToTestResult(MtpTestNodeUpdate update, string source, TestCaseIdAlgorithm? testCaseIdAlgorithm)
     {
-        var testCase = ToTestCase(update, source, useLegacySha1TestIds);
+        var testCase = ToTestCase(update, source, testCaseIdAlgorithm);
 
         var result = new TestResult(testCase)
         {

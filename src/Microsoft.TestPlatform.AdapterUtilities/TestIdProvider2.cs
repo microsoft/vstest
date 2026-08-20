@@ -12,11 +12,12 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// Used to generate id for tests, using xxHash128.
 /// </summary>
 /// <remarks>
-/// This is the replacement for <see cref="TestIdProvider"/>, which uses SHA1. SHA1 is a
+/// This is the intended successor to <see cref="TestIdProvider"/>, which uses SHA1. SHA1 is a
 /// cryptographic hash being used for a non-cryptographic purpose; it is slower than necessary and
 /// its presence trips security tooling. The ids produced here are RFC 9562 version 8 UUIDs that
 /// carry the version of the hashing scheme, so a future change to the algorithm is detectable
-/// from the id itself.
+/// from the id itself. It ships available but not default: <see cref="TestIdProvider"/> is still
+/// what test ids are computed with unless a run selects otherwise.
 /// </remarks>
 public class TestIdProvider2
 {

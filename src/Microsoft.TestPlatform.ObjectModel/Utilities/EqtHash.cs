@@ -19,7 +19,11 @@ public static class EqtHash
     /// Calculates a SHA1 hash of the string and copies the first 128 bits of the hash
     /// to a new Guid.
     /// </summary>
-    [Obsolete("GuidFromString is deprecated and will be removed because it uses SHA1, a cryptographic hash, for a non-cryptographic purpose. Migrate to GuidFromString2, which uses xxHash128 and produces a versioned RFC 9562 version 8 UUID.")]
+    /// <remarks>
+    /// This is the algorithm test case ids are computed with by default. See
+    /// <see cref="GuidFromString2(string)"/> for the xxHash128 based successor, which is available
+    /// but not yet the default.
+    /// </remarks>
     public static Guid GuidFromString(string data)
     {
         TPDebug.Assert(data != null);
@@ -47,10 +51,10 @@ public static class EqtHash
     /// </summary>
     /// <remarks>
     /// <para>
-    /// This replaces <see cref="GuidFromString(string)"/>. xxHash128 is a non-cryptographic hash,
-    /// which is what this has always needed - the id is an identity, never a security boundary -
-    /// and it is considerably faster than SHA1. Using SHA1 also makes vstest show up in security
-    /// scans and prevents it from running under FIPS-restricted policies.
+    /// This is the intended successor to <see cref="GuidFromString(string)"/>. xxHash128 is a
+    /// non-cryptographic hash, which is what this has always needed - the id is an identity, never a
+    /// security boundary - and it is considerably faster than SHA1. Using SHA1 also makes vstest show
+    /// up in security scans and prevents it from running under FIPS-restricted policies.
     /// </para>
     /// <para>
     /// The resulting Guid carries the version of the hashing scheme in its top 4 bits, so ids
@@ -59,9 +63,15 @@ public static class EqtHash
     /// </para>
     /// <para>
     /// This deliberately does NOT produce the same value as <see cref="GuidFromString(string)"/>.
-    /// Changing the id of a test is a breaking change for anything that stored it. The warning on
+    /// Changing the id of a test is a breaking change for anything that stored it, which is why this
+    /// ships available but not default: test case ids are computed with it only when a run selects it
+    /// through the VSTEST_TESTCASE_ID_ALGORITHM switch. The warning on
     /// <see cref="GuidFromString(string)"/> about work item association requiring sign off from the
-    /// TC-TA feature owners applies to adopting this method.
+    /// TC-TA feature owners applies to making this the default.
+    /// </para>
+    /// <para>
+    /// The bytes are laid out exactly as MSTest lays them out, so the same input produces the same
+    /// id in both, and an id produced by either is legible to the other.
     /// </para>
     /// </remarks>
     public static Guid GuidFromString2(string data)
