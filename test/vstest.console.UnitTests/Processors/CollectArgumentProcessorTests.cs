@@ -803,6 +803,28 @@ public class CollectArgumentProcessorTests
     }
 
     [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_PrefersNewerTargetFramework_WhenCollectorShipsUnderSeveral()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            CreateCodeCoveragePackage(tempDir, "18.5.0", targetFramework: "netstandard1.0");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.5.0", targetFramework: "netstandard2.0");
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // No package ships two of them today, but if one ever does the newer target framework is the
+            // one to load, and the answer must not depend on the order the file system returns them in.
+            Assert.AreEqual(expected, path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
     public void TryGetCodeCoverageAdapterPath_SkipsVersionWithoutCollector()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());

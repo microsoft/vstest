@@ -435,10 +435,11 @@ internal class CollectArgumentExecutor : IArgumentExecutor
         }
 
         // Real packages hold exactly one such folder. Order the candidates so the answer does not
-        // depend on the order the file system returns the directories in.
+        // depend on the order the file system returns the directories in, descending so that a newer
+        // target framework wins if a package ever ships the collector under more than one.
         return Directory.GetDirectories(buildDir)
             .Where(d => File.Exists(Path.Combine(d, TraceDataCollectorAssemblyName)))
-            .OrderBy(d => Path.GetFileName(d), StringComparer.Ordinal)
+            .OrderByDescending(d => Path.GetFileName(d), StringComparer.Ordinal)
             .FirstOrDefault();
     }
 
