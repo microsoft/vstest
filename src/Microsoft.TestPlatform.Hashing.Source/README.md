@@ -7,6 +7,11 @@ as `internal` types, following the same pattern as `src/Microsoft.TestPlatform.F
 `Microsoft.TestPlatform.CrossPlatEngine`, which has to reproduce the id of a test case from the
 runner process on the Microsoft.Testing.Platform path.
 
+Consumers pick files deliberately rather than taking everything: `AdapterUtilities` excludes
+`TestCaseIdAlgorithm.cs`, because it does not read the algorithm switch and every assembly that
+compiles a file here gets its own copy of the types in it. Check the `Compile` items when adding a
+file, since the two projects that use a `*.cs` glob will otherwise pick it up silently.
+
 ## What is here
 
 | File | Origin |

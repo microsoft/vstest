@@ -54,8 +54,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <!-- Vendored xxHash128, compiled in as internal. See src/Microsoft.TestPlatform.Hashing.Source/README.md. -->
-    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/*.cs" LinkBase="Hashing" />
+    <!-- Vendored xxHash128, compiled in as internal. See src/Microsoft.TestPlatform.Hashing.Source/README.md.
+         The test case id algorithm selector is deliberately excluded: this assembly does not read the
+         switch, and every assembly that compiles a shared source type gets its own copy of it. -->
+    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/*.cs"
+             Exclude="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/TestCaseIdAlgorithm.cs"
+             LinkBase="Hashing" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFrameworkIdentifier)' != '.NETCoreApp'">

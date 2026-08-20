@@ -10,11 +10,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 
 /// <summary>
-/// Pins <see cref="EqtHash.GuidFromString2(string)"/>, which produces the id of every test case.
+/// Pins <see cref="EqtHash.GuidFromString2(string)"/>, the xxHash128 based successor to
+/// <see cref="EqtHash.GuidFromString(string)"/>, which is available but not yet the algorithm test
+/// case ids are computed with by default.
 /// </summary>
 /// <remarks>
-/// These ids end up in TRX files, in Azure DevOps and in Test Case work item association, so they
-/// must never change by accident. If a change is deliberate, bump the hash version alongside it.
+/// Once a run selects it, these ids end up in TRX files, in Azure DevOps and in Test Case work item
+/// association, so they must never change by accident. If a change is deliberate, bump the hash
+/// version alongside it.
 /// </remarks>
 [TestClass]
 [DoNotParallelize]

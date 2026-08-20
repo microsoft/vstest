@@ -436,9 +436,9 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             return;
         }
 
-        // The test id algorithm opt-out is read by TestCase in whichever process builds the test case.
-        // Here that is the runner, which does not receive these variables, so capture the declared
-        // choice and pass it explicitly when converting nodes.
+        // The test id algorithm selection is read by TestCase in whichever process builds the test
+        // case. Here that is the runner, which does not receive these variables, so capture the
+        // declared choice and pass it explicitly when converting nodes.
         _testCaseIdAlgorithm = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(runSettingsEnvironmentVariables);
 
         EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();

@@ -42,12 +42,6 @@ public sealed class TestCase : TestObject
     internal const string TestCaseIdAlgorithmEnvironmentVariable = TestCaseIdAlgorithmResolver.EnvironmentVariableName;
 
     /// <summary>
-    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the SHA1
-    /// based ids.
-    /// </summary>
-    internal const string Sha1AlgorithmName = TestCaseIdAlgorithmResolver.Sha1Name;
-
-    /// <summary>
     /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the xxHash128
     /// based ids.
     /// </summary>
