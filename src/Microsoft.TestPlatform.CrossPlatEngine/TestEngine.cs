@@ -119,9 +119,10 @@ public class TestEngine : ITestEngine
         // other managers.
         var discoveryDataAggregator = new DiscoveryDataAggregator();
 
-        // The criteria handed to this creator is not the discoveryCriteria this method received. ParallelProxyDiscoveryManager
-        // splits the overall criteria into per-workload pieces (SplitToWorkloads), normally a single source each, and passes
-        // that piece here. Read the sources from the criteria we are given, not from the overall one.
+        // The criteria handed to this creator is not the same as the discoveryCriteria this method received.
+        // ParallelProxyDiscoveryManager splits the overall criteria into per-workload pieces (SplitToWorkloads),
+        // normally a single source each, and passes that piece here. Read the sources from the criteria we are
+        // given, not from the overall one.
         Func<TestRuntimeProviderInfo, DiscoveryCriteria, IProxyDiscoveryManager> proxyDiscoveryManagerCreator = (runtimeProviderInfo, workloadCriteria) =>
         {
             var sources = workloadCriteria.Sources.ToList();
