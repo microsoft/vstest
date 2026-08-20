@@ -38,6 +38,13 @@ internal class TestExecutionRecorder : TestSessionMessageLogger, ITestExecutionR
     /// <remarks>
     /// Pairing uses reference equality, so <see cref="RecordEnd"/> and <see cref="RecordResult"/>
     /// must receive the same <see cref="TestCase"/> instance for an execution.
+    /// <para>
+    /// An adapter may also reuse one instance for several executions that share an id. Start and end
+    /// counts stay balanced in that case, because a pending end is consumed by the next result for that
+    /// instance. The executions are no longer told apart though, so an end event can carry the outcome
+    /// of the other execution when results arrive in a different order than the executions ran. Pass a
+    /// distinct instance per execution to keep outcomes attributed.
+    /// </para>
     /// </remarks>
     private readonly Dictionary<TestCase, int> _testCaseEndCalledMap;
 

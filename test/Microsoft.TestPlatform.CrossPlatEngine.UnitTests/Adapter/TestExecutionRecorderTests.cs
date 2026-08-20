@@ -350,5 +350,29 @@ public class TestExecutionRecorderTests
             Times.Once);
     }
 
+    [TestMethod]
+    public void RecordResultShouldKeepStartsAndEndsBalancedWhenOneInstanceIsReusedForSequentialExecutions()
+    {
+        // An adapter may reuse a single TestCase instance for sequential executions that share an id,
+        // and the second execution can start before the first one's result arrives:
+        //
+        //   Start(tc) → End(tc) → Start(tc) → Result(tc) → Result(tc)
+        //
+        // The first result consumes the pending explicit end, so no end is sent for it. The second
+        // result finds no pending end and falls back to the safety net, which sends the end for the
+        // second execution. Both executions therefore get a start and an end.
+        _testResult.Outcome = TestOutcome.Passed;
+
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);                       // execution 1 start
+        _testRecorderWithTestEventsHandler.RecordEnd(_testCase, TestOutcome.Passed);     // execution 1 explicit end
+        _testRecorderWithTestEventsHandler.RecordStart(_testCase);                       // execution 2 start, same instance
+        _testRecorderWithTestEventsHandler.RecordResult(_testResult);                    // consumes the pending end
+        _testRecorderWithTestEventsHandler.RecordResult(_testResult);                    // safety net sends execution 2's end
+
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Exactly(2));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Exactly(2));
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestResult(_testResult), Times.Exactly(2));
+    }
+
     #endregion
 }
