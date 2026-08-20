@@ -82,6 +82,13 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 {
     private readonly IRunSettingsProvider _runSettingsManager;
     private readonly IFileHelper _fileHelper;
+
+    /// <summary>
+    /// The Code Coverage collector assembly, which marks the folder inside the
+    /// <c>microsoft.codecoverage</c> package that has to be handed to the run as an adapter path.
+    /// </summary>
+    private const string TraceDataCollectorAssemblyName = "Microsoft.VisualStudio.TraceDataCollector.dll";
+
     internal static List<string> EnabledDataCollectors = new();
     internal CollectArgumentExecutor(IRunSettingsProvider runSettingsManager, IFileHelper fileHelper)
     {
@@ -304,9 +311,17 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     /// <summary>
     /// Adds the Microsoft Code Coverage adapter path to the run settings, discovered from the
     /// <c>microsoft.codecoverage</c> NuGet package. Does nothing when the package cannot be found.
+    /// Set <c>VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY=1</c> to turn the discovery off without
+    /// having to pass an adapter path.
     /// </summary>
-    internal static void TryAddCodeCoverageAdapterPath(IRunSettingsProvider runSettingsManager, string? nugetPackagesOverride = null)
+    internal static void TryAddCodeCoverageAdapterPath(IRunSettingsProvider runSettingsManager, string? nugetPackagesOverride = null, IFeatureFlag? featureFlag = null)
     {
+        if ((featureFlag ?? FeatureFlag.Instance).IsSet(FeatureFlag.VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY))
+        {
+            EqtTrace.Verbose("CollectArgumentExecutor.TryAddCodeCoverageAdapterPath: Discovery is disabled by VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY.");
+            return;
+        }
+
         // A run that already has adapter paths does no discovery. A whitespace-only node counts as unset.
         var existingPaths = TestAdapterPathArgumentExecutor.SplitPaths(
             runSettingsManager.QueryRunSettingsNode(TestAdapterPathArgumentExecutor.RunSettingsPath));
@@ -326,9 +341,16 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     }
 
     /// <summary>
-    /// Finds the <c>build/</c> directory of the latest installed <c>microsoft.codecoverage</c>
-    /// NuGet package. Returns <see langword="false"/> when no suitable package is found.
+    /// Finds the directory holding the collector of the installed <c>microsoft.codecoverage</c> package,
+    /// which is the same leaf folder the MSBuild path uses. Returns <see langword="false"/> when no
+    /// suitable package is found.
     /// </summary>
+    /// <remarks>
+    /// This is not the same choice MSBuild makes. A project run injects the exact version the test project
+    /// references, while here there is no project to ask, so the highest installed version wins. Stable
+    /// releases are preferred over pre-releases so that a preview sitting in the package cache is only
+    /// picked when nothing else is installed. Pass <c>--testAdapterPath</c> to pin a specific one.
+    /// </remarks>
     internal static bool TryGetCodeCoverageAdapterPath([NotNullWhen(true)] out string? path, string? nugetPackagesOverride = null)
     {
         path = null;
@@ -367,8 +389,8 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
         foreach (var versionDir in Directory.GetDirectories(ccPackagePath))
         {
-            var buildDir = Path.Combine(versionDir, "build");
-            if (!Directory.Exists(buildDir))
+            var collectorDir = FindCollectorDirectory(Path.Combine(versionDir, "build"));
+            if (collectorDir is null)
             {
                 continue;
             }
@@ -385,13 +407,46 @@ internal class CollectArgumentExecutor : IArgumentExecutor
                 bestVersion = version;
                 bestPreRelease = preRelease;
                 bestDirectoryName = directoryName;
-                bestPath = buildDir;
+                bestPath = collectorDir;
             }
         }
 
         return bestPath;
     }
 
+    /// <summary>
+    /// Returns the directory that holds the Code Coverage collector, which sits in a target framework
+    /// folder under <c>build/</c>, e.g. <c>build/netstandard2.0</c>. Pointing at the folder that actually
+    /// holds the assembly matches what the MSBuild path injects, so the run does not depend on the default
+    /// adapter loading strategy searching directories recursively.
+    /// </summary>
+    private static string? FindCollectorDirectory(string buildDir)
+    {
+        if (!Directory.Exists(buildDir))
+        {
+            return null;
+        }
+
+        if (File.Exists(Path.Combine(buildDir, TraceDataCollectorAssemblyName)))
+        {
+            return buildDir;
+        }
+
+        // Real packages hold exactly one such folder. Order the candidates so the answer does not
+        // depend on the order the file system returns the directories in.
+        return Directory.GetDirectories(buildDir)
+            .Where(d => File.Exists(Path.Combine(d, TraceDataCollectorAssemblyName)))
+            .OrderBy(d => Path.GetFileName(d), StringComparer.Ordinal)
+            .FirstOrDefault();
+    }
+
+    /// <summary>
+    /// Returns the NuGet global packages folder path, or <see langword="null"/> if it cannot be determined.
+    /// Checks the <c>NUGET_PACKAGES</c> environment variable first, then falls back to
+    /// <c>~/.nuget/packages</c>. A <c>globalPackagesFolder</c> set in <c>NuGet.Config</c> is <em>not</em>
+    /// consulted, because reading it means taking a dependency on the NuGet libraries; set
+    /// <c>NUGET_PACKAGES</c> or pass <c>--testAdapterPath</c> when the packages folder is configured that way.
+    /// </summary>
     private static string? GetNuGetGlobalPackagesPath()
     {
         var envPath = Environment.GetEnvironmentVariable("NUGET_PACKAGES");
@@ -427,14 +482,24 @@ internal class CollectArgumentExecutor : IArgumentExecutor
     }
 
     /// <summary>
-    /// Orders two package versions the way NuGet does: numeric version first, then a pre-release below the
-    /// stable release with the same numeric version, then the pre-release label per SemVer 2.0. Equal
-    /// candidates fall back to the folder name so the result does not depend on directory order.
+    /// Orders two package versions the way this discovery wants them: a stable release first, then the
+    /// numeric version, then the pre-release label per SemVer 2.0. Preferring stable over a higher
+    /// pre-release differs from plain SemVer ordering on purpose, so that a preview left in the package
+    /// cache does not take over a run that never referenced it. Equal candidates fall back to the folder
+    /// name so the result does not depend on directory order.
     /// </summary>
     private static int CompareNuGetVersions(
         Version left, string? leftPreRelease, string leftName,
         Version right, string? rightPreRelease, string rightName)
     {
+        // A stable release wins even against a higher pre-release.
+        bool leftIsStable = leftPreRelease is null;
+        bool rightIsStable = rightPreRelease is null;
+        if (leftIsStable != rightIsStable)
+        {
+            return leftIsStable ? 1 : -1;
+        }
+
         var versionComparison = left.CompareTo(right);
         if (versionComparison != 0)
         {
@@ -443,12 +508,8 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
         if (leftPreRelease is null || rightPreRelease is null)
         {
-            return (leftPreRelease, rightPreRelease) switch
-            {
-                (null, not null) => 1,
-                (not null, null) => -1,
-                _ => string.CompareOrdinal(leftName, rightName),
-            };
+            // Both are stable, the mixed case already returned above.
+            return string.CompareOrdinal(leftName, rightName);
         }
 
         var preReleaseComparison = ComparePreReleaseLabels(leftPreRelease, rightPreRelease);

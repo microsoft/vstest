@@ -11,6 +11,7 @@ using Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -739,19 +740,19 @@ public class CollectArgumentProcessorTests
     }
 
     [TestMethod]
-    public void TryGetCodeCoverageAdapterPath_ReturnsLatestVersion_WhenMultipleVersionsInstalled()
+    public void TryGetCodeCoverageAdapterPath_ReturnsFalse_WhenBuildDirectoryHasNoCollector()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "17.12.0", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.0.0", "build"));
+            // A build folder without the collector is not a usable candidate, injecting it would only
+            // add an adapter path that has nothing to load.
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.0.0", "build", "netstandard2.0"));
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
-            Assert.IsTrue(result);
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+            Assert.IsFalse(result);
+            Assert.IsNull(path);
         }
         finally
         {
@@ -760,19 +761,104 @@ public class CollectArgumentProcessorTests
     }
 
     [TestMethod]
-    public void TryGetCodeCoverageAdapterPath_PicksHigherNumericVersion_EvenWhenItIsPreRelease()
+    public void TryGetCodeCoverageAdapterPath_ReturnsCollectorDirectory_NotTheBuildDirectory()
     {
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-preview-1", "build"));
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
-            // 18.6.0-preview-1 has a higher numeric version (18.6 > 18.5), so it wins even though it's a pre-release.
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-preview-1", "build"), StringComparison.OrdinalIgnoreCase));
+            // The collector sits in the target framework folder, which is what the MSBuild path injects too.
+            // Pointing at build/ instead would only work because the default loading strategy recurses.
+            Assert.AreEqual(collectorDir, path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ReturnsBuildDirectory_WhenCollectorSitsDirectlyInIt()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
+            Directory.CreateDirectory(buildDir);
+            File.WriteAllText(Path.Combine(buildDir, TraceDataCollectorFileName), string.Empty);
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(buildDir, path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_SkipsVersionWithoutCollector()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            // 18.6.0 is the higher version but holds no collector, so 18.5.0 is the one that can be used.
+            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0", "build", "netstandard2.0"));
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(collectorDir, path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_ReturnsLatestVersion_WhenMultipleVersionsInstalled()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            CreateCodeCoveragePackage(tempDir, "17.12.0");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.5.0");
+            CreateCodeCoveragePackage(tempDir, "18.0.0");
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            Assert.AreEqual(expected, path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_PrefersStable_OverHigherPreRelease()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var expected = CreateCodeCoveragePackage(tempDir, "18.5.0");
+            CreateCodeCoveragePackage(tempDir, "18.6.0-preview-1");
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // A project run injects the version the project references. There is no project to ask here, so
+            // a preview left in the package cache must not take over a run that never referenced it.
+            Assert.AreEqual(expected, path);
         }
         finally
         {
@@ -786,14 +872,34 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0-preview-1", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+            CreateCodeCoveragePackage(tempDir, "18.5.0-preview-1");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.5.0");
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
-            // Stable release wins over a pre-release with the same numeric version (NuGet SemVer: pre-release < release).
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(expected, path);
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryGetCodeCoverageAdapterPath_PicksHighestPreRelease_WhenNoStableIsInstalled()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            CreateCodeCoveragePackage(tempDir, "18.5.0-preview-1");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.6.0-preview-1");
+
+            bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
+
+            Assert.IsTrue(result);
+            // Nothing stable is installed, so the highest pre-release is the only thing left to pick.
+            Assert.AreEqual(expected, path);
         }
         finally
         {
@@ -814,13 +920,13 @@ public class CollectArgumentProcessorTests
             {
                 foreach (var version in creationOrder)
                 {
-                    Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", version, "build"));
+                    CreateCodeCoveragePackage(tempDir, version);
                 }
 
                 bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
                 Assert.IsTrue(result);
-                Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-preview-2", "build"), StringComparison.OrdinalIgnoreCase),
+                Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-preview-2", "build", "netstandard2.0"), StringComparison.OrdinalIgnoreCase),
                     $"Expected 18.6.0-preview-2 to win regardless of creation order, but got '{path}'.");
             }
             finally
@@ -836,14 +942,14 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-rc.2", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-rc.10", "build"));
+            CreateCodeCoveragePackage(tempDir, "18.6.0-rc.2");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.6.0-rc.10");
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
             // SemVer 2.0 compares dot-separated numeric identifiers as numbers, so rc.10 > rc.2.
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0-rc.10", "build"), StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(expected, path);
         }
         finally
         {
@@ -857,13 +963,13 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0.1", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0.2", "build"));
+            CreateCodeCoveragePackage(tempDir, "18.5.0.1");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.5.0.2");
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0.2", "build"), StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(expected, path);
         }
         finally
         {
@@ -877,13 +983,13 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build"));
+            CreateCodeCoveragePackage(tempDir, "18.5");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.5.0");
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.5.0", "build"), StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(expected, path);
         }
         finally
         {
@@ -897,14 +1003,14 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0-preview-1", "build"));
-            Directory.CreateDirectory(Path.Combine(tempDir, "microsoft.codecoverage", "18.6.0+abc123", "build"));
+            CreateCodeCoveragePackage(tempDir, "18.6.0-preview-1");
+            var expected = CreateCodeCoveragePackage(tempDir, "18.6.0+abc123");
 
             bool result = CollectArgumentExecutor.TryGetCodeCoverageAdapterPath(out var path, nugetPackagesOverride: tempDir);
 
             Assert.IsTrue(result);
             // Build metadata takes no part in ordering, so "18.6.0+abc123" is the stable 18.6.0 and beats the pre-release.
-            Assert.IsTrue(path!.EndsWith(Path.Combine("18.6.0+abc123", "build"), StringComparison.OrdinalIgnoreCase));
+            Assert.AreEqual(expected, path);
         }
         finally
         {
@@ -918,8 +1024,7 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
-            Directory.CreateDirectory(buildDir);
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
 
             var settingsProvider = new TestableRunSettingsProvider();
             settingsProvider.AddDefaultRunSettings();
@@ -927,7 +1032,7 @@ public class CollectArgumentProcessorTests
             CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
 
             var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
-            Assert.IsTrue(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase));
+            Assert.IsTrue(xml.Contains(collectorDir, StringComparison.OrdinalIgnoreCase));
         }
         finally
         {
@@ -941,8 +1046,7 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
-            Directory.CreateDirectory(buildDir);
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
 
             var settingsProvider = new TestableRunSettingsProvider();
             settingsProvider.AddDefaultRunSettings();
@@ -951,7 +1055,7 @@ public class CollectArgumentProcessorTests
             CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
 
             var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
-            Assert.AreEqual(1, CountOccurrences(xml, buildDir));
+            Assert.AreEqual(1, CountOccurrences(xml, collectorDir));
         }
         finally
         {
@@ -965,8 +1069,7 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
-            Directory.CreateDirectory(buildDir);
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
             var userPath = Path.Combine(tempDir, "my-custom-adapters");
             Directory.CreateDirectory(userPath);
 
@@ -977,8 +1080,59 @@ public class CollectArgumentProcessorTests
             CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
 
             var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
-            Assert.IsFalse(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase),
+            Assert.IsFalse(xml.Contains(collectorDir, StringComparison.OrdinalIgnoreCase),
                 "Expected auto-injection to be skipped when the user has already configured adapter paths.");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryAddCodeCoverageAdapterPath_SkipsInjection_WhenDiscoveryIsDisabledByFeatureFlag()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
+
+            var settingsProvider = new TestableRunSettingsProvider();
+            settingsProvider.AddDefaultRunSettings();
+
+            var featureFlag = new Mock<IFeatureFlag>();
+            featureFlag.Setup(f => f.IsSet(FeatureFlag.VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY)).Returns(true);
+
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir, featureFlag: featureFlag.Object);
+
+            var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
+            Assert.IsFalse(xml.Contains(collectorDir, StringComparison.OrdinalIgnoreCase),
+                "Expected VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY to turn auto-injection off.");
+        }
+        finally
+        {
+            Directory.Delete(tempDir, recursive: true);
+        }
+    }
+
+    [TestMethod]
+    public void TryAddCodeCoverageAdapterPath_Injects_WhenDiscoveryIsNotDisabledByFeatureFlag()
+    {
+        var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        try
+        {
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
+
+            var settingsProvider = new TestableRunSettingsProvider();
+            settingsProvider.AddDefaultRunSettings();
+
+            var featureFlag = new Mock<IFeatureFlag>();
+            featureFlag.Setup(f => f.IsSet(It.IsAny<string>())).Returns(false);
+
+            CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir, featureFlag: featureFlag.Object);
+
+            var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
+            Assert.IsTrue(xml.Contains(collectorDir, StringComparison.OrdinalIgnoreCase));
         }
         finally
         {
@@ -992,8 +1146,7 @@ public class CollectArgumentProcessorTests
         var tempDir = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
         try
         {
-            var buildDir = Path.Combine(tempDir, "microsoft.codecoverage", "18.5.0", "build");
-            Directory.CreateDirectory(buildDir);
+            var collectorDir = CreateCodeCoveragePackage(tempDir, "18.5.0");
 
             // Formatted run settings hold a newline and indentation inside the node. XmlDocument
             // drops that whitespace, so the node reads as empty, and discovery must still run.
@@ -1012,7 +1165,7 @@ public class CollectArgumentProcessorTests
             CollectArgumentExecutor.TryAddCodeCoverageAdapterPath(settingsProvider, nugetPackagesOverride: tempDir);
 
             var xml = settingsProvider.ActiveRunSettings?.SettingsXml ?? string.Empty;
-            Assert.IsTrue(xml.Contains(buildDir, StringComparison.OrdinalIgnoreCase),
+            Assert.IsTrue(xml.Contains(collectorDir, StringComparison.OrdinalIgnoreCase),
                 "Expected auto-injection when the existing TestAdaptersPaths node holds only whitespace.");
         }
         finally
@@ -1030,6 +1183,21 @@ public class CollectArgumentProcessorTests
 
         Assert.IsFalse(result);
         Assert.IsNull(path);
+    }
+
+    private const string TraceDataCollectorFileName = "Microsoft.VisualStudio.TraceDataCollector.dll";
+
+    /// <summary>
+    /// Creates a microsoft.codecoverage package layout, with the collector in a target framework folder
+    /// under <c>build/</c> the way the real package ships it. Returns the folder holding the collector.
+    /// </summary>
+    private static string CreateCodeCoveragePackage(string nugetPackagesPath, string version, string targetFramework = "netstandard2.0")
+    {
+        var collectorDir = Path.Combine(nugetPackagesPath, "microsoft.codecoverage", version, "build", targetFramework);
+        Directory.CreateDirectory(collectorDir);
+        File.WriteAllText(Path.Combine(collectorDir, TraceDataCollectorFileName), string.Empty);
+
+        return collectorDir;
     }
 
     private static int CountOccurrences(string text, string pattern)
