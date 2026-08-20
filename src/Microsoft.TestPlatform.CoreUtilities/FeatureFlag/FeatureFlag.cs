@@ -84,6 +84,10 @@ internal partial class FeatureFlag : IFeatureFlag
     // Disable turning dynamic code coverage for native code to OFF by default. Setting this to 1 will skip adding the setting.
     public const string VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING = nameof(VSTEST_DISABLE_DYNAMICNATIVE_CODECOVERAGE_DEFAULT_SETTING);
 
+    // Disable discovering the Code Coverage adapter from the microsoft.codecoverage NuGet package when --collect:"Code Coverage"
+    // runs against dlls, where the MSBuild task that normally provides the path did not run. Setting this to 1 will skip the discovery.
+    public const string VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY = nameof(VSTEST_DISABLE_CODE_COVERAGE_ADAPTER_DISCOVERY);
+
     // Disable running Microsoft.Testing.Platform applications under vstest while the integration is experimental.
     // This defaults to true. Set it to 0 to opt in to the feature.
     public const string VSTEST_DISABLE_MTP_TESTHOST = nameof(VSTEST_DISABLE_MTP_TESTHOST);
