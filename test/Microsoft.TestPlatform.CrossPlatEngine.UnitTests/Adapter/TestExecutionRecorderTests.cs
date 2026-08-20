@@ -187,6 +187,28 @@ public class TestExecutionRecorderTests
     }
 
     [TestMethod]
+    public void RecordResultShouldNotSendSecondTestCaseEndWhenMultipleTestCaseEventsAreDisabled()
+    {
+        // With the flag on, the deduplicated start must not leave the result safety net armed:
+        // Start(tc) → Start(tc, deduplicated) → End(tc) → Result(tc) sends one of each.
+        var featureFlag = new Mock<IFeatureFlag>();
+        featureFlag
+            .Setup(x => x.IsSet(FeatureFlag.VSTEST_DISABLE_MULTIPLE_TESTCASE_EVENTS))
+            .Returns(true);
+        var testRecorder = new TestExecutionRecorder(_mockTestCaseEventsHandler.Object, _testableTestRunCache, featureFlag.Object);
+        _testResult.Outcome = TestOutcome.Passed;
+
+        testRecorder.RecordStart(_testCase);
+        testRecorder.RecordStart(_testCase);
+        testRecorder.RecordEnd(_testCase, TestOutcome.Passed);
+        testRecorder.RecordResult(_testResult);
+
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseStart(_testCase), Times.Once);
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestCaseEnd(_testCase, TestOutcome.Passed), Times.Once);
+        _mockTestCaseEventsHandler.Verify(x => x.SendTestResult(_testResult), Times.Once);
+    }
+
+    [TestMethod]
     public void RecordStartAndRecordEndShouldSendEventsForNestedDataDrivenTestsWithSameId()
     {
         // Simulate a data-driven scenario where the parent test and its row executions
