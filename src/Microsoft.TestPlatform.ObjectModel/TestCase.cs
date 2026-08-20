@@ -41,10 +41,10 @@ public sealed class TestCase : TestObject
     internal const string TestCaseIdAlgorithmEnvironmentVariable = TestCaseIdAlgorithmResolver.EnvironmentVariableName;
 
     /// <summary>
-    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the legacy
-    /// SHA1 based ids.
+    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the SHA1
+    /// based ids.
     /// </summary>
-    internal const string LegacySha1AlgorithmName = TestCaseIdAlgorithmResolver.Sha1Name;
+    internal const string Sha1AlgorithmName = TestCaseIdAlgorithmResolver.Sha1Name;
 
     /// <summary>
     /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the xxHash128
@@ -52,7 +52,18 @@ public sealed class TestCase : TestObject
     /// </summary>
     internal const string XxHash128AlgorithmName = TestCaseIdAlgorithmResolver.XxHash128Name;
 
-    private static TestCaseIdAlgorithm? s_idAlgorithm;
+    /// <summary>
+    /// The resolved algorithm, offset by one so that 0 means "not resolved yet".
+    /// </summary>
+    /// <remarks>
+    /// Deliberately an <see cref="int"/> rather than a nullable enum. A <c>TestCaseIdAlgorithm?</c>
+    /// is a two field struct, and the runtime only guarantees atomic writes for word sized values, so
+    /// a racing reader could observe the "has a value" flag before the value itself and read the
+    /// zero valued member. That is exactly the outcome the cache exists to prevent: two different ids
+    /// for the same test within one process. An <see cref="int"/> write is atomic, so the race can
+    /// only ever produce a fully written value.
+    /// </remarks>
+    private static volatile int s_idAlgorithmPlusOne;
 
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
@@ -209,18 +220,30 @@ public sealed class TestCase : TestObject
     /// time. Type load happens at an arbitrary, hard to predict point, which made the behaviour
     /// depend on when the type happened to be touched and made it impossible to exercise this
     /// switch from a test. The result is then cached, because an id has to stay stable for the
-    /// lifetime of the process. Two threads racing here both compute the same value, so the race
-    /// is benign and does not need a lock.
+    /// lifetime of the process. Two threads racing here both compute the same value and each write
+    /// is atomic, so the race is benign and does not need a lock.
     /// </remarks>
     private static TestCaseIdAlgorithm IdAlgorithm
-        => s_idAlgorithm ??= TestCaseIdAlgorithmResolver.Resolve(
-            Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable));
+    {
+        get
+        {
+            int cached = s_idAlgorithmPlusOne;
+            if (cached == 0)
+            {
+                cached = (int)TestCaseIdAlgorithmResolver.Resolve(
+                    Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable)) + 1;
+                s_idAlgorithmPlusOne = cached;
+            }
+
+            return (TestCaseIdAlgorithm)(cached - 1);
+        }
+    }
 
     /// <summary>
     /// Clears the cached <see cref="IdAlgorithm"/> value so the environment variable is
     /// read again. For tests only - production code must not change algorithm mid-process.
     /// </summary>
-    internal static void ResetTestIdAlgorithmCache() => s_idAlgorithm = null;
+    internal static void ResetTestIdAlgorithmCache() => s_idAlgorithmPlusOne = 0;
 
     /// <summary>
     /// Creates a Id of TestCase
@@ -247,7 +270,11 @@ public sealed class TestCase : TestObject
         return algorithm switch
         {
             TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(testcaseFullName),
-            _ => EqtHash.GuidFromString(testcaseFullName),
+            TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(testcaseFullName),
+
+            // Naming both members above means adding a third one surfaces here as a deliberate
+            // decision rather than silently resolving to SHA1.
+            _ => throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null),
         };
     }
 

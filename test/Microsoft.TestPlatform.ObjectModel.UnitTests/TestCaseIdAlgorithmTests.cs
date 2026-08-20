@@ -18,6 +18,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 /// a static constructor, which is what makes it testable at all.
 /// </remarks>
 [TestClass]
+[DoNotParallelize]
 public class TestCaseIdAlgorithmTests
 {
     // The id of this test case under each algorithm. Same inputs as TestCaseTests.
@@ -59,6 +60,11 @@ public class TestCaseIdAlgorithmTests
     /// the way to computing an id, where there is nowhere sensible to surface an error, and failing
     /// a whole run over a typo in an opt-in switch would be a worse outcome than ignoring it.
     /// </summary>
+    /// <remarks>
+    /// Asserted against the id produced with nothing set, rather than against a literal, so that
+    /// this keeps testing "unrecognized means default" rather than quietly becoming a second place
+    /// that pins which algorithm the default is.
+    /// </remarks>
     [TestMethod]
     [DataRow("")]
     [DataRow("sha")]
@@ -66,7 +72,12 @@ public class TestCaseIdAlgorithmTests
     [DataRow("xxhash")]
     [DataRow("nonsense")]
     public void TestCaseIdUsesTheDefaultForAnyUnrecognizedEnvironmentVariableValue(string value)
-        => RunWithAlgorithm(value, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
+    {
+        string defaultId = string.Empty;
+        RunWithAlgorithm(null, () => defaultId = CreateTestCase().Id.ToString());
+
+        RunWithAlgorithm(value, () => Assert.AreEqual(defaultId, CreateTestCase().Id.ToString()));
+    }
 
     [TestMethod]
     public void TestCaseIdAlgorithmIsReadLazilyRatherThanAtTypeLoad()

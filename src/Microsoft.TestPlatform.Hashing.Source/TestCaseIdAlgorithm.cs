@@ -69,15 +69,21 @@ internal static class TestCaseIdAlgorithmResolver
     /// <remarks>
     /// <para>
     /// This is the whole rollout in one constant. xxHash128 ships available but not default, so the
-    /// release that introduces it changes no id at all and can be adopted with zero risk; flipping
-    /// this constant is then the entire behavioural change of the release that follows, and is
-    /// reviewable as a one line diff rather than as a diffuse change of polarity spread over the
-    /// classic path, the Microsoft.Testing.Platform path and their tests.
+    /// release that introduces it changes no id at all and can be adopted with zero risk; changing
+    /// this constant is then the entire behavioural change of the release that follows, rather than
+    /// a diffuse change of polarity spread over the classic path, the Microsoft.Testing.Platform
+    /// path and their tests.
+    /// </para>
+    /// <para>
+    /// Changing it will fail the pinned expectations that record what ids actually are - the ids in
+    /// TestCaseTests, the serialized payloads in TestResultSerializationTests, and the test that
+    /// asserts this default directly. That is the intended blast radius rather than a bug: those are
+    /// exactly the places whose whole job is to notice that ids moved.
     /// </para>
     /// <para>
     /// Both names are understood in both releases, so a value written down while this is
     /// <see cref="TestCaseIdAlgorithm.Sha1"/> keeps selecting exactly the same algorithm afterwards:
-    /// someone pinning <c>sha1</c> today is unaffected by the flip, and an early adopter of
+    /// someone pinning <c>sha1</c> today is unaffected by the change, and an early adopter of
     /// <c>xxhash128</c> does not have to unset anything once it becomes the default.
     /// </para>
     /// </remarks>

@@ -31,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 /// </para>
 /// </remarks>
 [TestClass]
+[DoNotParallelize]
 public class MtpTestNodeConverterTestIdTests
 {
     private const string Source = @"C:\tests\MtpApp.dll";
@@ -88,7 +89,8 @@ public class MtpTestNodeConverterTestIdTests
     /// <remarks>
     /// The distinction matters: "not declared" falls back to the runner's own environment, so
     /// treating a typo as "not declared" would let an inherited value take over a run that had said
-    /// something explicit about the algorithm.
+    /// something explicit about the algorithm. Which algorithm the default happens to be is
+    /// deliberately not asserted here - that belongs in one place only, in TestCaseIdAlgorithmTests.
     /// </remarks>
     [TestMethod]
     [DataRow("")]
@@ -100,9 +102,40 @@ public class MtpTestNodeConverterTestIdTests
 
         Assert.IsNotNull(resolved, "An unrecognized value is still a declaration, so it must not read as 'not declared'.");
         Assert.AreEqual(
-            MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring("sha1")),
+            MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring("also-not-an-algorithm")),
             resolved,
-            "SHA1 is expected to be the default algorithm in this release.");
+            "Every unrecognized value must resolve to the same algorithm.");
+    }
+
+    /// <summary>
+    /// The algorithm an MTP run falls back to must be the one the classic path falls back to.
+    /// </summary>
+    /// <remarks>
+    /// Compares ids rather than algorithm values, because the two paths cannot name a common type:
+    /// the algorithm type is compiled separately into each assembly.
+    /// </remarks>
+    [TestMethod]
+    public void TheDefaultForUnrecognizedValuesMatchesWhatTestCaseWouldHaveUsed()
+    {
+        string? original = Environment.GetEnvironmentVariable(EnvironmentVariable);
+        try
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariable, null);
+            TestCase.ResetTestIdAlgorithmCache();
+
+            TestCase converted = MtpTestNodeConverter.ToTestCase(
+                Node(),
+                Source,
+                MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring("not-an-algorithm")));
+            var equivalent = new TestCase(converted.FullyQualifiedName, converted.ExecutorUri, converted.Source);
+
+            Assert.AreEqual(equivalent.Id, converted.Id);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariable, original);
+            TestCase.ResetTestIdAlgorithmCache();
+        }
     }
 
     [TestMethod]

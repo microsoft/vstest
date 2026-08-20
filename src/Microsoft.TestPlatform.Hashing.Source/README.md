@@ -51,4 +51,20 @@ per file (explicit `using` directives, because vstest does not enable `ImplicitU
 namespace change). Do not reformat these files and do not "fix" analyzer complaints in them —
 they are excluded from repo style enforcement via `.editorconfig`.
 
+That exclusion is scoped to the vendored files **by name**, so that the vstest-authored files in
+this folder stay under normal repo style enforcement. When vendoring another file, add it to the
+pattern in `.editorconfig`, otherwise it is silently held to repo style and the next sync fights it.
+
+## Consequence of being shared source
+
+Because these are compiled into each consuming assembly rather than referenced from one, a type
+here exists once **per assembly**. Two assemblies compiling the same file do not share the type,
+and an assembly that can see the internals of both (a test project, via `InternalsVisibleTo`)
+cannot name it without `CS0433`. That is why
+`test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/Client/MTP/MtpTestNodeConverterTestIdTests.cs`
+never spells `TestCaseIdAlgorithm` out and infers it from the production resolver instead.
+
+Bear this in mind before adding a further consumer: it is cheap for types that only appear inside
+a method body, and awkward for types that appear in a signature a test needs to name.
+
 [testfx-hashing]: https://github.com/microsoft/testfx/tree/main/src/Platform/Microsoft.Testing.Extensions.TrxReport/Hashing

@@ -43,11 +43,6 @@ internal static class MtpTestNodeConverter
     private const string VsTestFullyQualifiedNameKey = "vstest.TestCase.FullyQualifiedName";
     private const string VsTestExecutorUriKey = "vstest.original-executor-uri";
 
-    // Selects the test id algorithm. On the classic path this is read from the testhost's own
-    // environment, which picks up runsettings RunConfiguration/EnvironmentVariables. MTP
-    // applications are their own host and their nodes are converted here, in the runner, so the
-    // runner has to read the declared value itself and pass the choice to the test case.
-
     // Execution states (MTP wire values).
     private const string StateInProgress = "in-progress";
     private const string StatePassed = "passed";
@@ -77,6 +72,10 @@ internal static class MtpTestNodeConverter
     /// declared in runsettings <c>RunConfiguration/EnvironmentVariables</c>.
     /// </summary>
     /// <remarks>
+    /// On the classic path this choice is read from the testhost's own environment, which those
+    /// runsettings variables populate. MTP applications are their own host and their nodes are
+    /// converted here, in the runner, which never receives those variables, so the runner has to
+    /// read the declared value itself and pass the choice to the test case.
     /// Returns <see langword="null"/> when the run does not declare the variable, so the test case
     /// falls back to the runner's own environment and the classic default. Declaring it explicitly
     /// wins, so a runsettings value overrides an inherited one rather than silently agreeing with it.
@@ -125,14 +124,21 @@ internal static class MtpTestNodeConverter
         // The seed is composed with TestIdSeed, from the test case's own properties rather than the
         // raw wire values, because this must hash precisely the bytes TestCase would have hashed
         // itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and host, so
-        // the raw string and the parsed uri do not necessarily render the same).
+        // the raw string and the parsed uri do not necessarily render the same). For the same reason
+        // the name here has to track TestCase.GetFullyQualifiedName, which prefers the ManagedType
+        // and ManagedMethod properties when they are set; this converter never sets them, so the
+        // plain FullyQualifiedName is the same value today.
         if (testCaseIdAlgorithm is { } algorithm)
         {
             string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName);
             testCase.Id = algorithm switch
             {
                 TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(seed),
-                _ => EqtHash.GuidFromString(seed),
+                TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(seed),
+
+                // Naming both members above means adding a third one surfaces here as a deliberate
+                // decision rather than silently resolving to SHA1.
+                _ => throw new ArgumentOutOfRangeException(nameof(testCaseIdAlgorithm), algorithm, null),
             };
         }
 

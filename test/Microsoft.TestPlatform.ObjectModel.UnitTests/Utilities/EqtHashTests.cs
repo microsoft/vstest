@@ -17,6 +17,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 /// must never change by accident. If a change is deliberate, bump the hash version alongside it.
 /// </remarks>
 [TestClass]
+[DoNotParallelize]
 public class EqtHashTests
 {
     private string? _originalAlgorithm;

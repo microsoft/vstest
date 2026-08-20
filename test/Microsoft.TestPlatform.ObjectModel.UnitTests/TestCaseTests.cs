@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
+[DoNotParallelize]
 public class TestCaseTests
 {
     private readonly TestCase _testCase;
