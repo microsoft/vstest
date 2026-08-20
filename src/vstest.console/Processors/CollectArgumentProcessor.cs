@@ -389,14 +389,16 @@ internal class CollectArgumentExecutor : IArgumentExecutor
 
         foreach (var versionDir in Directory.GetDirectories(ccPackagePath))
         {
-            var collectorDir = FindCollectorDirectory(Path.Combine(versionDir, "build"));
-            if (collectorDir is null)
+            // Parse the folder name before touching the disk, a name that is not a version is not a
+            // candidate no matter what it holds.
+            var directoryName = Path.GetFileName(versionDir);
+            if (!TryParseNuGetVersion(directoryName, out var version, out var preRelease))
             {
                 continue;
             }
 
-            var directoryName = Path.GetFileName(versionDir);
-            if (!TryParseNuGetVersion(directoryName, out var version, out var preRelease))
+            var collectorDir = FindCollectorDirectory(Path.Combine(versionDir, "build"));
+            if (collectorDir is null)
             {
                 continue;
             }
