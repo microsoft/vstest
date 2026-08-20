@@ -86,22 +86,47 @@ public class TestCaseIdAlgorithmTests
         // baked in the wrong answer by this point; a lazy read picks the new value up.
         _ = CreateTestCase().Id;
 
-        RunWithAlgorithm("xxhash128", () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
+        (string name, string expected) = NonDefaultAlgorithm();
+
+        RunWithAlgorithm(name, () => Assert.AreEqual(expected, CreateTestCase().Id.ToString()));
     }
 
     [TestMethod]
     public void TestCaseIdAlgorithmIsCachedSoIdsStayStableWithinAProcess()
     {
-        RunWithAlgorithm("xxhash128", () =>
+        (string name, string expected) = NonDefaultAlgorithm();
+
+        RunWithAlgorithm(name, () =>
         {
-            Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString());
+            Assert.AreEqual(expected, CreateTestCase().Id.ToString());
 
             // Changing the variable after the choice has been made must not change ids, otherwise
             // the same test could get two different ids within one run.
             Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, null);
 
-            Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString());
+            Assert.AreEqual(expected, CreateTestCase().Id.ToString());
         });
+    }
+
+    /// <summary>
+    /// The algorithm that is <em>not</em> currently the default, and the id it produces.
+    /// </summary>
+    /// <remarks>
+    /// Both tests above have to select an algorithm that differs from the default, otherwise they
+    /// hold vacuously: selecting the default proves nothing about whether the selection was read at
+    /// all. Which algorithm that is has to be derived rather than written down, so that these keep
+    /// testing laziness and caching after the default moves instead of quietly going hollow.
+    /// </remarks>
+    private static (string Name, string Id) NonDefaultAlgorithm()
+    {
+        string defaultId = string.Empty;
+        RunWithAlgorithm(null, () => defaultId = CreateTestCase().Id.ToString());
+
+        Assert.IsTrue(
+            defaultId is Sha1Id or XxHash128Id,
+            $"The default produced {defaultId}, which is neither known algorithm's id.");
+
+        return defaultId == Sha1Id ? ("xxhash128", XxHash128Id) : ("sha1", Sha1Id);
     }
 
     /// <summary>

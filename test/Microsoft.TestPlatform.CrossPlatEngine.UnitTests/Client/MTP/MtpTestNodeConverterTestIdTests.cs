@@ -138,6 +138,52 @@ public class MtpTestNodeConverterTestIdTests
         }
     }
 
+    /// <summary>
+    /// An unrecognized runsettings value beats an inherited one, rather than falling through to it.
+    /// </summary>
+    /// <remarks>
+    /// This is the scenario the "declared but unrecognized wins" rule exists for, and the only one
+    /// where it is observable: the ambient environment selects one algorithm while the run declares
+    /// a value that names none. Falling through would silently hand the run the inherited algorithm,
+    /// which is the opposite of what a run that said something explicit about ids should get.
+    /// </remarks>
+    [TestMethod]
+    public void AnUnrecognizedDeclaredValueBeatsTheAmbientEnvironment()
+    {
+        string? original = Environment.GetEnvironmentVariable(EnvironmentVariable);
+        try
+        {
+            var sha1 = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring("sha1"));
+            var unrecognized = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring("not-an-algorithm"));
+
+            // Pick whichever algorithm is not the default, so this stays meaningful after the
+            // default moves - with the default inherited, the two arms would be indistinguishable.
+            Environment.SetEnvironmentVariable(EnvironmentVariable, null);
+            TestCase.ResetTestIdAlgorithmCache();
+            Guid defaultId = MtpTestNodeConverter.ToTestCase(Node(), Source, testCaseIdAlgorithm: null).Id;
+
+            string ambient = defaultId == MtpTestNodeConverter.ToTestCase(Node(), Source, sha1).Id
+                ? "xxhash128"
+                : "sha1";
+
+            Environment.SetEnvironmentVariable(EnvironmentVariable, ambient);
+            TestCase.ResetTestIdAlgorithmCache();
+
+            Guid ambientId = MtpTestNodeConverter.ToTestCase(Node(), Source, testCaseIdAlgorithm: null).Id;
+            Assert.AreNotEqual(defaultId, ambientId, "The ambient value must select something other than the default.");
+
+            Guid declaredId = MtpTestNodeConverter.ToTestCase(Node(), Source, unrecognized).Id;
+
+            Assert.AreEqual(defaultId, declaredId, "An unrecognized declared value must resolve to the default.");
+            Assert.AreNotEqual(ambientId, declaredId, "An unrecognized declared value must not fall through to the ambient one.");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(EnvironmentVariable, original);
+            TestCase.ResetTestIdAlgorithmCache();
+        }
+    }
+
     [TestMethod]
     public void ResolveTestCaseIdAlgorithmMatchesTheVariableNameCaseInsensitively()
         => Assert.AreEqual(
