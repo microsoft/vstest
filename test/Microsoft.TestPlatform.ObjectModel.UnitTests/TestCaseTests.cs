@@ -10,13 +10,33 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 
 [TestClass]
+[DoNotParallelize]
 public class TestCaseTests
 {
     private readonly TestCase _testCase;
+    private string? _originalAlgorithm;
 
     public TestCaseTests()
     {
         _testCase = new TestCase("sampleTestClass.sampleTestCase", new Uri("executor://sampleTestExecutor"), "sampleTest.dll");
+    }
+
+    // The ids below are pinned to the default algorithm, so make sure an ambient
+    // VSTEST_TESTCASE_ID_ALGORITHM on the developer's machine cannot change what they assert.
+    // TestCase.Id is computed lazily on first access, so doing this after the constructor is fine.
+    [TestInitialize]
+    public void ForceDefaultTestIdAlgorithm()
+    {
+        _originalAlgorithm = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable);
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, null);
+        TestCase.ResetTestIdAlgorithmCache();
+    }
+
+    [TestCleanup]
+    public void RestoreTestIdAlgorithm()
+    {
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, _originalAlgorithm);
+        TestCase.ResetTestIdAlgorithmCache();
     }
 
     [TestMethod]

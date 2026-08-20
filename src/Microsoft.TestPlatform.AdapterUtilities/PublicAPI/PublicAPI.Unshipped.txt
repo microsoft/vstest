@@ -1,1 +1,7 @@
 #nullable enable
+Microsoft.TestPlatform.AdapterUtilities.TestIdProvider2
+Microsoft.TestPlatform.AdapterUtilities.TestIdProvider2.AppendBytes(byte[]! bytes) -> void
+Microsoft.TestPlatform.AdapterUtilities.TestIdProvider2.AppendString(string! str) -> void
+Microsoft.TestPlatform.AdapterUtilities.TestIdProvider2.GetHash() -> byte[]!
+Microsoft.TestPlatform.AdapterUtilities.TestIdProvider2.GetId() -> System.Guid
+Microsoft.TestPlatform.AdapterUtilities.TestIdProvider2.TestIdProvider2() -> void

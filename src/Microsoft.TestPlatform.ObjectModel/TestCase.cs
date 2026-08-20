@@ -7,7 +7,9 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
+using System.Threading;
 
+using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
@@ -19,6 +21,46 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 [DataContract]
 public sealed class TestCase : TestObject
 {
+    /// <summary>
+    /// Selects the algorithm used to compute <see cref="Id"/>. Set to <c>xxhash128</c> to opt in to
+    /// the new ids, or to <c>sha1</c> to pin the legacy ones.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The algorithm is <see cref="TestCaseIdAlgorithmResolver.Default"/> unless this says otherwise.
+    /// Moving to xxHash128 changes the id of every test whose id is computed by the platform, which
+    /// is a breaking change for anything that stored those ids - most notably Azure DevOps Test Case
+    /// work item association. It is therefore introduced as opt-in first, so that a release exists in
+    /// which the new algorithm can be evaluated against real data without changing anyone's ids, and
+    /// becomes the default only in a later release.
+    /// </para>
+    /// <para>
+    /// See <see cref="TestCaseIdAlgorithmResolver"/> for why this is an algorithm selector rather
+    /// than a boolean.
+    /// </para>
+    /// </remarks>
+    internal const string TestCaseIdAlgorithmEnvironmentVariable = TestCaseIdAlgorithmResolver.EnvironmentVariableName;
+
+    /// <summary>
+    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the xxHash128
+    /// based ids.
+    /// </summary>
+    internal const string XxHash128AlgorithmName = TestCaseIdAlgorithmResolver.XxHash128Name;
+
+    /// <summary>
+    /// The resolved algorithm, offset by one so that 0 means "not resolved yet".
+    /// </summary>
+    /// <remarks>
+    /// Deliberately an <see cref="int"/> rather than a nullable enum. A <c>TestCaseIdAlgorithm?</c>
+    /// is a two field struct, and the runtime only guarantees atomic writes for word sized values, so
+    /// a racing reader could observe the "has a value" flag before the value itself and read the
+    /// zero valued member. That is exactly the outcome the cache exists to prevent: two different ids
+    /// for the same test within one process. An <see cref="int"/> write is atomic, and an
+    /// <see cref="int"/> is also what <see cref="Interlocked.CompareExchange(ref int, int, int)"/>
+    /// needs to publish the value exactly once.
+    /// </remarks>
+    private static int s_idAlgorithmPlusOne;
+
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
     private string? _displayName;
@@ -167,41 +209,75 @@ public sealed class TestCase : TestObject
     }
 
     /// <summary>
+    /// The algorithm used to compute test case ids in this process.
+    /// </summary>
+    /// <remarks>
+    /// Read lazily rather than in a static initializer, so the value is not baked in at type load
+    /// time. Type load happens at an arbitrary, hard to predict point, which made the behaviour
+    /// depend on when the type happened to be touched and made it impossible to exercise this
+    /// switch from a test. The result is then cached, because an id has to stay stable for the
+    /// lifetime of the process. Threads racing on first use publish with a compare and exchange and
+    /// every one of them returns the published winner, so even a process whose environment changes
+    /// while ids are being computed cannot end up using two algorithms.
+    /// </remarks>
+    private static TestCaseIdAlgorithm IdAlgorithm
+    {
+        get
+        {
+            int cached = s_idAlgorithmPlusOne;
+            if (cached == 0)
+            {
+                int resolved = (int)TestCaseIdAlgorithmResolver.Resolve(
+                    Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable)) + 1;
+
+                // Deliberately return the winner rather than what this thread just computed: two
+                // threads reading the environment either side of a change would otherwise hand out
+                // two different ids for the same test.
+                int published = Interlocked.CompareExchange(ref s_idAlgorithmPlusOne, resolved, 0);
+                cached = published == 0 ? resolved : published;
+            }
+
+            return (TestCaseIdAlgorithm)(cached - 1);
+        }
+    }
+
+    /// <summary>
+    /// Clears the cached <see cref="IdAlgorithm"/> value so the environment variable is
+    /// read again. For tests only - production code must not change algorithm mid-process.
+    /// </summary>
+    internal static void ResetTestIdAlgorithmCache() => s_idAlgorithmPlusOne = 0;
+
+    /// <summary>
     /// Creates a Id of TestCase
     /// </summary>
     /// <returns>Guid test id</returns>
-    private Guid GetTestId()
+    private Guid GetTestId() => GetTestId(IdAlgorithm);
+
+    /// <summary>
+    /// Creates a Id of TestCase using the given algorithm.
+    /// </summary>
+    /// <returns>Guid test id</returns>
+    private Guid GetTestId(TestCaseIdAlgorithm algorithm)
     {
-        // To generate id hash "ExecutorUri + source + Name";
+        // To generate id hash "ExecutorUri + source + Name". The composition lives in TestIdSeed
+        // because the Microsoft.Testing.Platform path has to reproduce it exactly from the runner
+        // process, where a TestCase is built rather than computed. If ManagedType and ManagedMethod
+        // properties are filled then the id is based on those, which is what GetFullyQualifiedName
+        // resolves.
+        // ExecutorUri is passed as text rather than concatenated directly: the original expression
+        // concatenated the Uri object, which renders a null as empty, and a test case built through
+        // the serialization constructor can still be missing it.
+        string testcaseFullName = TestIdSeed.Compose(ExecutorUri?.ToString(), Source, GetFullyQualifiedName());
 
-        // If source is a file name then just use the filename for the identifier since the
-        // file might have moved between discovery and execution (in appx mode for example)
-        // This is not elegant because the Source contents should be a black box to the framework.
-        // For example in the database adapter case this is not a file path.
-        string source = Source;
-
-        // As discussed with team, we found no scenario for netcore, & fullclr where the Source is not present where ID is generated,
-        // which means we would always use FileName to generate ID. In cases where somehow Source Path contained garbage character the API Path.GetFileName()
-        // we are simply returning original input.
-        // For UWP where source during discovery, & during execution can be on different machine, in such case we should always use Path.GetFileName()
-        try
+        return algorithm switch
         {
-            // If source name is malformed, GetFileName API will throw exception, so use same input malformed string to generate ID
-            source = Path.GetFileName(source);
-        }
-        catch
-        {
-            // do nothing
-        }
+            TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(testcaseFullName),
+            TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(testcaseFullName),
 
-        // We still need to handle parameters in the case of a Theory or TestGroup of test cases that are only
-        // distinguished by parameters.
-        var testcaseFullName = ExecutorUri + source;
-
-        // If ManagedType and ManagedMethod properties are filled than TestId should be based on those.
-        testcaseFullName += GetFullyQualifiedName();
-
-        return EqtHash.GuidFromString(testcaseFullName);
+            // Naming both members above means adding a third one surfaces here as a deliberate
+            // decision rather than silently resolving to SHA1.
+            _ => throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null),
+        };
     }
 
     private void SetVariableAndResetId<T>(ref T variable, T value)
