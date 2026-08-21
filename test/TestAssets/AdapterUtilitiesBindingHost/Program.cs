@@ -57,11 +57,18 @@ internal static class Program
     /// Verifies the id was actually produced by the xxHash128 scheme.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// xxHash128 ids are RFC 9562 version 8 UUIDs with the hashing scheme version stamped into the
     /// top nibble, so the string form always starts with the scheme version ('1') and its third
     /// group always starts with the UUID version ('8'). Checking the shape keeps this host honest:
     /// an id that does not look like that was not produced by the code path this host exists to
     /// exercise.
+    /// </para>
+    /// <para>
+    /// The '1' is TestIdGuid.CurrentHashVersion, which cannot be referenced from here because it is
+    /// internal to the product. If that constant is ever bumped, this check has to be updated in
+    /// step, otherwise it fails for a legitimate change rather than a real binding problem.
+    /// </para>
     /// </remarks>
     private static bool VerifyXxHashId(Guid id)
     {

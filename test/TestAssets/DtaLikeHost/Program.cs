@@ -121,11 +121,18 @@ internal static class Program
     /// Verifies an id was actually produced by the xxHash128 scheme rather than by SHA1.
     /// </summary>
     /// <remarks>
+    /// <para>
     /// xxHash128 ids are RFC 9562 version 8 UUIDs with the hashing scheme version stamped into the
     /// top nibble, so the string form always starts with the scheme version ('1') and its third
     /// group always starts with the UUID version ('8'). Checking the shape is what keeps this host
     /// honest: if the algorithm selection ever stopped taking effect, the Span-using code would not
     /// run and the whole scenario would pass without proving anything.
+    /// </para>
+    /// <para>
+    /// The '1' is TestIdGuid.CurrentHashVersion, which cannot be referenced from here because it is
+    /// internal to the product. If that constant is ever bumped, this check has to be updated in
+    /// step, otherwise it fails for a legitimate change rather than a real binding problem.
+    /// </para>
     /// </remarks>
     private static bool VerifyXxHashId(Guid id, string origin)
     {
