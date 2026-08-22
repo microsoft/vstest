@@ -203,6 +203,7 @@
     <None Include="$(OutputPath)$(_CliContentTfm)\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" Pack="true" PackagePath="contentFiles\any\$(_CliContentTfm)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(_CliContentTfm)\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" Pack="true" PackagePath="contentFiles\any\$(_CliContentTfm)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(_CliContentTfm)\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\$(_CliContentTfm)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
+    <None Include="$(OutputPath)$(_CliContentTfm)\Microsoft.VisualStudio.TestPlatform.Extensions.TestIds.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\$(_CliContentTfm)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
     <None Include="$(OutputPath)$(_CliContentTfm)\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" Pack="true" PackagePath="contentFiles\any\$(_CliContentTfm)\Extensions\" BuildAction="None" PackageCopyToOutput="true" PackageFlatten="false" />
   </ItemGroup>
 
@@ -231,6 +232,7 @@
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.BlameDataCollector\Microsoft.TestPlatform.Extensions.BlameDataCollector.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.TrxLogger\Microsoft.TestPlatform.Extensions.TrxLogger.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.HtmlLogger\Microsoft.TestPlatform.Extensions.HtmlLogger.csproj" />
+    <ProjectReference Include="..\..\Microsoft.TestPlatform.Extensions.TestIdsLogger\Microsoft.TestPlatform.Extensions.TestIdsLogger.csproj" />
     <ProjectReference Include="..\..\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
   </ItemGroup>
 
@@ -453,6 +455,12 @@
         <PackageCopyToOutput>true</PackageCopyToOutput>
         <PackageFlatten>false</PackageFlatten>
       </_CliHtmlContent>
+      <_CliTestIdsContent Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.TestIdsLogger\$(Configuration)\netstandard2.0\**\Microsoft.VisualStudio.TestPlatform.Extensions.TestIds.TestLogger*.dll">
+        <PackagePath>contentFiles\any\net10.0\Extensions\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
+        <BuildAction>None</BuildAction>
+        <PackageCopyToOutput>true</PackageCopyToOutput>
+        <PackageFlatten>false</PackageFlatten>
+      </_CliTestIdsContent>
       <_CliTrxContent Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.TrxLogger\$(Configuration)\netstandard2.0\**\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger*.dll">
         <PackagePath>contentFiles\any\net10.0\Extensions\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
         <BuildAction>None</BuildAction>
@@ -465,7 +473,7 @@
         <PackageCopyToOutput>true</PackageCopyToOutput>
         <PackageFlatten>false</PackageFlatten>
       </_CliTestHostProviderContent>
-      <TfmSpecificPackageFile Include="@(_CliBlameContent);@(_CliEventLogContent);@(_CliHtmlContent);@(_CliTrxContent);@(_CliTestHostProviderContent)" />
+      <TfmSpecificPackageFile Include="@(_CliBlameContent);@(_CliEventLogContent);@(_CliHtmlContent);@(_CliTestIdsContent);@(_CliTrxContent);@(_CliTestHostProviderContent)" />
     </ItemGroup>
   </Target>
 

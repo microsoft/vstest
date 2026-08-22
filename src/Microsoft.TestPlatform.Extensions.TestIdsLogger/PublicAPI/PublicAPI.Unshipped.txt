@@ -1,0 +1,15 @@
+#nullable enable
+const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.DefaultReportFileName = "TestIds.csv" -> string!
+const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.ExtensionUri = "logger://Microsoft/TestPlatform/TestIdsLogger/v1" -> string!
+const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.FriendlyName = "testids" -> string!
+const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.LogFileNameKey = "LogFileName" -> string!
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.DiscoveredTestsHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveredTestsEventArgs! e) -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.DiscoveryCompleteHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs! e) -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents! events, string! testResultsDirPath) -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents! events, System.Collections.Generic.Dictionary<string!, string?>! parameters) -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.ReportFilePath.get -> string?
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.TestIdsLogger() -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.TestResultHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestResultEventArgs! e) -> void
+Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.TestRunCompleteHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs! e) -> void
