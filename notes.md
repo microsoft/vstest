@@ -1,5 +1,5 @@
 # Efficiency Improver — vstest Repo Memory
-_Last updated: 2026-08-15_
+_Last updated: 2026-08-22_
 
 ## Build / Test Commands
 - Bootstrap + full build: `./build.sh` (downloads pinned .NET 11 SDK to `.dotnet/`)
@@ -48,7 +48,8 @@ _Last updated: 2026-08-15_
 - **GetRunConfigurationNode**: called 15+ times per run, each parsing XML — MEDIUM impact
 - **All hot-path allocations**: filter eval, IPC serialization/deserialization — fully optimized in prior runs
 - **NuGet.Frameworks code**: vendored, out of scope for efficiency changes
-- **MTP bridge** (new code): scanned 2026-08-08 and 2026-08-15 — clean, no hot-path issues
+- **MTP bridge** (new code): scanned multiple times — clean, no hot-path issues
+- **CA1310/ordinal comparisons**: enabled in #16388 — already handled by maintainers
 
 ## Optimization Backlog (sorted by priority)
 | Priority | Area | Opportunity | Notes |
@@ -59,16 +60,16 @@ _Last updated: 2026-08-15_
 ## Backlog Cursor
 - All key hot paths fully scanned (IPC serialization V1+V2, filter eval, discovery aggregator, test run cache, parallel runners)
 - TestRequestManager startup path: fully scanned — XML parsing redundancy is the main finding (MEDIUM)
-- MTP bridge code: scanned 2026-08-08 and 2026-08-15 — no issues
+- MTP bridge code: scanned multiple times — no issues
 - NuGet.Frameworks: vendored, skip
-- **Status after 2026-08-15 scan**: No new HIGH-impact items found. Recent commits (Aug 8–15) are MTP retarget, logger fix, socket tests, infra.
-- Next area to investigate: R2R (Ready-to-Run) compilation for testhost startup (but requires infrastructure change, not code change)
+- **Status after 2026-08-22 scan**: No new HIGH-impact items found. Recent commits (Aug 15–22) are CA1310/ordinal fix, reflection deserialization removal, backslash normalization fix, infra.
+- Next area to investigate: TRX logger performance (only on test completion, likely cold path but worth scanning)
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
 - Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — CLOSED 2026-08-01
-- Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — active, updated 2026-08-15
-- Last run: 2026-08-15 (run ID 31896313699)
+- Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — active, updated 2026-08-22
+- Last run: 2026-08-22 (run ID 32585558358)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
