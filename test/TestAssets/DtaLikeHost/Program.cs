@@ -91,7 +91,7 @@ internal static class Program
         try
         {
             // TestCase.Id resolves the algorithm from VSTEST_TESTCASE_ID_ALGORITHM and, for
-            // xxhash128, goes through EqtHash.GuidFromString2 -> XxHash128 -> Span<T>, which forces
+            // xxhash128, goes through EqtHash.GuidFromStringXxHash128 -> XxHash128 -> Span<T>, which forces
             // the CLR to resolve System.Memory at the version baked into ObjectModel.dll's metadata.
             var testCase = new TestCase("SomeNamespace.SomeClass.SomeTest", new Uri("executor://dta-like-host"), "SomeTests.dll");
             id = testCase.Id;
@@ -100,9 +100,9 @@ internal static class Program
             // Exercise both hashes directly as well, so the two ids can be compared in-process.
             const string seed = "dta-like-host";
             sha1Id = EqtHash.GuidFromString(seed);
-            xxHashId = EqtHash.GuidFromString2(seed);
+            xxHashId = EqtHash.GuidFromStringXxHash128(seed);
             Console.WriteLine($"EqtHash.GuidFromString('{seed}'):  {sha1Id}");
-            Console.WriteLine($"EqtHash.GuidFromString2('{seed}'): {xxHashId}");
+            Console.WriteLine($"EqtHash.GuidFromStringXxHash128('{seed}'): {xxHashId}");
         }
         catch (Exception ex)
         {
@@ -112,7 +112,7 @@ internal static class Program
         }
 
         return VerifyXxHashId(id, "TestCase.Id")
-            && VerifyXxHashId(xxHashId, "EqtHash.GuidFromString2")
+            && VerifyXxHashId(xxHashId, "EqtHash.GuidFromStringXxHash128")
             && VerifyIdsDiffer(sha1Id, xxHashId)
             && VerifySystemMemoryLoaded();
     }

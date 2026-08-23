@@ -12,7 +12,7 @@ internal static class Program
 {
     private static int Main()
     {
-        var adapterUtilitiesAsm = typeof(TestIdProvider2).Assembly;
+        var adapterUtilitiesAsm = typeof(TestIdProviderXxHash128).Assembly;
         Console.WriteLine($"AdapterUtilities.dll path:    {adapterUtilitiesAsm.Location}");
         Console.WriteLine($"AdapterUtilities.dll version: {adapterUtilitiesAsm.GetName().Version}");
         foreach (var r in adapterUtilitiesAsm.GetReferencedAssemblies())
@@ -26,20 +26,20 @@ internal static class Program
         Guid id;
         try
         {
-            // TestIdProvider2 hashes with the vendored xxHash128, which uses Span<T> and
+            // TestIdProviderXxHash128 hashes with the vendored xxHash128, which uses Span<T> and
             // BinaryPrimitives and therefore forces the CLR to resolve System.Memory at the version
             // baked into AdapterUtilities.dll's metadata. Unlike the SHA1 TestIdProvider, this is
             // the only provider that touches System.Memory, so it has to be the one exercised here.
-            var provider = new TestIdProvider2();
+            var provider = new TestIdProviderXxHash128();
             provider.AppendString("executor://adapter-utilities-binding-host");
             provider.AppendString("SomeTests.dll");
             provider.AppendString("SomeNamespace.SomeClass.SomeTest");
             id = provider.GetId();
-            Console.WriteLine($"TestIdProvider2.GetId(): {id}");
+            Console.WriteLine($"TestIdProviderXxHash128.GetId(): {id}");
         }
         catch (Exception ex)
         {
-            Console.Error.WriteLine("REPRO HIT: exception computing an id with TestIdProvider2:");
+            Console.Error.WriteLine("REPRO HIT: exception computing an id with TestIdProviderXxHash128:");
             Console.Error.WriteLine(ex);
             return 1;
         }
@@ -74,7 +74,7 @@ internal static class Program
     {
         if (id == Guid.Empty)
         {
-            Console.Error.WriteLine("REPRO HIT: TestIdProvider2 produced an empty guid.");
+            Console.Error.WriteLine("REPRO HIT: TestIdProviderXxHash128 produced an empty guid.");
             return false;
         }
 
@@ -83,7 +83,7 @@ internal static class Program
         if (text[0] != '1' || groups[2][0] != '8')
         {
             Console.Error.WriteLine(
-                $"REPRO HIT: TestIdProvider2 produced '{text}', which is not an xxHash128 id (expected a " +
+                $"REPRO HIT: TestIdProviderXxHash128 produced '{text}', which is not an xxHash128 id (expected a " +
                 "leading '1' hash version nibble and a leading '8' UUID version nibble). The xxHash128 " +
                 "code path did not run, so this host proved nothing about System.Memory.");
             return false;

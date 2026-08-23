@@ -15,7 +15,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// different assembly version than the one baked into AdapterUtilities' metadata, computing a test
 /// id throws <c>FileNotFoundException</c> or <c>FileLoadException</c> at runtime.
 ///
-/// The failure is JIT-triggered, so the host has to run <c>TestIdProvider2</c> specifically:
+/// The failure is JIT-triggered, so the host has to run <c>TestIdProviderXxHash128</c> specifically:
 /// the SHA1 <c>TestIdProvider</c> never touches <c>Span&lt;T&gt;</c> and would pass with the
 /// dependency completely broken.
 ///
@@ -41,7 +41,7 @@ public class AdapterUtilitiesAssemblyBindingScenarioTests : NoBindingRedirectHos
         "That means Microsoft.TestPlatform.AdapterUtilities cannot resolve System.Memory in a host " +
         "without binding redirects: either it is not shipped/declared next to AdapterUtilities.dll, " +
         "or its assembly version does not match the one baked into AdapterUtilities' metadata. Every " +
-        "adapter computing a test id with TestIdProvider2 on .NET Framework will fail the same way.";
+        "adapter computing a test id with TestIdProviderXxHash128 on .NET Framework will fail the same way.";
 
     [TestMethod]
     [TestCategory("Windows-Review")]
