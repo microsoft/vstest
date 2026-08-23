@@ -21,7 +21,7 @@ public static class EqtHash
     /// </summary>
     /// <remarks>
     /// This is the algorithm test case ids are computed with by default. See
-    /// <see cref="GuidFromString2(string)"/> for the xxHash128 based successor, which is available
+    /// <see cref="GuidFromStringXxHash128(string)"/> for the xxHash128 based successor, which is available
     /// but not yet the default.
     /// </remarks>
     public static Guid GuidFromString(string data)
@@ -74,7 +74,7 @@ public static class EqtHash
     /// id in both, and an id produced by either is legible to the other.
     /// </para>
     /// </remarks>
-    public static Guid GuidFromString2(string data)
+    public static Guid GuidFromStringXxHash128(string data)
     {
         TPDebug.Assert(data != null);
 

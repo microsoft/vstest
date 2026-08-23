@@ -271,7 +271,7 @@ public sealed class TestCase : TestObject
 
         return algorithm switch
         {
-            TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(testcaseFullName),
+            TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromStringXxHash128(testcaseFullName),
             TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(testcaseFullName),
 
             // Naming both members above means adding a third one surfaces here as a deliberate

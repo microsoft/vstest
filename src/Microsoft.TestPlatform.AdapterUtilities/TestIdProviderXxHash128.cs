@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// from the id itself. It ships available but not default: <see cref="TestIdProvider"/> is still
 /// what test ids are computed with unless a run selects otherwise.
 /// </remarks>
-public class TestIdProvider2
+public class TestIdProviderXxHash128
 {
     private Guid _id = Guid.Empty;
     private byte[]? _hash;
@@ -27,9 +27,9 @@ public class TestIdProvider2
     private readonly XxHash128 _hasher;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TestIdProvider2"/> class.
+    /// Initializes a new instance of the <see cref="TestIdProviderXxHash128"/> class.
     /// </summary>
-    public TestIdProvider2()
+    public TestIdProviderXxHash128()
     {
         _hasher = new XxHash128();
     }

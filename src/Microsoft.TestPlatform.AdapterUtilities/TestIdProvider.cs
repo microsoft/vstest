@@ -11,7 +11,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// Used to generate id for tests, using SHA1.
 /// </summary>
 /// <remarks>
-/// This is the algorithm test case ids are computed with by default. See <see cref="TestIdProvider2"/>
+/// This is the algorithm test case ids are computed with by default. See <see cref="TestIdProviderXxHash128"/>
 /// for the xxHash128 based successor, which is available but not yet the default.
 /// </remarks>
 public class TestIdProvider

@@ -133,7 +133,7 @@ internal static class MtpTestNodeConverter
             string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName);
             testCase.Id = algorithm switch
             {
-                TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(seed),
+                TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromStringXxHash128(seed),
                 TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(seed),
 
                 // Naming both members above means adding a third one surfaces here as a deliberate

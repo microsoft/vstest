@@ -9,7 +9,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AdapterUtilities.UnitTests.TestIdProvider;
 
 /// <summary>
-/// Pins the ids produced by <see cref="AdapterUtilities.TestIdProvider2"/>, the xxHash128 based
+/// Pins the ids produced by <see cref="AdapterUtilities.TestIdProviderXxHash128"/>, the xxHash128 based
 /// successor to the SHA1 based <see cref="AdapterUtilities.TestIdProvider"/>.
 /// </summary>
 /// <remarks>
@@ -44,7 +44,7 @@ public class XxHash128CompatibilityTests
         var expectedId = new Guid(data[0]);
 
         // Act
-        var idProvider = new AdapterUtilities.TestIdProvider2();
+        var idProvider = new AdapterUtilities.TestIdProviderXxHash128();
         foreach (string d in data.Skip(1))
         {
             idProvider.AppendString(d);
@@ -74,7 +74,7 @@ public class XxHash128CompatibilityTests
     [TestMethod]
     public void GetId_IsStableAcrossCalls()
     {
-        var idProvider = new AdapterUtilities.TestIdProvider2();
+        var idProvider = new AdapterUtilities.TestIdProviderXxHash128();
         idProvider.AppendString("adapter://some.test.name");
 
         Assert.AreEqual(idProvider.GetId(), idProvider.GetId());
@@ -84,7 +84,7 @@ public class XxHash128CompatibilityTests
     public void GetHash_IsNotCorruptedByGetId()
     {
         // GetId versions the hash bytes in place, so it must not scribble on what GetHash returns.
-        var idProvider = new AdapterUtilities.TestIdProvider2();
+        var idProvider = new AdapterUtilities.TestIdProviderXxHash128();
         idProvider.AppendString("adapter://some.test.name");
 
         byte[] before = (byte[])idProvider.GetHash().Clone();
@@ -97,7 +97,7 @@ public class XxHash128CompatibilityTests
     [TestMethod]
     public void AppendString_Throws_AfterHashIsCalculated()
     {
-        var idProvider = new AdapterUtilities.TestIdProvider2();
+        var idProvider = new AdapterUtilities.TestIdProviderXxHash128();
         idProvider.AppendString("adapter://some.test.name");
         _ = idProvider.GetHash();
 
@@ -106,12 +106,12 @@ public class XxHash128CompatibilityTests
 
     [TestMethod]
     public void AppendString_Throws_WhenStringIsNull()
-        => Assert.ThrowsExactly<ArgumentNullException>(() => new AdapterUtilities.TestIdProvider2().AppendString(null!));
+        => Assert.ThrowsExactly<ArgumentNullException>(() => new AdapterUtilities.TestIdProviderXxHash128().AppendString(null!));
 
     private static void IdGeneration_TestVector(string testName, string expected)
     {
         // Arrange
-        var idProvider = new AdapterUtilities.TestIdProvider2();
+        var idProvider = new AdapterUtilities.TestIdProviderXxHash128();
 
         // Act
         idProvider.AppendString(testName);
@@ -124,7 +124,7 @@ public class XxHash128CompatibilityTests
     private static void IdGeneration_TestRepetitionVector(string input, int repetition, string expected)
     {
         // Arrange
-        var idProvider = new AdapterUtilities.TestIdProvider2();
+        var idProvider = new AdapterUtilities.TestIdProviderXxHash128();
 
         // Act
         for (int i = 0; i < repetition; i++)
