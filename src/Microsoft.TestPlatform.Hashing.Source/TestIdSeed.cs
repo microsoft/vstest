@@ -10,11 +10,12 @@ namespace Microsoft.TestPlatform.Hashing;
 /// Builds the string a test case id is hashed from.
 /// </summary>
 /// <remarks>
-/// Shared source, compiled into both <c>Microsoft.TestPlatform.ObjectModel</c> (where
-/// <c>TestCase</c> computes its own id) and <c>Microsoft.TestPlatform.CrossPlatEngine</c> (where the
-/// Microsoft.Testing.Platform path has to compute the id in the runner process). Both must derive
-/// the id from exactly the same bytes, so the composition lives in one place rather than being
-/// written out twice and silently drifting apart.
+/// Shared source, compiled into <c>Microsoft.TestPlatform.ObjectModel</c>, where <c>TestCase</c>
+/// computes its own id. <c>Microsoft.TestPlatform.CrossPlatEngine</c>, where the
+/// Microsoft.Testing.Platform path has to compute the id in the runner process, uses that same
+/// definition through <c>InternalsVisibleTo</c>. Both must derive the id from exactly the same
+/// bytes, so the composition lives in one place rather than being written out twice and silently
+/// drifting apart.
 /// </remarks>
 internal static class TestIdSeed
 {

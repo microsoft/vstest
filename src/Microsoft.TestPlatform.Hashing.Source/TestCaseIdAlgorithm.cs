@@ -28,10 +28,10 @@ internal enum TestCaseIdAlgorithm
 /// </summary>
 /// <remarks>
 /// <para>
-/// Shared source, compiled into both <c>Microsoft.TestPlatform.ObjectModel</c> (where
-/// <c>TestCase</c> computes its own id) and <c>Microsoft.TestPlatform.CrossPlatEngine</c> (where the
-/// Microsoft.Testing.Platform path has to compute the id in the runner process). Both must resolve
-/// the same value from the same input, so the resolution lives in one place.
+/// Shared source, compiled into <c>Microsoft.TestPlatform.ObjectModel</c>, where <c>TestCase</c>
+/// computes its own id. <c>Microsoft.TestPlatform.CrossPlatEngine</c>, where the
+/// Microsoft.Testing.Platform path has to compute the id in the runner process, uses that same
+/// definition through <c>InternalsVisibleTo</c>, so both resolve the same value from the same input.
 /// </para>
 /// <para>
 /// This is deliberately an algorithm selector rather than a boolean. A boolean would have to be

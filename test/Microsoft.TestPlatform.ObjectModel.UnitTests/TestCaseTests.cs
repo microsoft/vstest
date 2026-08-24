@@ -64,9 +64,13 @@ public class TestCaseTests
         // Same rendered name as FullyQualifiedName, so the id has to be the plain one.
         Assert.AreEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString());
 
-        _testCase.SetPropertyValue(TestProperty.Find("TestCase.ManagedMethod")!, "otherTestCase");
+        // A fresh test case, because SetPropertyValue on these hidden properties stores the value
+        // without resetting an already computed id, unlike assigning FullyQualifiedName or Source.
+        var renamed = new TestCase("sampleTestClass.sampleTestCase", new Uri("executor://sampleTestExecutor"), "sampleTest.dll");
+        renamed.SetPropertyValue(TestProperty.Find("TestCase.ManagedType")!, "sampleTestClass");
+        renamed.SetPropertyValue(TestProperty.Find("TestCase.ManagedMethod")!, "otherTestCase");
 
-        Assert.AreNotEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString(), "A managed name change must move the id.");
+        Assert.AreNotEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", renamed.Id.ToString(), "A managed name change must move the id.");
     }
 
     /// <summary>

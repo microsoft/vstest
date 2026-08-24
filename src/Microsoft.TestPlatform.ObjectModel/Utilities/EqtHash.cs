@@ -53,8 +53,8 @@ public static class EqtHash
     /// <para>
     /// This is the intended successor to <see cref="GuidFromString(string)"/>. xxHash128 is a
     /// non-cryptographic hash, which is what this has always needed - the id is an identity, never a
-    /// security boundary - and it is considerably faster than SHA1. Using SHA1 also makes vstest show
-    /// up in security scans and prevents it from running under FIPS-restricted policies.
+    /// security boundary - and it is considerably faster than SHA1. Using a cryptographic hash for
+    /// this also makes vstest show up in security scans that flag SHA1 regardless of how it is used.
     /// </para>
     /// <para>
     /// The resulting Guid carries the version of the hashing scheme in its top 4 bits, so ids
