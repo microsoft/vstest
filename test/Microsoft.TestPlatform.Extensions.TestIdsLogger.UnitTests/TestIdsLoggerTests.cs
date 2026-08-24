@@ -5,12 +5,14 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -32,12 +34,14 @@ public class TestIdsLoggerTests
 
     private readonly VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger _logger;
     private readonly Mock<TestLoggerEvents> _events;
+    private readonly FakeOutput _output;
     private readonly string _testRunDirectory;
 
     public TestIdsLoggerTests()
     {
         _events = new Mock<TestLoggerEvents>();
         _logger = new VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger();
+        _output = new FakeOutput();
         _testRunDirectory = Path.Combine(Path.GetTempPath(), "TestIdsLoggerTests", Guid.NewGuid().ToString("d"));
     }
 
@@ -216,7 +220,7 @@ public class TestIdsLoggerTests
         // ids, and one id needs exactly one row.
         _logger.TestResultHandler(this, new TestResultEventArgs(new ObjectModel.TestResult(testCase)));
         _logger.TestResultHandler(this, new TestResultEventArgs(new ObjectModel.TestResult(testCase)));
-        _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
 
         string[] lines = ReadReportLines();
 
@@ -244,7 +248,7 @@ public class TestIdsLoggerTests
 
         _logger.TestResultHandler(this, new TestResultEventArgs(new ObjectModel.TestResult(first)));
         _logger.TestResultHandler(this, new TestResultEventArgs(new ObjectModel.TestResult(second)));
-        _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
 
         string[] lines = ReadReportLines();
 
@@ -279,7 +283,7 @@ public class TestIdsLoggerTests
         };
         _logger.Initialize(_events.Object, parameters);
 
-        _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
 
         Assert.AreEqual(
             Path.Combine(_testRunDirectory, TestIdsLoggerConstants.DefaultReportFileName),
@@ -297,10 +301,187 @@ public class TestIdsLoggerTests
         };
         _logger.Initialize(_events.Object, parameters);
 
-        _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, false, false, null, null, null, TimeSpan.Zero));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
 
         Assert.AreEqual(Path.Combine(_testRunDirectory, "ids", "mapping.csv"), _logger.ReportFilePath);
         Assert.IsTrue(File.Exists(_logger.ReportFilePath));
+    }
+
+    #endregion
+
+    #region Reporting to the user
+
+    [TestMethod]
+    public void ReportPathIsWrittenToTheConsoleWhenTheReportIsWritten()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.Output = _output;
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.Contains(_logger.ReportFilePath!, _output.ToString());
+        Assert.IsFalse(_output.HasErrors, "A successful write must not report an error.");
+        Assert.IsFalse(_output.HasWarnings, "A completed run must not be reported as incomplete.");
+    }
+
+    [TestMethod]
+    public void AbortedRunReportsTheReportAsIncomplete()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.Output = _output;
+
+        _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        // The report is still written - a partial mapping is worth having - but it must not be
+        // mistaken for a complete one, because a missing row otherwise reads as a deleted test.
+        Assert.IsTrue(File.Exists(_logger.ReportFilePath));
+        Assert.IsTrue(_output.HasWarnings, "An aborted run must warn that the report is incomplete.");
+    }
+
+    [TestMethod]
+    public void CancelledRunReportsTheReportAsIncomplete()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.Output = _output;
+
+        _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, true, false, null, null, null, TimeSpan.Zero));
+
+        Assert.IsTrue(_output.HasWarnings);
+    }
+
+    [TestMethod]
+    public void AbortedDiscoveryReportsTheReportAsIncomplete()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.Output = _output;
+
+        _logger.DiscoveryCompleteHandler(this, new DiscoveryCompleteEventArgs(1, true));
+
+        Assert.IsTrue(_output.HasWarnings);
+    }
+
+    [TestMethod]
+    public void FailureToWriteTheReportIsReportedAndDoesNotThrow()
+    {
+        // A directory cannot be opened as a file, so this is a write that fails for a reason the
+        // user could plausibly hit: a path they do not have, or that is already taken.
+        Directory.CreateDirectory(Path.Combine(_testRunDirectory, "TestIds.csv"));
+
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.Output = _output;
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.IsTrue(_output.HasErrors, "A failed write must be reported to the user, not only traced.");
+
+        // The report was never written, so nothing may claim it was: a path here would send a
+        // migration script at a file that does not exist.
+        Assert.IsNull(_logger.ReportFilePath);
+    }
+
+    #endregion
+
+    #region Report file path
+
+    [TestMethod]
+    public void DefaultReportFileNameIsQualifiedByTheTargetFramework()
+    {
+        // A multi targeted project runs once per framework into one results directory, so an
+        // unqualified name would leave only the last framework's mapping behind.
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+            [DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0",
+        };
+        _logger.Initialize(_events.Object, parameters);
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.AreEqual(Path.Combine(_testRunDirectory, "TestIds_net8.0.csv"), _logger.ReportFilePath);
+        Assert.IsTrue(File.Exists(_logger.ReportFilePath));
+    }
+
+    [TestMethod]
+    public void ExplicitLogFileNameIsNotQualifiedByTheTargetFramework()
+    {
+        // An explicit name is the user's, and a migration script that was told where to look must
+        // find the report exactly there.
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+            [DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0",
+            [TestIdsLoggerConstants.LogFileNameKey] = "mapping.csv",
+        };
+        _logger.Initialize(_events.Object, parameters);
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.AreEqual(Path.Combine(_testRunDirectory, "mapping.csv"), _logger.ReportFilePath);
+    }
+
+    [TestMethod]
+    public void AbsoluteLogFileNameIsUsedAsGiven()
+    {
+        string absolute = Path.Combine(_testRunDirectory, "elsewhere", "mapping.csv");
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+            [TestIdsLoggerConstants.LogFileNameKey] = absolute,
+        };
+        _logger.Initialize(_events.Object, parameters);
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.AreEqual(absolute, _logger.ReportFilePath);
+        Assert.IsTrue(File.Exists(absolute));
+    }
+
+    #endregion
+
+    #region Determinism
+
+    [TestMethod]
+    public void CollapsedRowsKeepTheOrdinallyFirstDisplayName()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+
+        // Same id, so these are one row. Which display name survives must not depend on which
+        // parallel worker reported first, or two runs of the same suite would not be diffable.
+        var id = new Guid("bbbbbbbb-0000-0000-0000-000000000001");
+        var reportedSecond = new TestCase("SampleTests.UnitTest.DataDriven", new Uri(ExecutorUri), Source) { DisplayName = "AAA", Id = id };
+        var reportedFirst = new TestCase("SampleTests.UnitTest.DataDriven", new Uri(ExecutorUri), Source) { DisplayName = "ZZZ", Id = id };
+
+        _logger.TestResultHandler(this, new TestResultEventArgs(new ObjectModel.TestResult(reportedFirst)));
+        _logger.TestResultHandler(this, new TestResultEventArgs(new ObjectModel.TestResult(reportedSecond)));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        string[] lines = ReadReportLines();
+
+        Assert.HasCount(2, lines);
+        Assert.Contains("AAA", lines[1]);
+        Assert.DoesNotContain("ZZZ", lines[1]);
+    }
+
+    [TestMethod]
+    public void RowsAreSortedBySourceThenFullyQualifiedNameThenExecutorUriThenId()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+
+        // Fed in deliberately reversed order, including a pair that differs only in executor uri -
+        // which is part of the deduplication key and so has to be part of the sort too.
+        _logger.TestResultHandler(this, Result(new TestCase("B.Test", new Uri("executor://zzz/v1"), @"c:\x\Second.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("B.Test", new Uri("executor://aaa/v1"), @"c:\x\Second.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("A.Test", new Uri(ExecutorUri), @"c:\x\Second.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("A.Test", new Uri(ExecutorUri), @"c:\x\First.dll")));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        string[] lines = ReadReportLines();
+
+        Assert.HasCount(5, lines);
+        Assert.StartsWith(@"c:\x\First.dll,", lines[1]);
+        Assert.Contains("A.Test", lines[2]);
+        Assert.Contains("executor://aaa/v1", lines[3]);
+        Assert.Contains("executor://zzz/v1", lines[4]);
     }
 
     #endregion
@@ -328,6 +509,49 @@ public class TestIdsLoggerTests
         [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
         [TestIdsLoggerConstants.LogFileNameKey] = "TestIds.csv",
     };
+
+    private static TestRunCompleteEventArgs CompletedRun()
+        => new(null, false, false, null, null, null, TimeSpan.Zero);
+
+    private static TestResultEventArgs Result(TestCase testCase)
+        => new(new ObjectModel.TestResult(testCase));
+
+    /// <summary>
+    /// Captures what the logger tells the user, which <see cref="ConsoleOutput"/> cannot be made to
+    /// do after the fact: it captures <c>Console.Out</c> when its singleton is first constructed.
+    /// </summary>
+    private sealed class FakeOutput : IOutput
+    {
+        private readonly StringBuilder _output = new();
+
+        public bool HasErrors { get; private set; }
+
+        public bool HasWarnings { get; private set; }
+
+        public void Write(string? message, OutputLevel level)
+        {
+            switch (level)
+            {
+                case OutputLevel.Error:
+                    HasErrors = true;
+                    break;
+
+                case OutputLevel.Warning:
+                    HasWarnings = true;
+                    break;
+            }
+
+            _output.Append(message);
+        }
+
+        public void WriteLine(string? message, OutputLevel level)
+        {
+            Write(message, level);
+            Write(Environment.NewLine, level);
+        }
+
+        public override string ToString() => _output.ToString();
+    }
 
     private string[] ReadReportLines()
     {

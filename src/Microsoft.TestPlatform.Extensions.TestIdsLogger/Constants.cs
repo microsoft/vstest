@@ -37,9 +37,20 @@ public static class Constants
     /// <remarks>
     /// Deliberately a fixed name rather than a timestamped one: the report is an input to a
     /// migration script, and a script that has to glob for its own input is worse than one that
-    /// overwrites a known path.
+    /// overwrites a known path. It is qualified by the target framework when the platform reports
+    /// one, so that the frameworks of a multi targeted project do not overwrite each other.
     /// </remarks>
-    public const string DefaultReportFileName = "TestIds.csv";
+    public const string DefaultReportFileName = DefaultReportFileNameWithoutExtension + ReportFileExtension;
+
+    /// <summary>
+    /// The stem of <see cref="DefaultReportFileName"/>, to which the target framework is appended.
+    /// </summary>
+    internal const string DefaultReportFileNameWithoutExtension = "TestIds";
+
+    /// <summary>
+    /// The extension of the report file.
+    /// </summary>
+    internal const string ReportFileExtension = ".csv";
 
     /// <summary>
     /// Property id of the managed type a test case carries when its adapter reports one.

@@ -14,6 +14,9 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
+
+using TestIdsLoggerResources = Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Resources.Resources;
 
 namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 
@@ -62,9 +65,23 @@ public class TestIdsLogger : ITestLoggerWithParameters
     private string? _testResultsDirPath;
 
     /// <summary>
+    /// Where the report path, and any failure to write it, is reported to the user.
+    /// </summary>
+    /// <remarks>
+    /// Settable so that the messages can be asserted on. <see cref="ConsoleOutput.Instance"/>
+    /// captures <see cref="Console.Out"/> when it is first constructed, which a test cannot redirect
+    /// after the fact.
+    /// </remarks>
+    internal IOutput Output { get; set; } = ConsoleOutput.Instance;
+
+    /// <summary>
     /// The path the report was written to, once it has been written.
     /// </summary>
-    public string? ReportFilePath { get; private set; }
+    /// <remarks>
+    /// Only assigned once the report is actually on disk. A failed write leaves this null rather
+    /// than naming a file that does not exist or was truncated by the attempt.
+    /// </remarks>
+    internal string? ReportFilePath { get; private set; }
 
     /// <inheritdoc/>
     public void Initialize(TestLoggerEvents events, string testResultsDirPath)
@@ -128,12 +145,26 @@ public class TestIdsLogger : ITestLoggerWithParameters
     /// <summary>
     /// Writes the report at the end of a run.
     /// </summary>
-    public void TestRunCompleteHandler(object? sender, TestRunCompleteEventArgs e) => WriteReport();
+    /// <remarks>
+    /// The report is written even when the run did not complete, because a partial mapping is still
+    /// worth having, but an aborted or cancelled run is reported as incomplete: a report that is
+    /// missing tests is indistinguishable from one whose tests genuinely no longer exist, and
+    /// migrating stored ids against it would silently drop the tests that were never reached.
+    /// </remarks>
+    public void TestRunCompleteHandler(object? sender, TestRunCompleteEventArgs e)
+    {
+        ValidateArg.NotNull(e, nameof(e));
+        WriteReport(isComplete: !e.IsAborted && !e.IsCanceled);
+    }
 
     /// <summary>
     /// Writes the report at the end of a discovery.
     /// </summary>
-    public void DiscoveryCompleteHandler(object? sender, DiscoveryCompleteEventArgs e) => WriteReport();
+    public void DiscoveryCompleteHandler(object? sender, DiscoveryCompleteEventArgs e)
+    {
+        ValidateArg.NotNull(e, nameof(e));
+        WriteReport(isComplete: !e.IsAborted);
+    }
 
     private void Record(TestCase? testCase)
     {
@@ -144,9 +175,15 @@ public class TestIdsLogger : ITestLoggerWithParameters
 
         TestIdRecord record = CreateRecord(testCase);
 
-        // First one reported wins. A test that is retried, or that reports several results, is the
-        // same test with the same id, and repeating it would only make the report harder to load.
-        _records.TryAdd(BuildKey(record), record);
+        // First one reported wins, except that the display name is resolved deterministically. A
+        // test that is retried, or that reports several results, is the same test with the same id,
+        // and repeating it would only make the report harder to load. Where rows collapse they can
+        // still differ in display name, and picking the ordinally first one rather than whichever
+        // parallel worker reported first is what keeps two runs of the same suite byte identical.
+        _records.AddOrUpdate(
+            BuildKey(record),
+            record,
+            (_, existing) => string.CompareOrdinal(record.DisplayName, existing.DisplayName) < 0 ? record : existing);
     }
 
     /// <summary>
@@ -209,40 +246,61 @@ public class TestIdsLogger : ITestLoggerWithParameters
         return null;
     }
 
-    private void WriteReport()
+    private void WriteReport(bool isComplete)
     {
         if (_records is null)
         {
             return;
         }
 
+        string filePath = ResolveReportFilePath();
+
         try
         {
-            ReportFilePath = ResolveReportFilePath();
-
-            string? directory = Path.GetDirectoryName(ReportFilePath);
+            string? directory = Path.GetDirectoryName(filePath);
             if (!directory.IsNullOrEmpty())
             {
                 Directory.CreateDirectory(directory);
             }
 
             // Ordered so that two runs of the same suite produce byte identical reports, which is
-            // what makes diffing one against another useful.
+            // what makes diffing one against another useful. Every component of the deduplication
+            // key is sorted on, so no two rows can tie and fall back to the order the concurrent
+            // dictionary happens to enumerate in.
             List<TestIdRecord> ordered = _records.Values
                 .OrderBy(r => r.Source, StringComparer.Ordinal)
                 .ThenBy(r => r.FullyQualifiedName, StringComparer.Ordinal)
+                .ThenBy(r => r.ExecutorUri, StringComparer.Ordinal)
                 .ThenBy(r => r.Id.ToString("d", CultureInfo.InvariantCulture), StringComparer.Ordinal)
                 .ToList();
 
-            using var writer = new StreamWriter(
-                new FileStream(ReportFilePath, FileMode.Create, FileAccess.Write, FileShare.Read),
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: true));
+            using (var writer = new StreamWriter(
+                new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read),
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
+            {
+                TestIdReportWriter.Write(writer, ordered);
+            }
 
-            TestIdReportWriter.Write(writer, ordered);
+            ReportFilePath = filePath;
+
+            string reportFileMessage = string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsReportFile, filePath);
+            EqtTrace.Info(reportFileMessage);
+            Output.Information(false, reportFileMessage);
+
+            if (!isComplete)
+            {
+                string incompleteMessage = string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsReportIncomplete, filePath);
+                EqtTrace.Warning(incompleteMessage);
+                Output.Warning(false, incompleteMessage);
+            }
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("TestIdsLogger: Failed to write the test id report. {0}", ex);
+            // The report is this logger's only output, so a failure that is merely traced is a
+            // failure nobody sees without /diag - and the next thing the user does is migrate
+            // stored ids against a file that is missing or truncated.
+            EqtTrace.Error("TestIdsLogger: Failed to write the test id report '{0}'. Exception: {1}", filePath, ex);
+            Output.Error(false, string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsLoggerWriteFailed, filePath, ex.Message));
         }
     }
 
@@ -250,14 +308,37 @@ public class TestIdsLogger : ITestLoggerWithParameters
     {
         TPDebug.Assert(_testResultsDirPath is not null, "Initialize must be called before this method.");
 
-        string fileName = Constants.DefaultReportFileName;
         if (_parametersDictionary is not null
             && _parametersDictionary.TryGetValue(Constants.LogFileNameKey, out string? logFileNameValue)
             && !logFileNameValue.IsNullOrWhiteSpace())
         {
-            fileName = logFileNameValue;
+            return Path.IsPathRooted(logFileNameValue) ? logFileNameValue! : Path.Combine(_testResultsDirPath!, logFileNameValue!);
         }
 
-        return Path.IsPathRooted(fileName) ? fileName : Path.Combine(_testResultsDirPath!, fileName);
+        return Path.Combine(_testResultsDirPath!, GetDefaultReportFileName());
+    }
+
+    /// <summary>
+    /// The report file name used when no <c>LogFileName</c> was given, qualified by the target
+    /// framework when the platform reported one.
+    /// </summary>
+    /// <remarks>
+    /// A multi targeted project is run once per framework into the same results directory, so an
+    /// unqualified fixed name would leave only the last framework's mapping behind and the earlier
+    /// ones would be silently overwritten. The same qualification, from the same logger parameter,
+    /// is what the trx logger does with its default file name.
+    /// </remarks>
+    private string GetDefaultReportFileName()
+    {
+        if (_parametersDictionary is not null
+            && _parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out string? framework)
+            && !framework.IsNullOrWhiteSpace())
+        {
+            string shortName = Framework.FromString(framework)?.ShortName ?? framework!;
+
+            return Constants.DefaultReportFileNameWithoutExtension + "_" + shortName + Constants.ReportFileExtension;
+        }
+
+        return Constants.DefaultReportFileName;
     }
 }

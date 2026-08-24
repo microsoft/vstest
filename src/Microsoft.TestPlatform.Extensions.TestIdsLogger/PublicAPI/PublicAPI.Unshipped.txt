@@ -9,7 +9,6 @@ Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.Disco
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.DiscoveryCompleteHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs! e) -> void
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents! events, string! testResultsDirPath) -> void
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.Initialize(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestLoggerEvents! events, System.Collections.Generic.Dictionary<string!, string?>! parameters) -> void
-Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.ReportFilePath.get -> string?
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.TestIdsLogger() -> void
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.TestResultHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging.TestResultEventArgs! e) -> void
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.TestRunCompleteHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.TestRunCompleteEventArgs! e) -> void

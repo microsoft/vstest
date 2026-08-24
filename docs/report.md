@@ -243,11 +243,14 @@ replace them.
 #### Syntax
 
 ```shell
-/logger:testids [;LogFileName=<Defaults to TestIds.csv>]
+/logger:testids [;LogFileName=<Defaults to TestIds.csv, qualified by target framework>]
 ```
 
 Where `LogFileName` can be absolute or relative path. If the path is relative, it will be relative to
-the `TestResults` directory, created under current working directory.
+the `TestResults` directory, created under current working directory. When `LogFileName` is not given
+the default name is qualified by the target framework, so that a multi targeted project does not
+overwrite one framework's report with the next one's. Pass `LogFileName` when a script needs the
+report at a path it can name up front.
 
 #### Example
 
@@ -255,7 +258,8 @@ the `TestResults` directory, created under current working directory.
 vstest.console.exe Tests.dll /logger:testids
 ```
 
-The report will be `c:\tempDirectory\TestResults\TestIds.csv`.
+The report will be `c:\tempDirectory\TestResults\TestIds_net8.0.csv` for a test assembly targeting
+`net8.0`. The path is printed at the end of the run.
 
 ## Related links
 

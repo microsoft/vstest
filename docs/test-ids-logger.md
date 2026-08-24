@@ -38,8 +38,11 @@ vstest.console.exe Tests.dll /logger:testids
 dotnet test --logger:testids
 ```
 
-By default the report is written to `TestIds.csv` in the test results directory. A different path
-can be given with `LogFileName`, which may be absolute or relative to the test results directory:
+By default the report is written to `TestIds.csv` in the test results directory, qualified by the
+target framework when the platform reports one - a multi targeted project is run once per framework
+into the same directory, so its reports are written as `TestIds_net8.0.csv`, `TestIds_net48.csv` and
+so on rather than overwriting each other. A different path can be given with `LogFileName`, which may
+be absolute or relative to the test results directory and is used exactly as given:
 
 ```shell
 vstest.console.exe Tests.dll /logger:"testids;LogFileName=ids\mapping.csv"
@@ -72,8 +75,18 @@ database, a spreadsheet or a script without anything having to be written to par
 | `XxHash128Id` | The id the xxHash128 algorithm computes from this test's seed. |
 | `IdSource` | Where `Id` came from: `Sha1`, `XxHash128` or `SelfAssigned`. |
 
-Rows are sorted by source, then fully qualified name, then id, so two reports of the same suite are
-byte identical and can be diffed against each other.
+Rows are sorted by source, then fully qualified name, then executor uri, then id - every part of the
+deduplication key - so two reports of the same suite are byte identical and can be diffed against
+each other.
+
+The path the report was written to is printed at the end of the run. If it could not be written the
+failure is reported as an error rather than passed over silently, because a missing report is
+otherwise indistinguishable from a suite with no tests in it.
+
+If the run was aborted or cancelled the report is still written, but a warning says so. Such a report
+covers only the tests that were reported before the run stopped, and must not be used to migrate
+stored ids: the tests that were never reached are missing from it for a reason that has nothing to do
+with whether they still exist.
 
 ### Deduplication
 
@@ -85,7 +98,8 @@ the test carries.
 - **Data driven rows that carry distinct ids** are reported as distinct rows, because each id needs
   its own mapping. This is precisely the case a two-run join cannot resolve.
 - Data driven rows that share a single id collapse into one row - one id maps to one id, no matter
-  how many ways it was rendered. Where that happens, `DisplayName` is the first one seen.
+  how many ways it was rendered. Where that happens the ordinally first `DisplayName` is kept, so
+  which one survives does not depend on which parallel worker reported it first.
 
 ## The important part: not every id is computed by the platform
 
@@ -104,9 +118,16 @@ about to change when in fact none of them are. Read `IdSource` before doing anyt
 
 | `IdSource` | What it means |
 | ---------- | ------------- |
-| `Sha1` | Platform computed with the legacy algorithm. **This id changes** to `XxHash128Id` when the default moves. |
-| `XxHash128` | Platform computed with the new algorithm - this run already selected it. The id does not change. |
-| `SelfAssigned` | The adapter assigned the id. **Nothing changes.** Ignore the two computed columns for this row. |
+| `Sha1` | The carried id equals the SHA1 candidate, so the platform computed it with the legacy algorithm. **This id changes** to `XxHash128Id` when the default moves. |
+| `XxHash128` | The carried id equals the xxHash128 candidate - this run already selected it. The id does not change, but anything you stored before opting in is still a SHA1 id, and `Sha1Id` on this row is what it maps from. |
+| `SelfAssigned` | The carried id matches neither candidate, so the adapter assigned it. **Nothing changes.** Ignore the two computed columns for this row. |
+
+`IdSource` is inferred by comparing the id a test carries against the two candidates, which is all
+the report can do - an adapter does not say where it got an id from. An adapter that assigns an id
+which happens to equal one of the candidates is therefore reported as though the platform had
+computed it. In practice adapters either let the platform compute the id or assign an unrelated one,
+so this is a caveat rather than a live hazard, but it is why the column is named for where the id
+matches rather than asserting where it came from.
 
 ## Worked example
 
@@ -116,7 +137,7 @@ Running a suite that mixes an adapter using platform computed ids with an MSTest
 vstest.console.exe Sample.Tests.dll /logger:testids
 ```
 
-produces `TestResults\TestIds.csv`:
+produces `TestResults\TestIds_net8.0.csv`:
 
 ```csv
 Source,ExecutorUri,FullyQualifiedName,DisplayName,Id,Sha1Id,XxHash128Id,IdSource
@@ -134,31 +155,38 @@ Three things to read off this:
 
 ## Building an old to new mapping
 
-Load the CSV and select the rows that will actually change:
+Every row that the platform computed carries both candidates, so the mapping is `Sha1Id` to
+`XxHash128Id` regardless of which algorithm the reporting run happened to use:
 
 ```sql
--- Only Sha1 rows migrate. XxHash128 rows are already migrated, SelfAssigned rows never move.
-SELECT Id AS OldId, XxHash128Id AS NewId, FullyQualifiedName, DisplayName, Source
+-- Self assigned ids are not computed from the seed and never move, so they are the only rows
+-- excluded. Rows already carrying the new id still map, because the ids you stored are the old ones.
+SELECT Sha1Id AS OldId, XxHash128Id AS NewId, FullyQualifiedName, DisplayName, Source
 FROM TestIds
-WHERE IdSource = 'Sha1';
+WHERE IdSource <> 'SelfAssigned';
 ```
 
 Then join that against your own records on `OldId` and rewrite them to `NewId`. Rows with
-`IdSource = 'SelfAssigned'` should be left exactly as they are; rows with `IdSource = 'XxHash128'`
-were produced by a run that had already opted in, and are already correct.
+`IdSource = 'SelfAssigned'` should be left exactly as they are.
+
+Do not filter on `IdSource = 'Sha1'` and map from `Id`. That works only when the reporting run used
+SHA1: run the report with `VSTEST_TESTCASE_ID_ALGORITHM=xxhash128` set and every computed row comes
+back as `XxHash128`, so such a query returns nothing at all even though every one of those rows still
+holds the mapping you need.
 
 The same thing in PowerShell:
 
 ```powershell
-Import-Csv TestResults\TestIds.csv |
-    Where-Object IdSource -eq 'Sha1' |
-    Select-Object @{ n = 'OldId'; e = { $_.Id } }, @{ n = 'NewId'; e = { $_.XxHash128Id } }, FullyQualifiedName |
+Import-Csv TestResults\TestIds_net8.0.csv |
+    Where-Object IdSource -ne 'SelfAssigned' |
+    Select-Object @{ n = 'OldId'; e = { $_.Sha1Id } }, @{ n = 'NewId'; e = { $_.XxHash128Id } }, FullyQualifiedName |
     Export-Csv mapping.csv -NoTypeInformation
 ```
 
-If a test in your records does not appear in the report at all, it was not discovered by this run -
-the mapping cannot be produced for a test that no longer exists, and such records need deciding on
-separately.
+If a test in your records does not appear in the report at all, and the run that produced the report
+completed, it was not discovered by this run - the mapping cannot be produced for a test that no
+longer exists, and such records need deciding on separately. If the run was aborted or cancelled the
+logger says so, and a missing row means nothing: produce the report again from a run that completed.
 
 ## Related
 
