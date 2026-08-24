@@ -25,11 +25,36 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 internal static class TestPluginDiscoverer
 {
     /// <summary>
-    /// Files that we already failed to load. The same file is scanned once per extension type we look for
-    /// (test adapters, loggers, data collectors, settings providers, ...), so this both avoids repeating a load
-    /// that is known to fail, and makes sure the user is told about the failure only once.
+    /// Files we already failed to load, and why. The same file is scanned once per extension type we look for
+    /// (test adapters, loggers, data collectors, settings providers, ...), so this avoids repeating a load that
+    /// is known to fail. <see cref="TestPluginCache.ClearExtensions"/> empties it, so an extension whose missing
+    /// dependency has since appeared is tried again on the next request instead of staying broken for the rest
+    /// of the process.
     /// </summary>
-    private static readonly ConcurrentDictionary<string, object?> UnloadableFiles = new();
+    private static readonly ConcurrentDictionary<string, string> UnloadableFiles = new();
+
+    /// <summary>
+    /// Files the user was already told about. This is kept apart from <see cref="UnloadableFiles"/> because the
+    /// two answer different questions: that one says whether loading the file is worth another try, this one says
+    /// whether the user has already seen the warning. <see cref="TestPluginCache.ClearExtensions"/> empties it,
+    /// which is what makes the warning once per run rather than once per process. An editor keeps the runner
+    /// alive across many discovery and run requests, and a broken extension is news again on each of them.
+    ///
+    /// Paths are compared ignoring case. On Windows two spellings of the same path are the same file, and a
+    /// second warning about it tells the user nothing the first one did not.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, object?> ReportedFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Forgets which files failed to load and which of them the user was told about, so the next request tries
+    /// them again and reports them again. Called when the extension cache is cleared, because extensions are
+    /// then discovered from scratch.
+    /// </summary>
+    internal static void ClearLoadFailures()
+    {
+        UnloadableFiles.Clear();
+        ReportedFiles.Clear();
+    }
 
     /// <summary>
     /// Gets information about each of the test extensions available.
@@ -98,8 +123,12 @@ internal static class TestPluginDiscoverer
         // Scan each of the files for data extensions.
         foreach (var file in files)
         {
-            if (UnloadableFiles.ContainsKey(file))
+            if (UnloadableFiles.TryGetValue(file, out var knownReason))
             {
+                // We already failed to load this file while looking for another extension type. Don't pay for
+                // the failure again, but still hand it to the reporting, which decides on its own whether the
+                // user has heard about it.
+                ReportFailureToLoadExtensions(file, knownReason, reportFailures);
                 continue;
             }
 
@@ -114,13 +143,10 @@ internal static class TestPluginDiscoverer
                 EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
 
                 // The file cannot be loaded at all, don't try again for the other extension types, and tell the user
-                // about it once. Without this the extension is just silently missing, and the tests it provides are
+                // about it. Without this the extension is just silently missing, and the tests it provides are
                 // silently not run.
-                var isFirstFailureForFile = UnloadableFiles.TryAdd(file, null);
-                if (isFirstFailureForFile && reportFailures)
-                {
-                    ReportFailureToLoadExtensions(file, e.Message);
-                }
+                UnloadableFiles[file] = e.Message;
+                ReportFailureToLoadExtensions(file, e.Message, reportFailures);
 
                 continue;
             }
@@ -151,7 +177,7 @@ internal static class TestPluginDiscoverer
     /// <typeparam name="TExtension">
     /// Type of Extensions.
     /// </typeparam>
-    private static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath, bool reportFailures)
+    internal static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath, bool reportFailures)
         where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(assembly != null, "null assembly");
@@ -209,11 +235,9 @@ internal static class TestPluginDiscoverer
             // usually not extensions at all.
             if (types.Count == 0)
             {
-                var isFirstFailureForFile = UnloadableFiles.TryAdd(filePath, null);
-                if (isFirstFailureForFile && reportFailures)
-                {
-                    ReportFailureToLoadExtensions(filePath, GetLoaderExceptionsMessage(e));
-                }
+                var reason = GetLoaderExceptionsMessage(e);
+                UnloadableFiles[filePath] = reason;
+                ReportFailureToLoadExtensions(filePath, reason, reportFailures);
             }
         }
 
@@ -281,14 +305,23 @@ internal static class TestPluginDiscoverer
     }
 
     /// <summary>
-    /// Tells the user that a file that looks like a test extension could not be loaded.
+    /// Tells the user that a file that looks like a test extension could not be loaded, unless they were already
+    /// told about that file in this run.
     /// </summary>
     /// <param name="filePath">File path of the extension.</param>
     /// <param name="reason">Why the file could not be loaded.</param>
-    private static void ReportFailureToLoadExtensions(string filePath, string reason)
-        => TestSessionMessageLogger.Instance.SendMessage(
+    /// <param name="reportFailures">When false the failure is expected and stays invisible to the user.</param>
+    private static void ReportFailureToLoadExtensions(string filePath, string reason, bool reportFailures)
+    {
+        if (!reportFailures || !ReportedFiles.TryAdd(filePath, null))
+        {
+            return;
+        }
+
+        TestSessionMessageLogger.Instance.SendMessage(
             TestMessageLevel.Warning,
             string.Format(CultureInfo.CurrentCulture, CommonResources.FailedToLoadExtensionFile, filePath, reason));
+    }
 
     /// <summary>
     /// Joins the messages of the loader exceptions, they say why the types could not be loaded, e.g. which
