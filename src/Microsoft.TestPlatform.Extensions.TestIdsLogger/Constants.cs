@@ -41,11 +41,14 @@ internal static class Constants
     /// reported no target framework.
     /// </summary>
     /// <remarks>
-    /// Deliberately a fixed name rather than a timestamped one: the report is an input to a
-    /// migration script, and a script that has to glob for its own input is worse than one that
-    /// overwrites a known path. Internal rather than public, because a real run almost always
-    /// carries a target framework and so almost always qualifies the name with it - a constant that
-    /// names a file that is usually not there is worse than no constant at all.
+    /// A fixed stem rather than a timestamp, so that the name is recognisable and the first run into
+    /// a clean results directory produces exactly it. It is qualified by the target framework, and
+    /// an already claimed name iterates to <c>TestIds_net8.0(1).csv</c> rather than overwriting,
+    /// because the projects of one solution share a results directory and a mapping replaced by
+    /// another project's is a mapping lost. The path actually written is printed at the end of the
+    /// run, and <see cref="LogFileNameKey"/> is there for a script that needs to know the path up
+    /// front. Internal, because a real run almost always qualifies the name by framework and a public
+    /// constant naming a file that is usually absent is worse than none.
     /// </remarks>
     internal const string DefaultReportFileName = DefaultReportFileNameWithoutExtension + ReportFileExtension;
 

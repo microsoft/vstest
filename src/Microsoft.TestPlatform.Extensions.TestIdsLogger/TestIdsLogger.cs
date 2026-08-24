@@ -271,10 +271,11 @@ public class TestIdsLogger : ITestLoggerWithParameters
         // vstest.console loads. Resolving outside would escape the one report this method exists to
         // make, since the logger event dispatch only traces what a handler throws.
         string filePath = string.Empty;
+        bool reserved = false;
 
         try
         {
-            filePath = ResolveReportFilePath();
+            filePath = ResolveReportFilePath(out reserved);
 
             string? directory = Path.GetDirectoryName(filePath);
             if (!directory.IsNullOrEmpty())
@@ -352,6 +353,20 @@ public class TestIdsLogger : ITestLoggerWithParameters
         }
         catch (Exception ex)
         {
+            // A reservation that never became a report is worse than no file: it is an empty CSV
+            // that a migration script would happily read as a suite with no tests in it.
+            if (reserved && ReportFilePath is null)
+            {
+                try
+                {
+                    File.Delete(filePath);
+                }
+                catch (Exception deleteException)
+                {
+                    EqtTrace.Warning("TestIdsLogger: Failed to delete the reserved '{0}'. Exception: {1}", filePath, deleteException);
+                }
+            }
+
             // The report is this logger's only output, so a failure that is merely traced is a
             // failure nobody sees without /diag - and the next thing the user does is migrate
             // stored ids against a file that is missing or truncated.
@@ -360,7 +375,13 @@ public class TestIdsLogger : ITestLoggerWithParameters
         }
     }
 
-    private string ResolveReportFilePath()
+    /// <summary>
+    /// The path to write the report to, reserving it first when the name is the logger's own.
+    /// </summary>
+    /// <param name="reserved">
+    /// Whether an empty file was created to claim the path, so that a failure can clean it up again.
+    /// </param>
+    private string ResolveReportFilePath(out bool reserved)
     {
         TPDebug.Assert(_testResultsDirPath is not null, "Initialize must be called before this method.");
 
@@ -370,38 +391,56 @@ public class TestIdsLogger : ITestLoggerWithParameters
             && _parametersDictionary.TryGetValue(Constants.LogFileNameKey, out string? logFileNameValue)
             && !logFileNameValue.IsNullOrWhiteSpace())
         {
+            reserved = false;
+
             return Path.IsPathRooted(logFileNameValue) ? logFileNameValue! : Path.Combine(_testResultsDirPath!, logFileNameValue!);
         }
 
         // The default name is not the user's, and several runs can pick the same one - every project
         // of a solution built for the same framework does, when they share a results directory. The
         // next free iteration is taken rather than overwriting, the way the trx logger does, because
-        // a mapping quietly replaced by another project's is a mapping lost. The path that was
-        // actually written is reported at the end of the run.
-        return GetNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName());
+        // a mapping quietly replaced by another project's is a mapping lost.
+        Directory.CreateDirectory(_testResultsDirPath!);
+        reserved = true;
+
+        return ReserveNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName());
     }
 
     /// <summary>
-    /// The given path if nothing is there, and <c>name(1).csv</c>, <c>name(2).csv</c> and so on
-    /// otherwise - the same iteration the trx logger applies to its own default file name.
+    /// Claims the given path by creating it, and <c>name(1).csv</c>, <c>name(2).csv</c> and so on
+    /// when it is taken - the same iteration the trx logger applies to its own default file name.
     /// </summary>
-    private static string GetNextAvailableFilePath(string directory, string fileName)
+    /// <remarks>
+    /// The path is claimed rather than merely tested, because the case this exists for - the
+    /// projects of one solution writing into a shared results directory - is by definition several
+    /// processes finishing at once. Two of them that only asked whether a name was free would both
+    /// be told yes, and one of the two reports would be lost.
+    /// </remarks>
+    private static string ReserveNextAvailableFilePath(string directory, string fileName)
     {
-        string candidate = Path.Combine(directory, fileName);
-        if (!File.Exists(candidate))
-        {
-            return candidate;
-        }
-
         string stem = Path.GetFileNameWithoutExtension(fileName);
         string extension = Path.GetExtension(fileName);
 
-        for (int iteration = 1; iteration < ushort.MaxValue; iteration++)
+        for (int iteration = 0; iteration < ushort.MaxValue; iteration++)
         {
-            candidate = Path.Combine(directory, stem + "(" + iteration.ToString(CultureInfo.InvariantCulture) + ")" + extension);
-            if (!File.Exists(candidate))
+            string candidate = iteration == 0
+                ? Path.Combine(directory, fileName)
+                : Path.Combine(directory, stem + "(" + iteration.ToString(CultureInfo.InvariantCulture) + ")" + extension);
+
+            try
             {
+                // CreateNew is the claim: it fails rather than truncates when someone else got there
+                // first. Anything other than the path being taken - no permission, a directory in
+                // the way - is a real failure and is left to the caller to report.
+                using (new FileStream(candidate, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                }
+
                 return candidate;
+            }
+            catch (IOException)
+            {
+                // Taken, by an earlier run or by a project running alongside this one.
             }
         }
 

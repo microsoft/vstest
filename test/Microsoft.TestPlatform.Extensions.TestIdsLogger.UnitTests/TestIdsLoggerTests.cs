@@ -537,6 +537,28 @@ public class TestIdsLoggerTests
         Assert.Contains("Second.Test", File.ReadAllText(second.ReportFilePath!));
     }
 
+    [TestMethod]
+    public void FailedWriteUnderTheDefaultNameLeavesNoEmptyReservationBehind()
+    {
+        // The default name is claimed by creating it, so a failure after the claim has to clean up:
+        // an empty CSV reads as a suite with no tests in it, which is worse than no file at all.
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+        };
+        Directory.CreateDirectory(_testRunDirectory);
+        Directory.CreateDirectory(Path.Combine(_testRunDirectory, "TestIds.csv.tmp"));
+
+        _logger.Initialize(_events.Object, parameters);
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.IsNull(_logger.ReportFilePath);
+        Assert.IsTrue(_output.HasErrors);
+        Assert.IsFalse(
+            File.Exists(Path.Combine(_testRunDirectory, "TestIds.csv")),
+            "A reservation that never became a report must not be left behind.");
+    }
+
     #endregion
 
     #region Determinism
