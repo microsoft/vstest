@@ -81,13 +81,12 @@ public class TestIdProviderXxHash128
     /// <returns>An array containing the seed.</returns>
     /// <remarks>
     /// <see cref="AppendBytes(byte[])"/> and <see cref="AppendString(string)"/> cannot be called
-    /// on instance after this method is called.
+    /// on instance after this method is called. The returned array is a copy, so mutating it does
+    /// not disturb a later <see cref="GetId"/> or <see cref="GetHash"/> call.
     /// </remarks>
     public byte[] GetHash()
     {
-        _hash ??= _hasher.GetCurrentHash();
-
-        return _hash;
+        return (byte[])EnsureHash().Clone();
     }
 
     /// <summary>
@@ -105,11 +104,13 @@ public class TestIdProviderXxHash128
             return _id;
         }
 
-        // VersionedGuidFromHash mutates what it is given, and GetHash() hands out the cached array,
-        // so hand it a copy to keep GetHash() honest for callers that call it themselves.
-        byte[] hash = (byte[])GetHash().Clone();
+        // VersionedGuidFromHash mutates what it is given, so hand it a copy and keep the cached
+        // hash intact for callers that ask for it themselves.
+        byte[] hash = (byte[])EnsureHash().Clone();
         _id = TestIdGuid.VersionedGuidFromHash(hash, TestIdGuid.CurrentHashVersion);
 
         return _id;
     }
+
+    private byte[] EnsureHash() => _hash ??= _hasher.GetCurrentHash();
 }

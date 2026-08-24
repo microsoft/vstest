@@ -124,13 +124,13 @@ internal static class MtpTestNodeConverter
         // The seed is composed with TestIdSeed, from the test case's own properties rather than the
         // raw wire values, because this must hash precisely the bytes TestCase would have hashed
         // itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and host, so
-        // the raw string and the parsed uri do not necessarily render the same). For the same reason
-        // the name here has to track TestCase.GetFullyQualifiedName, which prefers the ManagedType
-        // and ManagedMethod properties when they are set; this converter never sets them, so the
-        // plain FullyQualifiedName is the same value today.
+        // the raw string and the parsed uri do not necessarily render the same), and the name, which
+        // TestCase takes from GetFullyQualifiedName so that ManagedType and ManagedMethod win when
+        // they are set. Calling the same method here means the two cannot drift apart if this
+        // converter ever starts populating those properties.
         if (testCaseIdAlgorithm is { } algorithm)
         {
-            string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName);
+            string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.GetFullyQualifiedName());
             testCase.Id = algorithm switch
             {
                 TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromStringXxHash128(seed),

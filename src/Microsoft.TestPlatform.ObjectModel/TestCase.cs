@@ -383,7 +383,7 @@ public sealed class TestCase : TestObject
         set => SetPropertyAndResetId(ManagedMethodProperty, value);
     }
 
-    private string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
+    internal string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
 
     /// <inheritdoc/>
     public override string ToString() => GetFullyQualifiedName();
