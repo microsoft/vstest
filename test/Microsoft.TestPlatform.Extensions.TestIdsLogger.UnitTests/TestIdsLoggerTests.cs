@@ -40,8 +40,8 @@ public class TestIdsLoggerTests
     public TestIdsLoggerTests()
     {
         _events = new Mock<TestLoggerEvents>();
-        _logger = new VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger();
         _output = new FakeOutput();
+        _logger = new VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger(_output);
         _testRunDirectory = Path.Combine(Path.GetTempPath(), "TestIdsLoggerTests", Guid.NewGuid().ToString("d"));
     }
 
@@ -315,7 +315,6 @@ public class TestIdsLoggerTests
     public void ReportPathIsWrittenToTheConsoleWhenTheReportIsWritten()
     {
         _logger.Initialize(_events.Object, BuildParameters());
-        _logger.Output = _output;
 
         _logger.TestRunCompleteHandler(this, CompletedRun());
 
@@ -328,7 +327,6 @@ public class TestIdsLoggerTests
     public void AbortedRunReportsTheReportAsIncomplete()
     {
         _logger.Initialize(_events.Object, BuildParameters());
-        _logger.Output = _output;
 
         _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
 
@@ -342,7 +340,6 @@ public class TestIdsLoggerTests
     public void CancelledRunReportsTheReportAsIncomplete()
     {
         _logger.Initialize(_events.Object, BuildParameters());
-        _logger.Output = _output;
 
         _logger.TestRunCompleteHandler(this, new TestRunCompleteEventArgs(null, true, false, null, null, null, TimeSpan.Zero));
 
@@ -353,7 +350,6 @@ public class TestIdsLoggerTests
     public void AbortedDiscoveryReportsTheReportAsIncomplete()
     {
         _logger.Initialize(_events.Object, BuildParameters());
-        _logger.Output = _output;
 
         _logger.DiscoveryCompleteHandler(this, new DiscoveryCompleteEventArgs(1, true));
 
@@ -368,7 +364,6 @@ public class TestIdsLoggerTests
         Directory.CreateDirectory(Path.Combine(_testRunDirectory, "TestIds.csv"));
 
         _logger.Initialize(_events.Object, BuildParameters());
-        _logger.Output = _output;
 
         _logger.TestRunCompleteHandler(this, CompletedRun());
 
@@ -377,6 +372,61 @@ public class TestIdsLoggerTests
         // The report was never written, so nothing may claim it was: a path here would send a
         // migration script at a file that does not exist.
         Assert.IsNull(_logger.ReportFilePath);
+    }
+
+    [TestMethod]
+    public void InvalidLogFileNameIsReportedAndDoesNotThrow()
+    {
+        // Path.Combine and Path.IsPathRooted throw on invalid characters on .NET Framework, so
+        // resolving the path is itself a failure the user has to be told about rather than one that
+        // escapes into the event dispatch and is only traced.
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+            [TestIdsLoggerConstants.LogFileNameKey] = "re|port\"name.csv",
+        };
+        _logger.Initialize(_events.Object, parameters);
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.IsNull(_logger.ReportFilePath);
+        Assert.IsTrue(_output.HasErrors, "An unusable path must be reported to the user.");
+    }
+
+    [TestMethod]
+    public void SuccessfulWriteLeavesNoTemporaryFileBehind()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.IsTrue(File.Exists(_logger.ReportFilePath));
+        Assert.IsFalse(
+            File.Exists(_logger.ReportFilePath + ".tmp"),
+            "The report is staged through a temporary file, which must not be left in the results directory.");
+    }
+
+    [TestMethod]
+    public void FailedWriteLeavesAPreviouslyWrittenReportIntact()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.TestResultHandler(this, Result(new TestCase("SampleTests.UnitTest.PassingTest", new Uri(ExecutorUri), Source)));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        string reportPath = _logger.ReportFilePath!;
+        string original = File.ReadAllText(reportPath);
+
+        // Taking the staging path makes the next write fail before the report itself is touched,
+        // which is the whole point of staging: a failed run must not destroy a good report.
+        Directory.CreateDirectory(reportPath + ".tmp");
+
+        var second = new VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger(_output);
+        second.Initialize(_events.Object, BuildParameters());
+        second.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.IsNull(second.ReportFilePath);
+        Assert.IsTrue(_output.HasErrors);
+        Assert.AreEqual(original, File.ReadAllText(reportPath));
     }
 
     #endregion

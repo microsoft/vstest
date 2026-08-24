@@ -68,11 +68,24 @@ public class TestIdsLogger : ITestLoggerWithParameters
     /// Where the report path, and any failure to write it, is reported to the user.
     /// </summary>
     /// <remarks>
-    /// Settable so that the messages can be asserted on. <see cref="ConsoleOutput.Instance"/>
-    /// captures <see cref="Console.Out"/> when it is first constructed, which a test cannot redirect
-    /// after the fact.
+    /// Injected through the internal constructor so that the messages can be asserted on.
+    /// <see cref="ConsoleOutput.Instance"/> captures <see cref="Console.Out"/> when it is first
+    /// constructed, which a test cannot redirect after the fact.
     /// </remarks>
-    internal IOutput Output { get; set; } = ConsoleOutput.Instance;
+    private readonly IOutput _output;
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TestIdsLogger"/> class.
+    /// </summary>
+    public TestIdsLogger()
+        : this(ConsoleOutput.Instance)
+    {
+    }
+
+    internal TestIdsLogger(IOutput output)
+    {
+        _output = output;
+    }
 
     /// <summary>
     /// The path the report was written to, once it has been written.
@@ -253,10 +266,16 @@ public class TestIdsLogger : ITestLoggerWithParameters
             return;
         }
 
-        string filePath = ResolveReportFilePath();
+        // Resolved inside the try: the path comes from a user supplied parameter, and Path.Combine
+        // and Path.IsPathRooted throw on invalid characters on .NET Framework - which is the build
+        // vstest.console loads. Resolving outside would escape the one report this method exists to
+        // make, since the logger event dispatch only traces what a handler throws.
+        string filePath = string.Empty;
 
         try
         {
+            filePath = ResolveReportFilePath();
+
             string? directory = Path.GetDirectoryName(filePath);
             if (!directory.IsNullOrEmpty())
             {
@@ -274,24 +293,48 @@ public class TestIdsLogger : ITestLoggerWithParameters
                 .ThenBy(r => r.Id.ToString("d", CultureInfo.InvariantCulture), StringComparer.Ordinal)
                 .ToList();
 
-            using (var writer = new StreamWriter(
-                new FileStream(filePath, FileMode.Create, FileAccess.Write, FileShare.Read),
-                new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
+            // Written to a temporary file and moved into place, so that a write which fails part
+            // way through cannot leave a truncated report behind - and cannot destroy a complete
+            // report from an earlier run either. A migration script that globs for the report must
+            // never find a half written one.
+            string temporaryPath = filePath + ".tmp";
+
+            try
             {
-                TestIdReportWriter.Write(writer, ordered);
+                using (var writer = new StreamWriter(
+                    new FileStream(temporaryPath, FileMode.Create, FileAccess.Write, FileShare.Read),
+                    new UTF8Encoding(encoderShouldEmitUTF8Identifier: true)))
+                {
+                    TestIdReportWriter.Write(writer, ordered);
+                }
+
+                File.Copy(temporaryPath, filePath, overwrite: true);
+            }
+            finally
+            {
+                try
+                {
+                    File.Delete(temporaryPath);
+                }
+                catch (Exception ex)
+                {
+                    // A leftover temporary file is not worth failing over, and never displaces the
+                    // report itself.
+                    EqtTrace.Warning("TestIdsLogger: Failed to delete '{0}'. Exception: {1}", temporaryPath, ex);
+                }
             }
 
             ReportFilePath = filePath;
 
             string reportFileMessage = string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsReportFile, filePath);
             EqtTrace.Info(reportFileMessage);
-            Output.Information(false, reportFileMessage);
+            _output.Information(false, reportFileMessage);
 
             if (!isComplete)
             {
                 string incompleteMessage = string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsReportIncomplete, filePath);
                 EqtTrace.Warning(incompleteMessage);
-                Output.Warning(false, incompleteMessage);
+                _output.Warning(false, incompleteMessage);
             }
         }
         catch (Exception ex)
@@ -300,7 +343,7 @@ public class TestIdsLogger : ITestLoggerWithParameters
             // failure nobody sees without /diag - and the next thing the user does is migrate
             // stored ids against a file that is missing or truncated.
             EqtTrace.Error("TestIdsLogger: Failed to write the test id report '{0}'. Exception: {1}", filePath, ex);
-            Output.Error(false, string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsLoggerWriteFailed, filePath, ex.Message));
+            _output.Error(false, string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsLoggerWriteFailed, filePath, ex.Message));
         }
     }
 
@@ -334,7 +377,14 @@ public class TestIdsLogger : ITestLoggerWithParameters
             && _parametersDictionary.TryGetValue(DefaultLoggerParameterNames.TargetFramework, out string? framework)
             && !framework.IsNullOrWhiteSpace())
         {
+            // ShortName is null for a framework that parses but has no folder name, and then the
+            // moniker itself is the best available label - which is not necessarily usable in a file
+            // name, so it is sanitized rather than trusted.
             string shortName = Framework.FromString(framework)?.ShortName ?? framework!;
+            foreach (char invalid in Path.GetInvalidFileNameChars())
+            {
+                shortName = shortName.Replace(invalid, '_');
+            }
 
             return Constants.DefaultReportFileNameWithoutExtension + "_" + shortName + Constants.ReportFileExtension;
         }

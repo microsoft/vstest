@@ -1,5 +1,4 @@
 #nullable enable
-const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.DefaultReportFileName = "TestIds.csv" -> string!
 const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.ExtensionUri = "logger://Microsoft/TestPlatform/TestIdsLogger/v1" -> string!
 const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.FriendlyName = "testids" -> string!
 const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.LogFileNameKey = "LogFileName" -> string!

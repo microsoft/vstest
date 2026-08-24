@@ -32,15 +32,17 @@ public static class Constants
     public const string LogFileNameKey = "LogFileName";
 
     /// <summary>
-    /// The report file name used when <see cref="LogFileNameKey"/> is not given.
+    /// The report file name used when <see cref="LogFileNameKey"/> is not given and the platform
+    /// reported no target framework.
     /// </summary>
     /// <remarks>
     /// Deliberately a fixed name rather than a timestamped one: the report is an input to a
     /// migration script, and a script that has to glob for its own input is worse than one that
-    /// overwrites a known path. It is qualified by the target framework when the platform reports
-    /// one, so that the frameworks of a multi targeted project do not overwrite each other.
+    /// overwrites a known path. Internal rather than public, because a real run almost always
+    /// carries a target framework and so almost always qualifies the name with it - a constant that
+    /// names a file that is usually not there is worse than no constant at all.
     /// </remarks>
-    public const string DefaultReportFileName = DefaultReportFileNameWithoutExtension + ReportFileExtension;
+    internal const string DefaultReportFileName = DefaultReportFileNameWithoutExtension + ReportFileExtension;
 
     /// <summary>
     /// The stem of <see cref="DefaultReportFileName"/>, to which the target framework is appended.
