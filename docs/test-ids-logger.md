@@ -41,8 +41,15 @@ dotnet test --logger:testids
 By default the report is written to `TestIds.csv` in the test results directory, qualified by the
 target framework when the platform reports one - a multi targeted project is run once per framework
 into the same directory, so its reports are written as `TestIds_net8.0.csv`, `TestIds_net48.csv` and
-so on rather than overwriting each other. A different path can be given with `LogFileName`, which may
-be absolute or relative to the test results directory and is used exactly as given:
+so on rather than overwriting each other. An existing report is never overwritten under the default
+name: the next free `TestIds_net8.0(1).csv`, `TestIds_net8.0(2).csv` is taken instead, because every
+project of a solution run into a shared results directory picks the same default name, and a mapping
+quietly replaced by another project's is a mapping lost. The path actually written is printed at the
+end of the run.
+
+A different path can be given with `LogFileName`, which may be absolute or relative to the test
+results directory. That path is used exactly as given and is overwritten if it already exists, so a
+script that was told where the report goes finds it there:
 
 ```shell
 vstest.console.exe Tests.dll /logger:"testids;LogFileName=ids\mapping.csv"
@@ -153,6 +160,29 @@ Three things to read off this:
 - Row 3 is MSTest. `Id` matches neither computed column, `IdSource` says `SelfAssigned`, and this id
   is not going anywhere.
 
+## What the report covers
+
+The report contains the tests **this invocation reported**, and nothing else. That is not the same
+as every test you have ids for:
+
+- A run narrowed by `/TestCaseFilter`, `/Tests` or a subset of sources reports only the tests it
+  selected.
+- A run that was aborted or cancelled reports only what it reached, and says so.
+- A test that never produces a result - because the run stopped first - is not in the report.
+
+So produce the report from an **unfiltered** invocation over **all** your test containers, and prefer
+`/ListTests`, which reaches every test without executing anything. Otherwise a row missing from the
+report says nothing about whether the test still exists.
+
+### Tests run from a package
+
+For a package based run - UWP, where the source given on the command line is an `.appx` or
+`.appxrecipe` rather than the assembly - the platform rewrites `TestCase.Source` to the package
+*after* the id was computed from the assembly. The report recomputes both candidates from what the
+test case now carries, so neither matches, and such rows are reported as `SelfAssigned` even though
+the platform did compute the id. Produce the mapping for those tests from a discovery over the test
+assemblies themselves.
+
 ## Building an old to new mapping
 
 Every row that the platform computed carries both candidates, so the mapping is `Sha1Id` to
@@ -183,10 +213,10 @@ Import-Csv TestResults\TestIds_net8.0.csv |
     Export-Csv mapping.csv -NoTypeInformation
 ```
 
-If a test in your records does not appear in the report at all, and the run that produced the report
-completed, it was not discovered by this run - the mapping cannot be produced for a test that no
-longer exists, and such records need deciding on separately. If the run was aborted or cancelled the
-logger says so, and a missing row means nothing: produce the report again from a run that completed.
+If a test in your records does not appear in the report at all, check first that the report covers
+what you think it does - see [What the report covers](#what-the-report-covers). For an unfiltered
+report from a run that completed, a missing test was not discovered, the mapping cannot be produced
+for a test that no longer exists, and such records need deciding on separately.
 
 ## Related
 

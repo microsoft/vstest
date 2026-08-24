@@ -12,24 +12,29 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 /// ids across the change of id hashing algorithm, and is deleted together with the SHA1
 /// implementation it reports on. See the class level remarks on <see cref="TestIdsLogger"/>.
 /// </para>
+/// <para>
+/// Internal, unlike the equivalent on the permanent loggers. A component whose stated plan is
+/// deletion should not leave public API behind for its removal to break; the uri and the friendly
+/// name are the contract, and those are documented rather than exported.
+/// </para>
 /// </remarks>
-public static class Constants
+internal static class Constants
 {
     /// <summary>
     /// Uri used to uniquely identify the test id report logger.
     /// </summary>
-    public const string ExtensionUri = "logger://Microsoft/TestPlatform/TestIdsLogger/v1";
+    internal const string ExtensionUri = "logger://Microsoft/TestPlatform/TestIdsLogger/v1";
 
     /// <summary>
     /// Alternate user friendly string to uniquely identify the test id report logger.
     /// </summary>
-    public const string FriendlyName = "testids";
+    internal const string FriendlyName = "testids";
 
     /// <summary>
     /// Log file parameter key, holding the path the report is written to. An absolute path is used
     /// as given, a relative one is resolved against the test results directory.
     /// </summary>
-    public const string LogFileNameKey = "LogFileName";
+    internal const string LogFileNameKey = "LogFileName";
 
     /// <summary>
     /// The report file name used when <see cref="LogFileNameKey"/> is not given and the platform

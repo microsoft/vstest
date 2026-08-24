@@ -1,8 +1,4 @@
 #nullable enable
-const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.ExtensionUri = "logger://Microsoft/TestPlatform/TestIdsLogger/v1" -> string!
-const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.FriendlyName = "testids" -> string!
-const Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants.LogFileNameKey = "LogFileName" -> string!
-Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.Constants
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.DiscoveredTestsHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveredTestsEventArgs! e) -> void
 Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.DiscoveryCompleteHandler(object? sender, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.DiscoveryCompleteEventArgs! e) -> void

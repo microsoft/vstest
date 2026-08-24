@@ -377,13 +377,14 @@ public class TestIdsLoggerTests
     [TestMethod]
     public void InvalidLogFileNameIsReportedAndDoesNotThrow()
     {
-        // Path.Combine and Path.IsPathRooted throw on invalid characters on .NET Framework, so
-        // resolving the path is itself a failure the user has to be told about rather than one that
-        // escapes into the event dispatch and is only traced.
+        // A null character is rejected as a path on every platform and every target framework,
+        // unlike the characters that are only invalid on Windows. Resolving or opening the path is
+        // itself a failure the user has to be told about, rather than one that escapes into the
+        // event dispatch and is only traced.
         var parameters = new Dictionary<string, string?>
         {
             [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
-            [TestIdsLoggerConstants.LogFileNameKey] = "re|port\"name.csv",
+            [TestIdsLoggerConstants.LogFileNameKey] = "re\0port.csv",
         };
         _logger.Initialize(_events.Object, parameters);
 
@@ -404,6 +405,31 @@ public class TestIdsLoggerTests
         Assert.IsFalse(
             File.Exists(_logger.ReportFilePath + ".tmp"),
             "The report is staged through a temporary file, which must not be left in the results directory.");
+    }
+
+    [TestMethod]
+    public void SecondRunReplacesAnExistingReport()
+    {
+        _logger.Initialize(_events.Object, BuildParameters());
+        _logger.TestResultHandler(this, Result(new TestCase("SampleTests.UnitTest.First", new Uri(ExecutorUri), Source)));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        string reportPath = _logger.ReportFilePath!;
+
+        // The rename takes a different path when the destination already exists, so a rerun into the
+        // same results directory - the normal case - has to be exercised too.
+        var second = new VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger(_output);
+        second.Initialize(_events.Object, BuildParameters());
+        second.TestResultHandler(this, Result(new TestCase("SampleTests.UnitTest.Second", new Uri(ExecutorUri), Source)));
+        second.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.AreEqual(reportPath, second.ReportFilePath);
+        Assert.IsFalse(_output.HasErrors);
+        Assert.IsFalse(File.Exists(reportPath + ".tmp"));
+
+        string content = File.ReadAllText(reportPath);
+        Assert.Contains("SampleTests.UnitTest.Second", content);
+        Assert.DoesNotContain("SampleTests.UnitTest.First", content);
     }
 
     [TestMethod]
@@ -484,6 +510,31 @@ public class TestIdsLoggerTests
 
         Assert.AreEqual(absolute, _logger.ReportFilePath);
         Assert.IsTrue(File.Exists(absolute));
+    }
+
+    [TestMethod]
+    public void DefaultReportFileNameDoesNotOverwriteAnExistingReport()
+    {
+        // Every project of a solution built for the same framework picks the same default name, so
+        // overwriting would leave a solution wide migration holding only the last project's rows.
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+            [DefaultLoggerParameterNames.TargetFramework] = ".NETCoreApp,Version=v8.0",
+        };
+        _logger.Initialize(_events.Object, parameters);
+        _logger.TestResultHandler(this, Result(new TestCase("First.Test", new Uri(ExecutorUri), Source)));
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        var second = new VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger(_output);
+        second.Initialize(_events.Object, parameters);
+        second.TestResultHandler(this, Result(new TestCase("Second.Test", new Uri(ExecutorUri), Source)));
+        second.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.AreEqual(Path.Combine(_testRunDirectory, "TestIds_net8.0.csv"), _logger.ReportFilePath);
+        Assert.AreEqual(Path.Combine(_testRunDirectory, "TestIds_net8.0(1).csv"), second.ReportFilePath);
+        Assert.Contains("First.Test", File.ReadAllText(_logger.ReportFilePath!));
+        Assert.Contains("Second.Test", File.ReadAllText(second.ReportFilePath!));
     }
 
     #endregion

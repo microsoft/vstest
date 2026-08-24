@@ -293,10 +293,13 @@ public class TestIdsLogger : ITestLoggerWithParameters
                 .ThenBy(r => r.Id.ToString("d", CultureInfo.InvariantCulture), StringComparer.Ordinal)
                 .ToList();
 
-            // Written to a temporary file and moved into place, so that a write which fails part
-            // way through cannot leave a truncated report behind - and cannot destroy a complete
-            // report from an earlier run either. A migration script that globs for the report must
-            // never find a half written one.
+            // Staged through a temporary file and renamed into place, so that a write which fails
+            // part way through neither leaves a truncated report behind nor destroys a complete one
+            // from an earlier run. A migration script that globs for the report must never find a
+            // half written file. The rename rather than a copy is the point: the staging path is the
+            // report path plus a suffix, so it is always in the same directory and therefore on the
+            // same volume, and a rename either happened or it did not - whereas a copy can fail
+            // half way and truncate the very file it was meant to protect.
             string temporaryPath = filePath + ".tmp";
 
             try
@@ -308,12 +311,22 @@ public class TestIdsLogger : ITestLoggerWithParameters
                     TestIdReportWriter.Write(writer, ordered);
                 }
 
-                File.Copy(temporaryPath, filePath, overwrite: true);
+                if (File.Exists(filePath))
+                {
+                    File.Replace(temporaryPath, filePath, destinationBackupFileName: null);
+                }
+                else
+                {
+                    File.Move(temporaryPath, filePath);
+                }
             }
             finally
             {
                 try
                 {
+                    // A no-op once the rename succeeded, and deleting a path that is not there does
+                    // not throw. This only cleans up after a failure before the rename, where the
+                    // staged file is incomplete and worth nothing.
                     File.Delete(temporaryPath);
                 }
                 catch (Exception ex)
@@ -351,6 +364,8 @@ public class TestIdsLogger : ITestLoggerWithParameters
     {
         TPDebug.Assert(_testResultsDirPath is not null, "Initialize must be called before this method.");
 
+        // An explicit name is the user's, and is used exactly as given. Overwriting it is the point:
+        // a migration script was told where the report goes and has to find it there.
         if (_parametersDictionary is not null
             && _parametersDictionary.TryGetValue(Constants.LogFileNameKey, out string? logFileNameValue)
             && !logFileNameValue.IsNullOrWhiteSpace())
@@ -358,7 +373,41 @@ public class TestIdsLogger : ITestLoggerWithParameters
             return Path.IsPathRooted(logFileNameValue) ? logFileNameValue! : Path.Combine(_testResultsDirPath!, logFileNameValue!);
         }
 
-        return Path.Combine(_testResultsDirPath!, GetDefaultReportFileName());
+        // The default name is not the user's, and several runs can pick the same one - every project
+        // of a solution built for the same framework does, when they share a results directory. The
+        // next free iteration is taken rather than overwriting, the way the trx logger does, because
+        // a mapping quietly replaced by another project's is a mapping lost. The path that was
+        // actually written is reported at the end of the run.
+        return GetNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName());
+    }
+
+    /// <summary>
+    /// The given path if nothing is there, and <c>name(1).csv</c>, <c>name(2).csv</c> and so on
+    /// otherwise - the same iteration the trx logger applies to its own default file name.
+    /// </summary>
+    private static string GetNextAvailableFilePath(string directory, string fileName)
+    {
+        string candidate = Path.Combine(directory, fileName);
+        if (!File.Exists(candidate))
+        {
+            return candidate;
+        }
+
+        string stem = Path.GetFileNameWithoutExtension(fileName);
+        string extension = Path.GetExtension(fileName);
+
+        for (int iteration = 1; iteration < ushort.MaxValue; iteration++)
+        {
+            candidate = Path.Combine(directory, stem + "(" + iteration.ToString(CultureInfo.InvariantCulture) + ")" + extension);
+            if (!File.Exists(candidate))
+            {
+                return candidate;
+            }
+        }
+
+        // Every iteration is taken, which means something is very wrong with the results directory.
+        // Overwriting the first one is a better answer than reporting nothing at all.
+        return Path.Combine(directory, fileName);
     }
 
     /// <summary>

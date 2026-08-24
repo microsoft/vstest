@@ -247,10 +247,11 @@ replace them.
 ```
 
 Where `LogFileName` can be absolute or relative path. If the path is relative, it will be relative to
-the `TestResults` directory, created under current working directory. When `LogFileName` is not given
-the default name is qualified by the target framework, so that a multi targeted project does not
-overwrite one framework's report with the next one's. Pass `LogFileName` when a script needs the
-report at a path it can name up front.
+the `TestResults` directory, created under current working directory. An explicitly named report is
+overwritten if it exists. When `LogFileName` is not given the default name is qualified by the target
+framework and an existing report is not overwritten - the next free `TestIds_net8.0(1).csv` is taken
+- so that a multi targeted project, or several projects of a solution sharing a results directory, do
+not overwrite each other's mappings.
 
 #### Example
 
