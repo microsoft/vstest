@@ -81,8 +81,9 @@ public class TestIdProviderXxHash128
     /// <returns>An array containing the seed.</returns>
     /// <remarks>
     /// <see cref="AppendBytes(byte[])"/> and <see cref="AppendString(string)"/> cannot be called
-    /// on instance after this method is called. The returned array is a copy, so mutating it does
-    /// not disturb a later <see cref="GetId"/> or <see cref="GetHash"/> call.
+    /// on instance after this method is called. Unlike <see cref="TestIdProvider.GetHash"/>, which
+    /// hands out the array it caches, the returned array is a copy, so mutating it does not disturb
+    /// a later <see cref="GetId"/> or <see cref="GetHash"/> call.
     /// </remarks>
     public byte[] GetHash()
     {

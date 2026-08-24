@@ -45,6 +45,41 @@ public class TestCaseTests
         Assert.AreEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString());
     }
 
+    /// <summary>
+    /// The managed name properties, when both are set, replace the fully qualified name in the seed
+    /// the id is hashed from.
+    /// </summary>
+    /// <remarks>
+    /// Anything that computes a test case id outside this class - the Microsoft.Testing.Platform
+    /// converter in the runner does - has to seed the hash with the same name, which means calling
+    /// <c>GetFullyQualifiedName</c> rather than reading <see cref="TestCase.FullyQualifiedName"/>.
+    /// Pinned here because that is where the rule lives.
+    /// </remarks>
+    [TestMethod]
+    public void TestCaseIdIsSeededWithTheManagedNamesWhenBothAreSet()
+    {
+        _testCase.SetPropertyValue(TestProperty.Find("TestCase.ManagedType")!, "sampleTestClass");
+        _testCase.SetPropertyValue(TestProperty.Find("TestCase.ManagedMethod")!, "sampleTestCase");
+
+        // Same rendered name as FullyQualifiedName, so the id has to be the plain one.
+        Assert.AreEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString());
+
+        _testCase.SetPropertyValue(TestProperty.Find("TestCase.ManagedMethod")!, "otherTestCase");
+
+        Assert.AreNotEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString(), "A managed name change must move the id.");
+    }
+
+    /// <summary>
+    /// One managed name on its own is not enough, so it must not disturb the id.
+    /// </summary>
+    [TestMethod]
+    public void TestCaseIdIgnoresAManagedTypeWithoutAManagedMethod()
+    {
+        _testCase.SetPropertyValue(TestProperty.Find("TestCase.ManagedType")!, "someOtherClass");
+
+        Assert.AreEqual("28e7a7ed-8fb9-05b7-5e90-4a8c52f32b5b", _testCase.Id.ToString());
+    }
+
     [TestMethod]
     public void TestCaseIdIfNotSetExplicitlyShouldReturnGuidBasedOnSourceAndNameIfNameIsChanged()
     {

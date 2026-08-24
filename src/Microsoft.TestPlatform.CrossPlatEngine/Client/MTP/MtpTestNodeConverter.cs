@@ -116,7 +116,10 @@ internal static class MtpTestNodeConverter
         AddTraits(update, testCase);
 
         // Deliberately last: setting FullyQualifiedName or Source resets the default id, so assigning
-        // it earlier could be silently undone by a later assignment.
+        // it earlier could be silently undone by a later assignment. The managed name properties are
+        // part of the seed too (see TestCase.GetFullyQualifiedName), and assigning Id here pins an
+        // explicit id that a later property assignment does not reset, so this block has to stay
+        // after everything that feeds the seed, not just after FullyQualifiedName and Source.
         //
         // Only a run that declared an algorithm needs an explicit assignment. Leaving the id alone
         // otherwise lets TestCase compute it lazily, exactly as it does on the classic path, so the

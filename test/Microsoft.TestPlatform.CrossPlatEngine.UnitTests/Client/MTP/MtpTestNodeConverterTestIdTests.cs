@@ -23,10 +23,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 /// choice in, otherwise a runsettings selection is silently ignored on this path only.
 /// </para>
 /// <para>
-/// The algorithm type lives in ObjectModel as shared source and this test assembly can see its
-/// internals, but nothing below names it: every choice is inferred from the production resolver,
-/// which has the side benefit that the assertions exercise the real resolution path instead of a
-/// value built by hand to look like its result.
+/// Nothing below names the algorithm type: every choice is inferred from the production resolver,
+/// so the assertions exercise the real resolution path instead of a value built by hand to look
+/// like its result.
 /// </para>
 /// </remarks>
 [TestClass]
@@ -110,8 +109,8 @@ public class MtpTestNodeConverterTestIdTests
     /// The algorithm an MTP run falls back to must be the one the classic path falls back to.
     /// </summary>
     /// <remarks>
-    /// Compares ids rather than algorithm values, because the two paths cannot name a common type:
-    /// the algorithm type is compiled separately into each assembly.
+    /// Compares ids rather than algorithm values so that the assertion runs through the production
+    /// resolution and hashing path end to end, which is what a run actually depends on.
     /// </remarks>
     [TestMethod]
     public void TheDefaultForUnrecognizedValuesMatchesWhatTestCaseWouldHaveUsed()
@@ -276,28 +275,5 @@ public class MtpTestNodeConverterTestIdTests
             Environment.SetEnvironmentVariable(EnvironmentVariable, original);
             TestCase.ResetTestIdAlgorithmCache();
         }
-    }
-
-    /// <summary>
-    /// The managed name properties take part in the seed, so the converter has to seed the hash with
-    /// the same name <see cref="TestCase"/> would use rather than the plain fully qualified name.
-    /// </summary>
-    /// <remarks>
-    /// The two agree today only because this converter never sets those properties. They are not
-    /// interchangeable, and a guard that converts a node and compares against a test case built from
-    /// the converted values cannot see the difference, because both sides would move together. This
-    /// pins the distinction directly instead, so the day the converter starts bridging the managed
-    /// name properties the seed is already correct.
-    /// </remarks>
-    [TestMethod]
-    public void ManagedNamesTakePartInTheIdComputedForATestCase()
-    {
-        TestCase converted = MtpTestNodeConverter.ToTestCase(Node(), Source, testCaseIdAlgorithm: null);
-
-        var managed = new TestCase(converted.FullyQualifiedName, converted.ExecutorUri, converted.Source);
-        managed.SetPropertyValue(TestProperty.Find("TestCase.ManagedType")!, "MtpApp.Tests.SomeOtherType");
-        managed.SetPropertyValue(TestProperty.Find("TestCase.ManagedMethod")!, "SomeOtherMethod");
-
-        Assert.AreNotEqual(converted.Id, managed.Id, "Managed names must feed the id, otherwise seeding with the plain name would be equivalent.");
     }
 }
