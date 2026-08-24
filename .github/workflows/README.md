@@ -178,7 +178,7 @@ App above).
 | [`code-simplifier.md`](./code-simplifier.md) | Daily + issues | Analyzes recently modified code and opens PRs that simplify it while preserving behavior. |
 | [`efficiency-improver.md`](./efficiency-improver.md) | Daily + manual + issues | Identifies and implements energy/compute efficiency improvements (capped at 8 open PRs). |
 | [`repository-quality-improver.md`](./repository-quality-improver.md) | Weekdays + manual | Rotating repository-quality analysis; opens tracking issues. |
-| [`daily-file-diet.md`](./daily-file-diet.md) | Weekdays + manual + issues | Identifies oversized source files and opens actionable refactoring issues. |
+| [`daily-file-diet.md`](./daily-file-diet.md) | Weekdays + manual + issues | Identifies oversized source files and opens actionable refactoring issues. Remembers what it proposed and skips any file proposed in the last 30 days. |
 | [`daily-qa.md`](./daily-qa.md) | Daily (04:00 UTC) + manual + issues | Daily maintenance digest — ad hoc, subjective quality assurance. |
 | [`malicious-code-scan.md`](./malicious-code-scan.md) | Daily + manual | Reviews recent code changes for suspicious patterns indicating malicious or agentic threats. |
 
