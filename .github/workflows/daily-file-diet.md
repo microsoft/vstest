@@ -58,13 +58,15 @@ You propose each file at most once, ever. Remembering what you have already prop
 
 ## Memory
 
-Use persistent repo memory to track every file you have ever proposed for refactoring:
+Use persistent repo memory to track every file you have proposed or excluded:
 
-- **file path**: the exact path of the file you proposed
-- **date**: the date you proposed it
-- **issue number**: the issue you created for it
+- **file path**: the exact path of the file
+- **date**: the date you recorded it
+- **status**: `proposed` or `excluded`
+- **issue number**: required for `proposed`; omit for `excluded`
+- **reason**: required for `excluded`, for example `vendored` or `generated`
 
-Read memory at the **start** of every run; update it at the **end**. Add the file you proposed to memory in the same run that you create the issue for it, so the next run can see it.
+Read memory at the **start** of every run; update it at the **end**. Add a proposed file to memory in the same run that you create its issue. Add an excluded file as soon as you identify it, without an issue number, so the next run skips it.
 
 **Never propose a file that is already recorded in memory**, no matter what happened to the issue afterwards. It does not matter whether that issue is still open, was closed, was merged, was rejected, or expired on its own. Once a file is recorded, it is permanently out of scope for you. Maintainers decide whether to act on a refactoring proposal, and re-filing one they have already seen wastes their time.
 
@@ -138,7 +140,7 @@ Read the candidate and understand its structure:
 head -n 100 <CANDIDATE_FILE>
 ```
 
-The first 100 lines are also your last check on provenance. If the header shows the file is vendored or generated — a `THIRD-PARTY NOTICE` banner, a `Written by <someone>` credit, an upstream URL outside this organisation, or a namespace such as `Jsonite`, `SimpleJSON`, or `NuGetClone` — abandon it, record it in memory as vendored so you never look at it again, and go back to step 2 for the next candidate down the list.
+The first 100 lines are also your last check on provenance. If the header shows the file is vendored or generated — a `THIRD-PARTY NOTICE` banner, a `Written by <someone>` credit, an upstream URL outside this organisation, or a namespace such as `Jsonite`, `SimpleJSON`, or `NuGetClone` — abandon it, record it in memory with status `excluded` and reason `vendored` or `generated`, omit the issue number, and go back to step 2 for the next candidate down the list.
 
 ```bash
 grep -n "^.*class \|^.*interface \|^.*struct \|^.*enum \|^.*record \|public.*static.*void\|public.*static.*async\|public.*void\|public.*async\|private.*void\|private.*async\|internal.*void\|internal.*async" <CANDIDATE_FILE> | head -50
