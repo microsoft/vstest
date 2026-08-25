@@ -132,7 +132,6 @@ https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/maste
 https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/v16.7.0;/TestPlatform.vsix
 https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/master/v16.8.0;/TestPlatform.vsix
 https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/microsoft/vstest/rel/16.9/20210223-02;/TestPlatform.vsix
-https://www.ibm.com/support/knowledgecenter/en/SSEQTP_liberty/com.ibm.websphere.wlp.doc/ae/rwlp_xml_escape.html
 https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.3.0-preview-20190715-02
 https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.3.0-preview-20190828-03
 https://www.nuget.org/packages/Microsoft.TestPlatform.ObjectModel/16.4.0
