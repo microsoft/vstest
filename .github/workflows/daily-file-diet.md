@@ -105,10 +105,10 @@ Both `grep -vE` calls are **case-sensitive**, and they must stay that way. `Test
 
 Also skip test files — focus on non-test production code.
 
-Extract:
+Keep the ranked output for candidate selection. For each entry, extract:
 
-- **File path**: Full path to the largest non-test source file
-- **Line count**: Number of lines in the file
+- **File path**: full path to the non-test source file
+- **Line count**: number of lines in the file
 
 ### 2. Select a Candidate
 
