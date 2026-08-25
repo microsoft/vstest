@@ -1,6 +1,6 @@
 ---
 name: Daily File Diet
-description: Analyzes source files daily to identify oversized files that exceed healthy size thresholds, creating actionable refactoring issues. Remembers previously proposed files so it rotates through the codebase instead of repeating itself.
+description: Analyzes source files daily to identify oversized files that exceed healthy size thresholds, creating actionable refactoring issues. Uses existing proposal issues so it rotates through the codebase instead of repeating itself.
 
 on:
   workflow_dispatch:
@@ -29,9 +29,6 @@ safe-outputs:
 tools:
   github:
     toolsets: [default]
-  cache-memory:
-    - id: proposed-files
-      key: file-diet-proposed-files
   bash:
     - "git"
     - "grep"
@@ -39,9 +36,7 @@ tools:
     - "wc"
     - "head"
     - "sort"
-    - "cat"
     - "date"
-    - "mkdir"
 
 timeout-minutes: 20
 ---
@@ -54,50 +49,30 @@ You are the Daily File Diet Agent - a code health specialist that monitors file 
 
 Analyze the repository's source files to identify the largest file that has **not** been proposed recently, and determine if it requires refactoring. Create an issue only when such a file exceeds healthy size thresholds, providing specific guidance for splitting it into smaller, more focused files.
 
-The workflow keeps a record of what it has already proposed, so that it moves through the codebase instead of asking for the same refactoring every run.
+The workflow uses the existing `[file-diet]` issues as its proposal history, so that it moves through the codebase instead of asking for the same refactoring every run.
 
 ## Current Context
 
 - **Repository**: ${{ github.repository }}
 - **Analysis Date**: $(date +%Y-%m-%d)
 - **Workspace**: ${{ github.workspace }}
-- **Cache Location**: `/tmp/gh-aw/cache-memory-proposed-files/`
 - **Recency Window**: 30 days
 
 ## Analysis Process
 
-### 0. Load Previously Proposed Files
+### 0. Find Recently Proposed Files
 
-Before analyzing anything, read the proposal history from cache memory:
+Before analyzing anything, use the GitHub tools to search this repository for **open and closed issues** whose title starts with `[file-diet]` and whose creation date is within the last **30 days**.
 
-```bash
-cat /tmp/gh-aw/cache-memory-proposed-files/history.json 2>/dev/null
-```
-
-If that prints nothing, the history is empty — this is the first run, or the cache has expired. Treat it as an empty list and carry on; it is not an error.
-
-The history file has this shape:
-
-```json
-{
-  "proposals": [
-    {
-      "file": "src/vstest.console/TestPlatformHelpers/TestRequestManager.cs",
-      "date": "2026-08-20",
-      "issue": 16394,
-      "lines": 1569
-    }
-  ]
-}
-```
-
-Get today's date so you can compare against the recorded dates:
+Get today's date first so you can calculate the beginning of the 30-day window:
 
 ```bash
 date +%Y-%m-%d
 ```
 
-Build the **recently proposed set**: every `file` whose `date` is within the last **30 days**. Note the date and issue number for each, so you can explain your choice. Entries older than 30 days do not exclude a file — they are eligible again.
+Read each matching issue body and extract the path from its `**File**: \`[FILE_PATH]\`` field. Build the **recently proposed set** from those paths. Note the creation date and issue number for each, so you can explain your choice.
+
+Use issue creation time, not update or close time. Include closed issues: closing a proposal does not make the same file immediately eligible again. If no matching issues exist, the recently proposed set is empty.
 
 ### 1. Identify Source Files and Their Sizes
 
@@ -110,8 +85,7 @@ git ls-tree -r --name-only HEAD \
   | grep -E '\.(cs|fs|vb)$' \
   | grep -vE '(Tests?\.|\.Tests|test/|\.Designer\.cs|\.generated\.cs|\.g\.cs)' \
   | xargs wc -l 2>/dev/null \
-  | sort -rn \
-  | head -40
+  | sort -rn
 ```
 
 Also skip test files — focus on non-test production code.
@@ -125,23 +99,23 @@ Extract, for each candidate:
 
 Healthy file size threshold: **500 lines**
 
-Walk the candidate list from largest to smallest and pick the **first file that is not in the recently proposed set** from step 0. That file is your candidate — not necessarily the largest file in the repository.
+First identify every production source file at or above the threshold. Then remove files in the recently proposed set from step 0. From the remaining files, select the largest one as the candidate.
 
-Then apply the threshold and the two stop conditions:
+Apply these stop conditions before creating an issue:
 
-**If the candidate is under 500 lines**, do NOT create an issue. Call the `noop` safe-output tool:
+**If no production source file is 500 lines or larger**, do NOT create an issue. Call the `noop` safe-output tool:
 
 ```json
-{"noop": {"message": "No action needed: all files are healthy. Largest file not proposed in the last 30 days: [FILE_PATH] ([LINE_COUNT] lines)."}}
+{"noop": {"message": "No action needed: every production source file is under 500 lines. Largest file: [FILE_PATH] ([LINE_COUNT] lines)."}}
 ```
 
-**If every candidate at or above 500 lines is in the recently proposed set**, do NOT create an issue and do NOT fall back to proposing one of them again. Call the `noop` safe-output tool:
+**If oversized files exist but every one is in the recently proposed set**, do NOT create an issue and do NOT fall back to proposing one of them again. Call the `noop` safe-output tool:
 
 ```json
 {"noop": {"message": "No action needed: every source file over 500 lines was already proposed in the last 30 days. Most recent: [FILE_PATH] on [DATE] in #[ISSUE_NUMBER]."}}
 ```
 
-**If the candidate is 500 or more lines and is not in the recently proposed set**, proceed to step 3.
+Otherwise, proceed to step 3 with the largest oversized file that is not in the recently proposed set.
 
 ### 3. Analyze the Candidate File's Structure
 
@@ -225,39 +199,9 @@ Based on the file's structure, split it into the following modules:
 **Expected Impact**: Improved code navigability, easier testing, reduced merge conflicts
 ```
 
-### 5. Record the Proposal in Cache Memory
-
-Do this only after `create_issue` succeeds. Append the proposal to the history so the next run does not repeat it:
-
-```bash
-mkdir -p /tmp/gh-aw/cache-memory-proposed-files/
-```
-
-Write `/tmp/gh-aw/cache-memory-proposed-files/history.json`, preserving every existing entry and adding one new entry for this run:
-
-```json
-{
-  "proposals": [
-    {
-      "file": "[FILE_PATH]",
-      "date": "[TODAY in YYYY-MM-DD]",
-      "issue": [ISSUE_NUMBER],
-      "lines": [LINE_COUNT]
-    }
-  ]
-}
-```
-
-Rules for this file:
-
-- **Preserve history**: read the existing entries first and write them back alongside the new one. Never overwrite the file with only the current run.
-- **Record the issue number** returned by `create_issue`, so a maintainer can trace a skip back to the issue that caused it.
-- **Prune entries older than 180 days** to keep the file small. Do not prune anything newer, and never prune to make a file eligible again.
-- If you called `noop` instead of `create_issue`, do not add an entry. Only filed proposals are recorded.
-
 ## Important Guidelines
 
-- **Never propose the same file twice within 30 days**: this is the whole point of the history file. If the only oversized files are recently proposed ones, `noop` is the correct outcome — a repeat issue is not.
+- **Never propose the same file twice within 30 days**: the existing `[file-diet]` issues are the proposal history. If the only oversized files are recently proposed ones, `noop` is the correct outcome — a repeat issue is not.
 - **Only create issues when threshold is exceeded**: Do not create issues for files under 500 lines
 - **Skip generated files**: Ignore files in `artifacts/`, `obj/`, `bin/`, or files with a header indicating they are generated (e.g., "Code generated", "DO NOT EDIT", `.Designer.cs`, `.g.cs`)
 - **Skip vendored third-party code**: Ignore files copied in from another project rather than written here, such as `Json/Jsonite/`, `Utilities/SimpleJSON.cs` and `Nuget.Frameworks/`. Splitting them breaks the ability to take updates from upstream, so a refactoring issue for one is not actionable.
@@ -267,4 +211,4 @@ Rules for this file:
 - **Estimate effort realistically**: Large files with many dependencies may require significant refactoring effort
 - **Always finish with exactly one safe output**: either `create_issue` or `noop`.
 
-Begin your analysis now. Read the proposal history, find the largest source file that has not been proposed in the last 30 days, assess whether it needs refactoring, and create an issue only if one is warranted.
+Begin your analysis now. Read the recent proposal issues, find the largest source file that has not been proposed in the last 30 days, assess whether it needs refactoring, and create an issue only if one is warranted.
