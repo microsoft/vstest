@@ -138,7 +138,6 @@ The Run workflow described above is very common in command line tools, and proba
 - *Discovery* - discovers tests in given test sources, most commonly .NET dlls.
 - *Run* - runs tests from given libraries (test sources) or from a given list of pre-discovered tests.
 - *Session* - starts the runner and waits for requests.
-- *TestSession* - starts a set of testhosts for given test sources, to make the ready to run.
 - *AttachmentProcessing* - processes a given set of attachments that were produced during a previous test run, e.g. merges code coverage files.
 
 ## Communication Protocol
@@ -328,7 +327,7 @@ Versions:
 - 2: Changed serialization from a generic bag that described each property and its type, to explicit properties that are serialized without additional type info.
 - 3: Added AttachDebugger message.
 - 4: Added because version 3 did not update the serialization to use, and it will use v1 serialization (bag) rather than explicit properties. Right side should avoid negotiating 3 and downgrade to 2.
-- 5: Unknown in the core `ProtocolVersioning` table (the source still marks this version as `// 5: ???`). The TranslationLayer defines a private `MinimumProtocolVersionWithTestSessionSupport = 5` in `VsTestConsoleRequestSender`, but the constant is currently unused, so the exact change associated with v5 is unclear from the current source.
+- 5: Added the test session messages, which pre-started a set of testhosts so a later run could reuse them. The feature was experimental and its messages were removed in [microsoft/vstest#16231](https://github.com/microsoft/vstest/pull/16231), so nothing is gated on this version anymore.
 - 6: Added Abort and Cancel with handlers that report the status.
 - 7: Added SkippedDiscoveredSources.
 
@@ -403,8 +402,6 @@ public enum TestMessageLevel
 ### Session
 
 Session starts the runner process, and connects to it. This is used in two ways. First as a way to pre-start Runner before there is any work for it, this is done for example by Visual Studio to have the runner ready to receive work. Or the flow is run just before other requests (e.g. Discovery).
-
-> ⚠️ Do not confuse this with TestSession workflow that pre-starts testhosts.
 
 #### Start Runner process request (Runner)
 
