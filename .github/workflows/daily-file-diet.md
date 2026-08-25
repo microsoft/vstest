@@ -123,8 +123,9 @@ That file is your candidate. Proceed to step 3.
 If no file meets all three conditions — because every large file has already been proposed, or because everything left is under 500 lines — do **not** create an issue. Output a status message instead:
 
 ```text
-✅ All files are healthy! Largest file: [FILE_PATH] ([LINE_COUNT] lines)
-No refactoring needed today.
+✅ No new refactoring candidate found.
+Files at or above 500 lines were already proposed or excluded as generated or vendored; remaining eligible files are below the threshold.
+No issue created today.
 ```
 
 It is completely fine, and often expected, for a run to produce **no issue at all**. The list of files worth refactoring is finite, and once you have proposed them all there is nothing left to say. A quiet run is a correct run. Do not lower the threshold, re-propose a recorded file, or reach for a vendored file to have something to report.
