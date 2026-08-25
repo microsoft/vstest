@@ -48,12 +48,22 @@
        The root .props goes to every TFM folder; the .targets vary by TFM:
          - net8.0   uses netcoreapp\Microsoft.NET.Test.Sdk.targets and the Program.* launcher files
          - net462   uses netfx\Microsoft.NET.Test.Sdk.targets
-         - netcoreapp2.0 / netstandard2.0 use the root Microsoft.NET.Test.Sdk.targets (incompatibility shim) -->
+         - netcoreapp2.0 / netstandard2.0 use the root Microsoft.NET.Test.Sdk.targets (incompatibility shim)
+
+       buildMultiTargeting gets the .props at the folder root, and nothing else. NuGet imports
+       buildMultiTargeting/$(PackageId).props|.targets into the outer build of a multi-targeting
+       project, and the outer build has no $(TargetFramework) to resolve a TFM subfolder against,
+       so anything under buildMultiTargeting/<tfm>/ is never read. That is why the outer build sees
+       no IsTestProject and pack produces a package for test projects (issue #15309).
+
+       No .targets goes there on purpose: the root Microsoft.NET.Test.Sdk.targets is the
+       unsupported-TFM shim, and its InitialTargets error is unconditional, so it would fail every
+       outer build. -->
   <ItemGroup>
     <!-- props (same file for all frameworks). Forward slashes: MSBuild Pack only treats a trailing OS directory
          separator as a folder marker, so a trailing '\' is honored on Windows but not on Linux (the VMR vertical
          build), where the files would be mis-placed (NU5129). '/' is a directory separator on both. -->
-    <None Include="Microsoft.NET.Test.Sdk.props" Pack="true" PackagePath="build/net8.0/;build/net462/;build/netcoreapp2.0/;build/netstandard2.0/;buildMultiTargeting/net8.0/;buildMultiTargeting/net462/;buildMultiTargeting/netcoreapp2.0/;buildMultiTargeting/netstandard2.0/" />
+    <None Include="Microsoft.NET.Test.Sdk.props" Pack="true" PackagePath="build/net8.0/;build/net462/;build/netcoreapp2.0/;build/netstandard2.0/;buildMultiTargeting/" />
 
     <!-- net8.0 targets + launcher program files -->
     <None Include="netcoreapp\Microsoft.NET.Test.Sdk.targets" Pack="true" PackagePath="build/net8.0/" />
@@ -65,7 +75,7 @@
     <None Include="netfx\Microsoft.NET.Test.Sdk.targets" Pack="true" PackagePath="build/net462/" />
 
     <!-- netcoreapp2.0 / netstandard2.0 incompatibility-shim targets (root targets file) -->
-    <None Include="Microsoft.NET.Test.Sdk.targets" Pack="true" PackagePath="build/netcoreapp2.0/;build/netstandard2.0/;buildMultiTargeting/netcoreapp2.0/;buildMultiTargeting/netstandard2.0/" />
+    <None Include="Microsoft.NET.Test.Sdk.targets" Pack="true" PackagePath="build/netcoreapp2.0/;build/netstandard2.0/" />
 
     <!-- Empty lib stubs (no assembly is shipped). lib/native/_._ marks the package compatible with
          native (C++) test projects. Note: the previous nuspec also declared an empty native0.0
