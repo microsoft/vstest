@@ -79,7 +79,7 @@ The following files have already been proposed. Record them in memory with statu
 
 Merge this list into memory on your first run, then keep extending memory as normal.
 
-**Important**: Memory may not be 100% accurate. Issues may have been created, closed, or commented on since your last run. Verify memory against the current repository state before acting on it. If memory is missing or unreadable, fall back to the seed list above and to a GitHub search for existing `[file-diet]` issues, including **closed** ones, before proposing anything.
+**Important**: Memory may not be 100% accurate. Issues may have been created, closed, or commented on since your last run. Verify memory against the current repository state before acting on it. If memory is missing or unreadable, fall back to the seed list above. Before proposing each candidate, search for existing `[file-diet]` issues containing that candidate's exact file path, including **closed** issues, and skip the candidate if you find one.
 
 ## Analysis Process
 
@@ -94,7 +94,7 @@ git ls-tree -r --name-only HEAD \
   | grep -E '\.(cs|fs|vb)$' \
   | grep -vE '(Tests?\.|\.Tests|test/|\.Designer\.cs|\.generated\.cs|\.g\.cs)' \
   | grep -vE '(Nuget\.Frameworks/|NuGetClone|/Jsonite/|SimpleJSON\.cs)' \
-  | xargs wc -l 2>/dev/null \
+  | xargs -n 1 wc -l 2>/dev/null \
   | sort -rn \
   | head -20
 ```
