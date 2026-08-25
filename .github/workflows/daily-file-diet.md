@@ -70,7 +70,7 @@ Read memory at the **start** of every run; update it at the **end**. Add a propo
 
 **Never propose a file that is already recorded in memory**, no matter what happened to the issue afterwards. It does not matter whether that issue is still open, was closed, was merged, was rejected, or expired on its own. Once a file is recorded, it is permanently out of scope for you. Maintainers decide whether to act on a refactoring proposal, and re-filing one they have already seen wastes their time.
 
-The following files have already been proposed and are recorded as if they were in memory. Treat them as excluded on every run, including the first run after this list was added:
+The following files have already been proposed. Record them in memory with status `proposed`, preserving the issue references below, and treat them as permanently out of scope on every run, including the first run after this list was added:
 
 | File | Proposed |
 |---|---|
