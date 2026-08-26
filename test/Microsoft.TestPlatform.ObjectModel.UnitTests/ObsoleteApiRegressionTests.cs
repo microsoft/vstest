@@ -33,7 +33,8 @@ public class ObsoleteApiRegressionTests
 
         Assert.IsNotNull(obsolete);
         Assert.IsTrue(obsolete.IsError, "IDataCollectorAttachments must stay obsolete as an error.");
-        Assert.Contains(nameof(IDataCollectorAttachmentProcessor), obsolete.Message!);
+        Assert.IsNotNull(obsolete.Message, "The obsoletion must keep carrying a message that names the replacement.");
+        Assert.Contains(nameof(IDataCollectorAttachmentProcessor), obsolete.Message);
     }
 
     [TestMethod]
@@ -62,7 +63,8 @@ public class ObsoleteApiRegressionTests
 
         Assert.IsNotNull(obsolete);
         Assert.IsTrue(obsolete.IsError, "RunConfiguration.TargetFrameworkVersion must stay obsolete as an error.");
-        Assert.Contains(nameof(RunConfiguration.TargetFramework), obsolete.Message!);
+        Assert.IsNotNull(obsolete.Message, "The obsoletion must keep carrying a message that names the replacement.");
+        Assert.Contains(nameof(RunConfiguration.TargetFramework), obsolete.Message);
     }
 
     [TestMethod]
@@ -71,12 +73,20 @@ public class ObsoleteApiRegressionTests
         // Assemblies compiled against an older ObjectModel still call these accessors, so the shim must keep
         // working. Looked up by name so that this test needs no [Obsolete] marker of its own.
         var runConfiguration = new RunConfiguration();
-        var property = typeof(RunConfiguration).GetProperty("TargetFrameworkVersion")!;
+        var property = typeof(RunConfiguration).GetProperty("TargetFrameworkVersion");
+
+        Assert.IsNotNull(property, "The property must stay on the type so that existing compiled callers still bind to it.");
 
         property.SetValue(runConfiguration, FrameworkVersion.Framework45);
 
-        Assert.AreEqual(Framework.FromString("Framework45")!.Name, runConfiguration.TargetFramework!.Name);
-        Assert.AreEqual(FrameworkVersion.Framework45, (FrameworkVersion)property.GetValue(runConfiguration)!);
+        var expected = Framework.FromString("Framework45");
+        Assert.IsNotNull(expected, "Framework.FromString must keep resolving Framework45.");
+        Assert.IsNotNull(runConfiguration.TargetFramework, "Setting TargetFrameworkVersion must keep populating TargetFramework.");
+        Assert.AreEqual(expected.Name, runConfiguration.TargetFramework.Name);
+
+        var actual = property.GetValue(runConfiguration);
+        Assert.IsNotNull(actual, "The TargetFrameworkVersion getter must keep returning the value that was set.");
+        Assert.AreEqual(FrameworkVersion.Framework45, (FrameworkVersion)actual);
     }
 
     [TestMethod]
@@ -95,7 +105,10 @@ public class ObsoleteApiRegressionTests
 
         var runConfiguration = XmlRunSettingsUtilities.GetRunConfigurationNode(settingsXml);
 
-        Assert.AreEqual(Framework.FromString("Framework45")!.Name, runConfiguration.TargetFramework!.Name);
+        var expected = Framework.FromString("Framework45");
+        Assert.IsNotNull(expected, "Framework.FromString must keep resolving Framework45.");
+        Assert.IsNotNull(runConfiguration.TargetFramework, "The <TargetFrameworkVersion> element must keep populating TargetFramework.");
+        Assert.AreEqual(expected.Name, runConfiguration.TargetFramework.Name);
         Assert.Contains("<TargetFrameworkVersion>", runConfiguration.ToXml().OuterXml);
     }
 }
