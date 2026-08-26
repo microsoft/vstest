@@ -6,6 +6,8 @@
     #href: concepts.md
 - name: Environment Variables
   href: environment-variables.md
+- name: Diagnostic IDs
+  href: diagnostics.md
 - name: Contribute
   href: contribute.md
 - name: Release Notes

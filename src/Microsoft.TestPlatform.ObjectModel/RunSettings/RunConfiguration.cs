@@ -273,7 +273,11 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
     /// </summary>
-    [Obsolete("Use TargetFramework instead")]
+#if NET
+    [Obsolete("Use TargetFramework instead", error: false, DiagnosticId = "TPVS004", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs004")]
+#else
+    [Obsolete("Use TargetFramework instead", error: false)]
+#endif
     public FrameworkVersion TargetFrameworkVersion
     {
         get => _framework?.Name switch

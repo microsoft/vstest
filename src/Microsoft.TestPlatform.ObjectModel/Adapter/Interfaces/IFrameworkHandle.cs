@@ -18,7 +18,11 @@ public interface IFrameworkHandle : ITestExecutionRecorder, IMessageLogger
     /// and should be used only when absolutely required as using it degrades the performance of the subsequent run.
     /// It throws InvalidOperationException when it is attempted to be enabled when keepAlive is false.
     /// </summary>
+#if NET
+    [Obsolete("This property has no effect", error: false, DiagnosticId = "TPVS006", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs006")]
+#else
     [Obsolete("This property has no effect", error: false)]
+#endif
     bool EnableShutdownAfterTestRun { get; set; }
 
     /// <summary>

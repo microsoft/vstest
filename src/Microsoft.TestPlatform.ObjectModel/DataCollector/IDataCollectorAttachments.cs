@@ -9,7 +9,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 /// <summary>
 /// Interface for data collectors add-ins that choose to handle attachment(s) generated
 /// </summary>
-[Obsolete("Interface is deprecated. Please use IDataCollectorAttachmentProcessor instead")]
+#if NET
+[Obsolete("Interface is deprecated. Please use IDataCollectorAttachmentProcessor instead", error: false, DiagnosticId = "TPVS003", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs003")]
+#else
+[Obsolete("Interface is deprecated. Please use IDataCollectorAttachmentProcessor instead", error: false)]
+#endif
 public interface IDataCollectorAttachments
 {
     /// <summary>

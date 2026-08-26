@@ -13,7 +13,18 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 /// <summary>
 /// Controller for various test operations on the test runner.
 /// </summary>
+///
+/// <remarks>
+/// This interface still inherits the obsolete <see cref="IVsTestConsoleWrapperAsync"/> on purpose: dropping
+/// the base interface would be a binary breaking change for the shipped Translation Layer contract. The
+/// inherited asynchronous members stay individually obsolete, so consumers reaching them through this
+/// interface keep getting a deprecation warning.
+/// </remarks>
+// TPVS001 is only emitted on .NET, where ObsoleteAttribute.DiagnosticId is available; CS0618 covers the
+// .NET Framework and netstandard2.0 builds. Both are suppressed here because the inheritance is deliberate.
+#pragma warning disable CS0618, TPVS001
 public interface IVsTestConsoleWrapper : IVsTestConsoleWrapperAsync
+#pragma warning restore CS0618, TPVS001
 {
     /// <summary>
     /// Starts the test runner process and readies for requests.
