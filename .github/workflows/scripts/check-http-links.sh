@@ -53,13 +53,13 @@ BROKEN_LINKS="$OUT_DIR/broken-links.txt"
 } > "$RESULTS"
 
 if [ "$#" -gt 0 ]; then
-  MARKDOWN_FILES="$*"
+  MARKDOWN_FILES=("$@")
 else
   echo "Finding all markdown files..."
-  MARKDOWN_FILES=$(find docs README.md -type f -name "*.md" 2>/dev/null || echo "")
+  mapfile -d '' -t MARKDOWN_FILES < <(find docs README.md -type f -name "*.md" -print0 2>/dev/null)
 fi
 
-if [ -z "$MARKDOWN_FILES" ]; then
+if [ "${#MARKDOWN_FILES[@]}" -eq 0 ]; then
   echo "No markdown files found"
   if [ -n "${GITHUB_OUTPUT:-}" ]; then echo "no_files=true" >> "$GITHUB_OUTPUT"; fi
   exit 0
@@ -70,7 +70,7 @@ fi
   echo ""
 } >> "$RESULTS"
 
-for file in $MARKDOWN_FILES; do
+for file in "${MARKDOWN_FILES[@]}"; do
   echo "Checking $file..."
   # Extract markdown links [text](url)
   grep -oP '\[([^\]]+)\]\(([^\)]+)\)' "$file" | grep -oP '\(([^\)]+)\)' | tr -d '()' >> "$ALL_LINKS" 2>/dev/null || true

@@ -141,20 +141,26 @@ After processing all broken links:
 
 ## Step 5: Create Pull Request or Noop
 
-Based on your work:
+After processing the links, run the checker again and update the accepted fingerprint:
 
-**If you fixed any links:**
-- Use the `create-pull-request` safe output to create a PR with your fixes
+```bash
+.github/workflows/scripts/check-http-links.sh
+cp /tmp/gh-aw/agent/broken-links.txt .github/workflows/scripts/known-broken-links.txt
+```
+
+This fingerprint update records both fixed links and reviewed unfixable links, so the weekly probe does not dispatch the same work again.
+
+**If the working tree changed:**
+- Use the `create-pull-request` safe output to create a PR with the fixes and updated fingerprint
 - In the PR body, include:
   - A summary of how many links were fixed
   - A list of the broken links and their replacements
-  - Any links that were added to the unfixable list
+  - Any links that remain broken and why they could not be fixed
 - Title format: "Fix broken documentation links"
 
-**If no links needed fixing:**
+**If the working tree did not change:**
 - Use the `noop` safe output with a clear message like:
-  - "All documentation links are working correctly" (if no broken links found)
-  - "All broken links are in the unfixable list, no new fixes available" (if broken links exist but can't be fixed)
+  - "The broken-link fingerprint is already current"
 
 ## Important Guidelines
 
@@ -163,7 +169,7 @@ Based on your work:
 - **Document everything:** Keep the cache memory up to date with unfixable links
 - **Be selective:** Only add links to the unfixable list if you've genuinely tried to find alternatives
 - **Use web-fetch wisely:** Try to fetch the broken URL and check for redirects or alternatives
-- **Relative links:** The link checker validates relative file links and anchors too. For broken relative links, check if the target file was renamed or moved and update the path accordingly. For broken anchors, check if the heading was renamed and update the anchor to match.
+- **Scope:** This workflow checks absolute HTTP(S) links. The `md-link-checker` workflow checks relative file links and anchors.
 
 ## Example Cache Memory Update
 
