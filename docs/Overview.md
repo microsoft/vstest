@@ -580,7 +580,7 @@ public class DiscoveryRequestPayload
         set;
     }
 
-    // A set of pre-started testhosts that this request should use.
+    // Retained for binary and wire compatibility. Test sessions are no longer supported.
     public TestSessionInfo? TestSessionInfo { get; set; }
 }
 ```
@@ -757,7 +757,7 @@ public class DiscoveryCriteria
     // dependent.
     public string? TestCaseFilter { get; set; }
 
-    // TestSession (pre-started testhosts) on which this discovery should happen.
+    // Retained for binary and wire compatibility. Test sessions are no longer supported.
     public TestSessionInfo? TestSessionInfo { get; set; }
 }
 ```
@@ -1036,7 +1036,7 @@ public class TestRunRequestPayload
     // Test platform options.
     public TestPlatformOptions? TestPlatformOptions { get; set; }
 
-    // The set of pre-started testhosts on which this run should try to run.
+    // Retained for binary and wire compatibility. Test sessions are no longer supported.
     public TestSessionInfo? TestSessionInfo { get; set; }
 }
 ```
@@ -1954,12 +1954,13 @@ The operations you can call on `IVsTestConsoleWrapper` are:
 - `InitializeExtensions(IEnumerable<string> pathToAdditionalExtensions)` - registers extra
   extension DLLs (adapters, loggers, data collectors) by full path before discovery/execution.
 - `DiscoverTests(...)` - discovers tests in the given sources. Overloads accept an optional
-  `TestPlatformOptions` and `TestSessionInfo`, and report results through an
-  `ITestDiscoveryEventsHandler` (legacy) or `ITestDiscoveryEventsHandler2`.
+  `TestPlatformOptions` and report results through an `ITestDiscoveryEventsHandler` (legacy) or
+  `ITestDiscoveryEventsHandler2`. Overloads with `TestSessionInfo` remain for binary compatibility,
+  but test sessions are no longer supported.
 - `RunTests(...)` - runs tests, selected either by `sources` (assemblies) or by an explicit
-  list of `TestCase` objects. Overloads accept `TestPlatformOptions`, a `TestSessionInfo`
-  (to run against a pre-warmed test session), an `ITestRunEventsHandler`, and optionally an
-  `ITelemetryEventsHandler`.
+  list of `TestCase` objects. Overloads accept `TestPlatformOptions`, an `ITestRunEventsHandler`,
+  and optionally an `ITelemetryEventsHandler`. Overloads with `TestSessionInfo` remain for binary
+  compatibility, but test sessions are no longer supported.
 - `RunTestsWithCustomTestHost(...)` - same as `RunTests`, but the testhost process is
   launched by a caller-supplied `ITestHostLauncher`. This is how IDEs attach a debugger to
   the testhost or otherwise control how it is started.
