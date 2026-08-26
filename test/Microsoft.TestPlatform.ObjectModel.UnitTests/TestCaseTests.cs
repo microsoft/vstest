@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -14,7 +14,7 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 public class TestCaseTests
 {
     private readonly TestCase _testCase;
-    private string? _originalAlgorithm;
+    private string? _originalFlag;
 
     public TestCaseTests()
     {
@@ -22,22 +22,27 @@ public class TestCaseTests
     }
 
     // The ids below are pinned to the default algorithm, so make sure an ambient
-    // VSTEST_TESTCASE_ID_ALGORITHM on the developer's machine cannot change what they assert.
-    // TestCase.Id is computed lazily on first access, so doing this after the constructor is fine.
+    // VSTEST_DISABLE_XXHASH128_TESTCASE_ID on the developer's machine cannot change what they
+    // assert. TestCase.Id is computed lazily on first access, so doing this after the constructor is
+    // fine.
     [TestInitialize]
     public void ForceDefaultTestIdAlgorithm()
     {
-        _originalAlgorithm = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable);
-        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, null);
-        TestCase.ResetTestIdAlgorithmCache();
+        _originalFlag = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag);
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag, null);
+        ResetFeatureFlagCache();
     }
 
     [TestCleanup]
     public void RestoreTestIdAlgorithm()
     {
-        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, _originalAlgorithm);
-        TestCase.ResetTestIdAlgorithmCache();
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag, _originalFlag);
+        ResetFeatureFlagCache();
     }
+
+#pragma warning disable CS0618 // ResetFeatureFlagCacheForTesting is what its name says it is.
+    private static void ResetFeatureFlagCache() => TestCase.ResetFeatureFlagCacheForTesting();
+#pragma warning restore CS0618
 
     [TestMethod]
     public void TestCaseIdIfNotSetExplicitlyShouldReturnGuidBasedOnSourceAndName()

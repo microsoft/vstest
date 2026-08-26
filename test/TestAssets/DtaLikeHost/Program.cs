@@ -15,12 +15,12 @@ internal static class Program
 {
     private static int Main()
     {
-        // Selects the xxHash128 test id algorithm. This has to happen before anything touches
-        // TestCase.Id: the algorithm is resolved from the environment on first use and cached for
-        // the lifetime of the process. It also has to happen at all - with the SHA1 default the
-        // Span-using xxHash code is never JIT-compiled, so a System.Memory binding break would go
-        // completely unnoticed by this host.
-        Environment.SetEnvironmentVariable("VSTEST_TESTCASE_ID_ALGORITHM", "xxhash128");
+        // Opts in to the xxHash128 test id algorithm. This has to happen before anything touches
+        // TestCase.Id: the feature flag is read on first use and cached for the lifetime of the
+        // process. It also has to happen at all - with the SHA1 default the Span-using xxHash code
+        // is never JIT-compiled, so a System.Memory binding break would go completely unnoticed by
+        // this host.
+        Environment.SetEnvironmentVariable("VSTEST_DISABLE_XXHASH128_TESTCASE_ID", "0");
 
         // Report what Common.dll expects and what we ship next to it, so the mismatch
         // (or agreement) is visible in the console output regardless of whether the
@@ -90,12 +90,13 @@ internal static class Program
         Guid xxHashId;
         try
         {
-            // TestCase.Id resolves the algorithm from VSTEST_TESTCASE_ID_ALGORITHM and, for
-            // xxhash128, goes through EqtHash.GuidFromStringXxHash128 -> XxHash128 -> Span<T>, which forces
-            // the CLR to resolve System.Memory at the version baked into ObjectModel.dll's metadata.
+            // TestCase.Id resolves the algorithm from VSTEST_DISABLE_XXHASH128_TESTCASE_ID and, when
+            // xxHash128 is opted in to, goes through EqtHash.GuidFromStringXxHash128 -> XxHash128 ->
+            // Span<T>, which forces the CLR to resolve System.Memory at the version baked into
+            // ObjectModel.dll's metadata.
             var testCase = new TestCase("SomeNamespace.SomeClass.SomeTest", new Uri("executor://dta-like-host"), "SomeTests.dll");
             id = testCase.Id;
-            Console.WriteLine($"TestCase.Id (xxhash128 selected): {id}");
+            Console.WriteLine($"TestCase.Id (xxhash128 opted in): {id}");
 
             // Exercise both hashes directly as well, so the two ids can be compared in-process.
             const string seed = "dta-like-host";

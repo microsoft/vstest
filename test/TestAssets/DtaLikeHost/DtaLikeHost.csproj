@@ -24,9 +24,9 @@
     2. System.Memory, via ObjectModel.dll. Computing a test case id with the xxHash128
        algorithm goes through the vendored xxHash128 implementation, which uses Span<T> and
        BinaryPrimitives - neither of which .NET Framework ships inbox. Note that this only
-       happens when the algorithm is actually selected: with the SHA1 default the Span-using
-       code is never JIT-compiled and the dependency is never resolved, so the host selects
-       xxhash128 explicitly and then asserts System.Memory really loaded.
+       happens when xxHash128 is actually in use: with the SHA1 default the Span-using code
+       is never JIT-compiled and the dependency is never resolved, so the host opts in with
+       VSTEST_DISABLE_XXHASH128_TESTCASE_ID=0 and then asserts System.Memory really loaded.
 
     With the fix, each of those assemblies' metadata references match the DLLs that ship next
     to ours, so hosts without binding redirects can load them without FileLoadException.

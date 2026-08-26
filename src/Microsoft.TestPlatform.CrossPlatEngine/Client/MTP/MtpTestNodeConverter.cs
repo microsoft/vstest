@@ -76,9 +76,9 @@ internal static class MtpTestNodeConverter
     /// runsettings variables populate. MTP applications are their own host and their nodes are
     /// converted here, in the runner, which never receives those variables, so the runner has to
     /// read the declared value itself and pass the choice to the test case.
-    /// Returns <see langword="null"/> when the run does not declare the variable, so the test case
-    /// falls back to the runner's own environment and the classic default. Declaring it explicitly
-    /// wins, so a runsettings value overrides an inherited one rather than silently agreeing with it.
+    /// Returns <see langword="null"/> when the run does not declare the flag, so the test case falls
+    /// back to the runner's own environment and the platform default. Declaring it explicitly wins,
+    /// so a runsettings value overrides an inherited one rather than silently agreeing with it.
     /// </remarks>
     public static TestCaseIdAlgorithm? ResolveTestCaseIdAlgorithm(IDictionary<string, string?>? runSettingsEnvironmentVariables)
         => TestCaseIdAlgorithmResolver.ResolveDeclared(runSettingsEnvironmentVariables);

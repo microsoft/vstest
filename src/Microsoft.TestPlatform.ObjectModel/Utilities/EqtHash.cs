@@ -64,8 +64,8 @@ public static class EqtHash
     /// <para>
     /// This deliberately does NOT produce the same value as <see cref="GuidFromString(string)"/>.
     /// Changing the id of a test is a breaking change for anything that stored it, which is why this
-    /// ships available but not default: test case ids are computed with it only when a run selects it
-    /// through the VSTEST_TESTCASE_ID_ALGORITHM switch. The warning on
+    /// ships available but not default: test case ids are computed with it only when a run opts in
+    /// through the VSTEST_DISABLE_XXHASH128_TESTCASE_ID feature flag. The warning on
     /// <see cref="GuidFromString(string)"/> about work item association requiring sign off from the
     /// TC-TA feature owners applies to making this the default.
     /// </para>

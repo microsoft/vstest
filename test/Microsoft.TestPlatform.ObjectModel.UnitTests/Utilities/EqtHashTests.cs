@@ -23,24 +23,29 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 [DoNotParallelize]
 public class EqtHashTests
 {
-    private string? _originalAlgorithm;
+    private string? _originalFlag;
 
-    // TestCase_Id_UsesGuidFromStringXxHash128_WhenXxHash128IsSelected drives TestCase through the algorithm
-    // switch, so pin the switch here rather than inheriting whatever the developer's machine has set.
+    // TestCase_Id_UsesGuidFromStringXxHash128_WhenXxHash128IsSelected drives TestCase through the
+    // feature flag, so pin the flag here rather than inheriting whatever the developer's machine has
+    // set.
     [TestInitialize]
     public void SelectXxHash128TestIdAlgorithm()
     {
-        _originalAlgorithm = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable);
-        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, TestCase.XxHash128AlgorithmName);
-        TestCase.ResetTestIdAlgorithmCache();
+        _originalFlag = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag);
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag, TestCase.XxHash128OptInValue);
+        ResetFeatureFlagCache();
     }
 
     [TestCleanup]
     public void RestoreTestIdAlgorithm()
     {
-        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, _originalAlgorithm);
-        TestCase.ResetTestIdAlgorithmCache();
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag, _originalFlag);
+        ResetFeatureFlagCache();
     }
+
+#pragma warning disable CS0618 // ResetFeatureFlagCacheForTesting is what its name says it is.
+    private static void ResetFeatureFlagCache() => TestCase.ResetFeatureFlagCacheForTesting();
+#pragma warning restore CS0618
 
     [TestMethod]
     [DataRow("", "19aa06d3-0147-88d8-a001-c324468d497f")]

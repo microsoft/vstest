@@ -16,9 +16,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 ///   1. <see cref="Microsoft.VisualStudio.TestPlatform.Common.Filtering.FilterExpressionWrapper"/>,
 ///      which triggers <c>FastFilter.Builder</c> and forces <c>System.Collections.Immutable</c> /
 ///      <c>System.Reflection.Metadata</c> to load.
-///   2. <c>TestCase.Id</c> with <c>VSTEST_TESTCASE_ID_ALGORITHM=xxhash128</c>, which goes through
-///      the vendored xxHash128 implementation and forces <c>System.Memory</c> to load. The
-///      algorithm has to be selected explicitly: with the SHA1 default the <c>Span&lt;T&gt;</c>
+///   2. <c>TestCase.Id</c> with <c>VSTEST_DISABLE_XXHASH128_TESTCASE_ID=0</c>, which goes through
+///      the vendored xxHash128 implementation and forces <c>System.Memory</c> to load. xxHash128
+///      has to be opted in to explicitly: with the SHA1 default the <c>Span&lt;T&gt;</c>
 ///      using code is never JIT-compiled, so the dependency is never resolved and a break in it
 ///      would go unnoticed.
 ///
