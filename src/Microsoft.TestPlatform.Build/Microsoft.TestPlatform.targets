@@ -32,7 +32,7 @@ Copyright (c) .NET Foundation. All rights reserved.
     <!-- Fallback to this old view when terminal logger is not enabled (_MSBUILDTLENABLED==0) , or when user explicitly opts out (VsTestUseMSBuildOutput != true) -->
     <CallTarget Targets="_VSTestConsole" Condition="'$(_MSBUILDTLENABLED)' == '0' OR '$(VsTestUseMSBuildOutput)' != 'true' OR '$(MSBUILDENSURESTDOUTFORTASKPROCESSES)' == '1'" />
     <!-- Proper MSBuild integration, but no custom colorization -->
-    <!-- Use the new view whe terminal logger is enabled (_MSBUILDTLENABLED==0), and user did not opt out (VsTestUseMSBuildOutput == true) -->
+    <!-- Use the new view when terminal logger is enabled (_MSBUILDTLENABLED==1), and user did not opt out (VsTestUseMSBuildOutput == true) -->
     <CallTarget Targets="_VSTestMSBuild" Condition="'$(_MSBUILDTLENABLED)' == '1' AND '$(VsTestUseMSBuildOutput)' == 'true'" />
   </Target>
 
