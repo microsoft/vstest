@@ -35,6 +35,11 @@
 
 set -uo pipefail
 
+if ! printf '\n' | grep -P '' >/dev/null 2>&1; then
+  echo "Error: check-http-links.sh requires grep with PCRE (-P) support." >&2
+  exit 1
+fi
+
 OUT_DIR="${OUT_DIR:-/tmp/gh-aw/agent}"
 mkdir -p "$OUT_DIR"
 
