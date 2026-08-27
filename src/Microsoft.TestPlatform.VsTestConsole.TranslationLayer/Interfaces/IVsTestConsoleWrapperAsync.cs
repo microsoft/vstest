@@ -17,40 +17,36 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 /// </summary>
 ///
 /// <remarks>
-/// The whole interface is obsolete: none of the asynchronous operations it declares actually run
-/// asynchronously, so consumers should use the synchronous <see cref="IVsTestConsoleWrapper"/> API instead.
-/// The interface-level attribute flags direct references to this type; the per-member attributes are kept
-/// deliberately, because the C# compiler does not report the interface-level obsoletion when a member is
-/// invoked through the derived <see cref="IVsTestConsoleWrapper"/>, which is how virtually every consumer
-/// reaches these methods.
+/// The type is obsolete as a reference: consumers should name the derived <see cref="IVsTestConsoleWrapper"/>
+/// instead, which exposes every member declared here. Most of those members are individually deprecated on top
+/// of that, because the asynchronous operation they promise does not actually happen, and each one carries its
+/// own attribute naming the synchronous replacement.
 /// <para>
-/// The interface-level attribute is new, so code that names this type directly gets a warning it did not get
-/// before, on every target framework. That includes the two <c>ProcessTestRunAttachmentsAsync</c> overloads
-/// below, which stay undeprecated because they have no synchronous replacement; a consumer that only needs
-/// those should hold an <see cref="IVsTestConsoleWrapper"/> rather than this interface. Nothing here is a
-/// binary breaking change and every attribute uses <c>error: false</c>.
+/// The per-member attributes below are kept deliberately rather than replaced by this one. The C# compiler
+/// does not report an interface-level obsoletion when a member is invoked through the derived
+/// <see cref="IVsTestConsoleWrapper"/>, which is how virtually every consumer reaches these methods, so
+/// removing them would silence the warning for almost everybody. The two attributes cover different call
+/// shapes: this one flags code that names <c>IVsTestConsoleWrapperAsync</c> directly, the member ones flag
+/// the calls themselves.
 /// </para>
 /// <para>
-/// <c>ObsoleteAttribute.DiagnosticId</c> only exists on .NET 5 and newer, so the TPVS001 id is applied under
-/// <c>#if NET</c>. Consumers of the .NET Framework and netstandard2.0 assemblies keep getting plain CS0618
-/// rather than TPVS001.
+/// The two <c>ProcessTestRunAttachmentsAsync</c> overloads are the exception: they genuinely run
+/// asynchronously and have no synchronous replacement, so they carry no member-level attribute. They are still
+/// reachable, without any warning, through <see cref="IVsTestConsoleWrapper"/> — which is what code that only
+/// wants them should reference, since naming this interface warns regardless of which member is used.
+/// </para>
+/// <para>
+/// This is not a binary breaking change, and <c>error: false</c> keeps it a warning. Code that names this type
+/// directly does get a warning it did not get before.
 /// </para>
 /// </remarks>
-#if NET
-[Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-[Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+[Obsolete("Reference IVsTestConsoleWrapper instead, which declares the same members.", error: false)]
 public interface IVsTestConsoleWrapperAsync
 {
     /// <summary>
     /// Asynchronous equivalent of <see cref="IVsTestConsoleWrapper.StartSession"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task StartSessionAsync();
 
     /// <summary>
@@ -58,11 +54,7 @@ public interface IVsTestConsoleWrapperAsync
     /// IVsTestConsoleWrapper.InitializeExtensions(
     ///     IEnumerable{string})"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task InitializeExtensionsAsync(IEnumerable<string> pathToAdditionalExtensions);
 
     /// <summary>
@@ -72,11 +64,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestDiscoveryEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
@@ -90,11 +78,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestDiscoveryEventsHandler2)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
@@ -110,11 +94,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestDiscoveryEventsHandler2)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task DiscoverTestsAsync(
         IEnumerable<string> sources,
         string? discoverySettings,
@@ -125,11 +105,7 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.CancelDiscovery"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void CancelDiscovery();
 
     /// <summary>
@@ -139,11 +115,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -157,11 +129,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -177,11 +145,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -199,11 +163,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITelemetryEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -219,11 +179,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     string,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -237,11 +193,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestPlatformOptions,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -257,11 +209,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     TestSessionInfo,
     ///     ITestRunEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -279,11 +227,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITelemetryEventsHandler)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -300,11 +244,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -320,11 +260,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -342,11 +278,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -366,11 +298,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITelemetryEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<string> sources,
         string? runSettings,
@@ -388,11 +316,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -408,11 +332,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -430,11 +350,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITestRunEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -454,11 +370,7 @@ public interface IVsTestConsoleWrapperAsync
     ///     ITelemetryEventsHandler,
     ///     ITestHostLauncher)"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     Task RunTestsWithCustomTestHostAsync(
         IEnumerable<TestCase> testCases,
         string? runSettings,
@@ -471,21 +383,13 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.CancelTestRun"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void CancelTestRun();
 
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.AbortTestRun"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void AbortTestRun();
 
     /// <summary>
@@ -533,10 +437,6 @@ public interface IVsTestConsoleWrapperAsync
     /// <summary>
     /// See <see cref="IVsTestConsoleWrapper.EndSession"/>.
     /// </summary>
-#if NET
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false, DiagnosticId = "TPVS001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md#tpvs001")]
-#else
-    [Obsolete("The async APIs don't work, use the sync API instead.", error: false)]
-#endif
+    [Obsolete("The async APIs don't work, use the sync API instead.")]
     void EndSession();
 }

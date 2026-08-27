@@ -28,11 +28,9 @@ public class TraitCollection : IEnumerable<Trait>
     /// <c>TraitCollectionRegressionTests.TraitsProperty_HasHiddenAndTraitAttributes</c> guards the serialized
     /// value against drift.
     /// </remarks>
-    // TPVS005 is only emitted on .NET, where ObsoleteAttribute.DiagnosticId is available; CS0618 covers the
-    // .NET Framework and netstandard2.0 builds.
-#pragma warning disable CS0618, TPVS005
+#pragma warning disable CS0618 // TestPropertyAttributes.Trait is obsolete; named here so the enum stays the source of truth.
     internal const TestPropertyAttributes TraitAttribute = TestPropertyAttributes.Trait;
-#pragma warning restore CS0618, TPVS005
+#pragma warning restore CS0618
 
     private static readonly TestProperty TraitsProperty = TestProperty.Register(
         TraitPropertyId,

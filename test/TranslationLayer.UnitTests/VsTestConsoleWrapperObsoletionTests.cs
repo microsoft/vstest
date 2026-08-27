@@ -10,7 +10,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // This file deliberately references the deprecated interface it guards.
-#pragma warning disable CS0618, TPVS001
+#pragma warning disable CS0618
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests;
 
@@ -25,32 +25,13 @@ public class VsTestConsoleWrapperObsoletionTests
     /// </summary>
     ///
     /// <remarks>
-    /// Deprecating them would emit a brand new <c>CS0618</c> at every call site that goes through
-    /// <see cref="IVsTestConsoleWrapper"/>, which builds with warnings as errors would fail on. That belongs
-    /// with the breaking changes of the deprecation clean up, so the gap is pinned here instead of closed.
+    /// Unlike their siblings these two genuinely run asynchronously and have no synchronous replacement to
+    /// name, so deprecating them is an API decision rather than hygiene. It would also emit a brand new
+    /// <c>CS0618</c> at every in-repo call site that goes through <see cref="IVsTestConsoleWrapper"/>, which
+    /// builds with warnings as errors would fail on. That belongs with the breaking changes of the deprecation
+    /// clean up, so the gap is pinned here instead of closed.
     /// </remarks>
     private const string NotIndividuallyObsolete = "ProcessTestRunAttachmentsAsync";
-
-#if NET
-    /// <summary>
-    /// The diagnostic id shared by <see cref="IVsTestConsoleWrapperAsync"/> and every one of its members.
-    /// </summary>
-    private const string Tpvs001 = "TPVS001";
-
-    /// <summary>
-    /// The document every TPVS deprecation links to, see <c>docs/diagnostics.md</c>.
-    /// </summary>
-    private const string DocumentationUrl = "https://github.com/microsoft/vstest/blob/main/docs/diagnostics.md";
-
-    /// <summary>
-    /// The anchor has to be the lowercased diagnostic id. GitHub lowercases the <c>id</c> of an anchor while
-    /// sanitizing rendered markdown but resolves the fragment case sensitively, so an uppercase fragment never
-    /// matches. That is also why <see cref="ObsoleteAttribute.UrlFormat"/> cannot use the <c>{0}</c> placeholder
-    /// here: it expands to the diagnostic id verbatim, which is uppercase.
-    /// </summary>
-    private static string ExpectedUrl(string diagnosticId)
-        => $"{DocumentationUrl}#{diagnosticId.ToLowerInvariant()}";
-#endif
 
     /// <summary>
     /// <see cref="IVsTestConsoleWrapper"/> keeps deriving from the deprecated async interface so that already
@@ -94,39 +75,6 @@ public class VsTestConsoleWrapperObsoletionTests
             Assert.IsFalse(GetObsoleteAttribute(member)!.IsError, $"'{member.Name}' must stay a warning.");
         }
     }
-
-#if NET
-    // ObsoleteAttribute.DiagnosticId only exists on .NET 5 and newer, so the id is applied under #if NET in the
-    // product code. The .NET Framework and netstandard2.0 assemblies keep emitting plain CS0618.
-    [TestMethod]
-    public void IVsTestConsoleWrapperAsync_UsesTpvs001OnTheInterfaceAndEveryObsoleteMember()
-    {
-        Assert.AreEqual(Tpvs001, GetObsoleteAttribute(typeof(IVsTestConsoleWrapperAsync))!.DiagnosticId);
-
-        foreach (var member in GetIndividuallyObsoleteMembers())
-        {
-            Assert.AreEqual(Tpvs001, GetObsoleteAttribute(member)!.DiagnosticId, $"'{member.Name}' id mismatch.");
-        }
-    }
-
-    // Setting DiagnosticId replaces CS0618, which silently invalidates any existing consumer suppression of
-    // CS0618. UrlFormat makes the replacement self-documenting by pointing the diagnostic at docs/diagnostics.md.
-    [TestMethod]
-    public void IVsTestConsoleWrapperAsync_PointsAtTheDiagnosticDocumentation()
-    {
-        Assert.AreEqual(
-            ExpectedUrl(Tpvs001),
-            GetObsoleteAttribute(typeof(IVsTestConsoleWrapperAsync))!.UrlFormat);
-
-        foreach (var member in GetIndividuallyObsoleteMembers())
-        {
-            Assert.AreEqual(
-                ExpectedUrl(Tpvs001),
-                GetObsoleteAttribute(member)!.UrlFormat,
-                $"'{member.Name}' must point at its section in the diagnostic documentation.");
-        }
-    }
-#endif
 
     /// <summary>
     /// Fails if <see cref="NotIndividuallyObsolete"/> goes stale, either because the overloads were finally

@@ -94,8 +94,8 @@ public class TraitCollectionRegressionTests
 
         Assert.IsNotNull(traitsProperty);
         Assert.AreEqual((TestPropertyAttributes)0x05, traitsProperty.Attributes);
-#pragma warning disable CS0618, TPVS005 // TestPropertyAttributes.Trait is obsolete; referenced here to pin the bit value.
+#pragma warning disable CS0618 // TestPropertyAttributes.Trait is obsolete; referenced here to pin the bit value.
         Assert.AreEqual(TestPropertyAttributes.Hidden | TestPropertyAttributes.Trait, traitsProperty.Attributes);
-#pragma warning restore CS0618, TPVS005
+#pragma warning restore CS0618
     }
 }
