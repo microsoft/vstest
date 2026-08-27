@@ -173,9 +173,11 @@ jobs:
           fi
 
           # An agent run that has started but not yet opened its PR is invisible to the check
-          # above, so look for one directly before adding a second.
-          IN_FLIGHT=$(gh run list --workflow md-link-checker.lock.yml --limit 20 \
-            --json status --jq '[.[] | select(.status != "completed")] | length')
+          # above, so look for one directly before adding a second. Scope it to the ref we
+          # would dispatch on: a manual run on some other branch is unrelated work, and
+          # letting it count here would silently hold up the scheduled main-branch dispatch.
+          IN_FLIGHT=$(gh run list --workflow md-link-checker.lock.yml --branch "$REF_NAME" \
+            --limit 20 --json status --jq '[.[] | select(.status != "completed")] | length')
 
           if [ "$IN_FLIGHT" -gt 0 ]; then
             echo "An agentic markdown link checker run is already in flight; skipping dispatch."
