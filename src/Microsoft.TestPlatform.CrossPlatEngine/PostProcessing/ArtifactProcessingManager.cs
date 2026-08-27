@@ -252,34 +252,52 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     private static bool IsTelemetryOptedIn() => Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")?.Equals("1", StringComparison.Ordinal) == true;
 
     /// <summary>
-    /// Creates a directory with permissions restricted to the current user on Unix.
+    /// Creates a directory that only the current user can access on Unix. The mode is passed to the
+    /// create call rather than applied afterwards, so the directory is never visible with a wider mode.
+    /// Creating a directory that already exists is a no-op, as it is for <see cref="Directory.CreateDirectory(string)"/>.
     /// </summary>
     internal /* for testing */ void CreateDirectoryWithUserOnlyAccess(string path)
     {
-        _fileHelper.CreateDirectory(path);
 #if !NETFRAMEWORK
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && Directory.Exists(path))
+        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
         {
-            SetUnixDirectoryPermissions(path);
+            CreateUnixDirectoryForCurrentUser(path);
+            return;
+        }
+#endif
+
+        _fileHelper.CreateDirectory(path);
+    }
+
+#if !NETFRAMEWORK
+    private static void CreateUnixDirectoryForCurrentUser(string path)
+    {
+#if NET
+        Directory.CreateDirectory(path, UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute);
+#else
+        // netstandard2.0 has no Directory.CreateDirectory overload that takes a mode, so call mkdir directly.
+        // 0700 octal = owner read/write/execute only.
+        const uint ownerFullAccess = 0x1C0;
+        const int errnoDirectoryAlreadyExists = 17;
+
+        byte[] nullTerminatedUtf8Path = System.Text.Encoding.UTF8.GetBytes(path + "\0");
+        if (NativeMkDir(nullTerminatedUtf8Path, ownerFullAccess) != 0)
+        {
+            int error = Marshal.GetLastWin32Error();
+
+            // Several processes of the same test session share the artifact folder, so losing the
+            // race to create it is expected and not an error.
+            if (error != errnoDirectoryAlreadyExists)
+            {
+                throw new IOException($"Failed to create directory '{path}'.", new System.ComponentModel.Win32Exception(error));
+            }
         }
 #endif
     }
 
-#if !NETFRAMEWORK
-    private static void SetUnixDirectoryPermissions(string path)
-    {
-        // 0700 octal = owner read/write/execute only
-        const int ownerFullAccess = 0x1C0;
-
-        int result = NativeChmod(path, ownerFullAccess);
-        if (result != 0)
-        {
-            int error = Marshal.GetLastWin32Error();
-            throw new InvalidOperationException($"Failed to set permissions on '{path}', errno: {error}");
-        }
-    }
-
-    [DllImport("libc", EntryPoint = "chmod", SetLastError = true)]
-    private static extern int NativeChmod(string pathname, int mode);
+#if !NET
+    [DllImport("libc", EntryPoint = "mkdir", SetLastError = true)]
+    private static extern int NativeMkDir([In] byte[] path, uint mode);
+#endif
 #endif
 }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -34,6 +36,7 @@ public class ArtifactProcessingTests
     private readonly Mock<IFeatureFlag> _featureFlagMock = new();
     private readonly Mock<IDataSerializer> _dataSerializer = new();
     private readonly Mock<ITestRunStatistics> _testRunStatistics = new();
+    private readonly string _testSessionCorrelationId = Guid.NewGuid().ToString();
     private ArtifactProcessingManager _artifactProcessingManager;
 
     public ArtifactProcessingTests()
@@ -42,7 +45,7 @@ public class ArtifactProcessingTests
         _fileHelperMock.Setup(x => x.GetTempPath()).Returns("/tmp");
 
         _artifactProcessingManager =
-            new ArtifactProcessingManager(Guid.NewGuid().ToString(),
+            new ArtifactProcessingManager(_testSessionCorrelationId,
             _fileHelperMock.Object,
             _testRunAttachmentsProcessingManagerMock.Object,
             _dataSerializer.Object,
@@ -97,10 +100,83 @@ public class ArtifactProcessingTests
         _artifactProcessingManager.CollectArtifacts(testRunCompleteEventArgs, string.Empty);
 
         // assert
-        _fileHelperMock.Verify(x => x.CreateDirectory(It.IsAny<string>()), Times.Exactly(2));
+        // The per-session process folder goes through the file helper. Its parent, the shared artifact
+        // folder, is created directly so it can be given a Unix mode, so it is not visible to the mock.
+        string sessionProcessFolderPrefix = Path.Combine("/tmp", _testSessionCorrelationId) + Path.DirectorySeparatorChar;
+        _fileHelperMock.Verify(x => x.CreateDirectory(It.Is<string>(path => path.StartsWith(sessionProcessFolderPrefix, StringComparison.Ordinal))), Times.Once);
         _fileHelperMock.Verify(x => x.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Exactly(2));
         _dataSerializer.Verify(x => x.SerializePayload(It.IsAny<string>(), It.IsAny<TestRunCompleteEventArgs>()), Times.Once);
     }
+
+    [TestMethod]
+    public void CreateDirectoryWithUserOnlyAccess_CreatesDirectoryOnlyCurrentUserCanAccess()
+    {
+        // arrange
+        ArtifactProcessingManager artifactProcessingManager = CreateManagerWithRealFileHelper();
+        string path = Path.Combine(Path.GetTempPath(), $"vstest_{Guid.NewGuid():N}");
+
+        try
+        {
+            // act
+            artifactProcessingManager.CreateDirectoryWithUserOnlyAccess(path);
+
+            // assert
+            Assert.IsTrue(Directory.Exists(path), $"Directory '{path}' was not created.");
+
+#if NET
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                UnixFileMode groupOrOtherPermissions =
+                    UnixFileMode.GroupRead | UnixFileMode.GroupWrite | UnixFileMode.GroupExecute |
+                    UnixFileMode.OtherRead | UnixFileMode.OtherWrite | UnixFileMode.OtherExecute;
+                Assert.AreEqual(UnixFileMode.None, File.GetUnixFileMode(path) & groupOrOtherPermissions);
+            }
+#endif
+        }
+        finally
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+        }
+    }
+
+    [TestMethod]
+    public void CreateDirectoryWithUserOnlyAccess_ExistingDirectoryShouldNotThrow()
+    {
+        // arrange
+        // Several processes of the same test session share the artifact folder, so the second one to
+        // get there finds it already created.
+        ArtifactProcessingManager artifactProcessingManager = CreateManagerWithRealFileHelper();
+        string path = Path.Combine(Path.GetTempPath(), $"vstest_{Guid.NewGuid():N}");
+
+        try
+        {
+            artifactProcessingManager.CreateDirectoryWithUserOnlyAccess(path);
+
+            // act
+            artifactProcessingManager.CreateDirectoryWithUserOnlyAccess(path);
+
+            // assert
+            Assert.IsTrue(Directory.Exists(path), $"Directory '{path}' was not created.");
+        }
+        finally
+        {
+            if (Directory.Exists(path))
+            {
+                Directory.Delete(path, true);
+            }
+        }
+    }
+
+    private ArtifactProcessingManager CreateManagerWithRealFileHelper()
+        => new(_testSessionCorrelationId,
+            new FileHelper(),
+            _testRunAttachmentsProcessingManagerMock.Object,
+            _dataSerializer.Object,
+            _testRunAttachmentsProcessingEventsHandlerMock.Object,
+            _featureFlagMock.Object);
 
     [TestMethod]
     public async Task PostProcessArtifactsAsync_NullSessionIdShouldReturn()
