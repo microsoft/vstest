@@ -29,7 +29,7 @@ public class TraitCollection : IEnumerable<Trait>
     /// value against drift.
     /// </remarks>
 #pragma warning disable CS0618 // TestPropertyAttributes.Trait is obsolete; named here so the enum stays the source of truth.
-    internal const TestPropertyAttributes TraitAttribute = TestPropertyAttributes.Trait;
+    private const TestPropertyAttributes TraitAttribute = TestPropertyAttributes.Trait;
 #pragma warning restore CS0618
 
     private static readonly TestProperty TraitsProperty = TestProperty.Register(

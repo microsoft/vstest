@@ -27,9 +27,9 @@ public class VsTestConsoleWrapperObsoletionTests
     /// <remarks>
     /// Unlike their siblings these two genuinely run asynchronously and have no synchronous replacement to
     /// name, so deprecating them is an API decision rather than hygiene. It would also emit a brand new
-    /// <c>CS0618</c> at every in-repo call site that goes through <see cref="IVsTestConsoleWrapper"/>, which
-    /// builds with warnings as errors would fail on. That belongs with the breaking changes of the deprecation
-    /// clean up, so the gap is pinned here instead of closed.
+    /// <c>CS0618</c> at every in-repo call site that reaches them through <see cref="IVsTestConsoleWrapper"/>,
+    /// and this repository treats warnings as errors, so the build would break. That belongs with the breaking
+    /// changes of the deprecation clean up, so the gap is pinned here instead of closed.
     /// </remarks>
     private const string NotIndividuallyObsolete = "ProcessTestRunAttachmentsAsync";
 
