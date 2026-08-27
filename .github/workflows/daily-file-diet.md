@@ -19,7 +19,6 @@ safe-outputs:
   noop:
     report-as-issue: false
   create-issue:
-    expires: 2d
     title-prefix: "[file-diet] "
     labels: [agentic-workflows]
     max: 1
