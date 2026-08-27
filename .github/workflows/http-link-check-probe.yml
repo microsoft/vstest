@@ -143,8 +143,16 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REF_NAME: ${{ github.ref_name }}
         run: |
+          # The search is only a coarse server-side filter. GitHub discards the brackets and
+          # matches the remaining phrase anywhere in the title, so '"[link-checker]" in:title'
+          # also returns PRs that merely mention the link checker: searching this repo returns
+          # 13 PRs, of which only 6 actually carry the prefix. Trusting that count lets an
+          # unrelated open PR suppress dispatch indefinitely — the probe keeps scanning, finds
+          # changed links, and silently declines to act on them. jq re-checks the real prefix
+          # so only an actual checker PR counts.
           OPEN_PR_COUNT=$(gh pr list --state open --search '"[link-checker]" in:title' \
-            --limit 1 --json number --jq 'length')
+            --limit 100 --json title \
+            --jq '[.[] | select(.title | startswith("[link-checker] "))] | length')
 
           if [ "$OPEN_PR_COUNT" -gt 0 ]; then
             echo "An HTTP link checker pull request is already open; skipping dispatch."
