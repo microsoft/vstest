@@ -144,12 +144,12 @@ jobs:
           REF_NAME: ${{ github.ref_name }}
         run: |
           # The search is only a coarse server-side filter. GitHub discards the brackets and
-          # matches the remaining phrase anywhere in the title, so '"[link-checker]" in:title'
-          # also returns PRs that merely mention the link checker: searching this repo returns
-          # 13 PRs, of which only 6 actually carry the prefix. Trusting that count lets an
-          # unrelated open PR suppress dispatch indefinitely — the probe keeps scanning, finds
-          # changed links, and silently declines to act on them. jq re-checks the real prefix
-          # so only an actual checker PR counts.
+          # matches the remaining words as a phrase anywhere in the title, so this query also
+          # returns PRs that merely mention the link checker rather than ones the checker
+          # opened. Trusting its count lets an unrelated open PR suppress dispatch for as long
+          # as it stays open, and it fails silently: the probe still scans, still sees the
+          # changed links, and just declines to act. jq re-checks the real prefix so only a
+          # PR the checker actually opened counts.
           OPEN_PR_COUNT=$(gh pr list --state open --search '"[link-checker]" in:title' \
             --limit 100 --json title \
             --jq '[.[] | select(.title | startswith("[link-checker] "))] | length')
@@ -157,6 +157,19 @@ jobs:
           if [ "$OPEN_PR_COUNT" -gt 0 ]; then
             echo "An HTTP link checker pull request is already open; skipping dispatch."
             echo "An HTTP link checker pull request is already open, so no new agent run was dispatched." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+
+          # An agent run that has started but not yet opened its PR is invisible to the check
+          # above, so look for one directly before adding a second. Scope it to the ref we
+          # would dispatch on: a manual run on another branch is unrelated work, and letting
+          # it count here would silently hold up the scheduled dispatch.
+          IN_FLIGHT=$(gh run list --workflow http-link-checker.lock.yml --branch "$REF_NAME" \
+            --limit 20 --json status --jq '[.[] | select(.status != "completed")] | length')
+
+          if [ "$IN_FLIGHT" -gt 0 ]; then
+            echo "An agentic HTTP link checker run is already in flight; skipping dispatch."
+            echo "An agentic HTTP link checker run is already in flight, so no new agent run was dispatched." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
 
