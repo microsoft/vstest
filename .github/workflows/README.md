@@ -189,7 +189,8 @@ App above).
 | [`markdown-linter.md`](./markdown-linter.md) | Weekdays (14:00 UTC) + manual + issues | Runs Markdown quality checks and opens issues for violations. |
 | [`md-link-check-probe.yml`](./md-link-check-probe.yml) | Weekly (Friday) + manual | Checks relative links and anchors, and dispatches the agentic fixer only when the broken-link fingerprint changes. |
 | [`md-link-checker.md`](./md-link-checker.md) | Dispatch only | Fixes changed relative link failures and updates the accepted fingerprint. |
-| [`http-link-checker.md`](./http-link-checker.md) | Weekly (Friday) | Finds and fixes broken HTTP links in documentation. |
+| [`http-link-check-probe.yml`](./http-link-check-probe.yml) | Weekly (Friday) + manual | Checks HTTP links and dispatches the agentic fixer only when the broken-link fingerprint changes. |
+| [`http-link-checker.md`](./http-link-checker.md) | Dispatch only | Investigates changed HTTP link failures and updates the accepted fingerprint. |
 
 ### Regular workflows
 
