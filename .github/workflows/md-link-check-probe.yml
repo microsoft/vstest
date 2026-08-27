@@ -157,13 +157,18 @@ jobs:
           # The prefix is checker-specific on purpose. The HTTP checker uses a different one,
           # so neither checker can suppress the other's dispatch.
           #
-          # The search is only a coarse server-side filter: GitHub matches the quoted phrase
-          # loosely, ignoring the brackets, so '"[md-link-checker]" in:title' also returns
-          # titles that merely contain the words "md link checker". Left at that, an unrelated
-          # PR could silently stop the checker from ever being dispatched. jq re-checks the
-          # real prefix so only an actual checker PR counts.
+          # The search is only a coarse server-side filter: GitHub discards the brackets and
+          # matches the remaining words as a phrase anywhere in the title, so this query also
+          # returns PRs that merely mention the checker rather than ones it opened. Left at
+          # that, an unrelated PR could silently stop the checker from ever being dispatched.
+          # jq re-checks the real prefix so only a PR the checker opened counts.
+          #
+          # The limit has to leave room for the whole coarse result set: this is a correctness
+          # guard, and a prefixed PR truncated out of the window would look like "none open"
+          # and dispatch a duplicate. gh pages through the API, so the value is a ceiling on
+          # how many PRs we are willing to inspect, not a per-request cap.
           OPEN_PR_COUNT=$(gh pr list --state open --search '"[md-link-checker]" in:title' \
-            --limit 100 --json title \
+            --limit 500 --json title \
             --jq '[.[] | select(.title | startswith("[md-link-checker] "))] | length')
 
           if [ "$OPEN_PR_COUNT" -gt 0 ]; then
@@ -176,8 +181,10 @@ jobs:
           # above, so look for one directly before adding a second. Scope it to the ref we
           # would dispatch on: a manual run on some other branch is unrelated work, and
           # letting it count here would silently hold up the scheduled main-branch dispatch.
+          # The limit is generous for the same reason as above — a burst of completed runs
+          # must not push the one in-flight run out of the window and make it look idle.
           IN_FLIGHT=$(gh run list --workflow md-link-checker.lock.yml --branch "$REF_NAME" \
-            --limit 20 --json status --jq '[.[] | select(.status != "completed")] | length')
+            --limit 200 --json status --jq '[.[] | select(.status != "completed")] | length')
 
           if [ "$IN_FLIGHT" -gt 0 ]; then
             echo "An agentic markdown link checker run is already in flight; skipping dispatch."
