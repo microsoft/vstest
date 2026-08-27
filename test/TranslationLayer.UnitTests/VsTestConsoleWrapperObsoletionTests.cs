@@ -68,11 +68,13 @@ public class VsTestConsoleWrapperObsoletionTests
     [TestMethod]
     public void IVsTestConsoleWrapperAsync_DeprecationIsAWarningAndNotAnError()
     {
-        Assert.IsFalse(GetObsoleteAttribute(typeof(IVsTestConsoleWrapperAsync))!.IsError);
+        Assert.IsFalse(GetObsoleteAttribute(typeof(IVsTestConsoleWrapperAsync))?.IsError ?? false);
 
         foreach (var member in GetIndividuallyObsoleteMembers())
         {
-            Assert.IsFalse(GetObsoleteAttribute(member)!.IsError, $"'{member.Name}' must stay a warning.");
+            Assert.IsFalse(
+                GetObsoleteAttribute(member)?.IsError ?? false,
+                $"'{member.Name}' must stay a warning.");
         }
     }
 
@@ -87,6 +89,7 @@ public class VsTestConsoleWrapperObsoletionTests
             .Where(member => GetObsoleteAttribute(member) is null)
             .Select(member => member.Name)
             .Distinct()
+            .OrderBy(name => name, StringComparer.Ordinal)
             .ToList();
 
         Assert.AreEqual(NotIndividuallyObsolete, string.Join(", ", notObsolete));

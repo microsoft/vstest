@@ -19,8 +19,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 /// <remarks>
 /// The type is obsolete as a reference: consumers should name the derived <see cref="IVsTestConsoleWrapper"/>
 /// instead, which exposes every member declared here. Most of those members are individually deprecated on top
-/// of that, because the asynchronous operation they promise does not actually happen, and each one carries its
-/// own attribute naming the synchronous replacement.
+/// of that, either because they do not actually run asynchronously or because they merely duplicate the
+/// synchronous member of the same name, and each carries its own attribute pointing at the synchronous API.
 /// <para>
 /// The per-member attributes below are kept deliberately rather than replaced by this one. The C# compiler
 /// does not report an interface-level obsoletion when a member is invoked through the derived
@@ -40,7 +40,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 /// directly does get a warning it did not get before.
 /// </para>
 /// </remarks>
-[Obsolete("Reference IVsTestConsoleWrapper instead, which declares the same members.", error: false)]
+[Obsolete("Reference IVsTestConsoleWrapper instead, which exposes the same members.", error: false)]
 public interface IVsTestConsoleWrapperAsync
 {
     /// <summary>
