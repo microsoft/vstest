@@ -10,16 +10,6 @@ internal static class ProtocolVersioning
     public const int HighestSupportedVersion = Version7;
     public const int LowestSupportedVersion = Version0;
 
-    // 0: the original protocol with no versioning (Message). It is used during negotiation.
-    // 1: new protocol with versioning (Message with Version field).
-    // 2: changed serialization because the serialization of properties in bag was too verbose,
-    //    so common properties are considered built-in and serialized without type info.
-    // 3: introduced because of changes to allow attaching debugger to external process.
-    // 4: introduced because 3 did not update this table and ended up using the serializer for protocol v1,
-    //    which is extremely slow. We negotiate 2 or 4, but never 3 unless the flag above is set.
-    // 5: added the test session messages, which pre-started a set of testhosts so a later run could
-    //    reuse them. The messages were removed, so nothing is gated on this version anymore.
-    // 6: accepts abort and cancel with handlers that report the status.
     /// <summary>
     /// The original protocol with no versioning. It sends and receives a Message that carries just data
     /// and has no Version field. It is used during negotiation to ensure that we communicate at the
@@ -50,8 +40,10 @@ internal static class ProtocolVersioning
     /// </summary>
     public const int Version3 = 3;
 
-    // 4: introduced because 3 did not update this table and ended up using the serializer for protocol v1,
-    //    which is extremely slow. We negotiate 2 or 4, but never 3 unless the flag above is set.
+    /// <summary>
+    /// Introduced because <see cref="Version3"/> did not update the serializer table and ended up
+    /// using the version 1 serializer, which is very slow. We negotiate 2 or 4, but never 3.
+    /// </summary>
     public const int Version4 = 4;
 
     /// <summary>
@@ -64,6 +56,15 @@ internal static class ProtocolVersioning
     /// this version anymore. The version number stays reserved and negotiable.
     /// </summary>
     public const int Version5 = 5;
+
+    /// <summary>
+    /// Added abort and cancel messages with handlers that report the final run status.
+    /// </summary>
     public const int Version6 = 6;
+
+    /// <summary>
+    /// Added <c>SkippedDiscoveredSources</c> to the discovery complete payload to report sources
+    /// that were skipped during discovery.
+    /// </summary>
     public const int Version7 = 7;
 }
