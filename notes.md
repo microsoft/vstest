@@ -1,5 +1,5 @@
 # Efficiency Improver — vstest Repo Memory
-_Last updated: 2026-08-22_
+_Last updated: 2026-08-29_
 
 ## Build / Test Commands
 - Bootstrap + full build: `./build.sh` (downloads pinned .NET 11 SDK to `.dotnet/`)
@@ -50,6 +50,7 @@ _Last updated: 2026-08-22_
 - **NuGet.Frameworks code**: vendored, out of scope for efficiency changes
 - **MTP bridge** (new code): scanned multiple times — clean, no hot-path issues
 - **CA1310/ordinal comparisons**: enabled in #16388 — already handled by maintainers
+- **TRX logger**: cold path (post-test-completion), EqtBaseCollection uses legacy Hashtable but not hot path — not actionable
 
 ## Optimization Backlog (sorted by priority)
 | Priority | Area | Opportunity | Notes |
@@ -62,14 +63,15 @@ _Last updated: 2026-08-22_
 - TestRequestManager startup path: fully scanned — XML parsing redundancy is the main finding (MEDIUM)
 - MTP bridge code: scanned multiple times — no issues
 - NuGet.Frameworks: vendored, skip
-- **Status after 2026-08-22 scan**: No new HIGH-impact items found. Recent commits (Aug 15–22) are CA1310/ordinal fix, reflection deserialization removal, backslash normalization fix, infra.
-- Next area to investigate: TRX logger performance (only on test completion, likely cold path but worth scanning)
+- TRX logger: scanned 2026-08-29 — cold path, no actionable findings
+- **Status after 2026-08-29 scan**: No new HIGH-impact items found. Recent commits Aug 22-29: protocol v5 docs/cleanup (#16411), dead code removal (#16402), TestCaseStart/Stop fix (#16033), signing validation (#16364)
+- Next area to investigate: HTML logger performance, or any new code areas added in upcoming commits
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
 - Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — CLOSED 2026-08-01
-- Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — active, updated 2026-08-22
-- Last run: 2026-08-22 (run ID 32585558358)
+- Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — active, updated 2026-08-29
+- Last run: 2026-08-29 (run ID 33263520320)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
