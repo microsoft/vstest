@@ -51,8 +51,11 @@ accidentally commit.
 It writes `$OUT_DIR/broken-links.md` (the broken links to fix) and
 `$OUT_DIR/link-check-results.md` (the full report), and prints a
 `**Summary:** <working> working, <broken> broken` line. Read `broken-links.md` to drive
-your fixes. `OUT_DIR` defaults to `/tmp/gh-aw/agent` (the path the pipeline uses); set it
-to a repo-local or temp directory when running locally on Windows.
+your fixes. It also writes `$OUT_DIR/broken-links.txt`, the same broken set as sorted
+`source_file|link` lines — that one is the fingerprint the `md-link-check-probe` workflow
+compares against, not something you need for fixing. `OUT_DIR` defaults to
+`/tmp/gh-aw/agent` (the path the pipeline uses); set it to a repo-local or temp directory
+when running locally on Windows.
 
 The script applies these rules. Each `[text](url)` link is classified by its `url`:
 
