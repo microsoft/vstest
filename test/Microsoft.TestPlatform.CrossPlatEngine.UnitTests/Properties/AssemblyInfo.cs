@@ -4,8 +4,8 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 // MtpTestNodeConverterTestIdTests pins the test id algorithm by setting
-// VSTEST_TESTCASE_ID_ALGORITHM and resetting TestCase's cache of it. Both are process wide, so a
-// class level [DoNotParallelize] does not stop another class from observing the pinned value. This
-// assembly already runs sequentially because nothing opts it into parallelization; this states that
-// as a requirement rather than leaving it as an accident.
+// VSTEST_DISABLE_XXHASH128_TESTCASE_ID and resetting the feature flag cache. Both are process wide,
+// so a class level [DoNotParallelize] does not stop another class from observing the pinned value.
+// This assembly already runs sequentially because nothing opts it into parallelization; this states
+// that as a requirement rather than leaving it as an accident.
 [assembly: DoNotParallelize]

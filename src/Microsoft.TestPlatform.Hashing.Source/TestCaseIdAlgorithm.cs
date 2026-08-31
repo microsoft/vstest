@@ -14,8 +14,8 @@ namespace Microsoft.TestPlatform.Hashing;
 internal enum TestCaseIdAlgorithm
 {
     /// <summary>
-    /// The SHA1 based ids, unversioned. These are the ids vstest computes unless a run opts out,
-    /// and every id it has produced by default historically.
+    /// The SHA1 based ids, unversioned. These are the ids vstest computes unless a run opts in to
+    /// xxHash128, and every id it has produced by default historically.
     /// </summary>
     Sha1,
 
@@ -86,10 +86,10 @@ internal static class TestCaseIdAlgorithmResolver
     /// notice that ids moved.
     /// </para>
     /// <para>
-    /// Only the ObjectModel copy of this file ever calls this. The Microsoft.Testing.Platform path
-    /// hands the converter a <see langword="null"/> algorithm when a run declares nothing, which
-    /// leaves the id to <c>TestCase</c> rather than resolving it a second time - so the CrossPlatEngine
-    /// copy cannot drift from ObjectModel on the default, because it never reads it.
+    /// Only <c>TestCase</c> ever reads this. The Microsoft.Testing.Platform path hands the converter
+    /// a <see langword="null"/> algorithm when a run declares nothing, which leaves the id to
+    /// <c>TestCase</c> rather than resolving it a second time - so the runner cannot disagree with
+    /// the testhost about the default, because it never reads the default itself.
     /// </para>
     /// </remarks>
     public static TestCaseIdAlgorithm Ambient
@@ -139,6 +139,16 @@ internal static class TestCaseIdAlgorithmResolver
     /// non-Windows, so a lowercase key in runsettings is honoured here and would be ignored by a
     /// testhost on Linux. Matching case-sensitively would instead make the same runsettings behave
     /// differently on Windows and Linux, which is the worse failure of the two.
+    /// </para>
+    /// <para>
+    /// Both asymmetries are reachable today, not only after the default moves, but they need a run to
+    /// supply the pathological input *and* an ambient value that disagrees with it. On non-Windows a
+    /// lowercase-keyed declaration is honoured here and ignored by a testhost; an empty declaration
+    /// falls back to the ambient value here and reads as setting the flag in a testhost. So an MTP run
+    /// and a classic run given the same runsettings can compute different ids. Neither alternative
+    /// removes this - the operating systems disagree about empty variables, and matching the key
+    /// case-sensitively would make the same runsettings behave differently on Windows and Linux - so
+    /// what is chosen here is the least surprising of the available answers rather than a correct one.
     /// </para>
     /// </remarks>
     public static TestCaseIdAlgorithm? ResolveDeclared(IDictionary<string, string?>? environmentVariables)
