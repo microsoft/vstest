@@ -22,7 +22,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 
 /// <summary>
 /// Reports every test in a run together with both the SHA1 derived and the xxHash128 derived test
-/// id, so that ids stored before the id hashing algorithm changed can be mapped onto the ids that
+/// id, so that ids stored before the id hashing algorithm changes can be mapped onto the ids that
 /// will replace them.
 /// </summary>
 /// <remarks>
@@ -273,6 +273,15 @@ public class TestIdsLogger : ITestLoggerWithParameters
         string filePath = string.Empty;
         bool reserved = false;
 
+        // What to name in a failure message when resolution threw before it produced a path. A
+        // message that reports the empty string tells the user nothing about what they asked for,
+        // and this logger's only output is the file it names.
+        string requestedPath = _parametersDictionary is not null
+            && _parametersDictionary.TryGetValue(Constants.LogFileNameKey, out string? requested)
+            && !requested.IsNullOrWhiteSpace()
+                ? requested!
+                : _testResultsDirPath ?? string.Empty;
+
         try
         {
             filePath = ResolveReportFilePath(out reserved);
@@ -355,7 +364,7 @@ public class TestIdsLogger : ITestLoggerWithParameters
         {
             // A reservation that never became a report is worse than no file: it is an empty CSV
             // that a migration script would happily read as a suite with no tests in it.
-            if (reserved && ReportFilePath is null)
+            if (reserved && ReportFilePath is null && !filePath.IsNullOrEmpty())
             {
                 try
                 {
@@ -367,11 +376,13 @@ public class TestIdsLogger : ITestLoggerWithParameters
                 }
             }
 
+            string pathForMessage = filePath.IsNullOrEmpty() ? requestedPath : filePath;
+
             // The report is this logger's only output, so a failure that is merely traced is a
             // failure nobody sees without /diag - and the next thing the user does is migrate
             // stored ids against a file that is missing or truncated.
-            EqtTrace.Error("TestIdsLogger: Failed to write the test id report '{0}'. Exception: {1}", filePath, ex);
-            _output.Error(false, string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsLoggerWriteFailed, filePath, ex.Message));
+            EqtTrace.Error("TestIdsLogger: Failed to write the test id report '{0}'. Exception: {1}", pathForMessage, ex);
+            _output.Error(false, string.Format(CultureInfo.CurrentCulture, TestIdsLoggerResources.TestIdsLoggerWriteFailed, pathForMessage, ex.Message));
         }
     }
 
@@ -401,9 +412,15 @@ public class TestIdsLogger : ITestLoggerWithParameters
         // next free iteration is taken rather than overwriting, the way the trx logger does, because
         // a mapping quietly replaced by another project's is a mapping lost.
         Directory.CreateDirectory(_testResultsDirPath!);
+
+        string claimed = ReserveNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName());
+
+        // Only once the claim actually succeeded: an out parameter is written straight through to
+        // the caller, so setting it before the call that can throw would have the caller delete a
+        // path that was never claimed.
         reserved = true;
 
-        return ReserveNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName());
+        return claimed;
     }
 
     /// <summary>

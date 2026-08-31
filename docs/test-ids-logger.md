@@ -152,9 +152,9 @@ run claims `TestIds_net8.0(1).csv` and prints that instead:
 
 ```csv
 Source,ExecutorUri,FullyQualifiedName,DisplayName,Id,Sha1Id,XxHash128Id,IdSource
-c:\src\Sample.Tests.dll,executor://sample/v1,Sample.Tests.Calculator.Adds,Adds,4ea1b0b6-0b17-3b06-a1c1-6a0a8ad0b6fd,4ea1b0b6-0b17-3b06-a1c1-6a0a8ad0b6fd,8f0a5b7c-1d22-8f31-9c44-2b7e6c0d1a55,Sha1
-c:\src\Sample.Tests.dll,executor://sample/v1,Sample.Tests.Calculator.Divides,"Divides (1,0)",b21f7c30-9d51-3a0e-88b2-71c5a3e0f912,b21f7c30-9d51-3a0e-88b2-71c5a3e0f912,c7d3e881-4a60-8b19-a2f3-55e9d7c14b08,Sha1
-c:\src\Sample.Tests.dll,executor://mstestadapter/v4,Sample.Tests.MSTestSuite.Works,Works,11111111-2222-3333-4444-555555555555,d4c2a919-77b3-3e2c-9d81-0f3a5b6c7d8e,3f9e1c22-8a70-8d45-b6c1-9e2d4a5f8b03,SelfAssigned
+c:\src\Sample.Tests.dll,executor://sample/v1,Sample.Tests.Calculator.Adds,Adds,4ea1b0b6-0b17-3b06-a1c1-6a0a8ad0b6fd,4ea1b0b6-0b17-3b06-a1c1-6a0a8ad0b6fd,1f0a5b7c-1d22-8f31-9c44-2b7e6c0d1a55,Sha1
+c:\src\Sample.Tests.dll,executor://sample/v1,Sample.Tests.Calculator.Divides,"Divides (1,0)",b21f7c30-9d51-3a0e-88b2-71c5a3e0f912,b21f7c30-9d51-3a0e-88b2-71c5a3e0f912,17d3e881-4a60-8b19-a2f3-55e9d7c14b08,Sha1
+c:\src\Sample.Tests.dll,executor://mstestadapter/v4,Sample.Tests.MSTestSuite.Works,Works,11111111-2222-3333-4444-555555555555,d4c2a919-77b3-3e2c-9d81-0f3a5b6c7d8e,139e1c22-8a70-8d45-b6c1-9e2d4a5f8b03,SelfAssigned
 ```
 
 Three things to read off this:

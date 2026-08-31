@@ -53,8 +53,8 @@ public class TestIdsLoggerTests
         var testCase = new TestCase("SampleTests.UnitTest.PassingTest", new Uri(ExecutorUri), Source);
 
         // The seed is the executor uri, then the file name of the source, then the fully qualified
-        // name. Spelled out here rather than taken from the shared source, so that this test fails
-        // if the composition the logger uses ever drifts from what a test id is actually hashed from.
+        // name. Spelled out here rather than taken from TestIdSeed, so that this test fails if the
+        // composition the logger uses ever drifts from what a test id is actually hashed from.
         string expectedSeed = ExecutorUri + SourceFileName + "SampleTests.UnitTest.PassingTest";
 
         var record = VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.CreateRecord(testCase);
@@ -392,6 +392,12 @@ public class TestIdsLoggerTests
 
         Assert.IsNull(_logger.ReportFilePath);
         Assert.IsTrue(_output.HasErrors, "An unusable path must be reported to the user.");
+
+        // The message has to name what the user asked for. On .NET Framework the resolution itself
+        // throws, before there is a resolved path to report, and a message naming the empty string
+        // would tell them nothing about which parameter was wrong. Only the tail is asserted on
+        // because the name deliberately contains a null character, which does not render.
+        Assert.Contains("port.csv", _output.ToString());
     }
 
     [TestMethod]
