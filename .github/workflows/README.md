@@ -191,6 +191,10 @@ App above).
 | [`http-link-check-probe.yml`](./http-link-check-probe.yml) | Weekly (Friday) + manual | Checks HTTP links and dispatches the agentic fixer only when the broken-link fingerprint changes. |
 | [`http-link-checker.md`](./http-link-checker.md) | Dispatch only | Investigates changed HTTP link failures and updates the accepted fingerprint. |
 
+Fingerprints and other state these workflows must be able to **commit** live in
+[`eng/agentic-workflows/`](../../eng/agentic-workflows/README.md), not under `.github/`, because
+safe outputs reject agent writes to top-level dot-folders.
+
 ### Regular workflows
 
 | Workflow | Trigger | Description |

@@ -5,7 +5,7 @@ name: "HTTP Link Check Probe"
 # The curl loop in .github/workflows/scripts/check-http-links.sh is cheap and is the part
 # that would actually catch new breakage. The agent is expensive, so it only runs when the
 # set of broken links differs from the checked-in fingerprint at
-# .github/workflows/scripts/known-broken-links.txt. Most of the broken set is links that can
+# eng/agentic-workflows/known-broken-links.txt. Most of the broken set is links that can
 # never resolve from a public runner (an internal Microsoft drop share, a package host that
 # shut down, a localhost placeholder), so the set is stable for months at a time and there is
 # nothing for an agent to decide.
@@ -58,7 +58,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          KNOWN=".github/workflows/scripts/known-broken-links.txt"
+          KNOWN="eng/agentic-workflows/known-broken-links.txt"
           CURRENT="$OUT_DIR/broken-links.txt"
           KNOWN_MISSING=false
 
@@ -121,7 +121,7 @@ jobs:
               echo '```'
               echo ""
             fi
-            echo "To accept the new set, replace \`.github/workflows/scripts/known-broken-links.txt\`"
+            echo "To accept the new set, replace \`eng/agentic-workflows/known-broken-links.txt\`"
             echo "with the \`broken-links.txt\` file from this run's \`http-link-check-probe\` artifact."
           } >> "$GITHUB_STEP_SUMMARY"
         shell: bash
