@@ -60,7 +60,7 @@ public class TestIdsLoggerTests
         var record = VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.CreateRecord(testCase);
 
         Assert.AreEqual(EqtHash.GuidFromString(expectedSeed), record.Sha1Id);
-        Assert.AreEqual(EqtHash.GuidFromString2(expectedSeed), record.XxHash128Id);
+        Assert.AreEqual(EqtHash.GuidFromStringXxHash128(expectedSeed), record.XxHash128Id);
         Assert.AreNotEqual(record.Sha1Id, record.XxHash128Id);
     }
 
@@ -75,7 +75,7 @@ public class TestIdsLoggerTests
         var record = VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.CreateRecord(testCase);
 
         Assert.AreEqual(EqtHash.GuidFromString(expectedSeed), record.Sha1Id);
-        Assert.AreEqual(EqtHash.GuidFromString2(expectedSeed), record.XxHash128Id);
+        Assert.AreEqual(EqtHash.GuidFromStringXxHash128(expectedSeed), record.XxHash128Id);
 
         // The reported fully qualified name stays the one the adapter reported, so that the row can
         // still be joined against records keyed on it.
@@ -149,7 +149,7 @@ public class TestIdsLoggerTests
         string seed = ExecutorUri + SourceFileName + "SampleTests.UnitTest.PassingTest";
         var testCase = new TestCase("SampleTests.UnitTest.PassingTest", new Uri(ExecutorUri), Source)
         {
-            Id = EqtHash.GuidFromString2(seed)
+            Id = EqtHash.GuidFromStringXxHash128(seed)
         };
 
         var record = VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger.CreateRecord(testCase);

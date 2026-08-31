@@ -55,8 +55,9 @@
 
   <ItemGroup>
     <!-- Vendored xxHash128, compiled in as internal. See src/Microsoft.TestPlatform.Hashing.Source/README.md.
-         The test case id algorithm selector is deliberately excluded: this assembly does not read the
-         switch, and every assembly that compiles a shared source type gets its own copy of it. -->
+         The test case id algorithm resolver must be excluded rather than merely need not be included:
+         it reads the CoreUtilities feature flag, and this assembly has no reference to CoreUtilities,
+         so compiling it in is an error. It is also not needed - this assembly does not read the flag. -->
     <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/*.cs"
              Exclude="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/TestCaseIdAlgorithm.cs"
              LinkBase="Hashing" />

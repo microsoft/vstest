@@ -15,14 +15,6 @@
     <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
   </ItemGroup>
   <ItemGroup>
-    <!-- The report has to hash exactly the bytes a test case id is hashed from, so the seed
-         composition is taken from the same shared source ObjectModel and CrossPlatEngine compile
-         rather than being written out a third time. Only the seed is needed: the algorithm selector
-         is not, because this logger deliberately reports both algorithms regardless of which one the
-         run selected. -->
-    <Compile Include="$(RepoRoot)src/Microsoft.TestPlatform.Hashing.Source/TestIdSeed.cs" LinkBase="Hashing" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />
     <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj" />
   </ItemGroup>

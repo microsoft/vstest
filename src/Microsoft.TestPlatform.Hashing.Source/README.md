@@ -3,14 +3,17 @@
 Shared source (not a NuGet package, not a separate assembly). The files here are compiled
 directly into `Microsoft.TestPlatform.ObjectModel` and `Microsoft.TestPlatform.AdapterUtilities`
 as `internal` types, following the same pattern as `src/Microsoft.TestPlatform.Filter.Source`.
-`TestIdSeed.cs` and `TestCaseIdAlgorithm.cs` are additionally compiled into
 `Microsoft.TestPlatform.CrossPlatEngine`, which has to reproduce the id of a test case from the
-runner process on the Microsoft.Testing.Platform path.
+runner process on the Microsoft.Testing.Platform path, does **not** compile these files: it uses
+ObjectModel's copy through the `InternalsVisibleTo` in
+`src/Microsoft.TestPlatform.ObjectModel/Friends.cs`, so there is exactly one `TestIdSeed` and one
+`TestCaseIdAlgorithm` on that path.
 
-Consumers pick files deliberately rather than taking everything: `AdapterUtilities` excludes
-`TestCaseIdAlgorithm.cs`, because it does not read the algorithm switch and every assembly that
-compiles a file here gets its own copy of the types in it. Check the `Compile` items when adding a
-file, since the two projects that use a `*.cs` glob will otherwise pick it up silently.
+Consumers pick files deliberately rather than taking everything: `AdapterUtilities` must exclude
+`TestCaseIdAlgorithm.cs`, because that file reads the CoreUtilities feature flag and `AdapterUtilities`
+does not reference CoreUtilities, so compiling it in is an error rather than a silent duplicate. It is
+not needed there either - `AdapterUtilities` does not read the flag. Check the `Compile` items when
+adding a file, since the two projects that use a `*.cs` glob will otherwise pick it up silently.
 
 ## What is here
 
@@ -21,7 +24,7 @@ file, since the two projects that use a `*.cs` glob will otherwise pick it up si
 | `BitOperations.cs` | polyfill of `System.Numerics.BitOperations` for target frameworks that lack it |
 | `TestIdGuid.cs` | vstest-authored — turns a 128-bit hash into an RFC 9562 version 8 UUID |
 | `TestIdSeed.cs` | vstest-authored — composes the string a test case id is hashed from |
-| `TestCaseIdAlgorithm.cs` | vstest-authored — selects which algorithm computes a test case id |
+| `TestCaseIdAlgorithm.cs` | vstest-authored — resolves which algorithm computes a test case id |
 
 `XxHash128.cs` and `XxHashShared.cs` were vendored via [microsoft/testfx][testfx-hashing],
 which vendors them from `dotnet/runtime`. Both upstreams are MIT licensed.
@@ -63,13 +66,14 @@ pattern in `.editorconfig`, otherwise it is silently held to repo style and the 
 ## Consequence of being shared source
 
 Because these are compiled into each consuming assembly rather than referenced from one, a type
-here exists once **per assembly**. Two assemblies compiling the same file do not share the type,
-and an assembly that can see the internals of both (a test project, via `InternalsVisibleTo`)
-cannot name it without `CS0433`. That is why
-`test/Microsoft.TestPlatform.CrossPlatEngine.UnitTests/Client/MTP/MtpTestNodeConverterTestIdTests.cs`
-never spells `TestCaseIdAlgorithm` out and infers it from the production resolver instead.
+here exists once **per assembly**. `ObjectModel` and `AdapterUtilities` therefore each have their
+own `TestIdGuid`, `XxHash128` and `TestIdSeed`, and those are different types despite the identical
+source. Two assemblies compiling the same file do not share the type, and an assembly that can see
+the internals of both (a test project, via `InternalsVisibleTo`) cannot name it without `CS0433`.
 
-Bear this in mind before adding a further consumer: it is cheap for types that only appear inside
-a method body, and awkward for types that appear in a signature a test needs to name.
+Prefer giving a new consumer access to an existing copy over compiling another one. Adding a
+consumer is cheap for types that only appear inside a method body, and awkward for types that
+appear in a signature a test needs to name — `CrossPlatEngine` takes the `InternalsVisibleTo`
+route for exactly that reason.
 
 [testfx-hashing]: https://github.com/microsoft/testfx/tree/main/src/Platform/Microsoft.Testing.Extensions.TrxReport/Hashing

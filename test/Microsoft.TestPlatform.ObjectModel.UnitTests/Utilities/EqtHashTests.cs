@@ -10,7 +10,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 
 /// <summary>
-/// Pins <see cref="EqtHash.GuidFromString2(string)"/>, the xxHash128 based successor to
+/// Pins <see cref="EqtHash.GuidFromStringXxHash128(string)"/>, the xxHash128 based successor to
 /// <see cref="EqtHash.GuidFromString(string)"/>, which is available but not yet the algorithm test
 /// case ids are computed with by default.
 /// </summary>
@@ -23,50 +23,55 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests.Utilities;
 [DoNotParallelize]
 public class EqtHashTests
 {
-    private string? _originalAlgorithm;
+    private string? _originalFlag;
 
-    // TestCase_Id_UsesGuidFromString2_WhenXxHash128IsSelected drives TestCase through the algorithm
-    // switch, so pin the switch here rather than inheriting whatever the developer's machine has set.
+    // TestCase_Id_UsesGuidFromStringXxHash128_WhenXxHash128IsSelected drives TestCase through the
+    // feature flag, so pin the flag here rather than inheriting whatever the developer's machine has
+    // set.
     [TestInitialize]
     public void SelectXxHash128TestIdAlgorithm()
     {
-        _originalAlgorithm = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable);
-        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, TestCase.XxHash128AlgorithmName);
-        TestCase.ResetTestIdAlgorithmCache();
+        _originalFlag = Environment.GetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag);
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag, TestCase.XxHash128OptInValue);
+        ResetFeatureFlagCache();
     }
 
     [TestCleanup]
     public void RestoreTestIdAlgorithm()
     {
-        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmEnvironmentVariable, _originalAlgorithm);
-        TestCase.ResetTestIdAlgorithmCache();
+        Environment.SetEnvironmentVariable(TestCase.TestCaseIdAlgorithmFeatureFlag, _originalFlag);
+        ResetFeatureFlagCache();
     }
+
+#pragma warning disable CS0618 // ResetFeatureFlagCacheForTesting is what its name says it is.
+    private static void ResetFeatureFlagCache() => TestCase.ResetFeatureFlagCacheForTesting();
+#pragma warning restore CS0618
 
     [TestMethod]
     [DataRow("", "19aa06d3-0147-88d8-a001-c324468d497f")]
     [DataRow("abc", "1dcae961-3d3c-87ca-8340-2c89fa0d3198")]
     [DataRow("abcdbcdecdefdefgefghfghighij", "104a4cb6-4809-8833-8bb8-ad8d0d87f655")]
     [DataRow("executor://mstestadapter/v2MyTest.dllMyNamespace.MyClass.MyMethod", "1bdbbaf9-e478-82dc-bc1a-f161fabee1ee")]
-    public void GuidFromString2_ProducesPinnedIds(string data, string expected)
-        => Assert.AreEqual(expected, EqtHash.GuidFromString2(data).ToString(), $"Test id for '{data}' changed.");
+    public void GuidFromStringXxHash128_ProducesPinnedIds(string data, string expected)
+        => Assert.AreEqual(expected, EqtHash.GuidFromStringXxHash128(data).ToString(), $"Test id for '{data}' changed.");
 
     [TestMethod]
-    public void GuidFromString2_ProducesPinnedId_ForVeryLargeInput()
+    public void GuidFromStringXxHash128_ProducesPinnedId_ForVeryLargeInput()
     {
         // Long enough to exercise the block based path rather than the short input path.
         string data = string.Concat(System.Linq.Enumerable.Repeat("abc", 100_000));
 
-        Assert.AreEqual("154504d8-e373-86f7-b493-b93fb9f2970a", EqtHash.GuidFromString2(data).ToString());
+        Assert.AreEqual("154504d8-e373-86f7-b493-b93fb9f2970a", EqtHash.GuidFromStringXxHash128(data).ToString());
     }
 
     [TestMethod]
-    public void GuidFromString2_IsDeterministic()
-        => Assert.AreEqual(EqtHash.GuidFromString2("some.test.name"), EqtHash.GuidFromString2("some.test.name"));
+    public void GuidFromStringXxHash128_IsDeterministic()
+        => Assert.AreEqual(EqtHash.GuidFromStringXxHash128("some.test.name"), EqtHash.GuidFromStringXxHash128("some.test.name"));
 
     [TestMethod]
-    public void GuidFromString2_ProducesVersion8Uuids()
+    public void GuidFromStringXxHash128_ProducesVersion8Uuids()
     {
-        Guid id = EqtHash.GuidFromString2("some.test.name");
+        Guid id = EqtHash.GuidFromStringXxHash128("some.test.name");
 
         string text = id.ToString("D");
         Assert.AreEqual('8', text[14], $"Expected a version 8 UUID but got {id}.");
@@ -75,13 +80,13 @@ public class EqtHashTests
     }
 
     [TestMethod]
-    public void GuidFromString2_DiffersFromLegacySha1Id()
+    public void GuidFromStringXxHash128_DiffersFromLegacySha1Id()
     {
         // The whole point of the change: the new id is not the old id. If these ever match, selecting
         // an algorithm would be a silent no-op.
         Guid legacy = EqtHash.GuidFromString("some.test.name");
 
-        Assert.AreNotEqual(legacy, EqtHash.GuidFromString2("some.test.name"));
+        Assert.AreNotEqual(legacy, EqtHash.GuidFromStringXxHash128("some.test.name"));
     }
 
     /// <summary>
@@ -103,19 +108,19 @@ public class EqtHashTests
     /// </para>
     /// </remarks>
     [TestMethod]
-    public void GuidFromString2_AgreesWithMsTestForTheSameInput()
+    public void GuidFromStringXxHash128_AgreesWithMsTestForTheSameInput()
         => Assert.AreEqual(
             "157ad7ac-90d2-8e05-a240-056ef4253f19",
-            EqtHash.GuidFromString2("MyAssemblyMyProduct.MyNamespace.MyClass.MyMethod").ToString(),
+            EqtHash.GuidFromStringXxHash128("MyAssemblyMyProduct.MyNamespace.MyClass.MyMethod").ToString(),
             "vstest and MSTest no longer produce the same id for the same input.");
 
     [TestMethod]
-    public void TestCase_Id_UsesGuidFromString2_WhenXxHash128IsSelected()
+    public void TestCase_Id_UsesGuidFromStringXxHash128_WhenXxHash128IsSelected()
     {
         var testCase = new TestCase("MyNamespace.MyClass.MyMethod", new Uri("executor://mstestadapter/v2"), "MyTest.dll");
 
         // TestCase.Id hashes ExecutorUri + fileName(Source) + FullyQualifiedName.
-        Guid expected = EqtHash.GuidFromString2("executor://mstestadapter/v2MyTest.dllMyNamespace.MyClass.MyMethod");
+        Guid expected = EqtHash.GuidFromStringXxHash128("executor://mstestadapter/v2MyTest.dllMyNamespace.MyClass.MyMethod");
 
         Assert.AreEqual(expected, testCase.Id);
     }

@@ -64,7 +64,7 @@ public class XxHash128Tests
         byte[] input = Encoding.ASCII.GetBytes(ascii);
 
         // Feed the input one byte at a time, which forces the buffering paths the one-shot overload
-        // never touches. TestIdProvider2 depends on those, since it appends once per string.
+        // never touches. TestIdProviderXxHash128 depends on those, since it appends once per string.
         var hasher = new XxHash128(seed);
         foreach (byte b in input)
         {

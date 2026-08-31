@@ -7,11 +7,11 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
-using System.Threading;
 
 using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -22,12 +22,11 @@ namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 public sealed class TestCase : TestObject
 {
     /// <summary>
-    /// Selects the algorithm used to compute <see cref="Id"/>. Set to <c>xxhash128</c> to opt in to
-    /// the new ids, or to <c>sha1</c> to pin the legacy ones.
+    /// Disables computing <see cref="Id"/> with xxHash128, falling back to the SHA1 ids the platform
+    /// has always produced. Set to <see cref="XxHash128OptInValue"/> to opt in to the new ids.
     /// </summary>
     /// <remarks>
     /// <para>
-    /// The algorithm is <see cref="TestCaseIdAlgorithmResolver.Default"/> unless this says otherwise.
     /// Moving to xxHash128 changes the id of every test whose id is computed by the platform, which
     /// is a breaking change for anything that stored those ids - most notably Azure DevOps Test Case
     /// work item association. It is therefore introduced as opt-in first, so that a release exists in
@@ -35,31 +34,16 @@ public sealed class TestCase : TestObject
     /// becomes the default only in a later release.
     /// </para>
     /// <para>
-    /// See <see cref="TestCaseIdAlgorithmResolver"/> for why this is an algorithm selector rather
-    /// than a boolean.
+    /// See <see cref="TestCaseIdAlgorithmResolver"/> for why this is an opt-out flag rather than a
+    /// selector naming an algorithm.
     /// </para>
     /// </remarks>
-    internal const string TestCaseIdAlgorithmEnvironmentVariable = TestCaseIdAlgorithmResolver.EnvironmentVariableName;
+    internal const string TestCaseIdAlgorithmFeatureFlag = TestCaseIdAlgorithmResolver.FeatureFlagName;
 
     /// <summary>
-    /// The value of <see cref="TestCaseIdAlgorithmEnvironmentVariable"/> that selects the xxHash128
-    /// based ids.
+    /// The value of <see cref="TestCaseIdAlgorithmFeatureFlag"/> that opts in to the xxHash128 ids.
     /// </summary>
-    internal const string XxHash128AlgorithmName = TestCaseIdAlgorithmResolver.XxHash128Name;
-
-    /// <summary>
-    /// The resolved algorithm, offset by one so that 0 means "not resolved yet".
-    /// </summary>
-    /// <remarks>
-    /// Deliberately an <see cref="int"/> rather than a nullable enum. A <c>TestCaseIdAlgorithm?</c>
-    /// is a two field struct, and the runtime only guarantees atomic writes for word sized values, so
-    /// a racing reader could observe the "has a value" flag before the value itself and read the
-    /// zero valued member. That is exactly the outcome the cache exists to prevent: two different ids
-    /// for the same test within one process. An <see cref="int"/> write is atomic, and an
-    /// <see cref="int"/> is also what <see cref="Interlocked.CompareExchange(ref int, int, int)"/>
-    /// needs to publish the value exactly once.
-    /// </remarks>
-    private static int s_idAlgorithmPlusOne;
+    internal const string XxHash128OptInValue = TestCaseIdAlgorithmResolver.OptInValue;
 
     private Guid _defaultId = Guid.Empty;
     private Guid _id;
@@ -212,40 +196,30 @@ public sealed class TestCase : TestObject
     /// The algorithm used to compute test case ids in this process.
     /// </summary>
     /// <remarks>
-    /// Read lazily rather than in a static initializer, so the value is not baked in at type load
-    /// time. Type load happens at an arbitrary, hard to predict point, which made the behaviour
-    /// depend on when the type happened to be touched and made it impossible to exercise this
-    /// switch from a test. The result is then cached, because an id has to stay stable for the
-    /// lifetime of the process. Threads racing on first use publish with a compare and exchange and
-    /// every one of them returns the published winner, so even a process whose environment changes
-    /// while ids are being computed cannot end up using two algorithms.
+    /// Resolved from the <see cref="TestCaseIdAlgorithmFeatureFlag"/> feature flag, which reads the
+    /// environment lazily on first use and then caches it. Both properties matter here: reading
+    /// lazily keeps the choice observable from a test rather than baking it in whenever the type
+    /// happened to be loaded, and caching keeps an id stable for the lifetime of the process.
     /// </remarks>
-    private static TestCaseIdAlgorithm IdAlgorithm
-    {
-        get
-        {
-            int cached = s_idAlgorithmPlusOne;
-            if (cached == 0)
-            {
-                int resolved = (int)TestCaseIdAlgorithmResolver.Resolve(
-                    Environment.GetEnvironmentVariable(TestCaseIdAlgorithmEnvironmentVariable)) + 1;
-
-                // Deliberately return the winner rather than what this thread just computed: two
-                // threads reading the environment either side of a change would otherwise hand out
-                // two different ids for the same test.
-                int published = Interlocked.CompareExchange(ref s_idAlgorithmPlusOne, resolved, 0);
-                cached = published == 0 ? resolved : published;
-            }
-
-            return (TestCaseIdAlgorithm)(cached - 1);
-        }
-    }
+    private static TestCaseIdAlgorithm IdAlgorithm => TestCaseIdAlgorithmResolver.Ambient;
 
     /// <summary>
-    /// Clears the cached <see cref="IdAlgorithm"/> value so the environment variable is
-    /// read again. For tests only - production code must not change algorithm mid-process.
+    /// Clears every cached feature flag, so <see cref="IdAlgorithm"/> reads its own again. For tests
+    /// only - production code must not change algorithm mid-process.
     /// </summary>
-    internal static void ResetTestIdAlgorithmCache() => s_idAlgorithmPlusOne = 0;
+    /// <remarks>
+    /// Named for what it actually does rather than for the one flag this type cares about: it resets
+    /// the whole <see cref="FeatureFlag"/> cache, because that is the granularity available. Flags
+    /// that are pure environment reads are simply read again, but any value a test injected with
+    /// <c>FeatureFlag.SetFlag</c> is discarded, so a caller has to know the scope. It is exposed here
+    /// rather than used directly because CoreUtilities internals are not visible to the ObjectModel
+    /// test assembly, and it carries the same <see cref="ObsoleteAttribute"/> the method it forwards
+    /// to carries, so a production assembly that can see it cannot call it without saying so.
+    /// </remarks>
+    [Obsolete("Only use this in tests.")]
+#pragma warning disable CS0618 // FeatureFlag.Reset exists for tests, which is what this is for.
+    internal static void ResetFeatureFlagCacheForTesting() => FeatureFlag.Reset();
+#pragma warning restore CS0618
 
     /// <summary>
     /// Creates a Id of TestCase
@@ -271,7 +245,7 @@ public sealed class TestCase : TestObject
 
         return algorithm switch
         {
-            TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(testcaseFullName),
+            TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromStringXxHash128(testcaseFullName),
             TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(testcaseFullName),
 
             // Naming both members above means adding a third one surfaces here as a deliberate
@@ -383,7 +357,7 @@ public sealed class TestCase : TestObject
         set => SetPropertyAndResetId(ManagedMethodProperty, value);
     }
 
-    private string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
+    internal string GetFullyQualifiedName() => ContainsManagedMethodAndType ? $"{ManagedType}.{ManagedMethod}" : FullyQualifiedName;
 
     /// <inheritdoc/>
     public override string ToString() => GetFullyQualifiedName();

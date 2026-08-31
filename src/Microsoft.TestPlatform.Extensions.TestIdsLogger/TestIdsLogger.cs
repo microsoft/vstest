@@ -38,9 +38,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 /// </para>
 /// <para>
 /// Without it the only way to obtain the mapping is to run the suite twice with
-/// <c>VSTEST_TESTCASE_ID_ALGORITHM</c> flipped and join the two reports, and that join is genuinely
-/// ambiguous for data driven tests whose arguments do not render distinctly. This logger removes the
-/// join entirely: one run, both ids on the same row.
+/// <c>VSTEST_DISABLE_XXHASH128_TESTCASE_ID</c> flipped and join the two reports, and that join is
+/// genuinely ambiguous for data driven tests whose arguments do not render distinctly. This logger
+/// removes the join entirely: one run, both ids on the same row.
 /// </para>
 /// <para>
 /// The report distinguishes the id a test actually carries from the two the platform would compute,
@@ -226,7 +226,7 @@ public class TestIdsLogger : ITestLoggerWithParameters
             testCase.DisplayName ?? string.Empty,
             testCase.Id,
             EqtHash.GuidFromString(seed),
-            EqtHash.GuidFromString2(seed));
+            EqtHash.GuidFromStringXxHash128(seed));
     }
 
     /// <summary>

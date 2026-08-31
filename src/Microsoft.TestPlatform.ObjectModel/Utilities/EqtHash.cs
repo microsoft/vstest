@@ -21,7 +21,7 @@ public static class EqtHash
     /// </summary>
     /// <remarks>
     /// This is the algorithm test case ids are computed with by default. See
-    /// <see cref="GuidFromString2(string)"/> for the xxHash128 based successor, which is available
+    /// <see cref="GuidFromStringXxHash128(string)"/> for the xxHash128 based successor, which is available
     /// but not yet the default.
     /// </remarks>
     public static Guid GuidFromString(string data)
@@ -53,8 +53,8 @@ public static class EqtHash
     /// <para>
     /// This is the intended successor to <see cref="GuidFromString(string)"/>. xxHash128 is a
     /// non-cryptographic hash, which is what this has always needed - the id is an identity, never a
-    /// security boundary - and it is considerably faster than SHA1. Using SHA1 also makes vstest show
-    /// up in security scans and prevents it from running under FIPS-restricted policies.
+    /// security boundary - and it is considerably faster than SHA1. Using a cryptographic hash for
+    /// this also makes vstest show up in security scans that flag SHA1 regardless of how it is used.
     /// </para>
     /// <para>
     /// The resulting Guid carries the version of the hashing scheme in its top 4 bits, so ids
@@ -64,8 +64,8 @@ public static class EqtHash
     /// <para>
     /// This deliberately does NOT produce the same value as <see cref="GuidFromString(string)"/>.
     /// Changing the id of a test is a breaking change for anything that stored it, which is why this
-    /// ships available but not default: test case ids are computed with it only when a run selects it
-    /// through the VSTEST_TESTCASE_ID_ALGORITHM switch. The warning on
+    /// ships available but not default: test case ids are computed with it only when a run opts in
+    /// through the VSTEST_DISABLE_XXHASH128_TESTCASE_ID feature flag. The warning on
     /// <see cref="GuidFromString(string)"/> about work item association requiring sign off from the
     /// TC-TA feature owners applies to making this the default.
     /// </para>
@@ -74,7 +74,7 @@ public static class EqtHash
     /// id in both, and an id produced by either is legible to the other.
     /// </para>
     /// </remarks>
-    public static Guid GuidFromString2(string data)
+    public static Guid GuidFromStringXxHash128(string data)
     {
         TPDebug.Assert(data != null);
 

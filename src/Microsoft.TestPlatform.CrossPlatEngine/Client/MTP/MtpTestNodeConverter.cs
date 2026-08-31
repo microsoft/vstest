@@ -76,9 +76,9 @@ internal static class MtpTestNodeConverter
     /// runsettings variables populate. MTP applications are their own host and their nodes are
     /// converted here, in the runner, which never receives those variables, so the runner has to
     /// read the declared value itself and pass the choice to the test case.
-    /// Returns <see langword="null"/> when the run does not declare the variable, so the test case
-    /// falls back to the runner's own environment and the classic default. Declaring it explicitly
-    /// wins, so a runsettings value overrides an inherited one rather than silently agreeing with it.
+    /// Returns <see langword="null"/> when the run does not declare the flag, so the test case falls
+    /// back to the runner's own environment and the platform default. Declaring it explicitly wins,
+    /// so a runsettings value overrides an inherited one rather than silently agreeing with it.
     /// </remarks>
     public static TestCaseIdAlgorithm? ResolveTestCaseIdAlgorithm(IDictionary<string, string?>? runSettingsEnvironmentVariables)
         => TestCaseIdAlgorithmResolver.ResolveDeclared(runSettingsEnvironmentVariables);
@@ -116,7 +116,10 @@ internal static class MtpTestNodeConverter
         AddTraits(update, testCase);
 
         // Deliberately last: setting FullyQualifiedName or Source resets the default id, so assigning
-        // it earlier could be silently undone by a later assignment.
+        // it earlier could be silently undone by a later assignment. The managed name properties are
+        // part of the seed too (see TestCase.GetFullyQualifiedName), and assigning Id here pins an
+        // explicit id that a later property assignment does not reset, so this block has to stay
+        // after everything that feeds the seed, not just after FullyQualifiedName and Source.
         //
         // Only a run that declared an algorithm needs an explicit assignment. Leaving the id alone
         // otherwise lets TestCase compute it lazily, exactly as it does on the classic path, so the
@@ -124,16 +127,16 @@ internal static class MtpTestNodeConverter
         // The seed is composed with TestIdSeed, from the test case's own properties rather than the
         // raw wire values, because this must hash precisely the bytes TestCase would have hashed
         // itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and host, so
-        // the raw string and the parsed uri do not necessarily render the same). For the same reason
-        // the name here has to track TestCase.GetFullyQualifiedName, which prefers the ManagedType
-        // and ManagedMethod properties when they are set; this converter never sets them, so the
-        // plain FullyQualifiedName is the same value today.
+        // the raw string and the parsed uri do not necessarily render the same), and the name, which
+        // TestCase takes from GetFullyQualifiedName so that ManagedType and ManagedMethod win when
+        // they are set. Calling the same method here means the two cannot drift apart if this
+        // converter ever starts populating those properties.
         if (testCaseIdAlgorithm is { } algorithm)
         {
-            string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.FullyQualifiedName);
+            string seed = TestIdSeed.Compose(testCase.ExecutorUri.ToString(), testCase.Source, testCase.GetFullyQualifiedName());
             testCase.Id = algorithm switch
             {
-                TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromString2(seed),
+                TestCaseIdAlgorithm.XxHash128 => EqtHash.GuidFromStringXxHash128(seed),
                 TestCaseIdAlgorithm.Sha1 => EqtHash.GuidFromString(seed),
 
                 // Naming both members above means adding a third one surfaces here as a deliberate

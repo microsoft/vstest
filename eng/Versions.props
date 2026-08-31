@@ -70,6 +70,11 @@
     <_MicrosoftVSSDKBuildToolsVersion_>17.14.2119</_MicrosoftVSSDKBuildToolsVersion_>
     <MicrosoftWin32RegistryVersion>5.0.0</MicrosoftWin32RegistryVersion>
     <NewtonsoftJsonVersion>13.0.4</NewtonsoftJsonVersion>
+    <!-- Bumping this requires checking the assembly version this package emits against the
+         System.Memory binding redirects in src/vstest.console/app.config, src/testhost.x86/app.config
+         and src/datacollector/app.config. The redirect's upper bound is a hard ceiling: an assembly
+         version above it stops being redirected and net462 hosts fail with FileLoadException on the
+         first Span<T> touch. -->
     <SystemMemoryVersion>4.6.3</SystemMemoryVersion>
     <SystemReflectionMetadataVersion>8.0.0</SystemReflectionMetadataVersion>
     <TestPlatformExternalsVersion>18.2.0-preview-1-11429-120</TestPlatformExternalsVersion>

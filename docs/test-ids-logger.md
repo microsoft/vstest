@@ -12,8 +12,8 @@
 ## What this is for
 
 vstest computes `TestCase.Id` by hashing a seed string. That hash has always been SHA1. A new
-algorithm, xxHash128, is now available and will become the default in a later release, selected in
-the meantime through the `VSTEST_TESTCASE_ID_ALGORITHM` environment variable - see
+algorithm, xxHash128, is now available and will become the default in a later release; until then a
+run opts in to it with the `VSTEST_DISABLE_XXHASH128_TESTCASE_ID` feature flag set to `0` - see
 [Environment variables](environment-variables.md).
 
 When the default moves, the id of every test whose id the platform computes changes. Anything that
@@ -63,7 +63,9 @@ vstest.console.exe Tests.dll /ListTests /logger:testids
 ```
 
 Which algorithm the run itself uses does not matter. Both ids are reported either way; the run's
-choice only determines which one the test actually carries.
+choice - the `VSTEST_DISABLE_XXHASH128_TESTCASE_ID` flag, which defaults to `1` and so today means
+SHA1 - only determines which one the test actually carries, and so which value `IdSource` reports.
+There is no need to set it to produce the mapping.
 
 ## Output format
 
@@ -219,7 +221,7 @@ Then join that against your own records on `OldId` and rewrite them to `NewId`. 
 `IdSource = 'SelfAssigned'` should be left exactly as they are.
 
 Do not filter on `IdSource = 'Sha1'` and map from `Id`. That works only when the reporting run used
-SHA1: run the report with `VSTEST_TESTCASE_ID_ALGORITHM=xxhash128` set and every computed row comes
+SHA1: run the report with `VSTEST_DISABLE_XXHASH128_TESTCASE_ID=0` set and every computed row comes
 back as `XxHash128`, so such a query returns nothing at all even though every one of those rows still
 holds the mapping you need.
 
@@ -239,5 +241,5 @@ for a test that no longer exists, and such records need deciding on separately.
 
 ## Related
 
-- [Environment variables](environment-variables.md) - `VSTEST_TESTCASE_ID_ALGORITHM`
+- [Environment variables](environment-variables.md) - `VSTEST_DISABLE_XXHASH128_TESTCASE_ID`
 - [Reporting test results](report.md) - test loggers in general

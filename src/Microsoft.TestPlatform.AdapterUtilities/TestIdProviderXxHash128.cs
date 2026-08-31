@@ -19,7 +19,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// from the id itself. It ships available but not default: <see cref="TestIdProvider"/> is still
 /// what test ids are computed with unless a run selects otherwise.
 /// </remarks>
-public class TestIdProvider2
+public class TestIdProviderXxHash128
 {
     private Guid _id = Guid.Empty;
     private byte[]? _hash;
@@ -27,9 +27,9 @@ public class TestIdProvider2
     private readonly XxHash128 _hasher;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="TestIdProvider2"/> class.
+    /// Initializes a new instance of the <see cref="TestIdProviderXxHash128"/> class.
     /// </summary>
-    public TestIdProvider2()
+    public TestIdProviderXxHash128()
     {
         _hasher = new XxHash128();
     }
@@ -81,13 +81,13 @@ public class TestIdProvider2
     /// <returns>An array containing the seed.</returns>
     /// <remarks>
     /// <see cref="AppendBytes(byte[])"/> and <see cref="AppendString(string)"/> cannot be called
-    /// on instance after this method is called.
+    /// on instance after this method is called. Unlike <see cref="TestIdProvider.GetHash"/>, which
+    /// hands out the array it caches, the returned array is a copy, so mutating it does not disturb
+    /// a later <see cref="GetId"/> or <see cref="GetHash"/> call.
     /// </remarks>
     public byte[] GetHash()
     {
-        _hash ??= _hasher.GetCurrentHash();
-
-        return _hash;
+        return (byte[])EnsureHash().Clone();
     }
 
     /// <summary>
@@ -105,11 +105,13 @@ public class TestIdProvider2
             return _id;
         }
 
-        // VersionedGuidFromHash mutates what it is given, and GetHash() hands out the cached array,
-        // so hand it a copy to keep GetHash() honest for callers that call it themselves.
-        byte[] hash = (byte[])GetHash().Clone();
+        // VersionedGuidFromHash mutates what it is given, so hand it a copy and keep the cached
+        // hash intact for callers that ask for it themselves.
+        byte[] hash = (byte[])EnsureHash().Clone();
         _id = TestIdGuid.VersionedGuidFromHash(hash, TestIdGuid.CurrentHashVersion);
 
         return _id;
     }
+
+    private byte[] EnsureHash() => _hash ??= _hasher.GetCurrentHash();
 }

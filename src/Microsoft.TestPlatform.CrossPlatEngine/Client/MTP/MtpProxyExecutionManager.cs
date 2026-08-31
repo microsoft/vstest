@@ -431,15 +431,20 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     private void ApplyRunSettingsEnvironmentVariables(string? runSettings)
     {
         Dictionary<string, string?>? runSettingsEnvironmentVariables = InferRunSettingsHelper.GetEnvironmentVariables(runSettings);
-        if (runSettingsEnvironmentVariables is null || runSettingsEnvironmentVariables.Count == 0)
-        {
-            return;
-        }
 
         // The test id algorithm selection is read by TestCase in whichever process builds the test
         // case. Here that is the runner, which does not receive these variables, so capture the
         // declared choice and pass it explicitly when converting nodes.
+        //
+        // Assigned before the early return below, and unconditionally, so that a run declaring
+        // nothing clears what a previous run on this instance declared instead of inheriting it.
+        // Resolving from a null or empty set yields null, which is exactly "nothing was declared".
         _testCaseIdAlgorithm = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(runSettingsEnvironmentVariables);
+
+        if (runSettingsEnvironmentVariables is null || runSettingsEnvironmentVariables.Count == 0)
+        {
+            return;
+        }
 
         EnvironmentVariables ??= CreateEnvironmentVariablesDictionary();
         foreach (KeyValuePair<string, string?> variable in runSettingsEnvironmentVariables)
