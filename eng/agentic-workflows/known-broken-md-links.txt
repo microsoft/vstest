@@ -14,7 +14,7 @@
 # does not match the script's output byte for byte would make the probe fire every week.
 # From the repo root:
 #
-#   KNOWN=.github/workflows/scripts/known-broken-md-links.txt
+#   KNOWN=eng/agentic-workflows/known-broken-md-links.txt
 #   OUT_DIR=/tmp/link-check python3 .github/workflows/scripts/check-md-links.py
 #   { grep '^#' "$KNOWN"; cat /tmp/link-check/broken-links.txt; } > "$KNOWN.new"
 #   mv "$KNOWN.new" "$KNOWN"

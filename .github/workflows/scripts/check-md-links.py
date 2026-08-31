@@ -31,7 +31,7 @@ Outputs (in OUT_DIR):
 
 broken-links.txt is the machine-readable fingerprint consumed by the
 `md-link-check-probe` workflow, which compares it against the accepted set in
-.github/workflows/scripts/known-broken-md-links.txt. It deliberately carries only the
+eng/agentic-workflows/known-broken-md-links.txt. It deliberately carries only the
 source file and the link as written — no resolved paths, counts, or wording — so the
 same broken link produces the same line on every platform and across report changes.
 It is always written, including on the early-exit paths, so the probe never has to

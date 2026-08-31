@@ -5,7 +5,7 @@ name: "Markdown Link Check Probe"
 # .github/workflows/scripts/check-md-links.py is pure filesystem work — no network, a few
 # seconds of CPU — and it is the part that actually catches new breakage. The agent is the
 # expensive part, so it only runs when the set of broken relative links and anchors differs
-# from the checked-in fingerprint at .github/workflows/scripts/known-broken-md-links.txt.
+# from the checked-in fingerprint at eng/agentic-workflows/known-broken-md-links.txt.
 #
 # Gating on "broken_count > 0" would not be enough: the workflow deliberately supports links
 # that cannot be fixed (a target that is simply gone, with no replacement), and those would
@@ -60,7 +60,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          KNOWN=".github/workflows/scripts/known-broken-md-links.txt"
+          KNOWN="eng/agentic-workflows/known-broken-md-links.txt"
           CURRENT="$OUT_DIR/broken-links.txt"
           KNOWN_MISSING=false
 
@@ -130,7 +130,7 @@ jobs:
             echo ""
             echo "To accept the new set, take the \`broken-links.txt\` file from this run's"
             echo "\`md-link-check-probe\` artifact and put its lines under the comment header in"
-            echo "\`.github/workflows/scripts/known-broken-md-links.txt\`."
+            echo "\`eng/agentic-workflows/known-broken-md-links.txt\`."
           } >> "$GITHUB_STEP_SUMMARY"
         shell: bash
 

@@ -3,7 +3,7 @@ description: Automated link checker that finds and fixes broken relative links i
 on:
   # Dispatched by .github/workflows/md-link-check-probe.yml, which runs the same script
   # weekly and only wakes this workflow when the set of broken links differs from
-  # .github/workflows/scripts/known-broken-md-links.txt.
+  # eng/agentic-workflows/known-broken-md-links.txt.
   workflow_dispatch:
 permissions:
   actions: read
@@ -134,7 +134,7 @@ After processing all broken links, rerun the checker and update the accepted fin
 
 ```bash
 OUT_DIR=/tmp/gh-aw/agent python3 .github/workflows/scripts/check-md-links.py
-KNOWN=.github/workflows/scripts/known-broken-md-links.txt
+KNOWN=eng/agentic-workflows/known-broken-md-links.txt
 { grep '^#' "$KNOWN"; cat /tmp/gh-aw/agent/broken-links.txt; } > "$KNOWN.new"
 mv "$KNOWN.new" "$KNOWN"
 ```
@@ -201,4 +201,4 @@ discipline on top:
 - Dispatched by the `md-link-check-probe` workflow when the set of broken links changes
 - Link test results are available at `/tmp/gh-aw/agent/link-check-results.md`
 - The broken links alone, sorted `source_file|link` and one per line, are at `/tmp/gh-aw/agent/broken-links.txt`
-- The set accepted at the last review is checked in at `.github/workflows/scripts/known-broken-md-links.txt`
+- The set accepted at the last review is checked in at `eng/agentic-workflows/known-broken-md-links.txt`
