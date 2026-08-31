@@ -10,6 +10,7 @@ using System.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -47,6 +48,22 @@ public class DiscoveryDataAggregatorTests
 
         aggregator.Aggregate(new(totalTests: 3, isAborted: false));
         Assert.AreEqual(10, aggregator.TotalTests, "Aggregated totalTests count does not match");
+    }
+
+    [TestMethod]
+    public void AggregateShouldApplySourceStatusReportedByProxy()
+    {
+        var aggregator = new DiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(["mtp.dll"], DiscoveryStatus.NotDiscovered);
+
+        aggregator.Aggregate(new DiscoveryCompleteEventArgs(2, false)
+        {
+            FullyDiscoveredSources = ["mtp.dll"],
+        });
+
+        Assert.HasCount(1, aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual("mtp.dll", aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)[0]);
+        Assert.IsEmpty(aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
     }
 
     [TestMethod]

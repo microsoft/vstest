@@ -50,6 +50,9 @@ internal sealed class FakeMtpServerClient : IMtpServerClient
     /// <summary>Gets or sets an exception the fake server throws from discover or run.</summary>
     public Exception? ThrowFromRequest { get; set; }
 
+    /// <summary>Gets or sets an exception the fake server throws during initialization.</summary>
+    public Exception? ThrowFromInitialize { get; set; }
+
     /// <summary>Gets or sets a delay applied to <see cref="ExitAsync"/>, simulating a wedged server.</summary>
     public TimeSpan ExitDelay { get; set; } = TimeSpan.Zero;
 
@@ -58,6 +61,11 @@ internal sealed class FakeMtpServerClient : IMtpServerClient
 
     public Task<MtpServerCapabilities> InitializeAsync(CancellationToken cancellationToken = default)
     {
+        if (ThrowFromInitialize is not null)
+        {
+            return Task.FromException<MtpServerCapabilities>(ThrowFromInitialize);
+        }
+
         Capabilities = new MtpServerCapabilities(
             serverProcessId: ProcessId,
             serverName: "FakeMtpServer",

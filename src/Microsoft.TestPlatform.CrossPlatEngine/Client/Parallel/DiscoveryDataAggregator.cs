@@ -111,16 +111,12 @@ internal sealed class DiscoveryDataAggregator
 
         AggregateMetrics(discoveryCompleteEventArgs.Metrics);
 
-        // Do not aggregate NotDiscovered, PartiallyDiscovered, FullyDiscovered sources here
-        // because this aggregator is shared with proxies so the state is already up-to-date.
-        //
-        // The reason to share the aggregator is that we only get 1 notification for completed
-        // discovery when discovery is done. Instead of 1 notification per discovery manager.
-        // And we also don't get any notification for discovery of sources that did not start
-        // discovering yet. So we need the state in the aggregator to start with all the sources
-        // that we were requested to discover in NotDiscovered state. And then as we discover them,
-        // we need to update that directly. So when any discovery is cancelled we can just take the
-        // current state in the aggregator and report it.
+        // Most proxies share this aggregator and update source status as discovery progresses.
+        // Proxies that cannot share it still report their final status through the completion event.
+        MarkSourcesWithStatus(discoveryCompleteEventArgs.NotDiscoveredSources, DiscoveryStatus.NotDiscovered);
+        MarkSourcesWithStatus(discoveryCompleteEventArgs.PartiallyDiscoveredSources, DiscoveryStatus.PartiallyDiscovered);
+        MarkSourcesWithStatus(discoveryCompleteEventArgs.FullyDiscoveredSources, DiscoveryStatus.FullyDiscovered);
+        MarkSourcesWithStatus(discoveryCompleteEventArgs.SkippedDiscoveredSources, DiscoveryStatus.SkippedDiscovery);
     }
 
     /// <summary>

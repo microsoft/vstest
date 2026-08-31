@@ -3,8 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -77,18 +80,44 @@ public class MtpProxyDiscoveryManagerTests
         _client.NodesToPush = [ActionNode("uid-1", "TestOne"), ActionNode("uid-2", "TestTwo")];
 
         List<TestCase>? discovered = null;
+        DiscoveryCompleteEventArgs? discoveryComplete = null;
+        var rawMessages = new List<string>();
         _eventHandler
             .Setup(h => h.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback<IEnumerable<TestCase>>(tests => discovered = [.. tests]);
+        _eventHandler
+            .Setup(h => h.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+            .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>?>((args, _) => discoveryComplete = args);
+        _eventHandler
+            .Setup(h => h.HandleRawMessage(It.IsAny<string>()))
+            .Callback<string>(rawMessages.Add);
 
         using var manager = new MtpProxyDiscoveryManager();
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsNotNull(discovered);
         Assert.HasCount(2, discovered);
-        _eventHandler.Verify(
-            h => h.HandleDiscoveryComplete(It.Is<DiscoveryCompleteEventArgs>(e => e.TotalCount == 2 && !e.IsAborted), null),
-            Times.Once);
+        Assert.IsNotNull(discoveryComplete);
+        Assert.AreEqual(2, discoveryComplete.TotalCount);
+        Assert.IsFalse(discoveryComplete.IsAborted);
+        Assert.HasCount(1, discoveryComplete.FullyDiscoveredSources!);
+        Assert.AreEqual(Source, discoveryComplete.FullyDiscoveredSources![0]);
+        Assert.IsEmpty(discoveryComplete.PartiallyDiscoveredSources!);
+        Assert.IsEmpty(discoveryComplete.NotDiscoveredSources!);
+
+        Assert.HasCount(2, rawMessages);
+        var discoveredMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[0]);
+        Assert.AreEqual(MessageType.TestCasesFound, discoveredMessage.MessageType);
+        var rawDiscovered = JsonDataSerializer.Instance.DeserializePayload<IEnumerable<TestCase>>(discoveredMessage);
+        Assert.HasCount(2, rawDiscovered!.ToList());
+
+        var completeMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[1]);
+        Assert.AreEqual(MessageType.DiscoveryComplete, completeMessage.MessageType);
+        var rawComplete = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCompletePayload>(completeMessage);
+        Assert.IsNotNull(rawComplete);
+        Assert.AreEqual(2, rawComplete.TotalTests);
+        Assert.HasCount(1, rawComplete.FullyDiscoveredSources!);
+        Assert.AreEqual(Source, rawComplete.FullyDiscoveredSources![0]);
     }
 
     [TestMethod]
@@ -166,5 +195,43 @@ public class MtpProxyDiscoveryManagerTests
         Assert.IsTrue(_client.ExitCalled, "Exit runs in a finally block, so a failed discovery still shuts down.");
         Assert.IsTrue(_client.Disposed);
         _eventHandler.Verify(h => h.HandleLogMessage(TestMessageLevel.Error, It.IsAny<string>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void DiscoverTestsReportsSourceAsNotDiscoveredWhenLaunchFails()
+    {
+        MtpServerClientFactory.Launch = (_, _) => throw new InvalidOperationException("launch failed");
+        DiscoveryCompleteEventArgs? discoveryComplete = null;
+        _eventHandler
+            .Setup(h => h.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+            .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>?>((args, _) => discoveryComplete = args);
+
+        using var manager = new MtpProxyDiscoveryManager();
+        manager.DiscoverTests(Criteria(), _eventHandler.Object);
+
+        Assert.IsNotNull(discoveryComplete);
+        Assert.IsEmpty(discoveryComplete.FullyDiscoveredSources!);
+        Assert.IsEmpty(discoveryComplete.PartiallyDiscoveredSources!);
+        Assert.HasCount(1, discoveryComplete.NotDiscoveredSources!);
+        Assert.AreEqual(Source, discoveryComplete.NotDiscoveredSources![0]);
+    }
+
+    [TestMethod]
+    public void DiscoverTestsReportsSourceAsNotDiscoveredWhenInitializationFails()
+    {
+        _client.ThrowFromInitialize = new InvalidOperationException("initialization failed");
+        DiscoveryCompleteEventArgs? discoveryComplete = null;
+        _eventHandler
+            .Setup(h => h.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
+            .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>?>((args, _) => discoveryComplete = args);
+
+        using var manager = new MtpProxyDiscoveryManager();
+        manager.DiscoverTests(Criteria(), _eventHandler.Object);
+
+        Assert.IsNotNull(discoveryComplete);
+        Assert.IsEmpty(discoveryComplete.FullyDiscoveredSources!);
+        Assert.IsEmpty(discoveryComplete.PartiallyDiscoveredSources!);
+        Assert.HasCount(1, discoveryComplete.NotDiscoveredSources!);
+        Assert.AreEqual(Source, discoveryComplete.NotDiscoveredSources![0]);
     }
 }

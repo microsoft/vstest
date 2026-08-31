@@ -7,9 +7,12 @@ using System.Linq;
 using System.Threading;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 
@@ -32,6 +35,8 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
     public void DiscoverTests(DiscoveryCriteria discoveryCriteria, ITestDiscoveryEventsHandler2 eventHandler)
     {
         var sources = discoveryCriteria.Sources?.ToList() ?? new List<string>();
+        var fullyDiscoveredSources = new List<string>();
+        var partiallyDiscoveredSources = new List<string>();
         long totalTests = 0;
         bool aborted = false;
 
@@ -43,24 +48,57 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
                 break;
             }
 
+            bool discoveryStarted = false;
             try
             {
-                totalTests += DiscoverSource(source, eventHandler);
+                totalTests += DiscoverSource(source, eventHandler, out discoveryStarted);
+                fullyDiscoveredSources.Add(source);
             }
             catch (OperationCanceledException)
             {
+                if (discoveryStarted)
+                {
+                    partiallyDiscoveredSources.Add(source);
+                }
+
                 aborted = true;
                 break;
             }
             catch (Exception ex)
             {
                 EqtTrace.Error("MtpProxyDiscoveryManager.DiscoverTests: discovery failed for '{0}': {1}", source, ex);
-                eventHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, $"Microsoft.Testing.Platform discovery failed for '{source}': {ex.Message}");
+                ReportLogMessage(eventHandler, TestMessageLevel.Error, $"Microsoft.Testing.Platform discovery failed for '{source}': {ex.Message}");
+                if (discoveryStarted)
+                {
+                    partiallyDiscoveredSources.Add(source);
+                }
+
                 aborted = true;
             }
         }
 
-        eventHandler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(totalTests, aborted), null);
+        List<string> notDiscoveredSources = sources
+            .Except(fullyDiscoveredSources)
+            .Except(partiallyDiscoveredSources)
+            .ToList();
+        long reportedTotalTests = aborted ? -1 : totalTests;
+        var completeArgs = new DiscoveryCompleteEventArgs(reportedTotalTests, aborted)
+        {
+            FullyDiscoveredSources = fullyDiscoveredSources,
+            PartiallyDiscoveredSources = partiallyDiscoveredSources,
+            NotDiscoveredSources = notDiscoveredSources,
+        };
+        var completePayload = new DiscoveryCompletePayload
+        {
+            TotalTests = reportedTotalTests,
+            IsAborted = aborted,
+            FullyDiscoveredSources = fullyDiscoveredSources,
+            PartiallyDiscoveredSources = partiallyDiscoveredSources,
+            NotDiscoveredSources = notDiscoveredSources,
+        };
+
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, completePayload));
+        eventHandler.HandleDiscoveryComplete(completeArgs, null);
     }
 
     public void Abort() => _cancellationTokenSource.Cancel();
@@ -81,13 +119,14 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
         }
     }
 
-    private int DiscoverSource(string source, ITestDiscoveryEventsHandler2 eventHandler)
+    private int DiscoverSource(string source, ITestDiscoveryEventsHandler2 eventHandler, out bool discoveryStarted)
     {
+        discoveryStarted = false;
         var discovered = new List<TestCase>();
 
         MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions();
         using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
-        client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
+        client.LogReceived += (_, e) => ReportLogMessage(eventHandler, MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
         client.TestNodesUpdated += (_, e) =>
         {
             foreach (MtpTestNodeUpdate change in e.Changes)
@@ -109,6 +148,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
             // Awaiting the discover request is sufficient: server-to-client messages arrive on a single
             // ordered stream that the client reads sequentially and dispatches synchronously, so every
             // node notification has already been delivered by the time the request completes.
+            discoveryStarted = true;
             client.DiscoverTestsAsync(_cancellationTokenSource.Token).GetAwaiter().GetResult();
         }
         finally
@@ -124,9 +164,17 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
         if (chunk.Count > 0)
         {
+            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, chunk));
             eventHandler.HandleDiscoveredTests(chunk);
         }
 
         return chunk.Count;
+    }
+
+    private static void ReportLogMessage(ITestDiscoveryEventsHandler2 eventHandler, TestMessageLevel level, string? message)
+    {
+        var payload = new TestMessagePayload { MessageLevel = level, Message = message };
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload));
+        eventHandler.HandleLogMessage(level, message);
     }
 }

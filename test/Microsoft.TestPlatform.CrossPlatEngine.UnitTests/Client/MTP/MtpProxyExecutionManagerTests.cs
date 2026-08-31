@@ -6,10 +6,15 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
+using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
@@ -57,6 +62,17 @@ public class MtpProxyExecutionManagerTests
     private static TestCase TestCaseWithoutUid()
         => new("My.Tests.MyTest", new Uri(MtpTestNodeConverter.DefaultExecutorUri), Source);
 
+    private static MtpTestNodeUpdate CompletedNode()
+        => new(
+            new Dictionary<string, object?>
+            {
+                ["uid"] = "node-uid-1",
+                ["display-name"] = "MyTest",
+                ["node-type"] = "action",
+                ["execution-state"] = "passed",
+            },
+            parentUid: null);
+
     private static TestRunCriteria CriteriaFor(params TestCase[] tests)
         => new(tests, 1);
 
@@ -72,6 +88,79 @@ public class MtpProxyExecutionManagerTests
 
         Assert.IsNotNull(_client.RunFilterUids);
         Assert.AreEqual("node-uid-1", _client.RunFilterUids.Single());
+    }
+
+    [TestMethod]
+    public void StartTestRunForwardsRawResultsAndCompletion()
+    {
+        _client.NodesToPush = [CompletedNode()];
+        var rawMessages = new List<string>();
+        _eventHandler
+            .Setup(h => h.HandleRawMessage(It.IsAny<string>()))
+            .Callback<string>(rawMessages.Add);
+
+        using var manager = new MtpProxyExecutionManager();
+        manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
+
+        Assert.HasCount(2, rawMessages);
+        var statsMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[0]);
+        Assert.AreEqual(MessageType.TestRunStatsChange, statsMessage.MessageType);
+        var statsChange = JsonDataSerializer.Instance.DeserializePayload<TestRunChangedEventArgs>(statsMessage);
+        Assert.IsNotNull(statsChange);
+        Assert.HasCount(1, statsChange.NewTestResults!.ToList());
+        Assert.AreEqual(TestOutcome.Passed, statsChange.NewTestResults!.Single().Outcome);
+
+        var completeMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[1]);
+        Assert.AreEqual(MessageType.ExecutionComplete, completeMessage.MessageType);
+        var completePayload = JsonDataSerializer.Instance.DeserializePayload<TestRunCompletePayload>(completeMessage);
+        Assert.IsNotNull(completePayload);
+        Assert.IsFalse(completePayload.TestRunCompleteArgs!.IsAborted);
+        Assert.AreEqual(1, completePayload.TestRunCompleteArgs.TestRunStatistics!.ExecutedTests);
+        Assert.HasCount(1, completePayload.ExecutorUris!);
+        _eventHandler.Verify(h => h.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()), Times.Once);
+        _eventHandler.Verify(
+            h => h.HandleTestRunComplete(
+                It.Is<TestRunCompleteEventArgs>(args => !args.IsAborted),
+                null,
+                It.IsAny<ICollection<AttachmentSet>>(),
+                It.IsAny<ICollection<string>>()),
+            Times.Once);
+    }
+
+    [TestMethod]
+    public void StartTestRunForwardsDataCollectorConnectionWarningAsRawMessageBeforeTypedCallback()
+    {
+        var dataCollectionManager = new Mock<IProxyDataCollectionManager>();
+        dataCollectionManager
+            .Setup(manager => manager.BeforeTestRunStart(true, true, It.IsAny<ITestMessageEventHandler>()))
+            .Returns(new DataCollectionParameters(true, null, 65536));
+        dataCollectionManager
+            .Setup(manager => manager.AfterTestRunEnd(false, It.IsAny<ITestMessageEventHandler>()))
+            .Returns(new DataCollectionResult(null, null));
+        var callbacks = new List<string>();
+        TestMessagePayload? rawWarning = null;
+        _eventHandler
+            .Setup(handler => handler.HandleRawMessage(It.IsAny<string>()))
+            .Callback<string>(rawMessage =>
+            {
+                var message = JsonDataSerializer.Instance.DeserializeMessage(rawMessage);
+                if (message.MessageType == MessageType.TestMessage)
+                {
+                    rawWarning = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
+                    callbacks.Add("raw");
+                }
+            });
+        _eventHandler
+            .Setup(handler => handler.HandleLogMessage(TestMessageLevel.Warning, It.IsAny<string>()))
+            .Callback(() => callbacks.Add("typed"));
+
+        using var manager = new MtpProxyExecutionManager(dataCollectionManager.Object);
+        manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
+
+        Assert.IsNotNull(rawWarning);
+        Assert.AreEqual(TestMessageLevel.Warning, rawWarning.MessageLevel);
+        Assert.Contains("Could not connect to the data collector", rawWarning.Message!);
+        CollectionAssert.AreEqual(new[] { "raw", "typed" }, callbacks);
     }
 
     /// <summary>

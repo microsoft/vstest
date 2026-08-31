@@ -10,13 +10,15 @@ using System.Linq;
 using System.Threading;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
-
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using CrossPlatEngineResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
@@ -110,7 +112,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             catch (Exception ex)
             {
                 EqtTrace.Error("MtpProxyExecutionManager.StartTestRun: run failed for '{0}': {1}", source, ex);
-                eventHandler.HandleLogMessage(ObjectModel.Logging.TestMessageLevel.Error, $"Microsoft.Testing.Platform run failed for '{source}': {ex.Message}");
+                ReportLogMessage(eventHandler, TestMessageLevel.Error, $"Microsoft.Testing.Platform run failed for '{source}': {ex.Message}");
                 aborted = true;
             }
         }
@@ -138,6 +140,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             completeArgs.InvokedDataCollectors.Add(collector);
         }
 
+        var completePayload = new TestRunCompletePayload
+        {
+            TestRunCompleteArgs = completeArgs,
+            RunAttachments = attachments,
+            ExecutorUris = executorUris.ToList(),
+        };
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, completePayload));
         eventHandler.HandleTestRunComplete(completeArgs, null, attachments, executorUris.ToList());
         return processId;
     }
@@ -189,7 +198,8 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             _testCaseEventForwarder = new MtpDataCollectionForwarder();
             if (!_testCaseEventForwarder.Connect(parameters.DataCollectionEventsPort))
             {
-                eventHandler.HandleLogMessage(
+                ReportLogMessage(
+                    eventHandler,
                     ObjectModel.Logging.TestMessageLevel.Warning,
                     "Could not connect to the data collector for per-test-case events; collectors that rely on them (such as Blame) may not function for this Microsoft.Testing.Platform run.");
                 _testCaseEventForwarder.Dispose();
@@ -316,7 +326,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     {
         MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions(EnvironmentVariables);
         using IMtpServerClient client = MtpServerClientFactory.Launch(source, options);
-        client.LogReceived += (_, e) => eventHandler.HandleLogMessage(MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
+        client.LogReceived += (_, e) => ReportLogMessage(eventHandler, MtpClientOptionsFactory.MapServerLogLevel(e.Level), e.Message);
         client.TestNodesUpdated += (_, e) =>
         {
             var results = new List<TestResult>();
@@ -373,7 +383,9 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                 snapshot = aggregate.Snapshot();
             }
 
-            eventHandler.HandleTestRunStatsChange(new TestRunChangedEventArgs(snapshot, results, null));
+            var statsChange = new TestRunChangedEventArgs(snapshot, results, null);
+            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, statsChange));
+            eventHandler.HandleTestRunStatsChange(statsChange);
         };
 
         // Let the data collector (e.g. code coverage) know the process it should track. The profiler
@@ -401,6 +413,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
 
         return processId;
+    }
+
+    private static void ReportLogMessage(IInternalTestRunEventsHandler eventHandler, TestMessageLevel level, string? message)
+    {
+        var payload = new TestMessagePayload { MessageLevel = level, Message = message };
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload));
+        eventHandler.HandleLogMessage(level, message);
     }
 
     private static IEnumerable<(string Source, List<TestCase>? Tests)> BuildWork(TestRunCriteria criteria)

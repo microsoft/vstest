@@ -7,7 +7,13 @@ using System.IO;
 using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+using Moq;
+
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
 
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
@@ -81,6 +87,80 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         InvokeVsTestWithMtpTestHostEnabled(arguments);
 
         ValidateSummaryStatus(4, 1, 1);
+    }
+
+    [TestMethod]
+    [TestMatrix(testHost: Target.Net)]
+    public void MtpApplicationWorksThroughDesignModeRawMessageForwarding(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        string source = GetAssetFullPath(MtpApp);
+        var environmentVariables = new Dictionary<string, string?>
+        {
+            [MtpTestHostDisableFeatureFlag] = "0",
+        };
+        var discoveryHandler = new Mock<ITestDiscoveryEventsHandler2>();
+        var discoveredTests = new List<TestCase>();
+        DiscoveryCompleteEventArgs? discoveryComplete = null;
+        discoveryHandler
+            .Setup(handler => handler.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
+            .Callback<IEnumerable<TestCase>>(tests => discoveredTests.AddRange(tests));
+        discoveryHandler
+            .Setup(handler => handler.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), It.IsAny<IEnumerable<TestCase>>()))
+            .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>?>((args, lastChunk) =>
+            {
+                discoveryComplete = args;
+                if (lastChunk is not null)
+                {
+                    discoveredTests.AddRange(lastChunk);
+                }
+            });
+
+        var runHandler = new Mock<ITestRunEventsHandler>();
+        var testResults = new List<TestResult>();
+        runHandler
+            .Setup(handler => handler.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
+            .Callback<TestRunChangedEventArgs?>(args =>
+            {
+                if (args?.NewTestResults is not null)
+                {
+                    testResults.AddRange(args.NewTestResults);
+                }
+            });
+        runHandler
+            .Setup(handler => handler.HandleTestRunComplete(
+                It.IsAny<TestRunCompleteEventArgs>(),
+                It.IsAny<TestRunChangedEventArgs>(),
+                It.IsAny<ICollection<AttachmentSet>>(),
+                It.IsAny<ICollection<string>>()))
+            .Callback<TestRunCompleteEventArgs, TestRunChangedEventArgs?, ICollection<AttachmentSet>?, ICollection<string>?>((_, lastChunk, _, _) =>
+            {
+                if (lastChunk?.NewTestResults is not null)
+                {
+                    testResults.AddRange(lastChunk.NewTestResults);
+                }
+            });
+
+        var wrapper = GetVsTestConsoleWrapper(environmentVariables);
+        try
+        {
+            wrapper.DiscoverTests([source], GetDefaultRunSettings(), null, discoveryHandler.Object);
+            wrapper.RunTests([source], GetDefaultRunSettings(), runHandler.Object);
+        }
+        finally
+        {
+            wrapper.EndSession();
+        }
+
+        Assert.HasCount(6, discoveredTests);
+        Assert.IsNotNull(discoveryComplete);
+        Assert.IsFalse(discoveryComplete.IsAborted);
+        Assert.Contains(source, discoveryComplete.FullyDiscoveredSources!);
+        Assert.HasCount(6, testResults);
+        Assert.AreEqual(4, testResults.Count(result => result.Outcome == TestOutcome.Passed));
+        Assert.ContainsSingle(testResults.Where(result => result.Outcome == TestOutcome.Failed));
+        Assert.ContainsSingle(testResults.Where(result => result.Outcome == TestOutcome.Skipped));
     }
 
     [TestMethod]
