@@ -103,6 +103,26 @@ public class DiscoveryDataAggregatorTests
     }
 
     [TestMethod]
+    public void AggregateShouldNotAdvanceSkippedSourceStatus()
+    {
+        var aggregator = new DiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(["skipped.dll"], DiscoveryStatus.NotDiscovered);
+        aggregator.Aggregate(new DiscoveryCompleteEventArgs(0, false)
+        {
+            SkippedDiscoveredSources = ["skipped.dll"],
+        });
+
+        aggregator.Aggregate(new DiscoveryCompleteEventArgs(0, false)
+        {
+            FullyDiscoveredSources = ["skipped.dll"],
+        });
+
+        Assert.ContainsSingle(aggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery));
+        Assert.AreEqual("skipped.dll", aggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery)[0]);
+        Assert.IsEmpty(aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+    }
+
+    [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAggregateMetricsCorrectly()
     {
         var aggregator = new DiscoveryDataAggregator();

@@ -119,13 +119,13 @@ internal static class MtpTestNodeConverter
         // Native MTP data-driven tests can share a method identity and display name. Preserve the
         // bridge ID or server-issued uid as the vstest identity while exposing a meaningful FQN.
         string? vstestId = GetRawString(update, VsTestIdKey);
-        if (Guid.TryParse(vstestId, out Guid parsedVstestId))
+        if (Guid.TryParse(vstestId, out Guid parsedVstestId) && parsedVstestId != Guid.Empty)
         {
             testCase.Id = parsedVstestId;
         }
         else if (uid is { Length: > 0 })
         {
-            testCase.Id = Guid.TryParse(uid, out Guid parsedUid)
+            testCase.Id = Guid.TryParse(uid, out Guid parsedUid) && parsedUid != Guid.Empty
                 ? parsedUid
                 : new TestCase(uid, testCase.ExecutorUri, source).Id;
         }

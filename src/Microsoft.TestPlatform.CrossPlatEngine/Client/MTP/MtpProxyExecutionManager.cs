@@ -327,15 +327,11 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         List<AttachmentSet> attachments,
         HashSet<string> executorUris)
     {
-        List<string>? selectedUids = tests is { Count: > 0 } ? BuildUids(tests) : null;
+        List<string>? selectedUids = null;
         Dictionary<string, TestCase>? selectedTestsByUid = null;
-        if (selectedUids is not null)
+        if (tests is { Count: > 0 })
         {
-            selectedTestsByUid = new Dictionary<string, TestCase>(selectedUids.Count, StringComparer.Ordinal);
-            for (int i = 0; i < selectedUids.Count; i++)
-            {
-                selectedTestsByUid[selectedUids[i]] = tests![i];
-            }
+            selectedTestsByUid = BuildSelectedTestsByUid(tests, out selectedUids);
         }
 
         MtpServerClientOptions options = MtpClientOptionsFactory.CreateOptions(EnvironmentVariables);
@@ -352,6 +348,13 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                 }
 
                 string? state = change.ExecutionState;
+                bool isInProgress = MtpTestNodeConverter.IsInProgressState(state);
+                if (isInProgress && _testCaseEventForwarder is null
+                    || !isInProgress && !MtpTestNodeConverter.IsTerminalState(state))
+                {
+                    continue;
+                }
+
                 TestCase testCase = ResolveTestCase(change, source, selectedTestsByUid, out bool matchedSelectedTest);
 
                 if (EqtTrace.IsVerboseEnabled)
@@ -368,14 +371,9 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
                 // A test entering the in-progress state is our "test started" signal. Forwarding it
                 // lets per-test-case collectors (e.g. Blame) know which test is in flight, which is
                 // what makes crash attribution work when the test never reaches a terminal state.
-                if (_testCaseEventForwarder is { } forwarder && MtpTestNodeConverter.IsInProgressState(state))
+                if (isInProgress)
                 {
-                    forwarder.NotifyTestCaseStart(testCase);
-                    continue;
-                }
-
-                if (!MtpTestNodeConverter.IsTerminalState(state))
-                {
+                    _testCaseEventForwarder?.NotifyTestCaseStart(testCase);
                     continue;
                 }
 
@@ -406,13 +404,17 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
             var statsChange = new TestRunChangedEventArgs(snapshot, results, null);
             string rawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, statsChange, _protocolVersion);
-            EqtTrace.Verbose(
-                "MtpProxyExecutionManager.RunSource: sending {0} with protocol version {1}, testResults={2}, source='{3}', rawMessageLength={4}.",
-                MessageType.TestRunStatsChange,
-                _protocolVersion,
-                results.Count,
-                source,
-                rawMessage.Length);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "MtpProxyExecutionManager.RunSource: sending {0} with protocol version {1}, testResults={2}, source='{3}', rawMessageLength={4}.",
+                    MessageType.TestRunStatsChange,
+                    _protocolVersion,
+                    results.Count,
+                    source,
+                    rawMessage.Length);
+            }
+
             eventHandler.HandleRawMessage(rawMessage);
             eventHandler.HandleTestRunStatsChange(statsChange);
         };
@@ -518,9 +520,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
     /// <exception cref="TestPlatformException">
     /// A selected test carries no MTP node uid, so the run cannot be expressed.
     /// </exception>
-    private static List<string> BuildUids(List<TestCase> tests)
+    private static Dictionary<string, TestCase> BuildSelectedTestsByUid(List<TestCase> tests, out List<string> uids)
     {
-        var uids = new List<string>(tests.Count);
+        uids = new List<string>(tests.Count);
+        var selectedTestsByUid = new Dictionary<string, TestCase>(tests.Count, StringComparer.Ordinal);
         foreach (TestCase test in tests)
         {
             string? uid = test.GetPropertyValue<string>(MtpTestNodeConverter.MtpUidProperty, null);
@@ -547,9 +550,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             }
 
             uids.Add(uid);
+            selectedTestsByUid[uid] = test;
         }
 
-        return uids;
+        return selectedTestsByUid;
     }
 
     private static void CollectAttachments(MtpRunResult runResult, List<AttachmentSet> attachments)

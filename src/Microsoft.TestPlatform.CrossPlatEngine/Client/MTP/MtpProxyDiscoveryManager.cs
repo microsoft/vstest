@@ -104,16 +104,20 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
         };
 
         string rawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, completePayload, _protocolVersion);
-        EqtTrace.Verbose(
-            "MtpProxyDiscoveryManager.DiscoverTests: sending {0} with protocol version {1}, totalTests={2}, aborted={3}, fullyDiscovered={4}, partiallyDiscovered={5}, notDiscovered={6}, rawMessageLength={7}.",
-            MessageType.DiscoveryComplete,
-            _protocolVersion,
-            reportedTotalTests,
-            aborted,
-            fullyDiscoveredSources.Count,
-            partiallyDiscoveredSources.Count,
-            notDiscoveredSources.Count,
-            rawMessage.Length);
+        if (EqtTrace.IsVerboseEnabled)
+        {
+            EqtTrace.Verbose(
+                "MtpProxyDiscoveryManager.DiscoverTests: sending {0} with protocol version {1}, totalTests={2}, aborted={3}, fullyDiscovered={4}, partiallyDiscovered={5}, notDiscovered={6}, rawMessageLength={7}.",
+                MessageType.DiscoveryComplete,
+                _protocolVersion,
+                reportedTotalTests,
+                aborted,
+                fullyDiscoveredSources.Count,
+                partiallyDiscoveredSources.Count,
+                notDiscoveredSources.Count,
+                rawMessage.Length);
+        }
+
         eventHandler.HandleRawMessage(rawMessage);
         eventHandler.HandleDiscoveryComplete(completeArgs, null);
     }

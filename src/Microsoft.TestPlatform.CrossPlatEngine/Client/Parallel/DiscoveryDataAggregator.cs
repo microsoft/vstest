@@ -222,7 +222,11 @@ internal sealed class DiscoveryDataAggregator
     {
         if (_isMessageSent == 1)
         {
-            EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Message was already sent so skipping source update.");
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Message was already sent so skipping source update.");
+            }
+
             return;
         }
 
@@ -238,41 +242,52 @@ internal sealed class DiscoveryDataAggregator
                 continue;
             }
 
-            if (!_sourcesWithDiscoveryStatus.TryGetValue(source, out DiscoveryStatus currentStatus))
+            while (true)
             {
-                EqtTrace.Verbose(
-                    "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Ignoring untracked source {0} with status '{1}'.",
-                    source,
-                    status);
-                continue;
-            }
-
-            _sourcesWithDiscoveryStatus.AddOrUpdate(
-                source,
-                currentStatus,
-                (_, latestStatus) =>
+                if (!_sourcesWithDiscoveryStatus.TryGetValue(source, out DiscoveryStatus currentStatus))
                 {
-                    if (GetStatusRank(status) <= GetStatusRank(latestStatus))
+                    if (EqtTrace.IsVerboseEnabled)
                     {
-                        if (status != latestStatus)
-                        {
-                            EqtTrace.Verbose(
-                                "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Ignoring source {0} status '{1}' because current status '{2}' is authoritative.",
-                                source,
-                                status,
-                                latestStatus);
-                        }
-
-                        return latestStatus;
+                        EqtTrace.Verbose(
+                            "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Ignoring untracked source {0} with status '{1}'.",
+                            source,
+                            status);
                     }
 
+                    break;
+                }
+
+                if (currentStatus == DiscoveryStatus.SkippedDiscovery
+                    || GetStatusRank(status) <= GetStatusRank(currentStatus))
+                {
+                    if (status != currentStatus && EqtTrace.IsVerboseEnabled)
+                    {
+                        EqtTrace.Verbose(
+                            "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Ignoring source {0} status '{1}' because current status '{2}' is authoritative.",
+                            source,
+                            status,
+                            currentStatus);
+                    }
+
+                    break;
+                }
+
+                if (!_sourcesWithDiscoveryStatus.TryUpdate(source, status, currentStatus))
+                {
+                    continue;
+                }
+
+                if (EqtTrace.IsVerboseEnabled)
+                {
                     EqtTrace.Verbose(
                         "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Advancing source {0} status from '{1}' to '{2}'.",
                         source,
-                        latestStatus,
+                        currentStatus,
                         status);
-                    return status;
-                });
+                }
+
+                break;
+            }
         }
     }
 

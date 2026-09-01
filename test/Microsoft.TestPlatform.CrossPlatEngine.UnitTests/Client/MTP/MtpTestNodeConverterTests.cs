@@ -165,6 +165,30 @@ public class MtpTestNodeConverterTests
     }
 
     [TestMethod]
+    public void ToTestCaseRejectsEmptyBridgeId()
+    {
+        var uid = Guid.NewGuid();
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(
+            Node(
+                ("uid", uid.ToString()),
+                ("vstest.TestCase.Id", Guid.Empty.ToString())),
+            Source);
+
+        Assert.AreEqual(uid, testCase.Id);
+    }
+
+    [TestMethod]
+    public void ToTestCaseRejectsEmptyGuidNodeUidAsId()
+    {
+        string uid = Guid.Empty.ToString();
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(("uid", uid)), Source);
+        var expected = new TestCase(uid, new Uri(MtpTestNodeConverter.DefaultExecutorUri), Source);
+
+        Assert.AreEqual(expected.Id, testCase.Id);
+        Assert.AreNotEqual(Guid.Empty, testCase.Id);
+    }
+
+    [TestMethod]
     public void ToTestCasePreservesBridgeIdWhenNodeUidIsMissing()
     {
         var vstestId = Guid.NewGuid();

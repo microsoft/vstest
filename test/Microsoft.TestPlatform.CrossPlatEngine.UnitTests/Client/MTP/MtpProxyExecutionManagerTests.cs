@@ -221,6 +221,26 @@ public class MtpProxyExecutionManagerTests
     }
 
     [TestMethod]
+    public void StartTestRunWithoutSelectedTestsUsesTheRunNodeIdentity()
+    {
+        _client.NodesToPush = [CompletedNode()];
+        TestRunChangedEventArgs? statsChange = null;
+        _eventHandler
+            .Setup(handler => handler.HandleTestRunStatsChange(It.IsAny<TestRunChangedEventArgs>()))
+            .Callback<TestRunChangedEventArgs>(args => statsChange = args);
+
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
+        manager.StartTestRun(new TestRunCriteria([Source], 1), _eventHandler.Object);
+
+        Assert.IsNotNull(statsChange);
+        TestResult result = statsChange.NewTestResults!.Single();
+        Assert.AreEqual("MyTest", result.TestCase.FullyQualifiedName);
+        Assert.AreEqual(
+            new TestCase("node-uid-1", new Uri(MtpTestNodeConverter.DefaultExecutorUri), Source).Id,
+            result.TestCase.Id);
+    }
+
+    [TestMethod]
     public void StartTestRunAsksTheServerToExitAndDisposesTheClient()
     {
         using var manager = new MtpProxyExecutionManager(ProtocolVersion);

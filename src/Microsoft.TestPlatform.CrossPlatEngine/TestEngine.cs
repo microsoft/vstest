@@ -134,10 +134,14 @@ public class TestEngine : ITestEngine
             // building the standard vstest testhost proxy.
             if (hostManager is IProxyManagerFactory proxyManagerFactory)
             {
-                EqtTrace.Verbose(
-                    "TestEngine.GetDiscoveryManager: provider '{0}' supplies its own discovery manager using negotiated protocol version {1}.",
-                    hostManager.GetType().Name,
-                    requestData.ProtocolConfig!.Version);
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose(
+                        "TestEngine.GetDiscoveryManager: provider '{0}' supplies its own discovery manager using negotiated protocol version {1}.",
+                        hostManager.GetType().Name,
+                        requestData.ProtocolConfig!.Version);
+                }
+
                 return proxyManagerFactory.CreateDiscoveryManager(requestData.ProtocolConfig!.Version);
             }
 
@@ -250,11 +254,15 @@ public class TestEngine : ITestEngine
             IProxyDataCollectionManager? dataCollectionManager = isDataCollectorEnabled
                 ? new ProxyDataCollectionManager(requestData, runtimeProviderInfo.RunSettings, sources)
                 : null;
-            EqtTrace.Verbose(
-                "TestEngine.CreateNonParallelExecutionManager: provider '{0}' supplies its own execution manager using negotiated protocol version {1} (data collection: {2}).",
-                hostManager.GetType().Name,
-                requestData.ProtocolConfig!.Version,
-                isDataCollectorEnabled);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "TestEngine.CreateNonParallelExecutionManager: provider '{0}' supplies its own execution manager using negotiated protocol version {1} (data collection: {2}).",
+                    hostManager.GetType().Name,
+                    requestData.ProtocolConfig!.Version,
+                    isDataCollectorEnabled);
+            }
+
             return proxyManagerFactory.CreateExecutionManager(dataCollectionManager, requestData.ProtocolConfig!.Version);
         }
 
