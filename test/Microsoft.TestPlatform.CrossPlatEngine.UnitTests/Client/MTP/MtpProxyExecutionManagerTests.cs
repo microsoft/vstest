@@ -19,6 +19,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Moq;
 
+using TestResult = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestResult;
+
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.MTP;
 
 /// <summary>
@@ -110,7 +112,10 @@ public class MtpProxyExecutionManagerTests
         var statsChange = JsonDataSerializer.Instance.DeserializePayload<TestRunChangedEventArgs>(statsMessage);
         Assert.IsNotNull(statsChange);
         Assert.HasCount(1, statsChange.NewTestResults!.ToList());
-        Assert.AreEqual(TestOutcome.Passed, statsChange.NewTestResults!.Single().Outcome);
+        TestResult result = statsChange.NewTestResults!.Single();
+        Assert.AreEqual(TestOutcome.Passed, result.Outcome);
+        Assert.AreEqual("My.Tests.MyTest", result.TestCase.FullyQualifiedName);
+        Assert.AreEqual(TestCaseWithUid("node-uid-1").Id, result.TestCase.Id);
 
         var completeMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[1]);
         Assert.AreEqual(ProtocolVersion, completeMessage.Version);

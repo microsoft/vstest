@@ -67,6 +67,42 @@ public class DiscoveryDataAggregatorTests
     }
 
     [TestMethod]
+    public void AggregateShouldNotDowngradeSourceStatusReportedBySharedProxy()
+    {
+        var aggregator = new DiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(["classic.dll"], DiscoveryStatus.FullyDiscovered);
+
+        aggregator.Aggregate(new DiscoveryCompleteEventArgs(2, false)
+        {
+            NotDiscoveredSources = ["classic.dll"],
+            PartiallyDiscoveredSources = ["classic.dll"],
+            SkippedDiscoveredSources = ["classic.dll"],
+        });
+
+        Assert.ContainsSingle(aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+        Assert.AreEqual("classic.dll", aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered)[0]);
+        Assert.IsEmpty(aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.IsEmpty(aggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+        Assert.IsEmpty(aggregator.GetSourcesWithStatus(DiscoveryStatus.SkippedDiscovery));
+    }
+
+    [TestMethod]
+    public void AggregateShouldIgnoreUntrackedSourceStatusReportedByProxy()
+    {
+        var aggregator = new DiscoveryDataAggregator();
+        aggregator.MarkSourcesWithStatus(["tracked.dll"], DiscoveryStatus.NotDiscovered);
+
+        aggregator.Aggregate(new DiscoveryCompleteEventArgs(2, false)
+        {
+            FullyDiscoveredSources = ["untracked.dll"],
+        });
+
+        Assert.ContainsSingle(aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreEqual("tracked.dll", aggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered)[0]);
+        Assert.IsEmpty(aggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+    }
+
+    [TestMethod]
     public void AggregateDiscoveryDataMetricsShouldAggregateMetricsCorrectly()
     {
         var aggregator = new DiscoveryDataAggregator();

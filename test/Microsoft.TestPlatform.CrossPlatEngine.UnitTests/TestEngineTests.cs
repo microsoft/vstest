@@ -85,7 +85,7 @@ public class TestEngineTests
     [TestMethod]
     public void GetDiscoveryManagerShouldPassNegotiatedProtocolVersionToProviderFactory()
     {
-        const int protocolVersion = 7;
+        const int protocolVersion = 6;
         _protocolConfig.Version = protocolVersion;
         const string runSettings =
             """
@@ -639,7 +639,7 @@ public class TestEngineTests
     [TestMethod]
     public void CreatingNonParallelExecutionManagerShouldPassNegotiatedProtocolVersionToProviderFactory()
     {
-        const int protocolVersion = 7;
+        const int protocolVersion = 6;
         _protocolConfig.Version = protocolVersion;
         var testRunCriteria = new TestRunCriteria(["1.dll"], 100, false, testSettings: null);
         var runtimeProviderInfo = new TestRuntimeProviderInfo(

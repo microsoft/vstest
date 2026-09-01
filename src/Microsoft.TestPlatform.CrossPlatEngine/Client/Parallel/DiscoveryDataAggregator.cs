@@ -111,12 +111,13 @@ internal sealed class DiscoveryDataAggregator
 
         AggregateMetrics(discoveryCompleteEventArgs.Metrics);
 
-        // Most proxies share this aggregator and update source status as discovery progresses.
-        // Proxies that cannot share it still report their final status through the completion event.
-        MarkSourcesWithStatus(discoveryCompleteEventArgs.NotDiscoveredSources, DiscoveryStatus.NotDiscovered);
-        MarkSourcesWithStatus(discoveryCompleteEventArgs.PartiallyDiscoveredSources, DiscoveryStatus.PartiallyDiscovered);
-        MarkSourcesWithStatus(discoveryCompleteEventArgs.FullyDiscoveredSources, DiscoveryStatus.FullyDiscovered);
-        MarkSourcesWithStatus(discoveryCompleteEventArgs.SkippedDiscoveredSources, DiscoveryStatus.SkippedDiscovery);
+        // Most proxies share this aggregator and have already recorded authoritative source state.
+        // Completion events are a fallback for proxies that cannot share it, so they may only advance
+        // a source that the parallel manager is already tracking.
+        MarkSourcesWithStatusFromCompletion(discoveryCompleteEventArgs.NotDiscoveredSources, DiscoveryStatus.NotDiscovered);
+        MarkSourcesWithStatusFromCompletion(discoveryCompleteEventArgs.SkippedDiscoveredSources, DiscoveryStatus.SkippedDiscovery);
+        MarkSourcesWithStatusFromCompletion(discoveryCompleteEventArgs.PartiallyDiscoveredSources, DiscoveryStatus.PartiallyDiscovered);
+        MarkSourcesWithStatusFromCompletion(discoveryCompleteEventArgs.FullyDiscoveredSources, DiscoveryStatus.FullyDiscovered);
     }
 
     /// <summary>
@@ -216,6 +217,74 @@ internal sealed class DiscoveryDataAggregator
                 });
         }
     }
+
+    private void MarkSourcesWithStatusFromCompletion(IEnumerable<string?>? sources, DiscoveryStatus status)
+    {
+        if (_isMessageSent == 1)
+        {
+            EqtTrace.Verbose("DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Message was already sent so skipping source update.");
+            return;
+        }
+
+        if (sources is null)
+        {
+            return;
+        }
+
+        foreach (string? source in sources)
+        {
+            if (source is null)
+            {
+                continue;
+            }
+
+            if (!_sourcesWithDiscoveryStatus.TryGetValue(source, out DiscoveryStatus currentStatus))
+            {
+                EqtTrace.Verbose(
+                    "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Ignoring untracked source {0} with status '{1}'.",
+                    source,
+                    status);
+                continue;
+            }
+
+            _sourcesWithDiscoveryStatus.AddOrUpdate(
+                source,
+                currentStatus,
+                (_, latestStatus) =>
+                {
+                    if (GetStatusRank(status) <= GetStatusRank(latestStatus))
+                    {
+                        if (status != latestStatus)
+                        {
+                            EqtTrace.Verbose(
+                                "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Ignoring source {0} status '{1}' because current status '{2}' is authoritative.",
+                                source,
+                                status,
+                                latestStatus);
+                        }
+
+                        return latestStatus;
+                    }
+
+                    EqtTrace.Verbose(
+                        "DiscoveryDataAggregator.MarkSourcesWithStatusFromCompletion: Advancing source {0} status from '{1}' to '{2}'.",
+                        source,
+                        latestStatus,
+                        status);
+                    return status;
+                });
+        }
+    }
+
+    private static int GetStatusRank(DiscoveryStatus status)
+        => status switch
+        {
+            DiscoveryStatus.NotDiscovered => 0,
+            DiscoveryStatus.SkippedDiscovery => 1,
+            DiscoveryStatus.PartiallyDiscovered => 2,
+            DiscoveryStatus.FullyDiscovered => 3,
+            _ => -1,
+        };
 
     /// <summary>
     /// Updates the discovery status of the source based on the discovered test cases.

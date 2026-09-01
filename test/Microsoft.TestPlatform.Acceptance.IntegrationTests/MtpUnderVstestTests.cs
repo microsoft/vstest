@@ -154,7 +154,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
                 dartFilteredTests,
                 $"A Dart-like FullyQualifiedName filter must retain the MTP tests discovered through raw design-mode messages. Discovered FQNs: {string.Join(", ", discoveredTests.Select(test => test.FullyQualifiedName))}");
             List<TestCase> selectedTests = dartFilteredTests
-                .Where(test => test.FullyQualifiedName.EndsWith(".TestPasses", StringComparison.Ordinal))
+                .Where(test => test.FullyQualifiedName == "MtpMSTestProject.UnitTests.TestPasses")
                 .ToList();
             Assert.ContainsSingle(selectedTests);
             wrapper.RunTests(selectedTests, GetDefaultRunSettings(), runHandler.Object);

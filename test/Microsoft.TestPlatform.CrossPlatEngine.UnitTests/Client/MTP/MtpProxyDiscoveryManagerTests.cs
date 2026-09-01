@@ -148,7 +148,7 @@ public class MtpProxyDiscoveryManagerTests
                 "opaque-node-uid",
                 "TestMethod",
                 "TestWindow.Smoke.IntegrationTests.TestClass",
-                "TestMethod"),
+                "TestMethod(System.Int32)"),
         ];
         string? rawMessage = null;
         _eventHandler

@@ -103,7 +103,18 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
             NotDiscoveredSources = notDiscoveredSources,
         };
 
-        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, completePayload, _protocolVersion));
+        string rawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, completePayload, _protocolVersion);
+        EqtTrace.Verbose(
+            "MtpProxyDiscoveryManager.DiscoverTests: sending {0} with protocol version {1}, totalTests={2}, aborted={3}, fullyDiscovered={4}, partiallyDiscovered={5}, notDiscovered={6}, rawMessageLength={7}.",
+            MessageType.DiscoveryComplete,
+            _protocolVersion,
+            reportedTotalTests,
+            aborted,
+            fullyDiscoveredSources.Count,
+            partiallyDiscoveredSources.Count,
+            notDiscoveredSources.Count,
+            rawMessage.Length);
+        eventHandler.HandleRawMessage(rawMessage);
         eventHandler.HandleDiscoveryComplete(completeArgs, null);
     }
 
@@ -170,7 +181,26 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
         if (chunk.Count > 0)
         {
-            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, chunk, _protocolVersion));
+            string rawMessage = JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, chunk, _protocolVersion);
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                string identities = string.Join(
+                    " | ",
+                    chunk
+                        .Take(5)
+                        .Select(test =>
+                            $"{test.FullyQualifiedName}#{test.Id}#{test.GetPropertyValue<string>(MtpTestNodeConverter.MtpUidProperty, null)}"));
+                EqtTrace.Verbose(
+                    "MtpProxyDiscoveryManager.DiscoverSource: sending {0} with protocol version {1}, testCases={2}, source='{3}', rawMessageLength={4}. First identities: {5}",
+                    MessageType.TestCasesFound,
+                    _protocolVersion,
+                    chunk.Count,
+                    source,
+                    rawMessage.Length,
+                    identities);
+            }
+
+            eventHandler.HandleRawMessage(rawMessage);
             eventHandler.HandleDiscoveredTests(chunk);
         }
 

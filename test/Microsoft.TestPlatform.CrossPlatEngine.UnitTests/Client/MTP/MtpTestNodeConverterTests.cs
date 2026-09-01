@@ -120,6 +120,18 @@ public class MtpTestNodeConverterTests
     }
 
     [TestMethod]
+    public void ToTestCaseStripsParameterTypesFromNativeMethodIdentity()
+    {
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(
+            Node(
+                ("location.type", "My.Namespace.MyClass"),
+                ("location.method", "MyDataTest(System.Int32,System.String)")),
+            Source);
+
+        Assert.AreEqual("My.Namespace.MyClass.MyDataTest", testCase.FullyQualifiedName);
+    }
+
+    [TestMethod]
     public void ToTestCaseUsesDisplayNameWhenMethodAndBridgeIdentitiesAreAbsent()
     {
         TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(), Source);
@@ -153,7 +165,25 @@ public class MtpTestNodeConverterTests
     }
 
     [TestMethod]
-    public void ToTestCasePrefersNativeMethodIdentityOverBridgeProperty()
+    public void ToTestCasePreservesBridgeIdWhenNodeUidIsMissing()
+    {
+        var vstestId = Guid.NewGuid();
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(
+            RawNode(
+                new Dictionary<string, object?>
+                {
+                    ["display-name"] = "MyTest",
+                    ["node-type"] = "action",
+                    ["vstest.TestCase.Id"] = vstestId.ToString(),
+                    ["vstest.TestCase.FullyQualifiedName"] = "My.Namespace.MyClass.MyTest",
+                }),
+            Source);
+
+        Assert.AreEqual(vstestId, testCase.Id);
+    }
+
+    [TestMethod]
+    public void ToTestCasePrefersBridgeFullyQualifiedNameOverNativeMethodIdentity()
     {
         TestCase testCase = MtpTestNodeConverter.ToTestCase(
             Node(
@@ -162,7 +192,7 @@ public class MtpTestNodeConverterTests
                 ("vstest.TestCase.FullyQualifiedName", "Bridge.Namespace.BridgeClass.BridgeTest")),
             Source);
 
-        Assert.AreEqual("My.Namespace.MyClass.MyTest", testCase.FullyQualifiedName);
+        Assert.AreEqual("Bridge.Namespace.BridgeClass.BridgeTest", testCase.FullyQualifiedName);
     }
 
     [TestMethod]
@@ -193,11 +223,11 @@ public class MtpTestNodeConverterTests
         MtpTestNodeUpdate FirstNode() => Node(
             ("uid", "data-row-1"),
             ("location.type", "My.Namespace.MyClass"),
-            ("location.method", "MyDataTest"));
+            ("location.method", "MyDataTest(System.Int32)"));
         MtpTestNodeUpdate SecondNode() => Node(
             ("uid", "data-row-2"),
             ("location.type", "My.Namespace.MyClass"),
-            ("location.method", "MyDataTest"));
+            ("location.method", "MyDataTest(System.Int32)"));
 
         TestCase first = MtpTestNodeConverter.ToTestCase(FirstNode(), Source);
         TestCase second = MtpTestNodeConverter.ToTestCase(SecondNode(), Source);

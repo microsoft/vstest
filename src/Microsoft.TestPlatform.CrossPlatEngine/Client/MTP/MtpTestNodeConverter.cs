@@ -73,11 +73,37 @@ internal static class MtpTestNodeConverter
         string? uid = update.Uid;
         string? locationType = GetRawString(update, LocationTypeKey);
         string? locationMethod = GetRawString(update, LocationMethodKey);
-        string fullyQualifiedName = locationType is { Length: > 0 } && locationMethod is { Length: > 0 }
-            ? $"{locationType}.{locationMethod}"
-            : GetRawString(update, VsTestFullyQualifiedNameKey)
-                ?? update.DisplayName
-                ?? (uid is { Length: > 0 } ? uid : Guid.NewGuid().ToString());
+        string? bridgeFullyQualifiedName = GetRawString(update, VsTestFullyQualifiedNameKey);
+        string? nativeMethodName = GetNativeMethodName(locationMethod);
+        string identitySource;
+        string fullyQualifiedName;
+
+        if (bridgeFullyQualifiedName is { Length: > 0 })
+        {
+            fullyQualifiedName = bridgeFullyQualifiedName;
+            identitySource = "vstest-bridge";
+        }
+        else if (locationType is { Length: > 0 } && nativeMethodName is { Length: > 0 })
+        {
+            fullyQualifiedName = $"{locationType}.{nativeMethodName}";
+            identitySource = "mtp-location";
+        }
+        else if (update.DisplayName is { Length: > 0 } displayName)
+        {
+            fullyQualifiedName = displayName;
+            identitySource = "display-name";
+        }
+        else if (uid is { Length: > 0 })
+        {
+            fullyQualifiedName = uid;
+            identitySource = "uid";
+        }
+        else
+        {
+            fullyQualifiedName = Guid.NewGuid().ToString();
+            identitySource = "generated";
+        }
+
         string executorUri = GetRawString(update, VsTestExecutorUriKey) ?? DefaultExecutorUri;
 
         var testCase = new TestCase(fullyQualifiedName, new Uri(executorUri), source)
@@ -88,15 +114,20 @@ internal static class MtpTestNodeConverter
         if (uid is { Length: > 0 })
         {
             testCase.SetPropertyValue(MtpUidProperty, uid);
+        }
 
-            // Native MTP data-driven tests can share a method identity and display name. Preserve the
-            // bridge ID or server-issued uid as the vstest identity while exposing a meaningful FQN.
-            string? vstestId = GetRawString(update, VsTestIdKey);
-            testCase.Id = Guid.TryParse(vstestId, out Guid parsedVstestId)
-                ? parsedVstestId
-                : Guid.TryParse(uid, out Guid parsedUid)
-                    ? parsedUid
-                    : new TestCase(uid, testCase.ExecutorUri, source).Id;
+        // Native MTP data-driven tests can share a method identity and display name. Preserve the
+        // bridge ID or server-issued uid as the vstest identity while exposing a meaningful FQN.
+        string? vstestId = GetRawString(update, VsTestIdKey);
+        if (Guid.TryParse(vstestId, out Guid parsedVstestId))
+        {
+            testCase.Id = parsedVstestId;
+        }
+        else if (uid is { Length: > 0 })
+        {
+            testCase.Id = Guid.TryParse(uid, out Guid parsedUid)
+                ? parsedUid
+                : new TestCase(uid, testCase.ExecutorUri, source).Id;
         }
 
         string? file = GetRawString(update, LocationFileKey);
@@ -110,13 +141,27 @@ internal static class MtpTestNodeConverter
         }
 
         AddTraits(update, testCase);
+
+        if (EqtTrace.IsVerboseEnabled)
+        {
+            EqtTrace.Verbose(
+                "MtpTestNodeConverter.ToTestCase: identitySource={0}, uid='{1}', id='{2}', fullyQualifiedName='{3}', displayName='{4}', source='{5}'.",
+                identitySource,
+                uid ?? "(none)",
+                testCase.Id,
+                testCase.FullyQualifiedName,
+                testCase.DisplayName,
+                source);
+        }
+
         return testCase;
     }
 
     public static TestResult ToTestResult(MtpTestNodeUpdate update, string source)
-    {
-        var testCase = ToTestCase(update, source);
+        => ToTestResult(update, ToTestCase(update, source));
 
+    public static TestResult ToTestResult(MtpTestNodeUpdate update, TestCase testCase)
+    {
         var result = new TestResult(testCase)
         {
             Outcome = ToOutcome(update.ExecutionState),
@@ -206,6 +251,19 @@ internal static class MtpTestNodeConverter
 
     private static string? GetRawString(MtpTestNodeUpdate update, string key)
         => update.Node.TryGetValue(key, out object? value) ? value as string : null;
+
+    private static string? GetNativeMethodName(string? locationMethod)
+    {
+        if (locationMethod is not { Length: > 0 })
+        {
+            return locationMethod;
+        }
+
+        int parameterListStart = locationMethod.IndexOf('(');
+        return parameterListStart >= 0
+            ? locationMethod.Substring(0, parameterListStart)
+            : locationMethod;
+    }
 
     /// <summary>
     /// Coerces a raw node value to <see cref="int"/>. The formatters box JSON numbers differently
