@@ -98,10 +98,11 @@ public class MtpTestRuntimeProvider : ISourceAwareTestRuntimeProvider, IProxyMan
 
     Task ITestRuntimeProvider.CleanTestHostAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    IProxyDiscoveryManager IProxyManagerFactory.CreateDiscoveryManager() => MtpProxyManagerFactory.CreateDiscoveryManager();
+    IProxyDiscoveryManager IProxyManagerFactory.CreateDiscoveryManager(int protocolVersion)
+        => MtpProxyManagerFactory.CreateDiscoveryManager(protocolVersion);
 
-    IProxyExecutionManager IProxyManagerFactory.CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager)
-        => MtpProxyManagerFactory.CreateExecutionManager(dataCollectionManager);
+    IProxyExecutionManager IProxyManagerFactory.CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager, int protocolVersion)
+        => MtpProxyManagerFactory.CreateExecutionManager(dataCollectionManager, protocolVersion);
 
     private static bool AllSourcesAreMicrosoftTestingPlatform(IEnumerable<string> sources)
     {

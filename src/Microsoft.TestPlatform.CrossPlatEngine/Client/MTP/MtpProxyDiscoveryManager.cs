@@ -24,6 +24,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly int _protocolVersion;
+
+    public MtpProxyDiscoveryManager(int protocolVersion)
+    {
+        _protocolVersion = protocolVersion;
+    }
 
     public void Initialize(bool skipDefaultAdapters)
     {
@@ -97,7 +103,7 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
             NotDiscoveredSources = notDiscoveredSources,
         };
 
-        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, completePayload));
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.DiscoveryComplete, completePayload, _protocolVersion));
         eventHandler.HandleDiscoveryComplete(completeArgs, null);
     }
 
@@ -164,17 +170,17 @@ internal sealed class MtpProxyDiscoveryManager : IProxyDiscoveryManager, IDispos
 
         if (chunk.Count > 0)
         {
-            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, chunk));
+            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestCasesFound, chunk, _protocolVersion));
             eventHandler.HandleDiscoveredTests(chunk);
         }
 
         return chunk.Count;
     }
 
-    private static void ReportLogMessage(ITestDiscoveryEventsHandler2 eventHandler, TestMessageLevel level, string? message)
+    private void ReportLogMessage(ITestDiscoveryEventsHandler2 eventHandler, TestMessageLevel level, string? message)
     {
         var payload = new TestMessagePayload { MessageLevel = level, Message = message };
-        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload));
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload, _protocolVersion));
         eventHandler.HandleLogMessage(level, message);
     }
 }

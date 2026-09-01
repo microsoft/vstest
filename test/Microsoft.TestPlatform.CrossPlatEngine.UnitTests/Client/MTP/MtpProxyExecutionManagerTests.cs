@@ -33,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 [DoNotParallelize]
 public class MtpProxyExecutionManagerTests
 {
+    private const int ProtocolVersion = 7;
     private const string Source = @"C:\tests\MtpApp.dll";
 
     private Func<string, MtpServerClientOptions, IMtpServerClient>? _originalLaunch;
@@ -83,7 +84,7 @@ public class MtpProxyExecutionManagerTests
     [TestMethod]
     public void StartTestRunSendsTheMtpNodeUidAsTheRunFilter()
     {
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
 
         Assert.IsNotNull(_client.RunFilterUids);
@@ -99,11 +100,12 @@ public class MtpProxyExecutionManagerTests
             .Setup(h => h.HandleRawMessage(It.IsAny<string>()))
             .Callback<string>(rawMessages.Add);
 
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
 
         Assert.HasCount(2, rawMessages);
         var statsMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[0]);
+        Assert.AreEqual(ProtocolVersion, statsMessage.Version);
         Assert.AreEqual(MessageType.TestRunStatsChange, statsMessage.MessageType);
         var statsChange = JsonDataSerializer.Instance.DeserializePayload<TestRunChangedEventArgs>(statsMessage);
         Assert.IsNotNull(statsChange);
@@ -111,6 +113,7 @@ public class MtpProxyExecutionManagerTests
         Assert.AreEqual(TestOutcome.Passed, statsChange.NewTestResults!.Single().Outcome);
 
         var completeMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[1]);
+        Assert.AreEqual(ProtocolVersion, completeMessage.Version);
         Assert.AreEqual(MessageType.ExecutionComplete, completeMessage.MessageType);
         var completePayload = JsonDataSerializer.Instance.DeserializePayload<TestRunCompletePayload>(completeMessage);
         Assert.IsNotNull(completePayload);
@@ -139,6 +142,7 @@ public class MtpProxyExecutionManagerTests
             .Returns(new DataCollectionResult(null, null));
         var callbacks = new List<string>();
         TestMessagePayload? rawWarning = null;
+        int? rawWarningVersion = null;
         _eventHandler
             .Setup(handler => handler.HandleRawMessage(It.IsAny<string>()))
             .Callback<string>(rawMessage =>
@@ -146,6 +150,7 @@ public class MtpProxyExecutionManagerTests
                 var message = JsonDataSerializer.Instance.DeserializeMessage(rawMessage);
                 if (message.MessageType == MessageType.TestMessage)
                 {
+                    rawWarningVersion = message.Version;
                     rawWarning = JsonDataSerializer.Instance.DeserializePayload<TestMessagePayload>(message);
                     callbacks.Add("raw");
                 }
@@ -154,10 +159,11 @@ public class MtpProxyExecutionManagerTests
             .Setup(handler => handler.HandleLogMessage(TestMessageLevel.Warning, It.IsAny<string>()))
             .Callback(() => callbacks.Add("typed"));
 
-        using var manager = new MtpProxyExecutionManager(dataCollectionManager.Object);
+        using var manager = new MtpProxyExecutionManager(dataCollectionManager.Object, ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
 
         Assert.IsNotNull(rawWarning);
+        Assert.AreEqual(ProtocolVersion, rawWarningVersion);
         Assert.AreEqual(TestMessageLevel.Warning, rawWarning.MessageLevel);
         Assert.Contains("Could not connect to the data collector", rawWarning.Message!);
         CollectionAssert.AreEqual(new[] { "raw", "typed" }, callbacks);
@@ -171,7 +177,7 @@ public class MtpProxyExecutionManagerTests
     [TestMethod]
     public void StartTestRunFailsLoudlyWhenATestCarriesNoMtpUid()
     {
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithoutUid()), _eventHandler.Object);
 
         Assert.IsNull(_client.RunFilterUids, "No run may be requested when the selection cannot be expressed.");
@@ -188,7 +194,7 @@ public class MtpProxyExecutionManagerTests
     [TestMethod]
     public void StartTestRunFailsLoudlyWhenOnlySomeTestsCarryAnMtpUid()
     {
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1"), TestCaseWithoutUid()), _eventHandler.Object);
 
         Assert.IsNull(
@@ -202,7 +208,7 @@ public class MtpProxyExecutionManagerTests
     [TestMethod]
     public void StartTestRunRunsEveryTestWhenNoSpecificTestsAreSelected()
     {
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(new TestRunCriteria([Source], 1), _eventHandler.Object);
 
         Assert.IsNull(_client.RunFilterUids, "An unfiltered run must not send a uid filter at all.");
@@ -212,7 +218,7 @@ public class MtpProxyExecutionManagerTests
     [TestMethod]
     public void StartTestRunAsksTheServerToExitAndDisposesTheClient()
     {
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
 
         Assert.IsTrue(_client.ExitCalled);
@@ -228,7 +234,7 @@ public class MtpProxyExecutionManagerTests
     {
         _client.ThrowFromRequest = new InvalidOperationException("server blew up");
 
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
 
         Assert.IsTrue(_client.ExitCalled);
@@ -244,7 +250,7 @@ public class MtpProxyExecutionManagerTests
     {
         _client.ThrowFromRequest = new OperationCanceledException();
 
-        using var manager = new MtpProxyExecutionManager();
+        using var manager = new MtpProxyExecutionManager(ProtocolVersion);
         manager.StartTestRun(CriteriaFor(TestCaseWithUid("node-uid-1")), _eventHandler.Object);
 
         Assert.IsTrue(_client.ExitCalled, "A cancelled run must still shut the test application down.");

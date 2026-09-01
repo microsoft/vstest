@@ -33,6 +33,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.UnitTests.Client.M
 [DoNotParallelize]
 public class MtpProxyDiscoveryManagerTests
 {
+    private const int ProtocolVersion = 7;
     private const string Source = @"C:\tests\MtpApp.dll";
 
     private Func<string, MtpServerClientOptions, IMtpServerClient>? _originalLaunch;
@@ -92,7 +93,7 @@ public class MtpProxyDiscoveryManagerTests
             .Setup(h => h.HandleRawMessage(It.IsAny<string>()))
             .Callback<string>(rawMessages.Add);
 
-        using var manager = new MtpProxyDiscoveryManager();
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsNotNull(discovered);
@@ -107,11 +108,13 @@ public class MtpProxyDiscoveryManagerTests
 
         Assert.HasCount(2, rawMessages);
         var discoveredMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[0]);
+        Assert.AreEqual(ProtocolVersion, discoveredMessage.Version);
         Assert.AreEqual(MessageType.TestCasesFound, discoveredMessage.MessageType);
         var rawDiscovered = JsonDataSerializer.Instance.DeserializePayload<IEnumerable<TestCase>>(discoveredMessage);
         Assert.HasCount(2, rawDiscovered!.ToList());
 
         var completeMessage = JsonDataSerializer.Instance.DeserializeMessage(rawMessages[1]);
+        Assert.AreEqual(ProtocolVersion, completeMessage.Version);
         Assert.AreEqual(MessageType.DiscoveryComplete, completeMessage.MessageType);
         var rawComplete = JsonDataSerializer.Instance.DeserializePayload<DiscoveryCompletePayload>(completeMessage);
         Assert.IsNotNull(rawComplete);
@@ -123,7 +126,7 @@ public class MtpProxyDiscoveryManagerTests
     [TestMethod]
     public void DiscoverTestsAsksTheServerToExit()
     {
-        using var manager = new MtpProxyDiscoveryManager();
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsTrue(_client.ExitCalled);
@@ -140,7 +143,7 @@ public class MtpProxyDiscoveryManagerTests
             .Setup(h => h.HandleDiscoveredTests(It.IsAny<IEnumerable<TestCase>>()))
             .Callback<IEnumerable<TestCase>>(tests => discovered = [.. tests]);
 
-        using (var discoveryManager = new MtpProxyDiscoveryManager())
+        using (var discoveryManager = new MtpProxyDiscoveryManager(ProtocolVersion))
         {
             discoveryManager.DiscoverTests(Criteria(), _eventHandler.Object);
         }
@@ -152,7 +155,7 @@ public class MtpProxyDiscoveryManagerTests
         MtpServerClientFactory.Launch = (_, _) => runClient;
         var runEventHandler = new Mock<IInternalTestRunEventsHandler>();
 
-        using var executionManager = new MtpProxyExecutionManager();
+        using var executionManager = new MtpProxyExecutionManager(ProtocolVersion);
         executionManager.StartTestRun(new TestRunCriteria(discovered, 1), runEventHandler.Object);
 
         Assert.IsNull(runClient.RunFilterUids, "No run may be requested for a node the server did not identify.");
@@ -171,7 +174,7 @@ public class MtpProxyDiscoveryManagerTests
     {
         _client.ThrowFromRequest = new OperationCanceledException();
 
-        using var manager = new MtpProxyDiscoveryManager();
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsTrue(_client.ExitCalled, "A cancelled discovery must still shut the test application down.");
@@ -189,7 +192,7 @@ public class MtpProxyDiscoveryManagerTests
     {
         _client.ThrowFromRequest = new InvalidOperationException("server blew up");
 
-        using var manager = new MtpProxyDiscoveryManager();
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsTrue(_client.ExitCalled, "Exit runs in a finally block, so a failed discovery still shuts down.");
@@ -206,7 +209,7 @@ public class MtpProxyDiscoveryManagerTests
             .Setup(h => h.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
             .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>?>((args, _) => discoveryComplete = args);
 
-        using var manager = new MtpProxyDiscoveryManager();
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsNotNull(discoveryComplete);
@@ -225,7 +228,7 @@ public class MtpProxyDiscoveryManagerTests
             .Setup(h => h.HandleDiscoveryComplete(It.IsAny<DiscoveryCompleteEventArgs>(), null))
             .Callback<DiscoveryCompleteEventArgs, IEnumerable<TestCase>?>((args, _) => discoveryComplete = args);
 
-        using var manager = new MtpProxyDiscoveryManager();
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
         manager.DiscoverTests(Criteria(), _eventHandler.Object);
 
         Assert.IsNotNull(discoveryComplete);

@@ -21,8 +21,9 @@ public static class MtpProxyManagerFactory
     /// <summary>
     /// Creates the discovery manager that drives discovery for Microsoft.Testing.Platform sources.
     /// </summary>
-    public static IProxyDiscoveryManager CreateDiscoveryManager()
-        => new MtpProxyDiscoveryManager();
+    /// <param name="protocolVersion">The negotiated vstest protocol version for messages sent to the client.</param>
+    public static IProxyDiscoveryManager CreateDiscoveryManager(int protocolVersion)
+        => new MtpProxyDiscoveryManager(protocolVersion);
 
     /// <summary>
     /// Creates the execution manager that drives execution for Microsoft.Testing.Platform sources.
@@ -31,8 +32,9 @@ public static class MtpProxyManagerFactory
     /// The data collection manager to wire in when data collectors are enabled, or <see langword="null"/>
     /// when data collection is off.
     /// </param>
-    public static IProxyExecutionManager CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager)
+    /// <param name="protocolVersion">The negotiated vstest protocol version for messages sent to the client.</param>
+    public static IProxyExecutionManager CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager, int protocolVersion)
         => dataCollectionManager is null
-            ? new MtpProxyExecutionManager()
-            : new MtpProxyExecutionManager(dataCollectionManager);
+            ? new MtpProxyExecutionManager(protocolVersion)
+            : new MtpProxyExecutionManager(dataCollectionManager, protocolVersion);
 }

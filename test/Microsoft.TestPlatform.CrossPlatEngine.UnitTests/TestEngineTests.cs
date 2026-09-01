@@ -6,12 +6,14 @@ using System.Collections.Generic;
 using System.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Hosting;
 using Microsoft.VisualStudio.TestPlatform.Common.Telemetry;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.Parallel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Engine;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -78,6 +80,53 @@ public class TestEngineTests
         var discoveryManager = _testEngine.GetDiscoveryManager(_mockRequestData.Object, discoveryCriteria, sourceToSourceDetailMap, new Mock<IWarningLogger>().Object);
         Assert.IsNotNull(discoveryManager);
         Assert.IsInstanceOfType(discoveryManager, typeof(ParallelProxyDiscoveryManager));
+    }
+
+    [TestMethod]
+    public void GetDiscoveryManagerShouldPassNegotiatedProtocolVersionToProviderFactory()
+    {
+        const int protocolVersion = 7;
+        _protocolConfig.Version = protocolVersion;
+        const string runSettings =
+            """
+            <RunSettings>
+              <RunConfiguration>
+                <DesignMode>true</DesignMode>
+                <MaxCpuCount>1</MaxCpuCount>
+              </RunConfiguration>
+            </RunSettings>
+            """;
+        var criteria = new DiscoveryCriteria(["1.dll"], 100, runSettings);
+        var sourceDetails = new Dictionary<string, SourceDetail>
+        {
+            ["1.dll"] = new() { Source = "1.dll", Architecture = Architecture.X64, Framework = Framework.DefaultFramework },
+        };
+        var proxyDiscoveryManager = new Mock<IProxyDiscoveryManager>();
+        proxyDiscoveryManager
+            .Setup(manager => manager.DiscoverTests(It.IsAny<DiscoveryCriteria>(), It.IsAny<ITestDiscoveryEventsHandler2>()))
+            .Callback<DiscoveryCriteria, ITestDiscoveryEventsHandler2>((_, handler) =>
+                handler.HandleDiscoveryComplete(new DiscoveryCompleteEventArgs(0, false), null));
+        var runtimeProvider = new Mock<ITestRuntimeProvider>();
+        var proxyManagerFactory = runtimeProvider.As<IProxyManagerFactory>();
+        proxyManagerFactory
+            .Setup(factory => factory.CreateDiscoveryManager(protocolVersion))
+            .Returns(proxyDiscoveryManager.Object);
+        var runtimeProviderManager = new Mock<ITestRuntimeProviderManager>();
+        runtimeProviderManager
+            .Setup(manager => manager.GetTestHostManagerByRunConfiguration(It.IsAny<string>(), It.IsAny<List<string>>()))
+            .Returns(runtimeProvider.Object);
+        var environment = new Mock<IEnvironment>();
+        environment.SetupGet(e => e.ProcessorCount).Returns(1);
+        var testEngine = new TestEngine(runtimeProviderManager.Object, _mockProcessHelper.Object, environment.Object);
+
+        var discoveryManager = testEngine.GetDiscoveryManager(
+            _mockRequestData.Object,
+            criteria,
+            sourceDetails,
+            new Mock<IWarningLogger>().Object);
+        discoveryManager.DiscoverTests(criteria, new Mock<ITestDiscoveryEventsHandler2>().Object);
+
+        proxyManagerFactory.Verify(factory => factory.CreateDiscoveryManager(protocolVersion), Times.Once);
     }
 
     [TestMethod]
@@ -585,6 +634,42 @@ public class TestEngineTests
 
         Assert.IsNotNull(nonParallelExecutionManager);
         Assert.IsInstanceOfType(nonParallelExecutionManager, typeof(ProxyExecutionManagerWithDataCollection));
+    }
+
+    [TestMethod]
+    public void CreatingNonParallelExecutionManagerShouldPassNegotiatedProtocolVersionToProviderFactory()
+    {
+        const int protocolVersion = 7;
+        _protocolConfig.Version = protocolVersion;
+        var testRunCriteria = new TestRunCriteria(["1.dll"], 100, false, testSettings: null);
+        var runtimeProviderInfo = new TestRuntimeProviderInfo(
+            typeof(ITestRuntimeProvider),
+            false,
+            "<RunSettings></RunSettings>",
+            [new() { Source = "1.dll", Architecture = Architecture.X64, Framework = Framework.DefaultFramework }]);
+        var proxyExecutionManager = new Mock<IProxyExecutionManager>();
+        var runtimeProvider = new Mock<ITestRuntimeProvider>();
+        var proxyManagerFactory = runtimeProvider.As<IProxyManagerFactory>();
+        proxyManagerFactory
+            .Setup(factory => factory.CreateExecutionManager(null, protocolVersion))
+            .Returns(proxyExecutionManager.Object);
+        var runtimeProviderManager = new Mock<ITestRuntimeProviderManager>();
+        runtimeProviderManager
+            .Setup(manager => manager.GetTestHostManagerByRunConfiguration(It.IsAny<string>(), It.IsAny<List<string>>()))
+            .Returns(runtimeProvider.Object);
+        var testEngine = new TestEngine(
+            runtimeProviderManager.Object,
+            _mockProcessHelper.Object,
+            new Mock<IEnvironment>().Object);
+
+        var executionManager = testEngine.CreateNonParallelExecutionManager(
+            _mockRequestData.Object,
+            testRunCriteria,
+            false,
+            runtimeProviderInfo);
+
+        Assert.AreSame(proxyExecutionManager.Object, executionManager);
+        proxyManagerFactory.Verify(factory => factory.CreateExecutionManager(null, protocolVersion), Times.Once);
     }
 
 

@@ -32,6 +32,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
 internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDisposable
 {
     private readonly CancellationTokenSource _cancellationTokenSource = new();
+    private readonly int _protocolVersion;
 
     /// <summary>
     /// Optional data collection manager (e.g. code coverage). When present, it is started before the
@@ -52,14 +53,16 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
     private bool _isInitialized;
 
-    public MtpProxyExecutionManager()
+    public MtpProxyExecutionManager(int protocolVersion)
     {
+        _protocolVersion = protocolVersion;
     }
 
-    public MtpProxyExecutionManager(IProxyDataCollectionManager dataCollectionManager)
+    public MtpProxyExecutionManager(IProxyDataCollectionManager dataCollectionManager, int protocolVersion)
     {
         _dataCollectionManager = dataCollectionManager;
         _dataCollectionEventsHandler = new DataCollectionRunEventsHandler();
+        _protocolVersion = protocolVersion;
     }
 
     public bool IsInitialized => _isInitialized;
@@ -146,7 +149,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             RunAttachments = attachments,
             ExecutorUris = executorUris.ToList(),
         };
-        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, completePayload));
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.ExecutionComplete, completePayload, _protocolVersion));
         eventHandler.HandleTestRunComplete(completeArgs, null, attachments, executorUris.ToList());
         return processId;
     }
@@ -384,7 +387,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
             }
 
             var statsChange = new TestRunChangedEventArgs(snapshot, results, null);
-            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, statsChange));
+            eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestRunStatsChange, statsChange, _protocolVersion));
             eventHandler.HandleTestRunStatsChange(statsChange);
         };
 
@@ -415,10 +418,10 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         return processId;
     }
 
-    private static void ReportLogMessage(IInternalTestRunEventsHandler eventHandler, TestMessageLevel level, string? message)
+    private void ReportLogMessage(IInternalTestRunEventsHandler eventHandler, TestMessageLevel level, string? message)
     {
         var payload = new TestMessagePayload { MessageLevel = level, Message = message };
-        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload));
+        eventHandler.HandleRawMessage(JsonDataSerializer.Instance.SerializePayload(MessageType.TestMessage, payload, _protocolVersion));
         eventHandler.HandleLogMessage(level, message);
     }
 

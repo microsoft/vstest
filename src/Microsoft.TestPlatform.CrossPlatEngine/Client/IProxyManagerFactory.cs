@@ -30,7 +30,8 @@ public interface IProxyManagerFactory
     /// <summary>
     /// Creates the discovery manager used to drive discovery for this provider's sources.
     /// </summary>
-    IProxyDiscoveryManager CreateDiscoveryManager();
+    /// <param name="protocolVersion">The negotiated vstest protocol version for messages sent to the client.</param>
+    IProxyDiscoveryManager CreateDiscoveryManager(int protocolVersion);
 
     /// <summary>
     /// Creates the execution manager used to drive execution for this provider's sources.
@@ -39,5 +40,6 @@ public interface IProxyManagerFactory
     /// The data collection manager to wire in when data collectors are enabled, or <see langword="null"/>
     /// when data collection is off.
     /// </param>
-    IProxyExecutionManager CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager);
+    /// <param name="protocolVersion">The negotiated vstest protocol version for messages sent to the client.</param>
+    IProxyExecutionManager CreateExecutionManager(IProxyDataCollectionManager? dataCollectionManager, int protocolVersion);
 }

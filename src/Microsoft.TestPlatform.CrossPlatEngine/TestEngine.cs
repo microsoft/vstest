@@ -135,7 +135,7 @@ public class TestEngine : ITestEngine
             if (hostManager is IProxyManagerFactory proxyManagerFactory)
             {
                 EqtTrace.Verbose("TestEngine.GetDiscoveryManager: provider '{0}' supplies its own discovery manager.", hostManager.GetType().Name);
-                return proxyManagerFactory.CreateDiscoveryManager();
+                return proxyManagerFactory.CreateDiscoveryManager(requestData.ProtocolConfig!.Version);
             }
 
             hostManager?.Initialize(TestSessionMessageLogger.Instance, runtimeProviderInfo.RunSettings!);
@@ -248,7 +248,7 @@ public class TestEngine : ITestEngine
                 ? new ProxyDataCollectionManager(requestData, runtimeProviderInfo.RunSettings, sources)
                 : null;
             EqtTrace.Verbose("TestEngine.CreateNonParallelExecutionManager: provider '{0}' supplies its own execution manager (data collection: {1}).", hostManager.GetType().Name, isDataCollectorEnabled);
-            return proxyManagerFactory.CreateExecutionManager(dataCollectionManager);
+            return proxyManagerFactory.CreateExecutionManager(dataCollectionManager, requestData.ProtocolConfig!.Version);
         }
 
         ThrowExceptionIfTestHostManagerIsNull(hostManager, runtimeProviderInfo.RunSettings);
