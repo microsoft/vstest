@@ -35,9 +35,12 @@ internal static class MtpTestNodeConverter
     private const string StandardErrorKey = "standardError";
     private const string LocationFileKey = "location.file";
     private const string LocationLineStartKey = "location.line-start";
+    private const string LocationTypeKey = "location.type";
+    private const string LocationMethodKey = "location.method";
     private const string TraitsKey = "traits";
 
     // Optional VSTest-provider properties (present only when the app still runs on the VSTestBridge).
+    private const string VsTestIdKey = "vstest.TestCase.Id";
     private const string VsTestFullyQualifiedNameKey = "vstest.TestCase.FullyQualifiedName";
     private const string VsTestExecutorUriKey = "vstest.original-executor-uri";
 
@@ -68,8 +71,13 @@ internal static class MtpTestNodeConverter
     public static TestCase ToTestCase(MtpTestNodeUpdate update, string source)
     {
         string? uid = update.Uid;
-        string fullyQualifiedName = GetRawString(update, VsTestFullyQualifiedNameKey)
-            ?? (uid is { Length: > 0 } ? uid : Guid.NewGuid().ToString());
+        string? locationType = GetRawString(update, LocationTypeKey);
+        string? locationMethod = GetRawString(update, LocationMethodKey);
+        string fullyQualifiedName = locationType is { Length: > 0 } && locationMethod is { Length: > 0 }
+            ? $"{locationType}.{locationMethod}"
+            : GetRawString(update, VsTestFullyQualifiedNameKey)
+                ?? update.DisplayName
+                ?? (uid is { Length: > 0 } ? uid : Guid.NewGuid().ToString());
         string executorUri = GetRawString(update, VsTestExecutorUriKey) ?? DefaultExecutorUri;
 
         var testCase = new TestCase(fullyQualifiedName, new Uri(executorUri), source)
@@ -80,6 +88,15 @@ internal static class MtpTestNodeConverter
         if (uid is { Length: > 0 })
         {
             testCase.SetPropertyValue(MtpUidProperty, uid);
+
+            // Native MTP data-driven tests can share a method identity and display name. Preserve the
+            // bridge ID or server-issued uid as the vstest identity while exposing a meaningful FQN.
+            string? vstestId = GetRawString(update, VsTestIdKey);
+            testCase.Id = Guid.TryParse(vstestId, out Guid parsedVstestId)
+                ? parsedVstestId
+                : Guid.TryParse(uid, out Guid parsedUid)
+                    ? parsedUid
+                    : new TestCase(uid, testCase.ExecutorUri, source).Id;
         }
 
         string? file = GetRawString(update, LocationFileKey);

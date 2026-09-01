@@ -66,6 +66,22 @@ public class MtpProxyDiscoveryManagerTests
             },
             parentUid: null);
 
+    private static MtpTestNodeUpdate ActionNodeWithMethodIdentity(
+        string uid,
+        string displayName,
+        string type,
+        string method)
+        => new(
+            new Dictionary<string, object?>
+            {
+                ["uid"] = uid,
+                ["display-name"] = displayName,
+                ["node-type"] = "action",
+                ["location.type"] = type,
+                ["location.method"] = method,
+            },
+            parentUid: null);
+
     private static MtpTestNodeUpdate ActionNodeWithoutUid(string displayName)
         => new(
             new Dictionary<string, object?>
@@ -121,6 +137,44 @@ public class MtpProxyDiscoveryManagerTests
         Assert.AreEqual(2, rawComplete.TotalTests);
         Assert.HasCount(1, rawComplete.FullyDiscoveredSources!);
         Assert.AreEqual(Source, rawComplete.FullyDiscoveredSources![0]);
+    }
+
+    [TestMethod]
+    public void DiscoverTestsRawMessageSupportsDartFullyQualifiedNameFiltering()
+    {
+        _client.NodesToPush =
+        [
+            ActionNodeWithMethodIdentity(
+                "opaque-node-uid",
+                "TestMethod",
+                "TestWindow.Smoke.IntegrationTests.TestClass",
+                "TestMethod"),
+        ];
+        string? rawMessage = null;
+        _eventHandler
+            .Setup(h => h.HandleRawMessage(It.IsAny<string>()))
+            .Callback<string>(message =>
+            {
+                if (JsonDataSerializer.Instance.DeserializeMessage(message).MessageType == MessageType.TestCasesFound)
+                {
+                    rawMessage = message;
+                }
+            });
+
+        using var manager = new MtpProxyDiscoveryManager(ProtocolVersion);
+        manager.DiscoverTests(Criteria(), _eventHandler.Object);
+
+        Assert.IsNotNull(rawMessage);
+        var message = JsonDataSerializer.Instance.DeserializeMessage(rawMessage);
+        Assert.AreEqual(ProtocolVersion, message.Version);
+        var tests = JsonDataSerializer.Instance.DeserializePayload<IEnumerable<TestCase>>(message);
+        var selectedTests = tests!
+            .Where(test => test.FullyQualifiedName.Contains("TestWindow.Smoke.IntegrationTests", StringComparison.Ordinal))
+            .ToList();
+        Assert.ContainsSingle(selectedTests);
+        Assert.AreEqual(
+            "TestWindow.Smoke.IntegrationTests.TestClass.TestMethod",
+            selectedTests[0].FullyQualifiedName);
     }
 
     [TestMethod]

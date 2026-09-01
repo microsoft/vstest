@@ -91,7 +91,7 @@ public class MtpUnderVstestTests : AcceptanceTestBase
 
     [TestMethod]
     [TestMatrix(testHost: Target.Net)]
-    public void MtpApplicationWorksThroughDesignModeRawMessageForwarding(RunnerInfo runnerInfo)
+    public void MtpApplicationWorksThroughDartLikeDesignModeDiscoveryAndSelectedExecution(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
@@ -146,7 +146,18 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         try
         {
             wrapper.DiscoverTests([source], GetDefaultRunSettings(), null, discoveryHandler.Object);
-            wrapper.RunTests([source], GetDefaultRunSettings(), runHandler.Object);
+            List<TestCase> dartFilteredTests = discoveredTests
+                .Where(test => test.FullyQualifiedName.Contains("MtpMSTestProject", StringComparison.Ordinal))
+                .ToList();
+            Assert.HasCount(
+                6,
+                dartFilteredTests,
+                $"A Dart-like FullyQualifiedName filter must retain the MTP tests discovered through raw design-mode messages. Discovered FQNs: {string.Join(", ", discoveredTests.Select(test => test.FullyQualifiedName))}");
+            List<TestCase> selectedTests = dartFilteredTests
+                .Where(test => test.FullyQualifiedName.EndsWith(".TestPasses", StringComparison.Ordinal))
+                .ToList();
+            Assert.ContainsSingle(selectedTests);
+            wrapper.RunTests(selectedTests, GetDefaultRunSettings(), runHandler.Object);
         }
         finally
         {
@@ -157,10 +168,8 @@ public class MtpUnderVstestTests : AcceptanceTestBase
         Assert.IsNotNull(discoveryComplete);
         Assert.IsFalse(discoveryComplete.IsAborted);
         Assert.Contains(source, discoveryComplete.FullyDiscoveredSources!);
-        Assert.HasCount(6, testResults);
-        Assert.AreEqual(4, testResults.Count(result => result.Outcome == TestOutcome.Passed));
-        Assert.ContainsSingle(testResults.Where(result => result.Outcome == TestOutcome.Failed));
-        Assert.ContainsSingle(testResults.Where(result => result.Outcome == TestOutcome.Skipped));
+        Assert.ContainsSingle(testResults);
+        Assert.AreEqual(TestOutcome.Passed, testResults[0].Outcome);
     }
 
     [TestMethod]

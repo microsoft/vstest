@@ -106,26 +106,63 @@ public class MtpTestNodeConverterTests
     }
 
     [TestMethod]
-    public void ToTestCaseUsesUidAsFullyQualifiedNameWhenBridgePropertiesAbsent()
+    public void ToTestCaseUsesNativeMethodIdentityAsFullyQualifiedName()
     {
-        TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(), Source);
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(
+            Node(
+                ("location.type", "My.Namespace.MyClass"),
+                ("location.method", "MyTest")),
+            Source);
 
-        Assert.AreEqual("node-uid-1", testCase.FullyQualifiedName);
+        Assert.AreEqual("My.Namespace.MyClass.MyTest", testCase.FullyQualifiedName);
         Assert.AreEqual(MtpTestNodeConverter.DefaultExecutorUri, testCase.ExecutorUri.OriginalString);
         Assert.AreEqual(Source, testCase.Source);
     }
 
     [TestMethod]
+    public void ToTestCaseUsesDisplayNameWhenMethodAndBridgeIdentitiesAreAbsent()
+    {
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(), Source);
+
+        Assert.AreEqual("MyTest", testCase.FullyQualifiedName);
+    }
+
+    [TestMethod]
     public void ToTestCasePrefersBridgePropertiesWhenPresent()
     {
+        var vstestId = Guid.NewGuid();
         TestCase testCase = MtpTestNodeConverter.ToTestCase(
             Node(
+                ("vstest.TestCase.Id", vstestId.ToString()),
                 ("vstest.TestCase.FullyQualifiedName", "My.Namespace.MyClass.MyTest"),
                 ("vstest.original-executor-uri", "executor://MSTestAdapter/v2")),
             Source);
 
+        Assert.AreEqual(vstestId, testCase.Id);
         Assert.AreEqual("My.Namespace.MyClass.MyTest", testCase.FullyQualifiedName);
         Assert.AreEqual("executor://MSTestAdapter/v2", testCase.ExecutorUri.OriginalString);
+    }
+
+    [TestMethod]
+    public void ToTestCasePreservesGuidNodeUidWhenBridgeIdIsAbsent()
+    {
+        var uid = Guid.NewGuid();
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(("uid", uid.ToString())), Source);
+
+        Assert.AreEqual(uid, testCase.Id);
+    }
+
+    [TestMethod]
+    public void ToTestCasePrefersNativeMethodIdentityOverBridgeProperty()
+    {
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(
+            Node(
+                ("location.type", "My.Namespace.MyClass"),
+                ("location.method", "MyTest"),
+                ("vstest.TestCase.FullyQualifiedName", "Bridge.Namespace.BridgeClass.BridgeTest")),
+            Source);
+
+        Assert.AreEqual("My.Namespace.MyClass.MyTest", testCase.FullyQualifiedName);
     }
 
     [TestMethod]
@@ -148,6 +185,25 @@ public class MtpTestNodeConverterTests
         TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(), Source);
 
         Assert.AreEqual("node-uid-1", testCase.GetPropertyValue<string>(MtpTestNodeConverter.MtpUidProperty, null));
+    }
+
+    [TestMethod]
+    public void ToTestCaseUsesMtpUidToDistinguishTestsWithTheSameMethodIdentity()
+    {
+        MtpTestNodeUpdate FirstNode() => Node(
+            ("uid", "data-row-1"),
+            ("location.type", "My.Namespace.MyClass"),
+            ("location.method", "MyDataTest"));
+        MtpTestNodeUpdate SecondNode() => Node(
+            ("uid", "data-row-2"),
+            ("location.type", "My.Namespace.MyClass"),
+            ("location.method", "MyDataTest"));
+
+        TestCase first = MtpTestNodeConverter.ToTestCase(FirstNode(), Source);
+        TestCase second = MtpTestNodeConverter.ToTestCase(SecondNode(), Source);
+
+        Assert.AreEqual(first.FullyQualifiedName, second.FullyQualifiedName);
+        Assert.AreNotEqual(first.Id, second.Id);
     }
 
     [TestMethod]
