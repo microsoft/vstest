@@ -67,7 +67,7 @@ Use persistent repo memory to track every file you have proposed or excluded:
 - **issue number**: required for `proposed`; omit for `excluded`
 - **reason**: required for `excluded`, for example `vendored` or `generated`
 
-Read memory at the **start** of every run; update it at the **end**. Add a file with status `proposed` only after you verify that its `[file-diet]` issue exists and capture the issue number. Issue creation is a deferred safe output, so do **not** add a newly proposed file to memory in the run that requests its issue; the next run will verify and record it. This keeps the file eligible for retry if issue creation fails. Add an excluded file as soon as you identify it, without an issue number, so the next run skips it.
+Read memory at the **start** of every run; update it at the **end**. Add a file with status `proposed` only after you verify that its `[file-diet]` issue exists and capture the issue number. Issue creation is a deferred safe output, so do **not** add a newly proposed file to memory in the run that requests its issue; the next eligible run after maintainers close the issue will verify and record it. This keeps the file eligible for retry if issue creation fails. Add an excluded file as soon as you identify it, without an issue number, so the next run skips it.
 
 **Never propose a file that is already recorded in memory**, no matter what happened to the issue afterwards. It does not matter whether that issue is still open, was closed, was merged, was rejected, or expired on its own. Once a file is recorded, it is permanently out of scope for you. Maintainers decide whether to act on a refactoring proposal, and re-filing one they have already seen wastes their time.
 
