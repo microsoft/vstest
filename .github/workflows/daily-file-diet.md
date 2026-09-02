@@ -69,7 +69,7 @@ Only one Daily File Diet cycle may remain active at a time. The `skip-if-match` 
 
 Use `eng/agentic-workflows/daily-file-diet.txt` as the durable ledger of every file you have proposed or excluded. This is checked-in workflow state, following the convention documented in `eng/agentic-workflows/README.md`.
 
-Before reading or modifying the ledger, search this repository for an open pull request whose title starts with `[file-diet-state]`. Use a PR-scoped query: `is:pr is:open in:title "[file-diet-state]"`. If one exists, do not modify any file or create an issue; call `noop` with the PR number and stop. This lets maintainers merge or close the pending state update before another cycle starts.
+Before reading or modifying the ledger, search this repository for an open pull request whose title starts with `[file-diet-state]`. Use a PR-scoped query: `is:pr is:open in:title "[file-diet-state]"`. If one exists, do not modify any file or create an issue; call `noop` with the message `State update PR #[NUMBER] is still open; no issue created.` and stop. This lets maintainers merge or close the pending state update before another cycle starts.
 
 Each non-comment line has four pipe-delimited fields:
 
