@@ -18,9 +18,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 /// </summary>
 public class LengthPrefixCommunicationChannel : ICommunicationChannel
 {
+    private readonly Stream _stream;
+
     private readonly BinaryReader _reader;
 
     private readonly BinaryWriter _writer;
+
+    private Exception? _sendFailure;
 
     /// <summary>
     /// Sync object for sending messages
@@ -30,6 +34,7 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
 
     public LengthPrefixCommunicationChannel(Stream stream)
     {
+        _stream = stream;
         _reader = new BinaryReader(stream, Encoding.UTF8, true);
 
         // Using the Buffered stream while writing, improves the write performance. By reducing the number of writes.
@@ -42,29 +47,47 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
     /// <inheritdoc />
     public Task Send(string data)
     {
-        try
+        // Writing Message on binarywriter is not Thread-Safe
+        // Need to sync one by one to avoid buffer corruption
+        lock (_writeSyncObject)
         {
-            // Writing Message on binarywriter is not Thread-Safe
-            // Need to sync one by one to avoid buffer corruption
-            lock (_writeSyncObject)
+            if (_sendFailure is not null)
+            {
+                throw new CommunicationException("Unable to send data over channel because a previous send failed.", _sendFailure);
+            }
+
+            try
             {
                 _writer.Write(data);
                 _writer.Flush();
             }
-        }
-        catch (NotSupportedException ex) when (!_writer.BaseStream.CanWrite)
-        {
-            // As we are simply creating streams around some stream passed as ctor argument, we
-            // end up in some unsynchronized behavior where it's possible that the outside stream
-            // was disposed and we are still trying to write something. In such case we would fail
-            // with "System.NotSupportedException: Stream does not support writing.".
-            // To avoid being too generic in that catch, I am checking if the stream is not writable.
-            EqtTrace.Verbose("LengthPrefixCommunicationChannel.Send: BaseStream is not writable (most likely it was dispose). {0}", ex);
-        }
-        catch (Exception ex)
-        {
-            EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error sending data: {0}.", ex);
-            throw new CommunicationException("Unable to send data over channel.", ex);
+            catch (NotSupportedException ex) when (!_stream.CanWrite)
+            {
+                // As we are simply creating streams around some stream passed as ctor argument, we
+                // end up in some unsynchronized behavior where it's possible that the outside stream
+                // was disposed and we are still trying to write something. In such case we would fail
+                // with "System.NotSupportedException: Stream does not support writing.".
+                // To avoid being too generic in that catch, I am checking if the stream is not writable.
+                EqtTrace.Verbose("LengthPrefixCommunicationChannel.Send: Stream is not writable (most likely it was disposed). {0}", ex);
+            }
+            catch (Exception ex)
+            {
+                _sendFailure = ex;
+
+                try
+                {
+                    // A failed write may have left a length prefix or a partial payload on the wire.
+                    // Close the stream before another send can reuse the broken frame boundary.
+                    _stream.Dispose();
+                }
+                catch (Exception disposeException)
+                {
+                    EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error closing stream after send failure: {0}.", disposeException);
+                }
+
+                EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error sending data: {0}.", ex);
+                throw new CommunicationException("Unable to send data over channel.", ex);
+            }
         }
 
         return Task.CompletedTask;
@@ -107,15 +130,36 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
     /// <inheritdoc />
     public void Dispose()
     {
+        // Dispose can run while another thread is inside Send. Take the write lock when it is
+        // free, so disposal never flushes the writer mid-frame, but never wait for it: blocking
+        // here would turn a stuck socket write into a shutdown hang.
+        var lockTaken = false;
         try
         {
+            Monitor.TryEnter(_writeSyncObject, ref lockTaken);
+
             EqtTrace.Verbose("LengthPrefixCommunicationChannel.Dispose: Dispose reader and writer.");
             _reader.Dispose();
-            _writer.Dispose();
+
+            // BinaryWriter.Dispose flushes its BufferedStream. Skip that flush after a failed
+            // send, where the buffer can still hold part of an incomplete frame that must not
+            // reach the peer, and skip it while a send holds the lock, to avoid racing that
+            // writer. Neither skip loses data: Send flushes after every message it completes.
+            if (lockTaken && _sendFailure is null)
+            {
+                _writer.Dispose();
+            }
         }
         catch (ObjectDisposedException)
         {
             // We don't own the underlying stream lifecycle so it's possible that it's already disposed.
+        }
+        finally
+        {
+            if (lockTaken)
+            {
+                Monitor.Exit(_writeSyncObject);
+            }
         }
 
         GC.SuppressFinalize(this);
