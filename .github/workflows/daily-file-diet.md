@@ -97,12 +97,15 @@ git ls-tree -r --name-only HEAD \
   | grep -vE '(Nuget\.Frameworks/|NuGetClone|/Jsonite/|SimpleJSON\.cs)' \
   | xargs wc -l 2>/dev/null \
   | grep -vE '^[[:space:]]*[0-9]+[[:space:]]+total$' \
+  | grep -E '^[[:space:]]*([5-9][0-9]{2}|[1-9][0-9]{3,})[[:space:]]+' \
   | sort -rn
 ```
 
 The second `grep -vE` drops vendored third-party code. See "Skip vendored third-party code" under `## Important Guidelines` for why those files must never be proposed.
 
 Both `grep -vE` calls are **case-sensitive**, and they must stay that way. `Tests?\.` matches `Foo.Tests.` but deliberately does not match the lowercase `test.` in `src/vstest.console/`. Adding `-i` would drop the whole of `vstest.console` from the scan.
+
+The final `grep -E` keeps the complete set of files at or above the 500-line threshold while omitting smaller files from the agent's context.
 
 Also skip test files — focus on non-test production code.
 
