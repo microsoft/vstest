@@ -49,6 +49,8 @@ Analyze the repository's source files to identify the largest file you have **no
 
 You propose each file at most once, ever. Remembering what you have already proposed is part of the job, not an optimisation — see `## Memory`.
 
+Only one `[file-diet]` issue may remain open at a time. Open issues do not expire automatically, and the `skip-if-match` guard intentionally pauses both scheduled and manual runs until maintainers close the current proposal. Once it is closed, the next run records it in memory and moves to the next eligible file.
+
 ## Current Context
 
 - **Repository**: ${{ github.repository }}
@@ -65,7 +67,7 @@ Use persistent repo memory to track every file you have proposed or excluded:
 - **issue number**: required for `proposed`; omit for `excluded`
 - **reason**: required for `excluded`, for example `vendored` or `generated`
 
-Read memory at the **start** of every run; update it at the **end**. Add a proposed file to memory in the same run that you create its issue. Add an excluded file as soon as you identify it, without an issue number, so the next run skips it.
+Read memory at the **start** of every run; update it at the **end**. Add a file with status `proposed` only after you verify that its `[file-diet]` issue exists and capture the issue number. Issue creation is a deferred safe output, so do **not** add a newly proposed file to memory in the run that requests its issue; the next run will verify and record it. This keeps the file eligible for retry if issue creation fails. Add an excluded file as soon as you identify it, without an issue number, so the next run skips it.
 
 **Never propose a file that is already recorded in memory**, no matter what happened to the issue afterwards. It does not matter whether that issue is still open, was closed, was merged, was rejected, or expired on its own. Once a file is recorded, it is permanently out of scope for you. Maintainers decide whether to act on a refactoring proposal, and re-filing one they have already seen wastes their time.
 
@@ -73,12 +75,12 @@ The following files have already been proposed. Record them in memory with statu
 
 | File | Proposed |
 |---|---|
-| `src/vstest.console/TestPlatformHelpers/TestRequestManager.cs` | 16 issues between 2026-06-19 and 2026-08-24, most recently #16405 |
+| `src/vstest.console/TestPlatformHelpers/TestRequestManager.cs` | #16405 |
 | `src/Microsoft.TestPlatform.CommunicationUtilities/Json/Jsonite/Jsonite.cs` | #16194 |
 
 Merge this list into memory on your first run, then keep extending memory as normal.
 
-**Important**: Memory may not be 100% accurate. Issues may have been created, closed, or commented on since your last run. Verify memory against the current repository state before acting on it. If memory is missing or unreadable, fall back to the seed list above. Before proposing each candidate, search for existing `[file-diet]` issues containing that candidate's exact file path, including **closed** issues, and skip the candidate if you find one.
+**Important**: Memory may not be 100% accurate. Issues may have been created, closed, or commented on since your last run. Verify memory against the current repository state before acting on it. If memory is missing or unreadable, fall back to the seed list above. Before proposing each candidate, search for existing `[file-diet]` issues containing that candidate's exact file path, including **closed** issues. If you find one, record the file in memory with status `proposed` and its issue number, then continue to the next candidate.
 
 ## Analysis Process
 
@@ -94,8 +96,7 @@ git ls-tree -r --name-only HEAD \
   | grep -vE '(Tests?\.|\.Tests|test/|\.Designer\.cs|\.generated\.cs|\.g\.cs)' \
   | grep -vE '(Nuget\.Frameworks/|NuGetClone|/Jsonite/|SimpleJSON\.cs)' \
   | xargs -n 1 wc -l 2>/dev/null \
-  | sort -rn \
-  | head -20
+  | sort -rn
 ```
 
 The second `grep -vE` drops vendored third-party code. See "Skip vendored third-party code" under `## Important Guidelines` for why those files must never be proposed.
