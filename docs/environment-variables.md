@@ -134,10 +134,11 @@ This document lists environment variables that are currently handled by VSTest s
 - **Example**: `VSTEST_DISABLE_MTP_TESTHOST=0`
 
 ### VSTEST_DISABLE_XXHASH128_TESTCASE_ID
-- **Description**: Disables computing `TestCase.Id`, the GUID that identifies a test, with xxHash128, falling back to the SHA1 ids vstest has always produced. xxHash128 is a faster non-cryptographic replacement that produces an [RFC 9562](https://www.rfc-editor.org/rfc/rfc9562.html#name-uuid-version-8) version 8 UUID, and matches the ids MSTest computes for the same input. It is intended to become the default in a later release, at which point the default of this variable flips to `0`; the meaning of each value stays the same, so `1` pins today's ids across that change. Only affects tests whose id the platform computes - adapters that assign `TestCase.Id` themselves, such as MSTest v3 and v4, are unaffected.
+- **Description**: Disables computing `TestCase.Id`, the GUID that identifies a test, with xxHash128, falling back to the SHA1 ids vstest has always produced. xxHash128 is a faster non-cryptographic replacement that produces an [RFC 9562](https://www.rfc-editor.org/rfc/rfc9562.html#name-uuid-version-8) version 8 UUID, and matches the ids MSTest computes for the same input. Only affects tests whose id the platform computes - adapters that assign `TestCase.Id` themselves, such as MSTest v3 and v4, are unaffected.
 - **Default**: `1` (disabled, so ids are unchanged)
 - **Values**: Set to `0` to opt in to the xxHash128 ids; any other value keeps them disabled
 - **Example**: `VSTEST_DISABLE_XXHASH128_TESTCASE_ID=0`
+- **Note**: xxHash128 is intended to become the default in a later release, at which point the default of this variable flips to `0`. The meaning of each value stays the same, so setting `1` pins today's ids across that change.
 
 ### VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING
 - **Description**: Disables artifact post-processing functionality.
