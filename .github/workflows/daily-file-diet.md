@@ -95,7 +95,8 @@ git ls-tree -r --name-only HEAD \
   | grep -E '\.(cs|fs|vb)$' \
   | grep -vE '(Tests?\.|\.Tests|test/|\.Designer\.cs|\.generated\.cs|\.g\.cs)' \
   | grep -vE '(Nuget\.Frameworks/|NuGetClone|/Jsonite/|SimpleJSON\.cs)' \
-  | xargs -n 1 wc -l 2>/dev/null \
+  | xargs wc -l 2>/dev/null \
+  | grep -vE '^[[:space:]]*[0-9]+[[:space:]]+total$' \
   | sort -rn
 ```
 
@@ -107,7 +108,7 @@ Also skip test files — focus on non-test production code.
 
 Keep the ranked output for candidate selection. For each entry, extract:
 
-- **File path**: full path to the non-test source file
+- **File path**: repository-relative path to the non-test source file
 - **Line count**: number of lines in the file
 
 ### 2. Select a Candidate
