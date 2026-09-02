@@ -25,9 +25,9 @@ runner's temp directory instead and never touch the working tree.
 
 ## Editing
 
-`daily-file-diet.txt` is an append-only ledger with no regenerating checker. The Daily File Diet
-agent extends it through state pull requests. Manual corrections are allowed when they preserve
-the pipe-delimited schema and file-path sort order documented in the file.
+`daily-file-diet.txt` is a durable, sorted ledger with no regenerating checker. The Daily File
+Diet agent adds records through state pull requests. Manual corrections are allowed when they
+preserve the pipe-delimited schema and file-path sort order documented in the file.
 
 Regenerate the link-checker fingerprint files; do not hand-write their entries. A line that does
 not match the checker's output byte for byte looks like a change to the probe, which dispatches
