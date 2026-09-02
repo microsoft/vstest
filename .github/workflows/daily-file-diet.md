@@ -47,7 +47,7 @@ You are the Daily File Diet Agent - a code health specialist that monitors file 
 
 Analyze the repository's source files to identify the largest file you have **not already proposed**, and determine if it requires refactoring. Create an issue only when such a file exceeds healthy size thresholds, providing specific guidance for splitting it into smaller, more focused files.
 
-You propose each file at most once, ever. Remembering what you have already proposed is part of the job, not an optimisation — see `## Memory`.
+A file is permanently out of scope once its `[file-diet]` issue is confirmed and recorded in memory. A failed deferred issue request may be retried because no proposal exists. Remembering confirmed proposals is part of the job, not an optimisation — see `## Memory`.
 
 Only one `[file-diet]` issue may remain open at a time. Open issues do not expire automatically, and the `skip-if-match` guard intentionally pauses both scheduled and manual runs until maintainers close the current proposal. Once it is closed, the next run records it in memory and moves to the next eligible file.
 
@@ -144,7 +144,7 @@ Read the candidate and understand its structure:
 head -n 100 <CANDIDATE_FILE>
 ```
 
-The first 100 lines are also your last check on provenance. If the header shows the file is vendored or generated — a `THIRD-PARTY NOTICE` banner, a `Written by <someone>` credit, an upstream URL outside this organisation, or a namespace such as `Jsonite`, `SimpleJSON`, or `NuGetClone` — abandon it, record it in memory with status `excluded` and reason `vendored` or `generated`, omit the issue number, and go back to step 2 for the next candidate down the list.
+The first 100 lines are also your last check on provenance. If the header shows the file is vendored or generated — a `THIRD-PARTY NOTICE` banner, a `Written by <someone>` credit, a `Source:` or `Copied from` marker pointing to a third-party repository, or a namespace such as `Jsonite`, `SimpleJSON`, or `NuGetClone` — abandon it, record it in memory with status `excluded` and reason `vendored` or `generated`, omit the issue number, and go back to step 2 for the next candidate down the list.
 
 ```bash
 grep -n "^.*class \|^.*interface \|^.*struct \|^.*enum \|^.*record \|public.*static.*void\|public.*static.*async\|public.*void\|public.*async\|private.*void\|private.*async\|internal.*void\|internal.*async" <CANDIDATE_FILE> | head -50
@@ -226,7 +226,7 @@ Based on the file's structure, split it into the following modules:
 - **Never propose the same file twice**: Check memory first. A file recorded in memory is out of scope permanently, whether its issue is open or closed. See `## Memory`
 - **Skip generated files**: Ignore files in `artifacts/`, `obj/`, `bin/`, or files with a header indicating they are generated (e.g., "Code generated", "DO NOT EDIT", `.Designer.cs`, `.g.cs`)
 - **Skip vendored third-party code**: This repository embeds copies of third-party sources so they can be re-synced from upstream. Splitting one makes every future sync a manual merge, so they must never be proposed. Treat a file as vendored when any of these hold:
-  - The header carries a third-party marker: `THIRD-PARTY NOTICE`, a `Written by <someone>` credit, or an upstream URL outside this organisation (for example `https://github.com/xoofx/jsonite`, `https://github.com/Bunny83/SimpleJSON`)
+  - The header carries a third-party marker: `THIRD-PARTY NOTICE`, a `Written by <someone>` credit, or a `Source:` or `Copied from` marker pointing to a third-party repository (for example `https://github.com/xoofx/jsonite`, `https://github.com/Bunny83/SimpleJSON`)
   - The namespace or path marks it as a vendored clone, for example `NuGetClone`, `Nuget.Frameworks`, `Jsonite`, `SimpleJSON`
   - The known vendored paths today are `src/Microsoft.TestPlatform.ObjectModel/Nuget.Frameworks/`, `src/Microsoft.TestPlatform.CommunicationUtilities/Json/Jsonite/`, and `src/Microsoft.TestPlatform.Common/Utilities/SimpleJSON.cs`. The ranking command in step 1 already excludes them; the header check in step 3 catches any that are added later
   - First-party code that merely *uses* a vendored library is fine. `src/Microsoft.TestPlatform.CommunicationUtilities/JsonDataSerializer.Jsonite.cs` is our own code and stays in scope
