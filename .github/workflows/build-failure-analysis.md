@@ -55,8 +55,9 @@ permissions:
 concurrency:
   group: build-failure-analysis-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
   cancel-in-progress: true
-  # Manual dispatches all share the same group key above (github.ref), which would
-  # make their compiler-generated job-level groups collide. Give each run its own.
+  # The compiler emits a constant conclusion-job group, so every run of this
+  # workflow serializes on it (queue: max, cancel-in-progress: false).
+  # Give each run its own key.
   job-discriminator: ${{ github.run_id }}
 
 env:
