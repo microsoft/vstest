@@ -12,7 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 /// <summary>
-/// End to end coverage of the temporary <c>testids</c> logger, run out of the shipped package.
+/// End to end coverage of the temporary <c>testids</c> logger, run out of the shipped packages.
 /// </summary>
 /// <remarks>
 /// <para>
@@ -20,7 +20,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// file a migration script can read. That spans extension discovery, the packaged layout and the
 /// report writer, and no unit test sees any of it: the unit tests construct the logger directly, so
 /// they would pass just as happily if the assembly never shipped or the extension attributes were
-/// wrong. These tests run <c>vstest.console</c> from the extracted package, so what they exercise is
+/// wrong. These tests run <c>vstest.console</c> from the extracted packages, so what they exercise is
 /// what a user gets.
 /// </para>
 /// <para>
@@ -43,9 +43,16 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// name branch is therefore covered by the unit tests rather than from end to end.
 /// </para>
 /// <para>
-/// One matrix entry per test. What is under test is the packaged extension and the file it writes,
-/// which is specific to neither the console flavour nor the target framework, and each row costs a
-/// full vstest.console invocation.
+/// What the report says is specific to neither the console flavour nor the target framework, so the
+/// tests that assert on its contents take one matrix entry each - a row costs a full vstest.console
+/// invocation. The build of the extension is the exception: the .NET package ships the netstandard
+/// one and the .NET Framework package the net48 one, and only a run out of that package says whether
+/// the second works as an extension.
+/// <see cref="TestIdsLoggerIsUsableFromTheDotNetFrameworkPackage"/> is the row that runs it.
+/// </para>
+/// <para>
+/// The Portable package ships both builds again under a layout of its own, and there is no runner
+/// here that reads that package - so nothing below covers it.
 /// </para>
 /// </remarks>
 [TestClass]
@@ -77,13 +84,7 @@ public class TestIdsLoggerTests : AcceptanceTestBase
 
         foreach (var row in beforeOptIn)
         {
-            Assert.AreEqual("Sha1", row.IdSource, $"'{row.FullyQualifiedName}' should carry a SHA1 id when the run did not opt in.");
-            Assert.AreEqual(row.Sha1Id, row.Id, $"'{row.FullyQualifiedName}' reports IdSource=Sha1, so Id must equal Sha1Id.");
-            Assert.AreNotEqual(row.Sha1Id, row.XxHash128Id, $"'{row.FullyQualifiedName}': the two algorithms must not produce the same id.");
-            Assert.IsTrue(
-                IsXxHash128Id(row.XxHash128Id),
-                $"'{row.XxHash128Id}' is not shaped like an xxHash128 id (leading '1' hash version nibble, third group leading '8').");
-            AssertRowIdentifiesItsTest(row, "SimpleTestProject4.dll");
+            AssertPlatformComputedSha1Row(row, "SimpleTestProject4.dll");
         }
 
         foreach (var row in afterOptIn)
@@ -172,13 +173,7 @@ public class TestIdsLoggerTests : AcceptanceTestBase
         // every assertion above.
         foreach (var row in rows)
         {
-            Assert.AreEqual("Sha1", row.IdSource, $"'{row.FullyQualifiedName}' should carry a SHA1 id when the run did not opt in.");
-            Assert.AreEqual(row.Sha1Id, row.Id, $"'{row.FullyQualifiedName}' reports IdSource=Sha1, so Id must equal Sha1Id.");
-            Assert.AreNotEqual(row.Sha1Id, row.XxHash128Id, $"'{row.FullyQualifiedName}': the two algorithms must not produce the same id.");
-            Assert.IsTrue(
-                IsXxHash128Id(row.XxHash128Id),
-                $"'{row.XxHash128Id}' is not shaped like an xxHash128 id (leading '1' hash version nibble, third group leading '8').");
-            AssertRowIdentifiesItsTest(row, "SimpleTestProject4.dll");
+            AssertPlatformComputedSha1Row(row, "SimpleTestProject4.dll");
         }
     }
 
@@ -249,6 +244,47 @@ public class TestIdsLoggerTests : AcceptanceTestBase
     }
 
     /// <summary>
+    /// The .NET Framework <c>vstest.console.exe</c>, taken from the <c>Microsoft.TestPlatform</c> package.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The <c>Microsoft.TestPlatform</c> package ships the .NET Framework build of the extension; the
+    /// <c>Microsoft.TestPlatform.CLI</c> package the other tests run out of ships the netstandard one.
+    /// </para>
+    /// <para>
+    /// Where those files land is already pinned twice, by the path keyed entries in
+    /// <c>eng/expected-dll-frameworks.json</c> and by <c>DiscoveryTests.TypesToLoadAttributeTests</c>,
+    /// which loads this assembly out of that exact folder. What neither of them does is run it as an
+    /// extension: they see a file and read its metadata, they never resolve the friendly name through
+    /// the console's extension cache, and they never hand it to a running console. The unit tests do
+    /// execute this build - their net481 leg binds to it rather than to the netstandard one - but they
+    /// construct the logger directly, which is the one thing a user never does. This is the only place
+    /// the .NET Framework build is reached the way a user reaches it.
+    /// </para>
+    /// <para>
+    /// It asserts the contents too, the same way the not-opted-in arm of
+    /// <see cref="TestIdsLoggerReportsBothIdsAndTheMappingDoesNotDependOnTheRunsAlgorithm"/> does.
+    /// Those assertions are console independent and so add no coverage of their own, but a report
+    /// that is found and wrong is not an outcome worth shipping either, and the run that proves the
+    /// build works has already paid for them.
+    /// </para>
+    /// </remarks>
+    [TestMethod]
+    [TestCategory("Windows-Review")]
+    [TestMatrix(console: NetFx, testHost: Net)]
+    public void TestIdsLoggerIsUsableFromTheDotNetFrameworkPackage(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var rows = RunAndReadReport(runnerInfo, featureFlagValue: "1", "netfx.csv");
+
+        foreach (var row in rows)
+        {
+            AssertPlatformComputedSha1Row(row, "SimpleTestProject4.dll");
+        }
+    }
+
+    /// <summary>
     /// xxHash128 ids are RFC 9562 version 8 UUIDs carrying the hashing scheme version in the top
     /// nibble, so the string form starts with the scheme version and its third group starts with the
     /// UUID version. SHA1 ids are unversioned and match neither.
@@ -263,6 +299,21 @@ public class TestIdsLoggerTests : AcceptanceTestBase
             && id.Split('-') is { Length: 5 } groups
             && groups[2].Length > 0
             && groups[2][0] == '8';
+
+    /// <summary>
+    /// A row for a test whose id the platform computed and that has not opted in: the carried id is
+    /// the SHA1 one, and the xxHash128 column is the id it is about to become.
+    /// </summary>
+    private static void AssertPlatformComputedSha1Row(ReportRow row, string expectedSourceFileName)
+    {
+        Assert.AreEqual("Sha1", row.IdSource, $"'{row.FullyQualifiedName}' should carry a SHA1 id when the run did not opt in.");
+        Assert.AreEqual(row.Sha1Id, row.Id, $"'{row.FullyQualifiedName}' reports IdSource=Sha1, so Id must equal Sha1Id.");
+        Assert.AreNotEqual(row.Sha1Id, row.XxHash128Id, $"'{row.FullyQualifiedName}': the two algorithms must not produce the same id.");
+        Assert.IsTrue(
+            IsXxHash128Id(row.XxHash128Id),
+            $"'{row.XxHash128Id}' is not shaped like an xxHash128 id (leading '1' hash version nibble, third group leading '8').");
+        AssertRowIdentifiesItsTest(row, expectedSourceFileName);
+    }
 
     /// <summary>
     /// The two columns a consumer joins on besides the id. They have empty fallbacks in the writer,
