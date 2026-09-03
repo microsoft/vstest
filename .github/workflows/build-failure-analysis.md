@@ -55,6 +55,9 @@ permissions:
 concurrency:
   group: build-failure-analysis-${{ github.event.pull_request.number || github.event.issue.number || github.ref }}
   cancel-in-progress: true
+  # Manual dispatches all share the same group key above (github.ref), which would
+  # make their compiler-generated job-level groups collide. Give each run its own.
+  job-discriminator: ${{ github.run_id }}
 
 env:
   NUGET_MCP_VERSION: '1.4.3'

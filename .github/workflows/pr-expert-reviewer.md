@@ -62,9 +62,6 @@ safe-outputs:
     run-failure: "⚠️ [{workflow_name}]({run_url}) {status}. Expert review could not be completed."
 
 timeout-minutes: 15
-
-imports:
-  - shared/repo-build-setup.md
 ---
 
 # Expert Code Reviewer 🧠
