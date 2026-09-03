@@ -3,14 +3,18 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 
+using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 using Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Common.Logging;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Adapter;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -23,6 +27,13 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 [TestClass]
 public class TestPluginDiscovererTests
 {
+    [TestCleanup]
+    public void Cleanup()
+    {
+        // The plugin cache is a process wide singleton and one of the tests below clears it.
+        TestPluginCacheHelper.ResetExtensionsCache();
+    }
+
     [TestMethod]
     public void GetTestExtensionsInformationShouldNotThrowOnALoadException()
     {
@@ -133,7 +144,179 @@ public class TestPluginDiscovererTests
         _ = TestPluginDiscoverer.GetTestExtensionsInformation<FaultyTestExecutorPluginInformation, ITestExecutor>(pathToExtensions);
     }
 
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnWhenAnExtensionCannotBeLoaded()
+    {
+        var extension = GetPathToExtensionThatCannotBeLoaded();
+
+        var messages = CaptureSessionMessages(
+            () => TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string> { extension }));
+
+        var message = messages.Single();
+        Assert.AreEqual(TestMessageLevel.Warning, message.Level);
+        Assert.Contains(extension, message.Message);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnOnlyOnceForTheSameExtension()
+    {
+        var extension = GetPathToExtensionThatCannotBeLoaded();
+
+        var messages = CaptureSessionMessages(() =>
+        {
+            var paths = new List<string> { extension };
+
+            // The same file is scanned once per extension type we look for, the user should hear about it once.
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(paths);
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestDiscovererPluginInformation, ITestDiscoverer>(paths);
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestExecutorPluginInformation, ITestExecutor>(paths);
+        });
+
+        Assert.ContainsSingle(messages);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldNotWarnWhenProbingForKnownExtensions()
+    {
+        // With no extension paths we probe for a few well known extensions that are usually not present,
+        // failing to load those is expected and must stay invisible to the user.
+        var messages = CaptureSessionMessages(
+            () => TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string>()));
+
+        Assert.IsEmpty(messages);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnAgainAfterTheExtensionCacheIsCleared()
+    {
+        var extension = GetPathToExtensionThatCannotBeLoaded();
+
+        var messages = CaptureSessionMessages(() =>
+        {
+            var paths = new List<string> { extension };
+
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(paths);
+
+            // This is what the runner does before every discovery or run request. Reporting once per run has to
+            // mean once per run even in an editor that keeps the runner alive across many of them, otherwise the
+            // user is told about a broken extension once and never again.
+            TestPluginCache.Instance.ClearExtensions();
+
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(paths);
+        });
+
+        Assert.HasCount(2, messages);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsInformationShouldWarnOnlyOnceForTheSameExtensionWhenTheCasingDiffers()
+    {
+        var extension = GetPathToExtensionThatCannotBeLoaded();
+
+        var messages = CaptureSessionMessages(() =>
+        {
+            // On Windows those two paths are the same file, and a second warning about it tells the user
+            // nothing they cannot already see in the first.
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string> { extension });
+            TestPluginDiscoverer.GetTestExtensionsInformation<TestLoggerPluginInformation, ITestLogger>(new List<string> { extension.ToUpperInvariant() });
+        });
+
+        Assert.ContainsSingle(messages);
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsFromAssemblyShouldNotWarnWhenOnlySomeTypesFailToLoad()
+    {
+        var filePath = GetPathToExtensionThatCannotBeLoaded();
+        var assembly = new PartiallyLoadedAssembly(typeof(ValidDiscoverer), null);
+        var pluginInfos = new Dictionary<string, TestDiscovererPluginInformation>();
+
+        var messages = CaptureSessionMessages(
+            () => TestPluginDiscoverer.GetTestExtensionsFromAssembly<TestDiscovererPluginInformation, ITestDiscoverer>(assembly, pluginInfos, filePath, reportFailures: true));
+
+        // Adapters that reference an older ObjectModel throw this on a run that is otherwise completely fine,
+        // see https://github.com/microsoft/vstest/issues/290. Warning here would put a warning on green runs.
+        Assert.IsEmpty(messages);
+
+        // And the types that did load are still discovered.
+        var expected = new TestDiscovererPluginInformation(typeof(ValidDiscoverer));
+        Assert.IsTrue(pluginInfos.ContainsKey(expected.IdentifierData!));
+    }
+
+    [TestMethod]
+    public void GetTestExtensionsFromAssemblyShouldWarnWithTheReasonWhenNoTypeLoads()
+    {
+        var filePath = GetPathToExtensionThatCannotBeLoaded();
+        var assembly = new PartiallyLoadedAssembly();
+        var pluginInfos = new Dictionary<string, TestDiscovererPluginInformation>();
+
+        var messages = CaptureSessionMessages(
+            () => TestPluginDiscoverer.GetTestExtensionsFromAssembly<TestDiscovererPluginInformation, ITestDiscoverer>(assembly, pluginInfos, filePath, reportFailures: true));
+
+        var message = messages.Single();
+        Assert.AreEqual(TestMessageLevel.Warning, message.Level);
+        Assert.Contains(filePath, message.Message);
+
+        // The whole point of the message is to say which dependency is missing, instead of telling the user to
+        // re-run with /diag.
+        Assert.Contains(MissingDependencyName, message.Message);
+    }
+
+    /// <summary>
+    /// A file that is guaranteed to not be loadable, and that no other test has reported yet.
+    /// </summary>
+    private static string GetPathToExtensionThatCannotBeLoaded()
+        => $"ThisExtensionCannotBeLoaded{Guid.NewGuid():N}.dll";
+
+    private static List<TestRunMessageEventArgs> CaptureSessionMessages(Action action)
+    {
+        var messages = new List<TestRunMessageEventArgs>();
+        void OnTestRunMessage(object? sender, TestRunMessageEventArgs args) => messages.Add(args);
+
+        TestSessionMessageLogger.Instance.TestRunMessage += OnTestRunMessage;
+        try
+        {
+            action();
+        }
+        finally
+        {
+            TestSessionMessageLogger.Instance.TestRunMessage -= OnTestRunMessage;
+        }
+
+        return messages;
+    }
+
     #region Implementations
+
+    private const string MissingDependencyName = "Microsoft.Bcl.AsyncInterfaces";
+
+    /// <summary>
+    /// An assembly that loaded but whose types did not, the way a real adapter behaves when one of its
+    /// dependencies is missing. <see cref="ReflectionTypeLoadException.Types"/> holds null for every type that
+    /// failed, so passing no type at all stands for an assembly nothing could be loaded from.
+    /// </summary>
+    private sealed class PartiallyLoadedAssembly : Assembly
+    {
+        private readonly Type?[] _loadedTypes;
+
+        public PartiallyLoadedAssembly(params Type?[] loadedTypes) => _loadedTypes = loadedTypes;
+
+        public override string FullName => "PartiallyLoadedAssembly, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null";
+
+        public override Type[] GetTypes()
+            => throw new ReflectionTypeLoadException(
+                _loadedTypes,
+                new Exception[] { new FileNotFoundException($"Could not load file or assembly '{MissingDependencyName}, Version=9.0.0.8, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51'. The system cannot find the file specified.") });
+
+        public override Type? GetType(string name, bool throwOnError, bool ignoreCase) => null;
+
+        // These have to hand back an Attribute[], the reflection helpers cast the result back to one.
+        public override object[] GetCustomAttributes(bool inherit) => Array.Empty<Attribute>();
+
+        public override object[] GetCustomAttributes(Type attributeType, bool inherit) => Array.Empty<Attribute>();
+
+        public override bool IsDefined(Type attributeType, bool inherit) => false;
+    }
 
     #region Discoverers
 
