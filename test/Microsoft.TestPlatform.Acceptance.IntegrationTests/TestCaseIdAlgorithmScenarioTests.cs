@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -87,13 +88,22 @@ public class TestCaseIdAlgorithmScenarioTests : AcceptanceTestBase
 
     /// <summary>
     /// xxHash128 ids are RFC 9562 version 8 UUIDs carrying the hashing scheme version in the top
-    /// nibble, so the string form starts with the scheme version and its third group starts with the
-    /// UUID version. SHA1 ids are unversioned and match neither.
+    /// nibble, so the dashed form starts with the scheme version and carries the UUID version at the
+    /// start of the third group. SHA1 ids are unversioned and match neither.
     /// </summary>
-    private static bool IsXxHash128Id(string id)
-        => id[0] == '1' && id.Split('-')[2][0] == '8';
+    /// <remarks>
+    /// Taking a <see cref="Guid"/> rather than a string keeps this total: the dashed form is fixed
+    /// width, so both positions always exist. Accepting a string and answering false for anything
+    /// unparseable would be worse than throwing, because <c>Assert.IsFalse(IsXxHash128Id(id))</c>
+    /// would then pass on a malformed id instead of reporting it.
+    /// </remarks>
+    private static bool IsXxHash128Id(Guid id)
+    {
+        var text = id.ToString("D");
+        return text[0] == '1' && text[14] == '8';
+    }
 
-    private List<string> RunAndReadTestCaseIds(RunnerInfo runnerInfo, string? featureFlagValue, string trxFileName)
+    private List<Guid> RunAndReadTestCaseIds(RunnerInfo runnerInfo, string? featureFlagValue, string trxFileName)
     {
         var assemblyPath = GetAssetFullPath("SimpleTestProject4.dll");
 
@@ -136,7 +146,7 @@ public class TestCaseIdAlgorithmScenarioTests : AcceptanceTestBase
         var trxPath = Path.Combine(TempDirectory.Path, trxFileName);
         Assert.IsTrue(File.Exists(trxPath), $"Expected a TRX at '{trxPath}'.");
 
-        var ids = XDocument.Load(trxPath)
+        var idAttributes = XDocument.Load(trxPath)
             .Descendants()
             .Where(e => e.Name.LocalName == "UnitTest")
             .Select(e => e.Attribute("id")?.Value)
@@ -144,13 +154,21 @@ public class TestCaseIdAlgorithmScenarioTests : AcceptanceTestBase
 
         // The counts above are asserted against console output; this pins the artifact the
         // assertions actually run over, so a truncated TRX cannot satisfy them by being short.
-        Assert.HasCount(ExpectedTestCount, ids, $"Unexpected number of test definitions in '{trxPath}'.");
+        Assert.HasCount(ExpectedTestCount, idAttributes, $"Unexpected number of test definitions in '{trxPath}'.");
 
-        Assert.DoesNotContain(
-            (string?)null,
-            ids,
-            $"A UnitTest element in '{trxPath}' has no id attribute, so its test case id cannot be read.");
+        // Rejecting anything that is not a guid here, rather than tolerating it in the shape check,
+        // keeps a malformed id a reported failure instead of one that quietly looks like a SHA1 id.
+        var ids = new List<Guid>();
+        foreach (var value in idAttributes)
+        {
+            Assert.IsTrue(
+                Guid.TryParse(value, out var id),
+                $"A UnitTest element in '{trxPath}' has id '{value ?? "(missing)"}', which is not a guid, " +
+                "so its test case id cannot be read.");
 
-        return ids!;
+            ids.Add(id);
+        }
+
+        return ids;
     }
 }
