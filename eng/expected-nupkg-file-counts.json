@@ -1,6 +1,6 @@
 {
   "Microsoft.CodeCoverage": 81,
-  "Microsoft.NET.Test.Sdk": 26,
+  "Microsoft.NET.Test.Sdk": 21,
   "Microsoft.TestPlatform": 540,
   "Microsoft.TestPlatform.AdapterUtilities": 66,
   "Microsoft.TestPlatform.Build": 22,
