@@ -35,6 +35,10 @@ permissions:
   copilot-requests: write
 
 tools:
+  # This reviewer reads the PR through the GitHub MCP tools only; it never shells out.
+  # gh-aw strict mode requires the setting to be explicit when min-integrity is 'none'.
+  bash: false
+  cli-proxy: false
   cache-memory: true
   github:
     toolsets: [pull_requests, repos]
