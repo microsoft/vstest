@@ -225,9 +225,9 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
         if (_dataCollectionEventsHandler.Messages.Count > 0)
         {
-            foreach (Tuple<ObjectModel.Logging.TestMessageLevel, string?> message in _dataCollectionEventsHandler.Messages)
+            foreach (var (level, message) in _dataCollectionEventsHandler.Messages)
             {
-                eventHandler.HandleLogMessage(message.Item1, message.Item2);
+                eventHandler.HandleLogMessage(level, message);
             }
 
             _dataCollectionEventsHandler.Messages.Clear();
