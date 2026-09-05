@@ -12,15 +12,28 @@
 
 <Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <!-- This target required to enable /collect:"Code Coverage" in "dotnet publish" scenario with "dotnet vstest".
-       E.g: Release pipelines where user/project nuget cache not available on current machine. -->
+  <!-- Makes /collect:"Code Coverage" work with "dotnet vstest" against a published folder, for example a
+       release pipeline where the project's NuGet cache is not available on the machine. The package layout
+       carries files that nothing else publishes, such as CodeCoverage\CodeCoverage.exe, so they are added here.
+
+       The target runs after ComputeFilesToPublish, so whatever the project itself publishes is already in
+       ResolvedFileToPublish. Package files whose RelativePath is already present are dropped and the
+       project's own copy stays. That is what keeps the newer Microsoft.CodeCoverage.* assemblies coming from
+       Microsoft.Testing.Extensions.CodeCoverage. Nothing here inspects PackageReference, so it makes no
+       difference whether that package is referenced directly or pulled in transitively. -->
   <Target Name="CopyTraceDataCollectorArtifacts" AfterTargets="ComputeFilesToPublish">
 
     <ItemGroup>
-      <TraceDataCollectorArtifacts Include="$(MSBuildThisFileDirectory)\**\*.*" />
+      <_TraceDataCollectorArtifacts Include="$(MSBuildThisFileDirectory)\**\*.*" />
+      <_TraceDataCollectorArtifacts Update="@(_TraceDataCollectorArtifacts)">
+        <RelativePath>%(_TraceDataCollectorArtifacts.RecursiveDir)%(_TraceDataCollectorArtifacts.Filename)%(_TraceDataCollectorArtifacts.Extension)</RelativePath>
+        <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+      </_TraceDataCollectorArtifacts>
+      <_TraceDataCollectorArtifacts Remove="@(ResolvedFileToPublish)"
+                                    MatchOnMetadata="RelativePath"
+                                    MatchOnMetadataOptions="PathLike" />
+      <ResolvedFileToPublish Include="@(_TraceDataCollectorArtifacts)" />
     </ItemGroup>
-
-    <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)" />
 
   </Target>
 
