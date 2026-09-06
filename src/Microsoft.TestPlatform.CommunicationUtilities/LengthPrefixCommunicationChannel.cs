@@ -72,25 +72,49 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
             }
             catch (Exception ex)
             {
-                _sendFailure = ex;
-
-                try
-                {
-                    // A failed write may have left a length prefix or a partial payload on the wire.
-                    // Close the stream before another send can reuse the broken frame boundary.
-                    _stream.Dispose();
-                }
-                catch (Exception disposeException)
-                {
-                    EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error closing stream after send failure: {0}.", disposeException);
-                }
-
-                EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error sending data: {0}.", ex);
+                FaultChannel(ex);
                 throw new CommunicationException("Unable to send data over channel.", ex);
             }
         }
 
         return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Marks the channel unusable after a failed write, and closes the transport.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// <see cref="BinaryWriter.Write(string)"/> does not report how many bytes it wrote, so once it
+    /// throws we cannot know whether the length prefix reached the peer without its payload. If it
+    /// did, the peer is waiting for a body that will never arrive, and every later message would be
+    /// consumed as part of that frame.
+    /// </para>
+    /// <para>
+    /// There is no way to tell the peer in band, because the framing it is reading is the thing that
+    /// broke. Closing the transport is the only signal left: the peer reads end of stream, which it
+    /// already handles.
+    /// </para>
+    /// <para>
+    /// Both callers, SocketClient and SocketServer, build this channel over a TcpClient stream and
+    /// close that client in their own error paths, so this closes a stream that was already on its
+    /// way down. Dispose still leaves the stream open, which DisposeShouldNotCloseTheStream pins.
+    /// </para>
+    /// </remarks>
+    private void FaultChannel(Exception ex)
+    {
+        _sendFailure = ex;
+
+        try
+        {
+            _stream.Dispose();
+        }
+        catch (Exception disposeException)
+        {
+            EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error closing stream after send failure: {0}.", disposeException);
+        }
+
+        EqtTrace.Error("LengthPrefixCommunicationChannel.Send: Error sending data: {0}.", ex);
     }
 
     /// <inheritdoc />
