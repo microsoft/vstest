@@ -190,6 +190,78 @@ public class LengthPrefixCommunicationChannelTests : IDisposable
         Assert.HasCount(3, stream.WrittenBytes);
     }
 
+    /// <summary>
+    /// The corruption this change prevents, asserted at the peer instead of at the sender. A send
+    /// that fails once its length prefix has reached the peer leaves a frame header on the wire
+    /// promising a body that never arrives. On unmodified main the next message is consumed as that
+    /// body, and the peer decodes a string nobody ever sent, which is where the
+    /// "Unexpected character encountered while parsing value" JSON abort comes from. Every other
+    /// test here asserts what the sender does; this one asserts what the peer can observe.
+    /// </summary>
+    [TestMethod]
+    public async Task PeerShouldNotDecodeAMessageThatWasNeverSent()
+    {
+        var message1 = new string('a', SocketConstants.BufferSize + 1);
+        var message2 = new string('b', SocketConstants.BufferSize + 1);
+
+        // The payload does not fit in what is left of the buffer, so the length prefix is flushed as
+        // its own write and reaches the peer before the payload write fails.
+        using var wire = new FailingWriteStream(bytesBeforeFailure: 3);
+        var sender = new LengthPrefixCommunicationChannel(wire);
+
+        await Assert.ThrowsExactlyAsync<CommunicationException>(() => sender.Send(message1));
+
+        try
+        {
+            // The injected failure fires once, so on unmodified main this second message is written
+            // and lands directly behind the orphaned prefix.
+            await sender.Send(message2);
+        }
+        catch (CommunicationException)
+        {
+            // Expected once the channel refuses to send after a failed frame.
+        }
+
+        var received = ReadFirstMessageFromWire(wire.WrittenBytes);
+
+        var decoded = received is null ? string.Empty : DescribeFirstChars(received);
+        Assert.IsNull(
+            received,
+            $"The peer decoded a {received?.Length ?? 0} character frame that was never sent as a message, starting {decoded}.");
+    }
+
+    private static string? ReadFirstMessageFromWire(byte[] bytesOnTheWire)
+    {
+        using var peerStream = new MemoryStream(bytesOnTheWire);
+        using var peer = new LengthPrefixCommunicationChannel(peerStream);
+
+        string? received = null;
+        peer.MessageReceived.Subscribe((sender, messageEventArgs) => received = messageEventArgs.Data);
+
+        try
+        {
+            peer.NotifyDataAvailable(CancellationToken.None).GetAwaiter().GetResult();
+        }
+        catch (EndOfStreamException)
+        {
+            // An incomplete frame is the correct outcome. The peer has nothing to act on.
+        }
+
+        return received;
+    }
+
+    private static string DescribeFirstChars(string value)
+    {
+        var count = Math.Min(3, value.Length);
+        var parts = new string[count];
+        for (var i = 0; i < count; i++)
+        {
+            parts[i] = $"U+{(int)value[i]:X4}";
+        }
+
+        return string.Join(" ", parts);
+    }
+
     [TestMethod]
     public async Task DisposeShouldNotFlushBufferedDataAfterSendFailure()
     {
