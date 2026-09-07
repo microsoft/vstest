@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System;
 using System.Diagnostics;
 using System.Threading;
 
@@ -98,5 +99,23 @@ public class ProcessHelperTests
             250L,
             stopwatch.ElapsedMilliseconds,
             $"With no redirected error stream the method must be a no-op (took {stopwatch.ElapsedMilliseconds} ms).");
+    }
+
+    /// <summary>
+    /// Regression test for https://github.com/microsoft/vstest/issues/16446: under some
+    /// sandboxing/emulation layers (e.g. proot on Android/Termux), Process.MainModule.FileName
+    /// reports an unrelated loader binary instead of the real process executable, because it is
+    /// derived from the first mapping in '/proc/self/maps'. GetCurrentProcessFileName must prefer
+    /// Environment.ProcessPath (backed by '/proc/self/exe' on Unix), which is not affected by this,
+    /// so that muxer-resolution correctly detects that the current process is the dotnet muxer.
+    /// </summary>
+    [TestMethod]
+    public void GetCurrentProcessFileNameShouldReturnEnvironmentProcessPathWhenAvailable()
+    {
+        var processHelper = new ProcessHelper();
+
+        string? currentProcessFileName = processHelper.GetCurrentProcessFileName();
+
+        Assert.AreEqual(Environment.ProcessPath, currentProcessFileName);
     }
 }
