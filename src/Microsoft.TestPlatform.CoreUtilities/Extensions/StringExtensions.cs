@@ -7,11 +7,27 @@ public static class StringExtensions
 {
     /// <summary>
     /// Add double quote around string. Useful in case of path which has white space in between.
+    /// Embedded double quotes are escaped and any run of backslashes immediately preceding the
+    /// closing quote is doubled, so the result parses back to the original value under the
+    /// Windows <c>CommandLineToArgvW</c> quoting rules.
     /// </summary>
     /// <param name="value"></param>
     /// <returns></returns>
     public static string AddDoubleQuote(this string value)
     {
-        return "\"" + value + "\"";
+        var escaped = value.Replace("\"", "\\\"");
+
+        var trailingBackslashCount = 0;
+        for (int i = escaped.Length - 1; i >= 0 && escaped[i] == '\\'; i--)
+        {
+            trailingBackslashCount++;
+        }
+
+        if (trailingBackslashCount > 0)
+        {
+            escaped += new string('\\', trailingBackslashCount);
+        }
+
+        return "\"" + escaped + "\"";
     }
 }
