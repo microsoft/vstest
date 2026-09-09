@@ -245,6 +245,20 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public string? GetCurrentProcessFileName()
     {
+#if NET
+        // Environment.ProcessPath is more reliable than MainModule under sandboxes such as
+        // proot, which is commonly used to run Linux distributions on Android (e.g. Termux).
+        // proot starts the real executable through an injected loader, and it cannot rewrite
+        // the contents of /proc/self/maps that MainModule is built from. When the loader is
+        // mapped below the executable (as it is on ARM64) MainModule reports the loader
+        // instead of the running dotnet host, which breaks test host resolution.
+        // See https://github.com/microsoft/vstest/issues/16446.
+        if (Environment.ProcessPath is { } processPath)
+        {
+            return processPath;
+        }
+#endif
+
         return _currentProcess.MainModule?.FileName;
     }
 
