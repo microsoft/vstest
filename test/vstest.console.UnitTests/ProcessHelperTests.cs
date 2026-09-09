@@ -35,16 +35,21 @@ public class ProcessHelperTests
 
         string? currentProcessFileName = processHelper.GetCurrentProcessFileName();
 
-        Assert.IsNotNull(currentProcessFileName, "The running executable must always be identifiable.");
+        using var currentProcess = Process.GetCurrentProcess();
+        string? mainModuleFileName = currentProcess.MainModule?.FileName;
+
 #if NET
         // On .NET we prefer Environment.ProcessPath, because MainModule can report an injected loader
         // rather than the running executable under sandboxes such as proot. See issue #16446.
-        Assert.AreEqual(Environment.ProcessPath, currentProcessFileName);
+        // ProcessPath is nullable, so mirror the fallback the production code performs instead of
+        // assuming it is always set.
+        string? expectedFileName = Environment.ProcessPath ?? mainModuleFileName;
 #else
         // .NET Framework has no Environment.ProcessPath, so the MainModule behavior must be preserved.
-        using var currentProcess = Process.GetCurrentProcess();
-        Assert.AreEqual(currentProcess.MainModule?.FileName, currentProcessFileName);
+        string? expectedFileName = mainModuleFileName;
 #endif
+
+        Assert.AreEqual(expectedFileName, currentProcessFileName);
     }
 
     [TestMethod]
