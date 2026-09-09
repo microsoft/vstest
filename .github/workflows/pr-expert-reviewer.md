@@ -239,7 +239,7 @@ This workflow adds one workflow-level override:
 
 ### Documentation-only PRs
 
-Only skip PRs whose changes are entirely ordinary prose documentation or localization resources (`.md`, `.txt`, `.resx`, `.xlf`). Files under `.github/workflows/` (including shared `.md` sources and `.lock.yml`), `.github/agents/`, and `.github/skills/` are executable configuration or instructions, not ordinary documentation. Dependency manifests, action-pin configuration, and other build configuration are also in scope regardless of extension.
+Only skip PRs whose changes are entirely documentation or localization resources (`.md`, `.txt`, `.resx`, `.xlf`). Files under `.github/workflows/` (including shared `.md` sources and `.lock.yml`) are executable configuration, not ordinary documentation. Dependency manifests, action-pin configuration, and other build configuration are also in scope regardless of extension.
 
 For a genuinely documentation/resource-only PR, call the registered `noop` safe-output tool with a brief explanation, then stop. Writing a JSON example in the final response is not a tool call.
 

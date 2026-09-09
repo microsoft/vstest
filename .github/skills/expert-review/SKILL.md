@@ -13,7 +13,6 @@ This skill maps changed folders to review dimensions, enabling focused expert re
 |--------|-------------------|
 | `.github/workflows/` (including `.md`, shared sources, and `.lock.yml`) | Build Script & Infrastructure Hygiene, Dependency & Package Integrity |
 | `.github/aw/`, `.github/dependabot.yml` | Build Script & Infrastructure Hygiene, Dependency & Package Integrity |
-| `.github/agents/`, `.github/skills/` | Build Script & Infrastructure Hygiene |
 | `eng/` | Build Script & Infrastructure Hygiene, Dependency & Package Integrity, Source Build & Cross-Platform Compliance |
 | `src/Microsoft.TestPlatform.CrossPlatEngine/` | Parallel Execution & Scheduling Safety, Error Reporting & Diagnostic Clarity, Process Architecture & Host Resolution |
 | `src/vstest.console/` | RunSettings Validation & Inference, Process Architecture & Host Resolution, Environment Variable & Feature Flag Contracts |
