@@ -99,4 +99,22 @@ public class ProcessHelperTests
             stopwatch.ElapsedMilliseconds,
             $"With no redirected error stream the method must be a no-op (took {stopwatch.ElapsedMilliseconds} ms).");
     }
+
+#if NET
+    [TestMethod]
+    public void GetCurrentProcessFileNameShouldPreferEnvironmentProcessPathOverMainModuleFileName()
+    {
+        // On .NET, Environment.ProcessPath resolves the executable directly (e.g. via /proc/self/exe on
+        // Linux), unlike Process.MainModule.FileName which derives the name from the first mapping in
+        // /proc/self/maps. Under sandboxing/tracing environments (e.g. proot on Android/Termux) an
+        // unrelated loader binary is mapped first, which makes MainModule.FileName report that loader
+        // instead of the real executable, breaking dotnet muxer resolution.
+        // See https://github.com/microsoft/vstest/issues/16446.
+        var processHelper = new ProcessHelper();
+
+        string? currentProcessFileName = processHelper.GetCurrentProcessFileName();
+
+        Assert.AreEqual(System.Environment.ProcessPath, currentProcessFileName);
+    }
+#endif
 }

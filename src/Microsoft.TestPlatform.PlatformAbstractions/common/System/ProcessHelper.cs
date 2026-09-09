@@ -245,7 +245,16 @@ public partial class ProcessHelper : IProcessHelper
     /// <inheritdoc/>
     public string? GetCurrentProcessFileName()
     {
+#if NET
+        // Environment.ProcessPath resolves the executable path directly (e.g. via /proc/self/exe on Linux),
+        // rather than relying on the first entry of /proc/self/maps like Process.MainModule.FileName does.
+        // Under some sandboxing/tracing environments (e.g. proot on Android/Termux) an unrelated loader binary
+        // is mapped at the lowest address of the process, which makes MainModule.FileName report that loader
+        // instead of the real executable. See https://github.com/microsoft/vstest/issues/16446.
+        return Environment.ProcessPath ?? _currentProcess.MainModule?.FileName;
+#else
         return _currentProcess.MainModule?.FileName;
+#endif
     }
 
     /// <inheritdoc/>
