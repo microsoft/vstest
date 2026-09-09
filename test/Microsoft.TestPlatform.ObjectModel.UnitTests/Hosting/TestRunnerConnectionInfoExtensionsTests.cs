@@ -68,6 +68,16 @@ public class TestRunnerConnectionInfoExtensionsTests
 
         var options = connectionInfo.ToCommandLineOptions();
 
-        Assert.EndsWith("--diag log.txt --tracelevel 3", options);
+        Assert.EndsWith("--diag \"log.txt\" --tracelevel 3", options);
+    }
+
+    [TestMethod]
+    public void ToCommandLineOptionsShouldQuoteDiagnosticsLogFilePathContainingSpaces()
+    {
+        var connectionInfo = new TestRunnerConnectionInfo { LogFile = @"C:\Users\Jane Doe\log.txt", TraceLevel = 3 };
+
+        var options = connectionInfo.ToCommandLineOptions();
+
+        Assert.EndsWith("--diag \"C:\\Users\\Jane Doe\\log.txt\" --tracelevel 3", options);
     }
 }
