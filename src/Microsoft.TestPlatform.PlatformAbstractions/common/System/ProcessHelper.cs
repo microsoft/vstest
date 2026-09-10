@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -300,10 +301,14 @@ public partial class ProcessHelper : IProcessHelper
             process.EnableRaisingEvents = true;
             process.Exited += (sender, args) => callbackAction?.Invoke(sender);
         }
-        catch (ArgumentException)
+        catch (Exception ex) when (ex is ArgumentException or Win32Exception or InvalidOperationException)
         {
-            // Process.GetProcessById() throws ArgumentException if process is not running(identifier might be expired).
-            // Invoke callback immediately.
+            // Process.GetProcessById() throws ArgumentException if process is not running (identifier might be
+            // expired). EnableRaisingEvents/Exited subscription can also throw Win32Exception (e.g. access denied
+            // attaching to a PID such as 0/Idle, or a PID owned by another session/user) or
+            // InvalidOperationException (e.g. the process exited between GetProcessById and the subscription).
+            // In all these cases the parent process cannot be monitored, so invoke the callback immediately
+            // instead of letting the exception escape and crash the caller.
             callbackAction?.Invoke(null);
         }
     }

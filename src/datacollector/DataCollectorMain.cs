@@ -115,16 +115,25 @@ public class DataCollectorMain
         EqtTrace.Info("DataCollectorMain.Run: Starting data collector run with args: {0}", args != null ? string.Join(",", args) : "null");
 
         // Attach to exit of parent process
-        var parentProcessId = CommandLineArgumentsHelper.GetIntArgFromDict(argsDictionary, ParentProcessArgument);
-        EqtTrace.Info("DataCollector: Monitoring parent process with id: '{0}'", parentProcessId);
+        if (!CommandLineArgumentsHelper.TryGetIntArgFromDict(argsDictionary, ParentProcessArgument, out var parentProcessId) || parentProcessId <= 0)
+        {
+            // The argument is required for the datacollector to be launched by vstest.console, but rather than
+            // crashing (or silently attaching to PID 0, which is the OS Idle/Swapper process and cannot be
+            // monitored), just skip the watchdog and log a warning.
+            EqtTrace.Warning("DataCollector: Argument '{0}' was not specified or is invalid, skipping parent process monitoring.", ParentProcessArgument);
+        }
+        else
+        {
+            EqtTrace.Info("DataCollector: Monitoring parent process with id: '{0}'", parentProcessId);
 
-        _processHelper.SetExitCallback(
-            parentProcessId,
-            (obj) =>
-            {
-                EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);
-                _environment.Exit(1);
-            });
+            _processHelper.SetExitCallback(
+                parentProcessId,
+                (obj) =>
+                {
+                    EqtTrace.Info("DataCollector: ParentProcess '{0}' Exited.", parentProcessId);
+                    _environment.Exit(1);
+                });
+        }
 
         // Get server port and initialize communication.
         int port = argsDictionary.TryGetValue(PortArgument, out var portValue)

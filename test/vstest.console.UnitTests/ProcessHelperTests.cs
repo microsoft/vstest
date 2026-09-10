@@ -11,6 +11,30 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 
 /// <summary>
+/// Tests for <see cref="ProcessHelper.SetExitCallback"/>, which attaches a "parent process exited" watchdog
+/// callback to a running process. The callback must be invoked immediately, instead of letting an exception
+/// escape and crash the caller, whenever the target process cannot be monitored (already exited, PID reused
+/// by an unrelated process, or access denied attaching to it).
+/// </summary>
+[TestClass]
+public class ProcessHelperSetExitCallbackTests
+{
+    [TestMethod]
+    public void SetExitCallbackShouldInvokeCallbackImmediatelyWhenProcessIdDoesNotExist()
+    {
+        var processHelper = new ProcessHelper();
+        object? invokedWith = "not-invoked";
+
+        // A process id that (almost certainly) doesn't correspond to a running process causes
+        // Process.GetProcessById to throw ArgumentException.
+        processHelper.SetExitCallback(int.MaxValue, obj => invokedWith = obj);
+
+        Assert.IsNull(invokedWith, "The callback must be invoked with null when the process cannot be found.");
+    }
+}
+
+
+/// <summary>
 /// Tests for <see cref="ProcessHelper.WaitForErrorStreamToDrain"/>, the bounded wait that lets the process
 /// exit callback observe the complete standard error output of a crashed test host. Without it, the exit
 /// callback could read the asynchronously-collected stderr before all ErrorDataReceived callbacks had run,

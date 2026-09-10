@@ -189,4 +189,44 @@ public class DataCollectorMainTests
         envVarMock.Verify(x => x.GetEnvironmentVariable("PreferredUILang"), Times.Never);
         envVarMock.Verify(x => x.SetEnvironmentVariable("PreferredUILang", It.IsAny<string>()), Times.Never);
     }
+
+    [TestMethod]
+    public void RunShouldSetExitCallbackForParentProcessWhenParentProcessIdArgIsValid()
+    {
+        // _args contains "--parentprocessid", "100".
+        _dataCollectorMain.Run(_args);
+
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(100, It.IsAny<Action<object?>>()), Times.Once);
+    }
+
+    [TestMethod]
+    public void RunShouldNotSetExitCallbackWhenParentProcessIdArgIsMissing()
+    {
+        string[] argsWithoutParentProcessId = ["--port", "1025", "--diag", "abc.txt", "--tracelevel", "3"];
+
+        _dataCollectorMain.Run(argsWithoutParentProcessId);
+
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(It.IsAny<int>(), It.IsAny<Action<object?>>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void RunShouldNotSetExitCallbackWhenParentProcessIdArgIsNotAnInteger()
+    {
+        string[] argsWithInvalidParentProcessId = ["--port", "1025", "--parentprocessid", "not-a-number", "--diag", "abc.txt", "--tracelevel", "3"];
+
+        _dataCollectorMain.Run(argsWithInvalidParentProcessId);
+
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(It.IsAny<int>(), It.IsAny<Action<object?>>()), Times.Never);
+    }
+
+    [TestMethod]
+    public void RunShouldNotSetExitCallbackWhenParentProcessIdArgIsZero()
+    {
+        // PID 0 is the OS Idle/Swapper process and cannot be monitored; attaching to it can throw Win32Exception.
+        string[] argsWithZeroParentProcessId = ["--port", "1025", "--parentprocessid", "0", "--diag", "abc.txt", "--tracelevel", "3"];
+
+        _dataCollectorMain.Run(argsWithZeroParentProcessId);
+
+        _mockProcessHelper.Verify(ph => ph.SetExitCallback(It.IsAny<int>(), It.IsAny<Action<object?>>()), Times.Never);
+    }
 }
