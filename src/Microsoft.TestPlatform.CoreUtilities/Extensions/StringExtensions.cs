@@ -10,10 +10,15 @@ public static class StringExtensions
     /// <summary>
     /// Quotes a command-line argument, escaping embedded quotes and backslashes before quotes.
     /// </summary>
-    /// <param name="value"></param>
+    /// <param name="value">The argument value. Null is treated as an empty string.</param>
     /// <returns></returns>
-    public static string AddDoubleQuote(this string value)
+    public static string AddDoubleQuote(this string? value)
     {
+        if (value is null)
+        {
+            return "\"\"";
+        }
+
         var builder = new StringBuilder();
         builder.Append('"');
         var backslashes = 0;

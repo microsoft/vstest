@@ -80,14 +80,17 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
-    [DataRow("log.txt")]
-    [DataRow("log with spaces.txt")]
-    public void SetupChannelShouldCreateTimestampedLogFileForHost(string logFile)
+    [DataRow("log.txt", "en-US")]
+    [DataRow("log with spaces.txt", "en-US")]
+    [DataRow("log with spaces.txt", "th-TH")]
+    public void SetupChannelShouldCreateTimestampedLogFileForHost(string logFile, string culture)
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
         var originalTraceLevel = EqtTrace.TraceLevel;
+        var originalCulture = CultureInfo.CurrentCulture;
         try
         {
+            CultureInfo.CurrentCulture = new CultureInfo(culture);
             EqtTrace.InitializeTrace(logFile, PlatformTraceLevel.Verbose);
 
             _testOperationManager.SetupChannel([], DefaultRunSettings);
@@ -98,13 +101,14 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
                         It.IsAny<IEnumerable<string>>(),
                         It.IsAny<Dictionary<string, string?>>(),
                         It.Is<TestRunnerConnectionInfo>(
-                            t => t.LogFile!.Contains(Path.GetFileNameWithoutExtension(logFile) + ".host." + DateTime.Now.ToString("yy-MM-dd", CultureInfo.CurrentCulture))
+                            t => t.LogFile!.Contains(Path.GetFileNameWithoutExtension(logFile) + ".host." + DateTime.Now.ToString("yy-MM-dd", CultureInfo.InvariantCulture))
                                  && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt")
                                  && !t.LogFile.Contains("\"")
                                  && t.ToCommandLineOptions().EndsWith("--diag \"" + t.LogFile + "\" --tracelevel 4", StringComparison.Ordinal))));
         }
         finally
         {
+            CultureInfo.CurrentCulture = originalCulture;
             EqtTrace.TraceLevel = originalTraceLevel;
         }
     }
