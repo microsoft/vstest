@@ -363,12 +363,17 @@ public class TestIdsLogger : ITestLoggerWithParameters
         catch (Exception ex)
         {
             // A reservation that never became a report is worse than no file: it is an empty CSV
-            // that a migration script would happily read as a suite with no tests in it.
+            // that a migration script would happily read as a suite with no tests in it. Only ever
+            // an empty one: the reservation is created with no content and the report is renamed over
+            // it, so anything with bytes in it is somebody else's report rather than ours to remove.
             if (reserved && ReportFilePath is null && !filePath.IsNullOrEmpty())
             {
                 try
                 {
-                    File.Delete(filePath);
+                    if (new FileInfo(filePath).Length == 0)
+                    {
+                        File.Delete(filePath);
+                    }
                 }
                 catch (Exception deleteException)
                 {
@@ -413,12 +418,12 @@ public class TestIdsLogger : ITestLoggerWithParameters
         // a mapping quietly replaced by another project's is a mapping lost.
         Directory.CreateDirectory(_testResultsDirPath!);
 
-        string claimed = ReserveNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName());
-
-        // Only once the claim actually succeeded: an out parameter is written straight through to
-        // the caller, so setting it before the call that can throw would have the caller delete a
-        // path that was never claimed.
-        reserved = true;
+        // Reports whether it actually created the path: the exhaustion fallback returns a name it did
+        // not claim, and treating that as a reservation would have the caller delete somebody else's
+        // complete report when the write then fails. Assigned only after the call, because an out
+        // parameter is written straight through to the caller and the call can throw.
+        string claimed = ReserveNextAvailableFilePath(_testResultsDirPath!, GetDefaultReportFileName(), out bool claimSucceeded);
+        reserved = claimSucceeded;
 
         return claimed;
     }
@@ -427,13 +432,19 @@ public class TestIdsLogger : ITestLoggerWithParameters
     /// Claims the given path by creating it, and <c>name(1).csv</c>, <c>name(2).csv</c> and so on
     /// when it is taken - the same iteration the trx logger applies to its own default file name.
     /// </summary>
+    /// <param name="directory">The results directory the report is written into.</param>
+    /// <param name="fileName">The name to try first, before iterating.</param>
+    /// <param name="reserved">
+    /// Whether the returned path was actually created here. False only when every iteration was
+    /// taken, where the returned path is an existing file this method did not make.
+    /// </param>
     /// <remarks>
     /// The path is claimed rather than merely tested, because the case this exists for - the
     /// projects of one solution writing into a shared results directory - is by definition several
     /// processes finishing at once. Two of them that only asked whether a name was free would both
     /// be told yes, and one of the two reports would be lost.
     /// </remarks>
-    private static string ReserveNextAvailableFilePath(string directory, string fileName)
+    private static string ReserveNextAvailableFilePath(string directory, string fileName, out bool reserved)
     {
         string stem = Path.GetFileNameWithoutExtension(fileName);
         string extension = Path.GetExtension(fileName);
@@ -453,6 +464,8 @@ public class TestIdsLogger : ITestLoggerWithParameters
                 {
                 }
 
+                reserved = true;
+
                 return candidate;
             }
             catch (IOException)
@@ -462,7 +475,11 @@ public class TestIdsLogger : ITestLoggerWithParameters
         }
 
         // Every iteration is taken, which means something is very wrong with the results directory.
-        // Overwriting the first one is a better answer than reporting nothing at all.
+        // Overwriting the first one is a better answer than reporting nothing at all - but it was not
+        // claimed here, so it is somebody else's complete report and must not be cleaned up as though
+        // it were an empty reservation of ours.
+        reserved = false;
+
         return Path.Combine(directory, fileName);
     }
 

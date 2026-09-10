@@ -29,7 +29,13 @@ public class TestIdsLoggerTests
     // that rendering, so a mixed case uri here would make the expected seeds below wrong in a way
     // that says nothing about the code under test.
     private const string ExecutorUri = "executor://testidsloggertests/v1";
-    private const string Source = @"c:\some\where\SampleTests.dll";
+
+    // Forward slashes deliberately. The seed is built from Path.GetFileName of the source, and a
+    // backslash is a directory separator only on Windows - on Linux and macOS it is an ordinary
+    // filename character, so a path written with backslashes is not split at all there and the whole
+    // string ends up in the seed. A forward slash separates on every operating system, so the
+    // expected seeds below are the same everywhere. SourceFileNameIsTheFileNameOfSource pins it.
+    private const string Source = "c:/some/where/SampleTests.dll";
     private const string SourceFileName = "SampleTests.dll";
 
     private readonly VisualStudio.TestPlatform.Extensions.TestIdsLogger.TestIdsLogger _logger;
@@ -46,6 +52,15 @@ public class TestIdsLoggerTests
     }
 
     #region Id computation
+
+    /// <summary>
+    /// The seeds spelled out below assume the source splits into a file name the same way on every
+    /// operating system. Pinned separately so that, if it ever stops being true, the failure names
+    /// the assumption rather than appearing as five unrelated wrong hashes.
+    /// </summary>
+    [TestMethod]
+    public void SourceFileNameIsTheFileNameOfSource()
+        => Assert.AreEqual(SourceFileName, Path.GetFileName(Source));
 
     [TestMethod]
     public void CreateRecordComputesBothIdsFromTheSeedThePlatformHashes()
@@ -461,6 +476,35 @@ public class TestIdsLoggerTests
         Assert.AreEqual(original, File.ReadAllText(reportPath));
     }
 
+    [TestMethod]
+    public void FailedWriteUnderTheDefaultNameLeavesAFileItDidNotReserveIntact()
+    {
+        // The reservation loop hands back an unclaimed path when every iteration is taken, and the
+        // cleanup must tell that apart from a reservation of its own. Approximated here by a report
+        // that already has content under the default name: whatever route put it there, a failed
+        // write must not remove a file this run did not create empty.
+        Directory.CreateDirectory(_testRunDirectory);
+        var occupied = Path.Combine(_testRunDirectory, "TestIds.csv");
+        File.WriteAllText(occupied, "somebody else's complete report");
+
+        // Takes the staging path of the next free iteration, so the write fails after the claim.
+        Directory.CreateDirectory(Path.Combine(_testRunDirectory, "TestIds(1).csv.tmp"));
+
+        var parameters = new Dictionary<string, string?>
+        {
+            [DefaultLoggerParameterNames.TestRunDirectory] = _testRunDirectory,
+        };
+        _logger.Initialize(_events.Object, parameters);
+        _logger.TestRunCompleteHandler(this, CompletedRun());
+
+        Assert.IsNull(_logger.ReportFilePath);
+        Assert.IsTrue(_output.HasErrors);
+        Assert.AreEqual(
+            "somebody else's complete report",
+            File.ReadAllText(occupied),
+            "A file with content in it was not an empty reservation of ours, so it must survive.");
+    }
+
     #endregion
 
     #region Report file path
@@ -598,16 +642,16 @@ public class TestIdsLoggerTests
 
         // Fed in deliberately reversed order, including a pair that differs only in executor uri -
         // which is part of the deduplication key and so has to be part of the sort too.
-        _logger.TestResultHandler(this, Result(new TestCase("B.Test", new Uri("executor://zzz/v1"), @"c:\x\Second.dll")));
-        _logger.TestResultHandler(this, Result(new TestCase("B.Test", new Uri("executor://aaa/v1"), @"c:\x\Second.dll")));
-        _logger.TestResultHandler(this, Result(new TestCase("A.Test", new Uri(ExecutorUri), @"c:\x\Second.dll")));
-        _logger.TestResultHandler(this, Result(new TestCase("A.Test", new Uri(ExecutorUri), @"c:\x\First.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("B.Test", new Uri("executor://zzz/v1"), "c:/x/Second.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("B.Test", new Uri("executor://aaa/v1"), "c:/x/Second.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("A.Test", new Uri(ExecutorUri), "c:/x/Second.dll")));
+        _logger.TestResultHandler(this, Result(new TestCase("A.Test", new Uri(ExecutorUri), "c:/x/First.dll")));
         _logger.TestRunCompleteHandler(this, CompletedRun());
 
         string[] lines = ReadReportLines();
 
         Assert.HasCount(5, lines);
-        Assert.StartsWith(@"c:\x\First.dll,", lines[1]);
+        Assert.StartsWith("c:/x/First.dll,", lines[1]);
         Assert.Contains("A.Test", lines[2]);
         Assert.Contains("executor://aaa/v1", lines[3]);
         Assert.Contains("executor://zzz/v1", lines[4]);
