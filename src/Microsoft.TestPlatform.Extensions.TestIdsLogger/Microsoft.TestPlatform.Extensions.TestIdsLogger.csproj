@@ -13,6 +13,12 @@
   <ItemGroup>
     <Compile Include="$(RepoRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
     <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
+    <!-- This assembly applies [Experimental], so it must declare the down-level polyfill itself rather
+         than picking up ObjectModel's internal copy through InternalsVisibleTo. Its netstandard2.0
+         build runs against ObjectModel's net8.0 build, which compiles that copy out, so a type
+         reference into ObjectModel would fail to resolve at runtime and reflecting over the logger's
+         attributes would throw - which silently loses the extension during discovery. -->
+    <Compile Include="$(RepoRoot)src\Microsoft.TestPlatform.Hashing.Source\ExperimentalAttribute.cs" Link="ExperimentalAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(RepoRoot)src\Microsoft.TestPlatform.ObjectModel\Microsoft.TestPlatform.ObjectModel.csproj" />

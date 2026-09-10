@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -37,6 +38,13 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 /// on this logger as a permanent part of a pipeline is using it wrong and will break when it goes.
 /// </para>
 /// <para>
+/// The type is public API only because the extension framework instantiates it by name, and it is
+/// annotated <c>[Experimental("VSTEST001")]</c> so that publishing it does not commit us to
+/// supporting it. Referencing it from code is a compile error unless the caller suppresses
+/// VSTEST001; running the logger with <c>/logger:testids</c> is unaffected, because that path is
+/// reflection rather than a compile time reference.
+/// </para>
+/// <para>
 /// Without it the only way to obtain the mapping is to run the suite twice with
 /// <c>VSTEST_DISABLE_XXHASH128_TESTCASE_ID</c> flipped and join the two reports, and that join is
 /// genuinely ambiguous for data driven tests whose arguments do not render distinctly. This logger
@@ -53,6 +61,12 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 /// </remarks>
 [FriendlyName(Constants.FriendlyName)]
 [ExtensionUri(Constants.ExtensionUri)]
+// CS0436: this assembly declares its own down-level ExperimentalAttribute and also sees ObjectModel's
+// internal one through InternalsVisibleTo. Binding to the local one is the point - see the comment on
+// the Compile item in the csproj - and the compiler already resolves it that way.
+#pragma warning disable CS0436
+[Experimental("VSTEST001")]
+#pragma warning restore CS0436
 public class TestIdsLogger : ITestLoggerWithParameters
 {
     /// <summary>
