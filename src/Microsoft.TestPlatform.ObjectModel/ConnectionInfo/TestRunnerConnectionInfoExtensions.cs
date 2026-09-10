@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -20,7 +21,7 @@ public static class TestRunnerConnectionInfoExtensions
         var options = $"--port {connectionInfo.Port} --endpoint {connectionInfo.ConnectionInfo.Endpoint} --role {(connectionInfo.ConnectionInfo.Role == ConnectionRole.Client ? "client" : "host")} --parentprocessid {connectionInfo.RunnerProcessId}";
         if (!StringUtils.IsNullOrEmpty(connectionInfo.LogFile))
         {
-            options = $"{options} --diag {connectionInfo.LogFile} --tracelevel {connectionInfo.TraceLevel}";
+            options = $"{options} --diag {connectionInfo.LogFile.AddDoubleQuote()} --tracelevel {connectionInfo.TraceLevel}";
         }
 
         return options;

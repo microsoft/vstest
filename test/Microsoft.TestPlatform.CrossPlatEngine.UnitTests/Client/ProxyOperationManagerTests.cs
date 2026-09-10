@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
@@ -79,26 +80,33 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
-    public void SetupChannelShouldCreateTimestampedLogFileForHost()
+    [DataRow("log.txt")]
+    [DataRow("log with spaces.txt")]
+    public void SetupChannelShouldCreateTimestampedLogFileForHost(string logFile)
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
-        EqtTrace.InitializeTrace("log.txt", PlatformTraceLevel.Verbose);
+        var originalTraceLevel = EqtTrace.TraceLevel;
+        try
+        {
+            EqtTrace.InitializeTrace(logFile, PlatformTraceLevel.Verbose);
 
-        _testOperationManager.SetupChannel([], DefaultRunSettings);
+            _testOperationManager.SetupChannel([], DefaultRunSettings);
 
-        _mockTestHostManager.Verify(
-            th =>
-                th.GetTestHostProcessStartInfo(
-                    It.IsAny<IEnumerable<string>>(),
-                    It.IsAny<Dictionary<string, string?>>(),
-                    It.Is<TestRunnerConnectionInfo>(
-                        t => t.LogFile!.Contains("log.host." + DateTime.Now.ToString("yy-MM-dd", CultureInfo.CurrentCulture))
-                             && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt"))));
-#if NETFRAMEWORK
-        EqtTrace.TraceLevel = TraceLevel.Off;
-#else
-        EqtTrace.TraceLevel = PlatformTraceLevel.Off;
-#endif
+            _mockTestHostManager.Verify(
+                th =>
+                    th.GetTestHostProcessStartInfo(
+                        It.IsAny<IEnumerable<string>>(),
+                        It.IsAny<Dictionary<string, string?>>(),
+                        It.Is<TestRunnerConnectionInfo>(
+                            t => t.LogFile!.Contains(Path.GetFileNameWithoutExtension(logFile) + ".host." + DateTime.Now.ToString("yy-MM-dd", CultureInfo.CurrentCulture))
+                                 && t.LogFile.Contains("_" + Environment.CurrentManagedThreadId + ".txt")
+                                 && !t.LogFile.Contains("\"")
+                                 && t.ToCommandLineOptions().EndsWith("--diag \"" + t.LogFile + "\" --tracelevel 4", StringComparison.Ordinal))));
+        }
+        finally
+        {
+            EqtTrace.TraceLevel = originalTraceLevel;
+        }
     }
 
     [TestMethod]
