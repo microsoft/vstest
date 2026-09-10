@@ -26,6 +26,7 @@ adding a file, since the two projects that use a `*.cs` glob will otherwise pick
 | `XxHash128.cs` | `dotnet/runtime` — `src/libraries/System.IO.Hashing/src/System/IO/Hashing/XxHash128.cs` |
 | `XxHashShared.cs` | `dotnet/runtime` — `src/libraries/System.IO.Hashing/src/System/IO/Hashing/XxHashShared.cs` |
 | `BitOperations.cs` | polyfill of `System.Numerics.BitOperations` for target frameworks that lack it |
+| `ExperimentalAttribute.cs` | polyfill of `System.Diagnostics.CodeAnalysis.ExperimentalAttribute` for target frameworks that lack it |
 | `TestIdGuid.cs` | vstest-authored — turns a 128-bit hash into an RFC 9562 version 8 UUID |
 | `TestIdSeed.cs` | vstest-authored — composes the string a test case id is hashed from |
 | `TestCaseIdAlgorithm.cs` | vstest-authored — resolves which algorithm computes a test case id |
