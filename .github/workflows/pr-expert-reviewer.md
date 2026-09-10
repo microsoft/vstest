@@ -6,22 +6,10 @@ description: >
 
 engine:
   id: copilot
-  # gh-aw adds these defaults to every non-empty bash allowlist. Deny them so
-  # only the two MCP wrappers below gain shell access.
+  # With tools.bash disabled, permit only the MCP wrappers without implicit command grants.
   args:
-    - --deny-tool=shell(cat)
-    - --deny-tool=shell(date)
-    - --deny-tool=shell(echo)
-    - --deny-tool=shell(grep)
-    - --deny-tool=shell(head)
-    - --deny-tool=shell(ls)
-    - --deny-tool=shell(printf)
-    - --deny-tool=shell(pwd)
-    - --deny-tool=shell(sort)
-    - --deny-tool=shell(tail)
-    - --deny-tool=shell(uniq)
-    - --deny-tool=shell(wc)
-    - --deny-tool=shell(yq)
+    - --allow-tool=shell(github:*)
+    - --allow-tool=shell(safeoutputs:*)
 
 on:
   pull_request:
@@ -54,9 +42,7 @@ permissions:
   copilot-requests: write
 
 tools:
-  # Allow only gh-aw's MCP CLI wrappers when native MCP discovery is unavailable.
-  # Both wrappers still use the configured gateway toolsets and safe-output limits.
-  bash: ["github:*", "safeoutputs:*"]
+  bash: false
   cli-proxy: false
   cache-memory: true
   github:
