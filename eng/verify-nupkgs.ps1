@@ -17,6 +17,15 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $isCI = $env:TF_BUILD -eq 'true' -or $env:CI -eq 'true'
 $expectedCountsFile = Join-Path $PSScriptRoot "expected-nupkg-file-counts.json"
 
+# Files that must sit at an exact path inside a package, on top of the plain file count.
+# A file that moves between folders keeps the count identical, so the count check cannot see it.
+$expectedPackagePaths = @{
+    # NuGet imports buildMultiTargeting/<PackageId>.props into the outer build of a multi-targeting
+    # project. The outer build has no TargetFramework, so a copy under buildMultiTargeting/<tfm>/ is
+    # never read and the test project properties never get set (issue #15309).
+    "Microsoft.NET.Test.Sdk" = @("buildMultiTargeting/Microsoft.NET.Test.Sdk.props")
+}
+
 # Import binding redirect verification.
 . "$PSScriptRoot/verify-binding-redirects.ps1"
 
@@ -92,6 +101,7 @@ function Verify-Nuget-Packages {
 
     Write-Host "Verify NuGet packages files."
     $errors = @()
+    $layoutErrors = @()
     $actualCounts = @{}
     $hasCountMismatch = $false
     foreach ($unzipNugetPackageDir in $unzipNugetPackageDirs) {
@@ -114,9 +124,18 @@ function Verify-Nuget-Packages {
             $hasCountMismatch = $true
         }
 
+        $layoutErrors += Verify-PackageLayout -packageKey $packageKey -nugetDir $unzipNugetPackageDir
+
         if ($packageKey -eq "Microsoft.TestPlatform") {
             Verify-Version -nugetDir $unzipNugetPackageDir -errors $errors
         }
+    }
+
+    # Reported on its own, and not folded into the count errors above: locally a count mismatch is
+    # auto-fixed by rewriting the expected counts file, and a layout error must not be swallowed
+    # along with it.
+    if ($layoutErrors) {
+        Write-Error "There are $($layoutErrors.Count) package layout errors:`n$($layoutErrors -join "`n")"
     }
 
     if ($hasCountMismatch) {
@@ -219,6 +238,38 @@ function Verify-Version {
     $vsTestProductVersion = (Get-Item $vsTestExe).VersionInfo.ProductVersion
 
     Match-VersionAgainstBranch -vsTestVersion $vsTestProductVersion -branchName $currentBranch -errors $errors
+}
+
+# Verifies where files sit inside a package, which the file count cannot do: moving a file from one
+# folder to another leaves the count unchanged. Returns the errors it found.
+function Verify-PackageLayout {
+    param ([string] $packageKey, [string] $nugetDir)
+
+    $errs = @()
+    $packageRoot = (Resolve-Path -LiteralPath $nugetDir).Path
+
+    foreach ($relativePath in $expectedPackagePaths[$packageKey]) {
+        $fullPath = Join-Path $packageRoot ($relativePath -replace '/', [System.IO.Path]::DirectorySeparatorChar)
+        if (-not (Test-Path -LiteralPath $fullPath -PathType Leaf)) {
+            $errs += "Package '$packageKey' is missing '$relativePath'. Check the PackagePath of the matching None item in the package project."
+        }
+    }
+
+    # NuGet only reads buildMultiTargeting files that sit at the folder root, because the outer build
+    # of a multi-targeting project has no TargetFramework to resolve a subfolder against. A file in a
+    # subfolder there ships but is never imported.
+    $multiTargetingDir = Join-Path $packageRoot "buildMultiTargeting"
+    if (Test-Path -LiteralPath $multiTargetingDir -PathType Container) {
+        $multiTargetingRoot = (Resolve-Path -LiteralPath $multiTargetingDir).Path
+        foreach ($file in @(Get-ChildItem -LiteralPath $multiTargetingDir -Recurse -File)) {
+            if ($file.Directory.FullName -ne $multiTargetingRoot) {
+                $packageRelativePath = $file.FullName.Substring($packageRoot.Length + 1).Replace([System.IO.Path]::DirectorySeparatorChar, '/')
+                $errs += "Package '$packageKey' ships '$packageRelativePath' in a buildMultiTargeting subfolder, where NuGet never imports it. Move it to the buildMultiTargeting root, or to build/<tfm>/."
+            }
+        }
+    }
+
+    $errs
 }
 
 function Verify-NugetPackageExe {
