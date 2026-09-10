@@ -26,6 +26,7 @@ adding a file, since the two projects that use a `*.cs` glob will otherwise pick
 | `XxHash128.cs` | `dotnet/runtime` — `src/libraries/System.IO.Hashing/src/System/IO/Hashing/XxHash128.cs` |
 | `XxHashShared.cs` | `dotnet/runtime` — `src/libraries/System.IO.Hashing/src/System/IO/Hashing/XxHashShared.cs` |
 | `BitOperations.cs` | polyfill of `System.Numerics.BitOperations` for target frameworks that lack it |
+| `ExperimentalAttribute.cs` | polyfill of `System.Diagnostics.CodeAnalysis.ExperimentalAttribute` for target frameworks that lack it |
 | `TestIdGuid.cs` | vstest-authored — turns a 128-bit hash into an RFC 9562 version 8 UUID |
 | `TestIdSeed.cs` | vstest-authored — composes the string a test case id is hashed from |
 | `TestCaseIdAlgorithm.cs` | vstest-authored — resolves which algorithm computes a test case id |
@@ -79,5 +80,18 @@ Prefer giving a new consumer access to an existing copy over compiling another o
 consumer is cheap for types that only appear inside a method body, and awkward for types that
 appear in a signature a test needs to name — `CrossPlatEngine` takes the `InternalsVisibleTo`
 route for exactly that reason.
+
+## Public API status
+
+The xxHash128 test id API is experimental and not supported. `EqtHash.GuidFromStringXxHash128` and
+`TestIdProviderXxHash128` are annotated `[Experimental("VSTEST001")]`, so calling either is a
+compile error unless the caller suppresses `VSTEST001`. It ships that way to gather feedback while
+xxHash128 is not the default; it may change or be removed. The annotation is metadata only, so
+removing it once the API is supported is not a breaking change.
+
+`ExperimentalAttribute` only exists from .NET 8 onwards, and both consuming projects also build for
+`net462` and `netstandard2.0`, so `ExperimentalAttribute.cs` declares an internal copy under
+`#if !NET8_0_OR_GREATER`. The compiler binds the attribute by full name, not by identity, so the
+internal copy reports the same diagnostic the framework type would.
 
 [testfx-hashing]: https://github.com/microsoft/testfx/tree/main/src/Platform/Microsoft.Testing.Extensions.TrxReport/Hashing

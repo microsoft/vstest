@@ -6,11 +6,12 @@
     <TargetFrameworks>$(NetFrameworkMinimum);$(ExtensionTargetFrameworks);$(NetCoreAppMinimum)</TargetFrameworks>
     <IsTestProject>false</IsTestProject>
     <!-- The source-only MTP client package (Microsoft.Testing.Platform.ServerMode.Client.Sources)
-         compiles its own down-level nullable-annotation polyfills (System.Diagnostics.CodeAnalysis)
-         on net462/netstandard2.0. CrossPlatEngine already imports the identical attributes from
-         CoreUtilities (InternalsVisibleTo), so let the package defer to those to avoid CS0436
-         duplicate-type conflicts. No-op on net8.0 where the attributes are in-box. -->
-    <DefineConstants Condition="'$(DotNetBuildSourceOnly)' != 'true'">$(DefineConstants);MTP_CLIENT_EXCLUDE_NULLABLE_ATTRIBUTES</DefineConstants>
+         compiles its own down-level polyfills (System.Diagnostics.CodeAnalysis) on
+         net462/netstandard2.0. CrossPlatEngine already imports the identical attributes from
+         CoreUtilities and ObjectModel (InternalsVisibleTo), so let the package defer to those to
+         avoid CS0436 duplicate-type conflicts. No-op on net8.0 where the attributes are in-box, and
+         not set in source-only builds, where the package is not restored at all (see below). -->
+    <DefineConstants Condition="'$(DotNetBuildSourceOnly)' != 'true'">$(DefineConstants);MTP_CLIENT_EXCLUDE_NULLABLE_ATTRIBUTES;MTP_CLIENT_EXCLUDE_EXPERIMENTAL_ATTRIBUTE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
     <EmbeddedResource Update="Resources\Resources.resx">
