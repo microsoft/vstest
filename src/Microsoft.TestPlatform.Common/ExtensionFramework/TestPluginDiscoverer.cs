@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -23,7 +24,37 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 /// </summary>
 internal static class TestPluginDiscoverer
 {
-    private static readonly HashSet<string> UnloadableFiles = new();
+    /// <summary>
+    /// Files we already failed to load, and why. The same file is scanned once per extension type we look for
+    /// (test adapters, loggers, data collectors, settings providers, ...), so this avoids repeating a load that
+    /// is known to fail. <see cref="TestPluginCache.ClearExtensions"/> empties it, so an extension whose missing
+    /// dependency has since appeared is tried again on the next request instead of staying broken for the rest
+    /// of the process.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, string> UnloadableFiles = new();
+
+    /// <summary>
+    /// Files the user was already told about. This is kept apart from <see cref="UnloadableFiles"/> because the
+    /// two answer different questions: that one says whether loading the file is worth another try, this one says
+    /// whether the user has already seen the warning. <see cref="TestPluginCache.ClearExtensions"/> empties it,
+    /// which is what makes the warning once per run rather than once per process. An editor keeps the runner
+    /// alive across many discovery and run requests, and a broken extension is news again on each of them.
+    ///
+    /// Paths are compared ignoring case. On Windows two spellings of the same path are the same file, and a
+    /// second warning about it tells the user nothing the first one did not.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, object?> ReportedFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Forgets which files failed to load and which of them the user was told about, so the next request tries
+    /// them again and reports them again. Called when the extension cache is cleared, because extensions are
+    /// then discovered from scratch.
+    /// </summary>
+    internal static void ClearLoadFailures()
+    {
+        UnloadableFiles.Clear();
+        ReportedFiles.Clear();
+    }
 
     /// <summary>
     /// Gets information about each of the test extensions available.
@@ -40,13 +71,16 @@ internal static class TestPluginDiscoverer
 
         var pluginInfos = new Dictionary<string, TPluginInfo>();
 
-        // C++ UWP adapters do not follow TestAdapater naming convention, so making this exception
-        if (!extensionPaths.Any())
+        // C++ UWP adapters do not follow TestAdapter naming convention, so making this exception
+        var probeForKnownExtensions = !extensionPaths.Any();
+        if (probeForKnownExtensions)
         {
             AddKnownExtensions(ref extensionPaths);
         }
 
-        GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos);
+        // The known extensions are just a guess, they are not expected to be present, so failing to load them is
+        // normal and must not be reported to the user.
+        GetTestExtensionsFromFiles<TPluginInfo, TExtension>(extensionPaths.ToArray(), pluginInfos, reportFailures: !probeForKnownExtensions);
 
         return pluginInfos;
     }
@@ -74,9 +108,13 @@ internal static class TestPluginDiscoverer
     /// <param name="pluginInfos">
     /// Test plugins collection to add to.
     /// </param>
+    /// <param name="reportFailures">
+    /// When true, files that fail to load are reported to the user as warnings.
+    /// </param>
     private static void GetTestExtensionsFromFiles<TPluginInfo, TExtension>(
         string[] files,
-        Dictionary<string, TPluginInfo> pluginInfos)
+        Dictionary<string, TPluginInfo> pluginInfos,
+        bool reportFailures)
         where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(files != null, "null files");
@@ -85,29 +123,43 @@ internal static class TestPluginDiscoverer
         // Scan each of the files for data extensions.
         foreach (var file in files)
         {
-            if (UnloadableFiles.Contains(file))
+            if (UnloadableFiles.TryGetValue(file, out var knownReason))
             {
+                // We already failed to load this file while looking for another extension type. Don't pay for
+                // the failure again, but still hand it to the reporting, which decides on its own whether the
+                // user has heard about it.
+                ReportFailureToLoadExtensions(file, knownReason, reportFailures);
                 continue;
             }
+
+            Assembly assembly;
             try
             {
                 var assemblyName = Path.GetFileNameWithoutExtension(file);
-                var assembly = Assembly.Load(new AssemblyName(assemblyName));
-                if (assembly != null)
-                {
-                    GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file);
-                }
-            }
-            catch (FileLoadException e)
-            {
-                EqtTrace.Warning("TestPluginDiscoverer-FileLoadException: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
-                string fileLoadErrorMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.FailedToLoadAdapaterFile, file);
-                TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, fileLoadErrorMessage);
-                UnloadableFiles.Add(file);
+                assembly = Assembly.Load(new AssemblyName(assemblyName));
             }
             catch (Exception e)
             {
                 EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
+
+                // The file cannot be loaded at all, don't try again for the other extension types, and tell the user
+                // about it. Without this the extension is just silently missing, and the tests it provides are
+                // silently not run.
+                UnloadableFiles[file] = e.Message;
+                ReportFailureToLoadExtensions(file, e.Message, reportFailures);
+
+                continue;
+            }
+
+            try
+            {
+                GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(assembly, pluginInfos, file, reportFailures);
+            }
+            catch (Exception e)
+            {
+                // The assembly itself loaded, only inspecting it failed. Keep this quiet, it is a problem of a
+                // single extension type and the file may still provide extensions of another type.
+                EqtTrace.Warning("TestPluginDiscoverer: Failed to get extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
             }
         }
     }
@@ -118,13 +170,14 @@ internal static class TestPluginDiscoverer
     /// <param name="assembly">Assembly to check for test extension availability</param>
     /// <param name="pluginInfos">Test extensions collection to add to.</param>
     /// <param name="filePath">File path of the assembly.</param>
+    /// <param name="reportFailures">When true, an assembly from which no type can be loaded is reported to the user as a warning.</param>
     /// <typeparam name="TPluginInfo">
     /// Type of Test Plugin Information.
     /// </typeparam>
     /// <typeparam name="TExtension">
     /// Type of Extensions.
     /// </typeparam>
-    private static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath)
+    internal static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath, bool reportFailures)
         where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(assembly != null, "null assembly");
@@ -175,6 +228,16 @@ internal static class TestPluginDiscoverer
                 {
                     EqtTrace.Warning("LoaderExceptions: {0}", ex);
                 }
+            }
+
+            // Not a single type came out of the assembly, so it cannot provide any extension. When some types did
+            // load we stay quiet, the extension most likely still works, and the types that did not load are
+            // usually not extensions at all.
+            if (types.Count == 0)
+            {
+                var reason = GetLoaderExceptionsMessage(e);
+                UnloadableFiles[filePath] = reason;
+                ReportFailureToLoadExtensions(filePath, reason, reportFailures);
             }
         }
 
@@ -241,4 +304,39 @@ internal static class TestPluginDiscoverer
         }
     }
 
+    /// <summary>
+    /// Tells the user that a file that looks like a test extension could not be loaded, unless they were already
+    /// told about that file in this run.
+    /// </summary>
+    /// <param name="filePath">File path of the extension.</param>
+    /// <param name="reason">Why the file could not be loaded.</param>
+    /// <param name="reportFailures">When false the failure is expected and stays invisible to the user.</param>
+    private static void ReportFailureToLoadExtensions(string filePath, string reason, bool reportFailures)
+    {
+        if (!reportFailures || !ReportedFiles.TryAdd(filePath, null))
+        {
+            return;
+        }
+
+        TestSessionMessageLogger.Instance.SendMessage(
+            TestMessageLevel.Warning,
+            string.Format(CultureInfo.CurrentCulture, CommonResources.FailedToLoadExtensionFile, filePath, reason));
+    }
+
+    /// <summary>
+    /// Joins the messages of the loader exceptions, they say why the types could not be loaded, e.g. which
+    /// dependency is missing.
+    /// </summary>
+    private static string GetLoaderExceptionsMessage(ReflectionTypeLoadException exception)
+    {
+        var reasons = exception.LoaderExceptions?
+            .Where(loaderException => loaderException != null)
+            .Select(loaderException => loaderException!.Message)
+            .Distinct()
+            .ToArray();
+
+        return reasons?.Length > 0
+            ? string.Join(Environment.NewLine, reasons)
+            : exception.Message;
+    }
 }
