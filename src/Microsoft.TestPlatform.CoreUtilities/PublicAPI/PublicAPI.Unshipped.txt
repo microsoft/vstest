@@ -7,3 +7,5 @@
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.TranslationLayerStartTestSessionStop() -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.TranslationLayerStopTestSessionStart() -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.TranslationLayerStopTestSessionStop() -> void
+*REMOVED*static Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions.StringExtensions.AddDoubleQuote(this string! value) -> string!
+static Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions.StringExtensions.AddDoubleQuote(this string? value) -> string!
