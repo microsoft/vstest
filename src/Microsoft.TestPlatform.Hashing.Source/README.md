@@ -81,17 +81,4 @@ consumer is cheap for types that only appear inside a method body, and awkward f
 appear in a signature a test needs to name — `CrossPlatEngine` takes the `InternalsVisibleTo`
 route for exactly that reason.
 
-## Public API status
-
-The xxHash128 test id API is experimental and not supported. `EqtHash.GuidFromStringXxHash128` and
-`TestIdProviderXxHash128` are annotated `[Experimental("VSTEST001")]`, so calling either is a
-compile error unless the caller suppresses `VSTEST001`. It ships that way to gather feedback while
-xxHash128 is not the default; it may change or be removed. The annotation is metadata only, so
-removing it once the API is supported is not a breaking change.
-
-`ExperimentalAttribute` only exists from .NET 8 onwards, and both consuming projects also build for
-`net462` and `netstandard2.0`, so `ExperimentalAttribute.cs` declares an internal copy under
-`#if !NET8_0_OR_GREATER`. The compiler binds the attribute by full name, not by identity, so the
-internal copy reports the same diagnostic the framework type would.
-
 [testfx-hashing]: https://github.com/microsoft/testfx/tree/main/src/Platform/Microsoft.Testing.Extensions.TrxReport/Hashing
