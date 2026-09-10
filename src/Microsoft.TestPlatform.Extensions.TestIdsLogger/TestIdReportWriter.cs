@@ -51,22 +51,28 @@ internal static class TestIdReportWriter
 
         foreach (TestIdRecord record in records)
         {
+            string[] fields =
+            {
+                record.Source,
+                record.ExecutorUri,
+                record.FullyQualifiedName,
+                record.DisplayName,
+                Format(record.Id),
+                Format(record.Sha1Id),
+                Format(record.XxHash128Id),
+                record.IdSource.ToString(),
+            };
+
             var row = new StringBuilder();
-            AppendField(row, record.Source);
-            row.Append(',');
-            AppendField(row, record.ExecutorUri);
-            row.Append(',');
-            AppendField(row, record.FullyQualifiedName);
-            row.Append(',');
-            AppendField(row, record.DisplayName);
-            row.Append(',');
-            AppendField(row, Format(record.Id));
-            row.Append(',');
-            AppendField(row, Format(record.Sha1Id));
-            row.Append(',');
-            AppendField(row, Format(record.XxHash128Id));
-            row.Append(',');
-            AppendField(row, record.IdSource.ToString());
+            for (int i = 0; i < fields.Length; i++)
+            {
+                if (i > 0)
+                {
+                    row.Append(',');
+                }
+
+                AppendField(row, fields[i]);
+            }
 
             writer.Write(row.ToString());
             writer.Write("\r\n");
