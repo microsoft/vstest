@@ -60,6 +60,27 @@ public class MtpProxyExecutionManagerTests
     private static TestRunCriteria CriteriaFor(params TestCase[] tests)
         => new(tests, 1);
 
+    private static TestRunCriteria CriteriaWithFilter(string testCaseFilter)
+        => new(
+            [Source],
+            frequencyOfRunStatsChangeEvent: 1,
+            keepAlive: false,
+            testSettings: null,
+            TimeSpan.MaxValue,
+            testHostLauncher: null,
+            testCaseFilter,
+            filterOptions: null);
+
+    private static MtpTestNodeUpdate ActionNode(string uid, string displayName)
+        => new(
+            new Dictionary<string, object?>
+            {
+                ["uid"] = uid,
+                ["display-name"] = displayName,
+                ["node-type"] = "action",
+            },
+            parentUid: null);
+
     /// <summary>
     /// The server matches a run filter on node uid alone, so the uid stored at discovery is what
     /// must be sent - not the display name or the fully qualified name.
@@ -118,6 +139,40 @@ public class MtpProxyExecutionManagerTests
 
         Assert.IsNull(_client.RunFilterUids, "An unfiltered run must not send a uid filter at all.");
         Assert.IsTrue(_client.ExitCalled);
+    }
+
+    /// <summary>
+    /// A /TestCaseFilter run arrives as a source with no specific tests. MTP has no notion of the
+    /// vstest filter expression, so the manager must discover the source first and run only the
+    /// node uids of the tests matching the filter - not the whole suite.
+    /// </summary>
+    [TestMethod]
+    public void StartTestRunHonorsTestCaseFilterByRunningOnlyMatchingNodeUids()
+    {
+        _client.NodesToPush = [ActionNode("uid-1", "TestPasses"), ActionNode("uid-2", "TestFails")];
+
+        using var manager = new MtpProxyExecutionManager();
+        manager.StartTestRun(CriteriaWithFilter("DisplayName~TestPasses"), _eventHandler.Object);
+
+        Assert.IsNotNull(_client.RunFilterUids);
+        Assert.AreEqual("uid-1", _client.RunFilterUids.Single());
+    }
+
+    /// <summary>
+    /// A filter matching nothing must run zero tests, not fall back to running the whole suite. The
+    /// only way <see cref="MtpProxyExecutionManager"/> can express "run nothing" against the fake
+    /// (or the real) MTP client is to skip the source entirely, since sending an empty uid list is
+    /// indistinguishable on the wire from "no filter given" (which MTP treats as run everything).
+    /// </summary>
+    [TestMethod]
+    public void StartTestRunSkipsTheSourceWhenTestCaseFilterMatchesNothing()
+    {
+        _client.NodesToPush = [ActionNode("uid-1", "TestPasses")];
+
+        using var manager = new MtpProxyExecutionManager();
+        manager.StartTestRun(CriteriaWithFilter("DisplayName~NoSuchTest"), _eventHandler.Object);
+
+        Assert.IsNull(_client.RunFilterUids, "A non-matching filter must not run the whole suite.");
     }
 
     [TestMethod]

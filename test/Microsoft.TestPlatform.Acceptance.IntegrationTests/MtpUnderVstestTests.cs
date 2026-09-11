@@ -274,6 +274,55 @@ public class MtpUnderVstestTests : AcceptanceTestBase
     }
 
     [TestMethod]
+    // /TestCaseFilter must scope an MTP run just like it does on the classic path. MTP has no notion of
+    // the vstest filter expression, so vstest.console discovers the app, evaluates the expression against
+    // the discovered tests and runs only the matching test-node uids. Before this fix the filter was
+    // silently ignored and the whole suite ran instead of just the two tests the filter selects.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationHonorsTestCaseFilter(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"DisplayName~TestPasses\"");
+
+        InvokeVsTestWithMtpTestHostEnabled(arguments);
+
+        // Only TestPasses and TestPassesToo match; TestFails, TestSkipped and the other tests are
+        // excluded by the filter.
+        ValidateSummaryStatus(2, 0, 0);
+    }
+
+    [TestMethod]
+    // A /TestCaseFilter that matches nothing must run zero tests on the MTP path, not fall back to
+    // running the whole suite. This guards the regression the feature targets: before, a non-matching
+    // filter was silently ignored and every test ran.
+    [TestMatrix(testHost: Target.Net)]
+    public void RunMtpApplicationHonorsNonMatchingTestCaseFilter(RunnerInfo runnerInfo)
+    {
+        SetTestEnvironment(_testEnvironment, runnerInfo);
+
+        var arguments = PrepareArguments(
+            GetAssetFullPath(MtpApp),
+            testAdapterPath: null,
+            runSettings: string.Empty,
+            FrameworkArgValue,
+            runnerInfo.InIsolationValue,
+            resultsDirectory: TempDirectory.Path);
+        arguments = string.Concat(arguments, " /TestCaseFilter:\"DisplayName~NoSuchTestNameMatchesThis\"");
+
+        InvokeVsTestWithMtpTestHostEnabled(arguments);
+
+        ValidateSummaryStatus(0, 0, 0);
+    }
+
+    [TestMethod]
     // A generic out-of-process data collector (SampleDataCollector) subscribes to per-test-case
     // start/end events, emits per-test-case attachments and reports the launched test-host PID. In the
     // classic path the testhost drives all of that; under MTP there is no testhost, so vstest.console
