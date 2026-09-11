@@ -14,14 +14,63 @@
 
   <!-- This target required to enable /collect:"Code Coverage" in "dotnet publish" scenario with "dotnet vstest".
        E.g: Release pipelines where user/project nuget cache not available on current machine. -->
-  <Target Name="CopyTraceDataCollectorArtifacts" AfterTargets="ComputeFilesToPublish">
-
+  <Target Name="CopyTraceDataCollectorArtifacts"
+          AfterTargets="ComputeFilesToPublish"
+          BeforeTargets="_HandleFileConflictsForPublish">
     <ItemGroup>
       <TraceDataCollectorArtifacts Include="$(MSBuildThisFileDirectory)\**\*.*" />
     </ItemGroup>
+    <ItemGroup>
+      <TraceDataCollectorArtifacts>
+        <RelativePath>%(TraceDataCollectorArtifacts.RecursiveDir)%(TraceDataCollectorArtifacts.Filename)%(TraceDataCollectorArtifacts.Extension)</RelativePath>
+      </TraceDataCollectorArtifacts>
+    </ItemGroup>
+    <ItemGroup>
+      <!-- The consuming application owns its publish destinations, including runtime-pack assets.
+           PathLike compares the whole destination path, normalizing separators and dot segments. -->
+      <_msCoverageNonConflictingArtifact Include="@(TraceDataCollectorArtifacts)" />
+      <_msCoverageNonConflictingArtifact Remove="@(ResolvedFileToPublish)"
+                                         MatchOnMetadata="RelativePath" MatchOnMetadataOptions="PathLike" />
+      <_msCoverageNonConflictingApplicationFile Include="@(ResolvedFileToPublish)" />
+      <_msCoverageNonConflictingApplicationFile Remove="@(TraceDataCollectorArtifacts)"
+                                              MatchOnMetadata="RelativePath" MatchOnMetadataOptions="PathLike" />
+    </ItemGroup>
+    <ItemGroup>
+      <_msCoverageApplicationFile Include="@(ResolvedFileToPublish)"
+                                  Condition="'%(ResolvedFileToPublish.CopyToPublishDirectory)' != 'Never'" />
+      <_msCoverageApplicationFile Remove="@(_msCoverageNonConflictingApplicationFile)"
+                                  MatchOnMetadata="RelativePath" MatchOnMetadataOptions="PathLike" />
 
-    <Copy SourceFiles="@(TraceDataCollectorArtifacts)" DestinationFolder="$(PublishDir)%(RecursiveDir)" />
+      <!-- Framework-dependent applications do not publish shared-framework assemblies. Do not
+           introduce private copies of those assemblies from the collector's bundled dependencies. -->
+      <_msCoverageFrameworkFile Include="@(ReferencePath)"
+                                Condition="'%(ReferencePath.FrameworkReferenceName)' != '' or '%(ReferencePath.FrameworkFile)' == 'true' or '%(ReferencePath.ResolvedFrom)' == '{TargetFrameworkDirectory}'">
+        <RelativePath>%(ReferencePath.Filename)%(ReferencePath.Extension)</RelativePath>
+      </_msCoverageFrameworkFile>
+    </ItemGroup>
+    <ItemGroup>
+      <_msCoverageFrameworkFile Remove="@(ResolvedFileToPublish)"
+                                MatchOnMetadata="RelativePath" MatchOnMetadataOptions="PathLike" />
+      <_msCoverageFrameworkArtifact Include="@(_msCoverageNonConflictingArtifact)" />
+      <_msCoverageNonConflictingArtifact Remove="@(_msCoverageFrameworkFile)"
+                                         MatchOnMetadata="RelativePath" MatchOnMetadataOptions="PathLike" />
+      <_msCoverageFrameworkArtifact Remove="@(_msCoverageNonConflictingArtifact)" />
 
+      <!-- Replace a newer collector dependency left in PublishDir by an older version of this
+           target. PreserveNewest would keep that file even after resolving the collision correctly. -->
+      <ResolvedFileToPublish Remove="@(_msCoverageApplicationFile)"
+                             MatchOnMetadata="RelativePath" MatchOnMetadataOptions="PathLike" />
+      <ResolvedFileToPublish Include="@(_msCoverageApplicationFile)" CopyToPublishDirectory="Always" />
+      <ResolvedFileToPublish Include="@(_msCoverageNonConflictingArtifact)"
+                             CopyToPublishDirectory="Always" ExcludeFromSingleFile="true" />
+    </ItemGroup>
+  </Target>
+
+  <Target Name="_RemoveMsCoverageFrameworkArtifacts"
+          BeforeTargets="CopyFilesToPublishDirectory"
+          DependsOnTargets="CopyTraceDataCollectorArtifacts">
+    <!-- Remove private framework assemblies left by previous versions of this package. -->
+    <Delete Files="@(_msCoverageFrameworkArtifact->'$(PublishDir)%(RelativePath)')" />
   </Target>
 
   <PropertyGroup Condition="'$(NETCoreSdkVersion)' != '' and '$(DisableMsCoverageReferencedPathMaps)' != 'true'">
