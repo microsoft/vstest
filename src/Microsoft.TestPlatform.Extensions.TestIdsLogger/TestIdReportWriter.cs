@@ -77,7 +77,7 @@ internal static class TestIdReportWriter
     /// Formats a test id the way every other vstest surface prints one, so a value in this report
     /// compares byte for byte against a value taken from a TRX file or from the object model.
     /// </summary>
-    private static string Format(Guid id) => id.ToString("d", CultureInfo.InvariantCulture);
+    internal static string Format(Guid id) => id.ToString("d", CultureInfo.InvariantCulture);
 
     private static void AppendField(StringBuilder row, string value)
     {

@@ -241,7 +241,7 @@ public class TestIdsLogger : ITestLoggerWithParameters
     /// mapping does not use.
     /// </remarks>
     private static string BuildKey(TestIdRecord record)
-        => string.Join("\u0000", new[] { record.Source, record.ExecutorUri, record.FullyQualifiedName, record.Id.ToString("d", CultureInfo.InvariantCulture) });
+        => string.Join("\u0000", new[] { record.Source, record.ExecutorUri, record.FullyQualifiedName, TestIdReportWriter.Format(record.Id) });
 
     /// <summary>
     /// Reads a test property by its id from the properties the test case actually carries.
@@ -300,7 +300,7 @@ public class TestIdsLogger : ITestLoggerWithParameters
                 .OrderBy(r => r.Source, StringComparer.Ordinal)
                 .ThenBy(r => r.FullyQualifiedName, StringComparer.Ordinal)
                 .ThenBy(r => r.ExecutorUri, StringComparer.Ordinal)
-                .ThenBy(r => r.Id.ToString("d", CultureInfo.InvariantCulture), StringComparer.Ordinal)
+                .ThenBy(r => TestIdReportWriter.Format(r.Id), StringComparer.Ordinal)
                 .ToList();
 
             // Staged through a temporary file and renamed into place, so that a write which fails
