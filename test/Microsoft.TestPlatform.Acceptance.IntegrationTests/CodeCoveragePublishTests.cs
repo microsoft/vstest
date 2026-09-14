@@ -96,8 +96,7 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(console: Net, testHost: Net)]
-    [TestMatrix(console: Net, testHost: NetFx)]
+    [TestMatrix(console: Net)]
     public void PublishedTestsDiscoverCoverageWithoutPackageAdapterPath(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
