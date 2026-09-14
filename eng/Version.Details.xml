@@ -22,9 +22,9 @@
     </Dependency>
   </ProductDependencies>
   <ToolsetDependencies>
-    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.26431.5">
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="10.0.0-beta.26459.2">
       <Uri>https://github.com/dotnet/arcade</Uri>
-      <Sha>c642c365e52bd6c5bd979f759963260fb79d710a</Sha>
+      <Sha>8244eabaf13539341cfeb03c89b724a3826b7f00</Sha>
     </Dependency>
     <Dependency Name="Microsoft.DiaSymReader.Pdb2Pdb" Version="1.1.0-beta2-19575-01">
       <Uri>https://github.com/dotnet/symreader-converter</Uri>
