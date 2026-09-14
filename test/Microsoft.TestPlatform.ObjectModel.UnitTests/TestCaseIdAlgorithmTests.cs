@@ -3,6 +3,7 @@
 
 using System;
 
+using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -13,9 +14,18 @@ namespace Microsoft.TestPlatform.ObjectModel.UnitTests;
 /// algorithm computes <see cref="TestCase.Id"/>.
 /// </summary>
 /// <remarks>
-/// These tests mutate a process wide environment variable and the cached flag value, so each one
-/// restores both in a finally block. The flag is read lazily on first use rather than at type load,
-/// which is what makes it testable at all.
+/// <para>
+/// Only the tests that genuinely depend on the ambient environment - the default, laziness, and
+/// caching - mutate the process wide environment variable and the cached flag value, restoring both
+/// in a finally block. Everything that only asks "which algorithm does this declared value select"
+/// goes through <see cref="TestCaseIdAlgorithmResolver.Resolve(string)"/> instead, which is a pure
+/// function of its argument and touches no shared state, so those tests do not need to coordinate
+/// with anything else in this assembly.
+/// </para>
+/// <para>
+/// See <see href="https://github.com/microsoft/vstest/issues/16433"/> for why the ambient tests
+/// cannot be converted the same way.
+/// </para>
 /// </remarks>
 [TestClass]
 [DoNotParallelize]
@@ -46,14 +56,23 @@ public class TestCaseIdAlgorithmTests
     public void TestCaseIdUsesSha1WhenTheFeatureFlagIsNotSet()
         => RunWithFlag(null, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
 
+    /// <summary>
+    /// A declared value that opts in to xxHash128 resolves to that algorithm.
+    /// </summary>
+    /// <remarks>
+    /// Goes through <see cref="TestCaseIdAlgorithmResolver.Resolve(string)"/> directly rather than
+    /// through <see cref="TestCase.Id"/>, so this asserts the resolution rule itself without touching
+    /// the environment or the feature flag cache. <see cref="TestCaseIdUsesSha1WhenTheFeatureFlagIsNotSet"/>
+    /// and the tests below it are what actually exercise the ambient path.
+    /// </remarks>
     [TestMethod]
     [DataRow(OptIn)]
     [DataRow(" 0 ")]
-    public void TestCaseIdUsesXxHash128WhenTheFeatureFlagOptsIn(string value)
-        => RunWithFlag(value, () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
+    public void ResolveSelectsXxHash128WhenTheDeclaredValueOptsIn(string value)
+        => Assert.AreEqual(TestCaseIdAlgorithm.XxHash128, TestCaseIdAlgorithmResolver.Resolve(value));
 
     /// <summary>
-    /// Every value other than <c>0</c> sets the flag, and therefore selects SHA1.
+    /// Every value other than <c>0</c> resolves to SHA1.
     /// </summary>
     /// <remarks>
     /// <para>
@@ -67,10 +86,9 @@ public class TestCaseIdAlgorithmTests
     /// is the one input where this and the declared-value path could silently drift apart.
     /// </para>
     /// <para>
-    /// The <c>1</c> row is also the promise that makes the flag safe to write down now: it asserts
-    /// today's ids against a literal, so someone pinning <c>1</c> keeps getting exactly these ids
-    /// after the default moves. Asserting it against the unset id instead would tie the promise to
-    /// the very thing that is going to move.
+    /// Goes through <see cref="TestCaseIdAlgorithmResolver.Resolve(string)"/> directly for the same
+    /// reason as <see cref="ResolveSelectsXxHash128WhenTheDeclaredValueOptsIn"/>: it is a pure
+    /// function of the declared value and needs no ambient state to assert against.
     /// </para>
     /// </remarks>
     [TestMethod]
@@ -80,8 +98,8 @@ public class TestCaseIdAlgorithmTests
     [DataRow("true")]
     [DataRow("nonsense")]
     [DataRow("00")]
-    public void TestCaseIdUsesSha1ForEveryValueOtherThanZero(string value)
-        => RunWithFlag(value, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
+    public void ResolveSelectsSha1ForEveryDeclaredValueOtherThanZero(string value)
+        => Assert.AreEqual(TestCaseIdAlgorithm.Sha1, TestCaseIdAlgorithmResolver.Resolve(value));
 
     [TestMethod]
     public void TestCaseIdAlgorithmIsReadLazilyRatherThanAtTypeLoad()
