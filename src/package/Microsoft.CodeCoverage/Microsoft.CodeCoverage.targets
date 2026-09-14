@@ -34,7 +34,7 @@
        including files left by earlier publishes. These tools run in the collector host, not in WASM. -->
   <Target Name="ExcludeTraceDataCollectorArtifactsFromWasmBundle" AfterTargets="_GetDefaultWasmAssembliesToBundle">
     <ItemGroup>
-      <WasmAssembliesToBundle Remove="$(PublishDir)Microsoft.CodeCoverage/**/*.dll" />
+      <WasmAssembliesToBundle Remove="$([MSBuild]::EnsureTrailingSlash('$(PublishDir)'))Microsoft.CodeCoverage/**/*.dll" />
     </ItemGroup>
   </Target>
 

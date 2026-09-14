@@ -65,11 +65,11 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
               <Import Project="coverage-package/Microsoft.CodeCoverage.targets" />
               <Target Name="_GetDefaultWasmAssembliesToBundle">
                 <ItemGroup>
-                  <WasmAssembliesToBundle Include="$(PublishDir)**/*.dll" />
+                  <WasmAssembliesToBundle Include="$(PublishDir)/**/*.dll" />
                 </ItemGroup>
               </Target>
-              <Target Name="CheckWasmBundle" DependsOnTargets="PrepareForPublish;_GetDefaultWasmAssembliesToBundle">
-                <WriteLinesToFile File="$(PublishDir)wasm-inputs.txt" Lines="@(WasmAssembliesToBundle)" Overwrite="true" />
+              <Target Name="CheckWasmBundle" DependsOnTargets="_GetDefaultWasmAssembliesToBundle">
+                <WriteLinesToFile File="$(PublishDir)/wasm-inputs.txt" Lines="@(WasmAssembliesToBundle)" Overwrite="true" />
               </Target>
             </Project>
             """);
@@ -88,10 +88,15 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
 
             Assert.AreEqual("native", File.ReadAllText(Path.Combine(deployment.Path, "Microsoft.CodeCoverage", "x64", "instrumentation.dll")));
             Assert.AreEqual("resource", File.ReadAllText(Path.Combine(deployment.Path, "Microsoft.CodeCoverage", "fr", "collector.resources.dll")));
-            RunDotnet($"""msbuild "{projectPath}" -t:CheckWasmBundle -p:PublishDir="{deployment.Path}" """);
-            var bundledFiles = File.ReadAllLines(Path.Combine(deployment.Path, "wasm-inputs.txt"));
-            Assert.Contains(path => path.EndsWith("System.Memory.dll", StringComparison.Ordinal), bundledFiles);
-            Assert.DoesNotContain(path => path.Contains($"Microsoft.CodeCoverage{Path.DirectorySeparatorChar}", StringComparison.Ordinal), bundledFiles);
+            var publishDirectory = deployment.Path.TrimEnd(Path.DirectorySeparatorChar, Path.AltDirectorySeparatorChar);
+            // A trailing backslash would escape the closing quote in Windows process arguments.
+            foreach (var directory in new[] { publishDirectory, publishDirectory + Path.AltDirectorySeparatorChar })
+            {
+                RunDotnet($"""msbuild "{projectPath}" -t:CheckWasmBundle -p:PublishDir="{directory}" """);
+                var bundledFiles = File.ReadAllLines(Path.Combine(deployment.Path, "wasm-inputs.txt"));
+                Assert.Contains(path => path.EndsWith("System.Memory.dll", StringComparison.Ordinal), bundledFiles);
+                Assert.DoesNotContain(path => path.Contains($"Microsoft.CodeCoverage{Path.DirectorySeparatorChar}", StringComparison.Ordinal), bundledFiles);
+            }
         }
     }
 
