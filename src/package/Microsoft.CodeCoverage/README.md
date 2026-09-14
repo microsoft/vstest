@@ -19,8 +19,9 @@ dotnet test --collect "Code Coverage"
 ## Published tests
 
 `dotnet publish` places the collector, tools, and their private dependencies in the
-`Microsoft.CodeCoverage` subdirectory. Deploy the entire publish directory. VSTest
-discovers the collector beside the published tests without a project or NuGet cache:
+`Microsoft.CodeCoverage` subdirectory. Deploy the entire publish directory. VSTest's
+data collector host searches the test assembly's directory and its subdirectories,
+so it discovers the collector without a project or NuGet cache:
 
 ```sh
 dotnet vstest publish/Tests.dll --collect:"Code Coverage"
