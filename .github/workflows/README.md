@@ -50,10 +50,10 @@ personal PAT**. Authentication flows through org-owned credentials instead:
 | --- | --- | --- |
 | `copilot-requests: write` (permission) | GitHub Copilot CLI (model inference) | **Preferred.** Declared in every agentic workflow's `permissions:` block; gh-aw then authenticates inference with the per-run `GITHUB_TOKEN` and bills through the org's Copilot subscription. Replaces `COPILOT_GITHUB_TOKEN`. |
 | `COPILOT_GITHUB_TOKEN` (secret) | *(legacy)* Copilot inference | **No longer referenced** by any compiled workflow — `copilot-requests: write` supersedes it. Safe to delete after this change ships. |
-| `APP_ID` (variable) + `APP_PRIVATE_KEY` (secret) | Org-owned GitHub App for safe-output write-backs | **Preferred write path.** Every workflow with a mutating safe output references this pair with `ignore-if-missing: true`. The App mints a short-lived token per run, scoped to the safe-output job's `permissions:`, and auto-revokes it when the run ends. |
+| `APP_ID` (variable containing the App Client ID) + `APP_PRIVATE_KEY` (secret) | Org-owned GitHub App for safe-output write-backs | **Preferred write path.** Every workflow with a mutating safe output references this pair with `ignore-if-missing: true`. The App mints a short-lived token per run, scoped to the safe-output job's `permissions:`, and auto-revokes it when the run ends. |
 | `GH_AW_GITHUB_TOKEN` (secret) | *(legacy, compiler-generated fallback)* Safe-output and GitHub API access beyond `GITHUB_TOKEN` | No workflow source references it. gh-aw emits the optional fallback chain in generated locks; when unset, operations fall back to the per-run `GITHUB_TOKEN`. Removable after this change merges. |
 | `GH_AW_GITHUB_MCP_SERVER_TOKEN` (secret) | *(legacy, compiler-generated fallback)* GitHub MCP reads | No workflow source references it. gh-aw emits the optional chain `GH_AW_GITHUB_MCP_SERVER_TOKEN \|\| GH_AW_GITHUB_TOKEN \|\| GITHUB_TOKEN`; current workflows only require same-repository reads, so it is removable after this change merges. |
-| `GH_AW_CI_TRIGGER_TOKEN` (secret) | *(legacy)* Trigger CI after a write-back push | PR creation and branch-push outputs now explicitly use `github-token-for-extra-empty-commit: app`, so gh-aw no longer emits this secret in their manifests. Remove it after the App is provisioned; without either credential, PR creation still falls back to `GITHUB_TOKEN`, but the extra commit cannot trigger downstream Actions. |
+| `GH_AW_CI_TRIGGER_TOKEN` (secret) | *(legacy)* Trigger CI after a write-back push | PR creation and branch-push outputs now explicitly use `github-token-for-extra-empty-commit: app`, so gh-aw no longer emits this secret in their manifests. Safe to delete after this change merges. In `app` mode this secret is not a fallback: until the App is provisioned, PR creation still falls back to `GITHUB_TOKEN`, but the extra commit cannot trigger downstream Actions. |
 | `GITHUB_TOKEN` (built-in) | Default per-run auth | Always present; scoped to the job's `permissions:` and auto-revoked at run end. |
 
 > [!IMPORTANT]
@@ -65,10 +65,12 @@ personal PAT**. Authentication flows through org-owned credentials instead:
 > workflows with **no long-lived PAT at all**.
 >
 > **Fast unblock:** after this change merges, delete `COPILOT_GITHUB_TOKEN`,
-> `GH_AW_GITHUB_TOKEN`, and `GH_AW_GITHUB_MCP_SERVER_TOKEN` if present. No workflow source
-> references them, and every workflow degrades gracefully to the built-in `GITHUB_TOKEN`
-> while the App is absent. Keep `GH_AW_CI_TRIGGER_TOKEN` only until the App is provisioned
-> if generated PRs must continue triggering downstream Actions during that transition.
+> `GH_AW_GITHUB_TOKEN`, `GH_AW_GITHUB_MCP_SERVER_TOKEN`, and `GH_AW_CI_TRIGGER_TOKEN` if
+> present. No workflow source references them, and write-backs degrade gracefully to the
+> built-in `GITHUB_TOKEN` while the App is absent. Provision the App before relying on
+> generated PRs to trigger downstream Actions: explicit `app` mode does not read
+> `GH_AW_CI_TRIGGER_TOKEN`, so the extra CI-trigger commit is skipped until App credentials
+> are available.
 
 ### Preferred: eliminate the expiring PATs
 
@@ -98,13 +100,16 @@ short-PAT policy without manual rotation. Only `COPILOT_GITHUB_TOKEN` cannot use
 Set it up once (requires org admin to create/install the App):
 
 1. Create a GitHub App owned by the `microsoft` org (Settings → Developer settings →
-   GitHub Apps). Grant the read/write repository permissions the workflows need (Contents,
-   Issues, Pull requests, and Security events for code-scanning alerts), generate a
-   **private key** (`.pem`), and **install** the App on `microsoft/vstest`.
-2. Store the App ID as a repository **variable** and the private key as a **secret**:
+   GitHub Apps). Grant the repository permissions the workflows need (Administration
+   read-only; Contents, Issues, and Pull requests read/write; and Security events
+   read/write for code-scanning alerts), generate a **private key** (`.pem`), and
+   **install** the App on `microsoft/vstest`.
+2. Store the App **Client ID** as a repository **variable** and the private key as a
+   **secret**. The variable remains named `APP_ID` to match the workflow sources, but its
+   value must be the Client ID, not the numeric App ID:
 
    ```bash
-   gh variable set APP_ID          --repo microsoft/vstest --body "<app-id>"
+   gh variable set APP_ID          --repo microsoft/vstest --body "<client-id>"
    gh secret   set APP_PRIVATE_KEY --repo microsoft/vstest --body "$(cat path/to/private-key.pem)"
    ```
 
