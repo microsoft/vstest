@@ -246,4 +246,5 @@ for a test that no longer exists, and such records need deciding on separately.
 ## Related
 
 - [Environment variables](environment-variables.md) - `VSTEST_DISABLE_XXHASH128_TESTCASE_ID`
+- [Experimental APIs](experimental-apis.md#vstest001) - what VSTEST001 covers and how to suppress it
 - [Reporting test results](report.md) - test loggers in general

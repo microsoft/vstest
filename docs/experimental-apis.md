@@ -8,8 +8,6 @@ supported. Removing it is metadata only, so it is not a breaking change for call
 Running a feature is unaffected. The diagnostic applies to compiling a reference to the API, not to
 using the feature through configuration, the command line, or reflection.
 
-<a id="VSTEST001"></a>
-
 ## VSTEST001
 
 Covers the xxHash128 test case id work:

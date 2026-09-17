@@ -65,7 +65,9 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 // internal one through InternalsVisibleTo. Binding to the local one is the point - see the comment on
 // the Compile item in the csproj - and the compiler already resolves it that way.
 #pragma warning disable CS0436
-[Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#{0}")]
+// The fragment is hardcoded lowercase rather than composed from {0}: the diagnostic id is uppercase,
+// and GitHub generates lowercase heading anchors, so "#{0}" would never resolve.
+[Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#vstest001")]
 #pragma warning restore CS0436
 public class TestIdsLogger : ITestLoggerWithParameters
 {
