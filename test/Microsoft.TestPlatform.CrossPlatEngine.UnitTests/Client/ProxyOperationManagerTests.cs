@@ -87,6 +87,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(123);
         var originalTraceLevel = EqtTrace.TraceLevel;
+        var originalLogFile = EqtTrace.LogFile;
         var originalCulture = CultureInfo.CurrentCulture;
         try
         {
@@ -109,7 +110,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         finally
         {
             CultureInfo.CurrentCulture = originalCulture;
-            EqtTrace.TraceLevel = originalTraceLevel;
+            EqtTrace.InitializeTrace(originalLogFile, (PlatformTraceLevel)originalTraceLevel);
         }
     }
 
