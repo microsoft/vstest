@@ -12,8 +12,9 @@ public static class StringExtensions
     /// </summary>
     /// <param name="value">The argument value. Null is treated as an empty string.</param>
     /// <returns></returns>
-    public static string AddDoubleQuote(this string? value)
+    public static string AddDoubleQuote(this string value)
     {
+        // Preserve null-as-empty behavior for callers that do not use nullable annotations.
         if (value is null)
         {
             return "\"\"";

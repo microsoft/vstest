@@ -10,7 +10,6 @@ namespace Microsoft.TestPlatform.CoreUtilities.UnitTests.Extensions;
 public class StringExtensionsTests
 {
     [TestMethod]
-    [DataRow(null, "\"\"")]
     [DataRow("", "\"\"")]
     [DataRow("plain", "\"plain\"")]
     [DataRow("with spaces", "\"with spaces\"")]
@@ -26,10 +25,18 @@ public class StringExtensionsTests
     [DataRow("\\\"quoted", "\"\\\\\\\"quoted\"")]
     [DataRow("\\\\\"quoted", "\"\\\\\\\\\\\"quoted\"")]
     [DataRow("a\\\"b\\", "\"a\\\\\\\"b\\\\\"")]
-    public void AddDoubleQuoteShouldEscapeCommandLineArgument(string? value, string expected)
+    public void AddDoubleQuoteShouldEscapeCommandLineArgument(string value, string expected)
     {
         var quoted = value.AddDoubleQuote();
 
         Assert.AreEqual(expected, quoted);
+    }
+
+    [TestMethod]
+    public void AddDoubleQuoteShouldPreserveNullAsEmptyBehavior()
+    {
+        var quoted = StringExtensions.AddDoubleQuote(null!);
+
+        Assert.AreEqual("\"\"", quoted);
     }
 }
