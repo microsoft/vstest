@@ -80,7 +80,9 @@ public static class EqtHash
     /// suppressing VSTEST001.
     /// </para>
     /// </remarks>
-    [Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#{0}")]
+    // The fragment is hardcoded lowercase rather than composed from {0}: the diagnostic id is
+    // uppercase, and GitHub generates lowercase heading anchors, so "#{0}" would never resolve.
+    [Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#vstest001")]
     public static Guid GuidFromStringXxHash128(string data)
     {
         TPDebug.Assert(data != null);
