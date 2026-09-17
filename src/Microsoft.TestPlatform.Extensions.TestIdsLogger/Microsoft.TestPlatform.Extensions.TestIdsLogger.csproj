@@ -14,10 +14,13 @@
     <Compile Include="$(RepoRoot)src\Microsoft.TestPlatform.TestHostProvider\Properties\TestExtensionTypesAttribute.cs" Link="Properties\TestExtensionTypesAttribute.cs" />
     <Compile Include="..\..\shared\NullableAttributes.cs" Link="NullableAttributes.cs" />
     <!-- This assembly applies [Experimental], so it must declare the down-level polyfill itself rather
-         than picking up ObjectModel's internal copy through InternalsVisibleTo. Its netstandard2.0
-         build runs against ObjectModel's net8.0 build, which compiles that copy out, so a type
-         reference into ObjectModel would fail to resolve at runtime and reflecting over the logger's
-         attributes would throw - which silently loses the extension during discovery. -->
+         than picking up ObjectModel's internal copy through InternalsVisibleTo. Compiling against
+         ObjectModel's copy would succeed, because this assembly's netstandard2.0 build compiles
+         against ObjectModel's netstandard2.0 target, which declares it. It would then fail at
+         runtime: a netstandard2.0 extension is loaded into whichever host runs it, and in a .NET
+         host that is ObjectModel's net8.0 assembly, which compiles the polyfill out. The type
+         reference would not resolve, so reflecting over the logger's attributes would throw - which
+         silently loses the extension during discovery. -->
     <Compile Include="$(RepoRoot)src\Microsoft.TestPlatform.Hashing.Source\ExperimentalAttribute.cs" Link="ExperimentalAttribute.cs" />
   </ItemGroup>
   <ItemGroup>
