@@ -6,10 +6,15 @@ description: >
 
 engine:
   id: copilot
-  # With tools.bash disabled, permit only the MCP wrappers without implicit command grants.
+  # With tools.bash disabled, permit only the MCP wrappers without implicit command grants,
+  # plus jq. Large GitHub MCP responses (a Dependabot bump of the generated `.lock.yml`
+  # files is enough) are spilled to a one-line escaped-JSON payload file instead of being
+  # returned inline, and jq is the only allowed way to read one. Without it the agent burns
+  # its whole budget retrying python3/node/sed/awk and never reaches the review.
   args:
     - --allow-tool=shell(github:*)
     - --allow-tool=shell(safeoutputs:*)
+    - --allow-tool=shell(jq)
 
 on:
   pull_request:
@@ -91,6 +96,43 @@ This workflow does not assess, discuss, or make recommendations about potential 
 - **Pull Request**: #${{ github.event.pull_request.number }}
 - **PR Title**: "${{ github.event.pull_request.title }}"
 - **Triggered by**: ${{ github.actor }}
+
+## Tools Available to You
+
+`tools.bash` is disabled for this workflow and the agent runs with `--no-ask-user`. **A denied
+command cannot be escalated — the denial is final.** Retrying the same idea with a different
+utility only burns the run budget; a previous run spent its entire 15-minute timeout doing
+exactly that and published no review.
+
+You can run:
+
+- `github ...` — the GitHub MCP wrapper (PR details, diffs, files, reviews, file contents)
+- `safeoutputs ...` — the safe-output wrapper used to publish review comments and the verdict
+- `jq ...` — for reading MCP payload files (see below)
+- The read-only shell built-ins Copilot CLI always permits: `cat`, `ls`, `echo`, `grep`,
+  `head`, `tail`, `wc`, and read-only `git` commands such as `git diff`, `git show`, `git log`
+
+You cannot run anything else. In particular `python3`, `node`, `sed`, `awk`, `perl`, `tr`,
+`find`, `xargs`, `curl` and `gh` are all unavailable — do not attempt them.
+
+### Reading large MCP responses
+
+When a `github` response is too large to return inline it is written to a payload file under
+`/tmp/gh-aw/mcp-payloads/` as a single line of escaped JSON. The path is reported in the tool
+output. Use `jq` to read it:
+
+```bash
+jq -r '(if type == "array" then .[0] else . end).content[].text' /tmp/gh-aw/mcp-payloads/<...>/payload.json
+```
+
+If that shape does not match, run `jq 'keys'` (or `jq '.[0] | keys'`) on the file first and
+adjust the path. This is the intended way to read large diffs — do not try to unescape the
+JSON by hand with `grep`.
+
+The repository is also checked out at the PR head, so `git diff <base.sha>..<head.sha>` is a
+valid fallback for obtaining the **diff** if a payload is still unwieldy. This fallback applies
+to review *input* only; the review *instructions* in Step 4 must still come from the base-SHA
+copies fetched via the GitHub tools, never from the checkout.
 
 ## Scope Boundaries
 
