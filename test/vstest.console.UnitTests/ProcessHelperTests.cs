@@ -1,9 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-#if NET
 using System;
-#endif
 using System.Diagnostics;
 using System.Threading;
 
@@ -50,6 +48,64 @@ public class ProcessHelperTests
 #endif
 
         Assert.AreEqual(expectedFileName, currentProcessFileName);
+    }
+
+#if NET
+    [TestMethod]
+    public void GetCurrentProcessFileNameShouldPreferProcessPathOverDifferentMainModuleFileName()
+    {
+        var processHelper = new ProcessHelper();
+
+        string? currentProcessFileName = processHelper.GetCurrentProcessFileName(
+            getProcessPath: () => "/usr/share/dotnet/dotnet",
+            getMainModuleFileName: () => "/proot/loader");
+
+        Assert.AreEqual("/usr/share/dotnet/dotnet", currentProcessFileName);
+    }
+
+    [TestMethod]
+    public void GetCurrentProcessFileNameShouldNotReadMainModuleWhenProcessPathIsAvailable()
+    {
+        var processHelper = new ProcessHelper();
+
+        string? currentProcessFileName = processHelper.GetCurrentProcessFileName(
+            getProcessPath: () => "/usr/share/dotnet/dotnet",
+            getMainModuleFileName: () => throw new InvalidOperationException("MainModule must not be read when ProcessPath is available."));
+
+        Assert.AreEqual("/usr/share/dotnet/dotnet", currentProcessFileName);
+    }
+#else
+    [TestMethod]
+    public void GetCurrentProcessFileNameShouldNotReadProcessPathOnNetFramework()
+    {
+        var processHelper = new ProcessHelper();
+
+        string? currentProcessFileName = processHelper.GetCurrentProcessFileName(
+            getProcessPath: () => throw new InvalidOperationException("ProcessPath is unavailable on .NET Framework."),
+            getMainModuleFileName: () => "dotnet.exe");
+
+        Assert.AreEqual("dotnet.exe", currentProcessFileName);
+    }
+#endif
+
+    [TestMethod]
+    [DataRow("/usr/share/dotnet/dotnet")]
+    [DataRow(null)]
+    public void GetCurrentProcessFileNameShouldFallBackToMainModuleWhenProcessPathIsNull(string? mainModuleFileName)
+    {
+        var processHelper = new ProcessHelper();
+        int mainModuleReads = 0;
+
+        string? currentProcessFileName = processHelper.GetCurrentProcessFileName(
+            getProcessPath: () => null,
+            getMainModuleFileName: () =>
+            {
+                mainModuleReads++;
+                return mainModuleFileName;
+            });
+
+        Assert.AreEqual(mainModuleFileName, currentProcessFileName);
+        Assert.AreEqual(1, mainModuleReads);
     }
 
     [TestMethod]
