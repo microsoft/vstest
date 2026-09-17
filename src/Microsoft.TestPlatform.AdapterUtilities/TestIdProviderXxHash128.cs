@@ -27,7 +27,7 @@ namespace Microsoft.TestPlatform.AdapterUtilities;
 /// VSTEST001.
 /// </para>
 /// </remarks>
-[Experimental("VSTEST001")]
+[Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#{0}")]
 public class TestIdProviderXxHash128
 {
     private Guid _id = Guid.Empty;

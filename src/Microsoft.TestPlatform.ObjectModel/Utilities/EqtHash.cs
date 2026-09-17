@@ -80,7 +80,7 @@ public static class EqtHash
     /// suppressing VSTEST001.
     /// </para>
     /// </remarks>
-    [Experimental("VSTEST001")]
+    [Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#{0}")]
     public static Guid GuidFromStringXxHash128(string data)
     {
         TPDebug.Assert(data != null);

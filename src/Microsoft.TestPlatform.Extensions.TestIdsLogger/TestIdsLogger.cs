@@ -65,7 +65,7 @@ namespace Microsoft.VisualStudio.TestPlatform.Extensions.TestIdsLogger;
 // internal one through InternalsVisibleTo. Binding to the local one is the point - see the comment on
 // the Compile item in the csproj - and the compiler already resolves it that way.
 #pragma warning disable CS0436
-[Experimental("VSTEST001")]
+[Experimental("VSTEST001", UrlFormat = "https://github.com/microsoft/vstest/blob/main/docs/experimental-apis.md#{0}")]
 #pragma warning restore CS0436
 public class TestIdsLogger : ITestLoggerWithParameters
 {
@@ -240,6 +240,11 @@ public class TestIdsLogger : ITestLoggerWithParameters
             testCase.DisplayName ?? string.Empty,
             testCase.Id,
             EqtHash.GuidFromString(seed),
+            // Deliberately not suppressed. Roslyn does not report an experimental diagnostic inside a
+            // context that is itself [Experimental], and TestIdsLogger is. Note this is not matched on
+            // the diagnostic id - any [Experimental] on the enclosing type silences every experimental
+            // use within it - so the "a new accidental use fails the build" guarantee the pragmas give
+            // elsewhere does not hold in this file.
             EqtHash.GuidFromStringXxHash128(seed));
     }
 

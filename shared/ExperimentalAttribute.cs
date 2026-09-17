@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-// ExperimentalAttribute ships in the framework from .NET 8 onwards. ObjectModel and AdapterUtilities
-// also build for net462 and netstandard2.0, where it does not exist, so it is declared here for those
+// ExperimentalAttribute ships in the framework from .NET 8 onwards. The assemblies that apply
+// [Experimental] also build target frameworks that predate it, so it is declared here for those
 // legs. The compiler binds the attribute by full name rather than by identity, so an internal
 // declaration in the right namespace is enough for the VSTEST001 diagnostic to be reported.
 #if !NET8_0_OR_GREATER
