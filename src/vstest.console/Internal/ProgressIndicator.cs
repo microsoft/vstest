@@ -37,6 +37,7 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
     public ProgressIndicator(IOutput output, IConsoleHelper consoleHelper, ISystemTimersTimer? timer = null)
     {
         _timer = timer ?? new SystemTimersTimer(1000);
+        _timer.Elapsed += Timer_Elapsed;
         ConsoleOutput = output;
         ConsoleHelper = consoleHelper;
         _testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
@@ -47,7 +48,6 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
     {
         lock (_syncObject)
         {
-            _timer.Elapsed += Timer_Elapsed;
             _timer.Start();
 
             // Print the string based on the previous state, that is dotCounter
@@ -65,9 +65,12 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
     /// <param name="startPos">the starting position</param>
     private void Clear(int startPos)
     {
+        // Guard against a negative starting position (e.g. from a shrinking console window)
+        // which would otherwise throw from SetCursorPosition or produce a negative fill length.
+        startPos = Math.Max(startPos, 0);
         var currentLineCursor = ConsoleHelper.CursorTop;
         ConsoleHelper.SetCursorPosition(startPos, ConsoleHelper.CursorTop);
-        ConsoleOutput.Write(new string(' ', ConsoleHelper.WindowWidth - startPos), OutputLevel.Information);
+        ConsoleOutput.Write(new string(' ', Math.Max(ConsoleHelper.WindowWidth - startPos, 0)), OutputLevel.Information);
         ConsoleHelper.SetCursorPosition(startPos, currentLineCursor);
     }
 
@@ -98,17 +101,20 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
 
     private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (IsRunning)
+        lock (_syncObject)
         {
-            // If running, prints dot every second.
-            ConsoleOutput.Write(".", OutputLevel.Information);
-            _dotCounter = ++_dotCounter % 3;
-
-            // When counter reaches 3, that is 3 dots have been printed
-            // Clear and start printing again
-            if (_dotCounter == 0)
+            if (IsRunning)
             {
-                Clear(ConsoleHelper.CursorLeft - 3);
+                // If running, prints dot every second.
+                ConsoleOutput.Write(".", OutputLevel.Information);
+                _dotCounter = ++_dotCounter % 3;
+
+                // When counter reaches 3, that is 3 dots have been printed
+                // Clear and start printing again
+                if (_dotCounter == 0)
+                {
+                    Clear(ConsoleHelper.CursorLeft - 3);
+                }
             }
         }
     }

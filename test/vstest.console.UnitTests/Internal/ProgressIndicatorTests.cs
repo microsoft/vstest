@@ -102,4 +102,42 @@ public class ProgressIndicatorTests
         _consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Once);
         _consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(2));
     }
+
+    [TestMethod]
+    public void RepeatedPauseAndStartShouldNotDuplicateElapsedSubscription()
+    {
+        _consoleHelper.Setup(c => c.CursorLeft).Returns(30);
+
+        // Mirrors ConsoleLogger.TestMessageHandler, which calls Pause() then Start()
+        // around every logged message. Elapsed should be subscribed exactly once
+        // (in the constructor), regardless of how many Pause/Start cycles occur.
+        _indicator.Start();
+        for (var i = 0; i < 20; i++)
+        {
+            _indicator.Pause();
+            _indicator.Start();
+        }
+
+        _steppableTimer.Step();
+
+        // A single Step() should produce exactly one "." write, not N writes for N
+        // prior Start() calls.
+        _consoleOutput.Verify(m => m.Write(".", OutputLevel.Information), Times.Once);
+    }
+
+    [TestMethod]
+    public void ClearShouldNotThrowWhenStartPositionIsNegative()
+    {
+        // Simulates a race where Timer_Elapsed computes a cursor position based on
+        // stale state right as Pause()/Start() resets it, or a console window that
+        // has shrunk since the last read of CursorLeft/WindowWidth.
+        _consoleHelper.Setup(c => c.CursorLeft).Returns(1);
+
+        _indicator.Start();
+
+        // CursorLeft (1) - 3 would be negative; this must not throw.
+        _steppableTimer.Step();
+        _steppableTimer.Step();
+        _steppableTimer.Step();
+    }
 }
