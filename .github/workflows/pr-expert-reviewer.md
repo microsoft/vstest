@@ -120,7 +120,8 @@ command cannot be escalated — the denial is final.** Retrying the same idea wi
 utility only burns the run budget; a previous run spent its entire 15-minute timeout doing
 exactly that and published no review.
 
-This is the complete list of what you can run. It matches the `engine.args` allowlist exactly:
+This is the complete list of **shell commands** you can run. It matches the `engine.args`
+allowlist exactly:
 
 - `github ...` — the GitHub MCP wrapper (PR details, diffs, files, reviews, file contents)
 - `safeoutputs ...` — the safe-output wrapper used to publish review comments and the verdict
@@ -128,9 +129,15 @@ This is the complete list of what you can run. It matches the `engine.args` allo
 - `cat`, `ls`, `grep`, `head`, `tail`, `wc` — read-only inspection
 - `git diff`, `git log`, `git show`, `git merge-base` — read-only history inspection
 
-Anything else is denied. In particular `python3`, `node`, `sed`, `awk`, `perl`, `tr`, `find`,
-`xargs`, `curl`, `gh`, and network or writing git subcommands such as `git fetch` are all
-unavailable — do not attempt them.
+No other shell command is permitted. In particular `python3`, `node`, `sed`, `awk`, `perl`,
+`tr`, `find`, `xargs`, `curl`, `gh`, and network or writing git subcommands such as `git fetch`
+are all unavailable — do not attempt them. Do not invoke a shell interpreter or the MCP bridge
+scripts directly either.
+
+Separately from the shell, you have the native file **read** and **write** tools. Use `write`
+for the cache-memory files in Step 6 — that is the intended way to update them, not a shell
+redirect. Prefer the native GitHub and safe-output MCP tools over the `github` and
+`safeoutputs` CLI wrappers; the wrappers exist as a fallback when native discovery fails.
 
 ### Reading large MCP responses
 
@@ -277,7 +284,8 @@ Skip this check for dependency update PRs (maestro) — their descriptions are a
 
 ### Step 6: Update Memory Cache
 
-After the review, update:
+After the review, use the native `write` tool (not a shell redirect — see
+[Tools Available to You](#tools-available-to-you)) to update:
 
 - **`/tmp/gh-aw/cache-memory/architecture.json`**: Record new architectural patterns observed
 - **`/tmp/gh-aw/cache-memory/perf-hotspots.json`**: Add files/methods identified as performance-sensitive
@@ -316,4 +324,4 @@ For PRs titled `[main] Update dependencies from dotnet/...`:
 
 **Important**: Every run must produce a safe output. Use `noop` only for the explicit skip cases above; otherwise submit a review. Check the tool result. If a tool is missing or fails, report the failure rather than claiming the review or noop succeeded.
 
-Use native MCP tools when available. If native discovery fails, the same configured GitHub and safe-output tools are available through the `github` and `safeoutputs` CLI wrappers. Use their help/schema to invoke the intended tool, including `noop`, `create_pull_request_review_comment`, and `submit_pull_request_review`. These two wrappers are the only allowed shell commands; do not invoke a shell interpreter or the bridge script directly.
+Use native MCP tools when available. If native discovery fails, the same configured GitHub and safe-output tools are available through the `github` and `safeoutputs` CLI wrappers. Use their help/schema to invoke the intended tool, including `noop`, `create_pull_request_review_comment`, and `submit_pull_request_review`. Do not invoke a shell interpreter or the bridge script directly; see [Tools Available to You](#tools-available-to-you) for the full list of permitted shell commands.
