@@ -137,14 +137,28 @@ redirect. Prefer the native GitHub and safe-output MCP tools over the `github` a
 When a `github` response is too large to return inline it is written to a payload file under
 `/tmp/gh-aw/mcp-payloads/` as a single line of escaped JSON. The path is reported in the tool
 output. **This is how you read a large diff** — there is no other supported path, so do not
-abandon it and go looking for one. Use `jq`:
+abandon it and go looking for one.
+
+Inspect the shape first, then extract. Do not assume a shape:
 
 ```bash
-jq -r '(if type == "array" then .[0] else . end).content[].text' /tmp/gh-aw/mcp-payloads/<...>/payload.json
+jq 'if type == "array" then .[0] else . end | keys' /tmp/gh-aw/mcp-payloads/<...>/payload.json
 ```
 
-If that shape does not match, run `jq 'keys'` (or `jq '.[0] | keys'`) on the file first and
-adjust the path. Do not try to unescape the JSON by hand with `grep`.
+Responses are normally wrapped in an MCP result envelope, so this extracts every text part
+without dropping later array elements:
+
+```bash
+jq -r '(if type == "array" then .[] else . end) | .content[]?.text' /tmp/gh-aw/mcp-payloads/<...>/payload.json
+```
+
+If the envelope differs, this pulls every text node regardless of nesting:
+
+```bash
+jq -r '[.. | objects | select(.type == "text") | .text] | join("\n")' /tmp/gh-aw/mcp-payloads/<...>/payload.json
+```
+
+Do not try to unescape the JSON by hand with `grep` — `jq` already returns the decoded text.
 
 If you still cannot read the diff, request the changes in smaller pieces — for example
 per-file contents via the `github` tools — rather than spending turns on shell workarounds. If
