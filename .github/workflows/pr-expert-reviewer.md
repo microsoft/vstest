@@ -7,16 +7,21 @@ description: >
 engine:
   id: copilot
   # tools.bash stays false so this workflow never picks up gh-aw's implicit command
-  # grants. Everything granted here is read-only, and the "Tools Available to You"
-  # prompt section must be kept in sync with this list.
+  # grants. The "Tools Available to You" prompt section must be kept in sync with
+  # this list.
+  #
+  # `safeoutputs` publishes review comments and the verdict, so it is write-capable
+  # by design; its writes are constrained by the safe-outputs config below. Every
+  # other grant is read-only.
   #
   # jq is required because large GitHub MCP responses (a Dependabot bump of the
   # generated `.lock.yml` files is enough) are spilled to a one-line escaped-JSON
   # payload file instead of being returned inline. Without a JSON reader the agent
   # burns its whole budget retrying python3/node/sed/awk and never reaches the review.
   #
-  # These are all non-stem commands, so the bare `shell(name)` form prefix-matches any
-  # invocation without needing a `:*` wildcard that would also admit writing flags.
+  # jq and the inspection commands are non-stem, so the bare `shell(name)` form
+  # prefix-matches any invocation without needing a `:*` wildcard that would also
+  # admit writing flags.
   args:
     - --allow-tool=shell(github:*)
     - --allow-tool=shell(safeoutputs:*)
@@ -118,8 +123,9 @@ exactly that and published no review.
 
 These shell commands are explicitly granted in `engine.args`. Rely only on these:
 
-- `github ...` — the GitHub MCP wrapper (PR details, diffs, files, reviews, file contents)
-- `safeoutputs ...` — the safe-output wrapper used to publish review comments and the verdict
+- `github ...` — the GitHub MCP wrapper, read-only (PR details, diffs, files, reviews, file contents)
+- `safeoutputs ...` — the safe-output wrapper used to publish review comments and the verdict.
+  This is your **only** way to write anything back to the PR
 - `jq ...` — for reading MCP payload files (see below)
 - `cat`, `ls`, `grep`, `head`, `tail`, `wc` — read-only inspection
 
