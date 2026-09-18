@@ -462,7 +462,11 @@ internal class TestRequestManager : ITestRequestManager
                     attachmentsProcessingPayload.InvokedDataCollectors,
                     attachmentsProcessingEventsHandler,
                     _currentAttachmentsProcessingCancellationTokenSource.Token);
-                task.Wait();
+
+                // Use GetAwaiter().GetResult() instead of .Wait() so that a faulted task rethrows the
+                // original exception directly instead of wrapping it in an AggregateException, matching
+                // what callers of this method (e.g. DesignModeClient) expect when logging ex directly.
+                task.GetAwaiter().GetResult();
             }
             finally
             {

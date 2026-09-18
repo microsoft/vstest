@@ -99,7 +99,10 @@ internal class ArtifactProcessingPostProcessModeProcessorExecutor : IArgumentExe
             // We don't have async execution at the moment for the argument processors.
             // Anyway post processing could involve a lot of I/O and so we make some space
             // for some possible parallelization async/await and fair I/O for the callee.
-            _artifactProcessingManage.PostProcessArtifactsAsync().Wait();
+            // Use GetAwaiter().GetResult() instead of .Wait() so that a faulted task rethrows the
+            // original exception directly instead of wrapping it in an AggregateException, matching
+            // what the catch block below and its trace log expect.
+            _artifactProcessingManage.PostProcessArtifactsAsync().GetAwaiter().GetResult();
             return ArgumentProcessorResult.Success;
         }
         catch (Exception e)

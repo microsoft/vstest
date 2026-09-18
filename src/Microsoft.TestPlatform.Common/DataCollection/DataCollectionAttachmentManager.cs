@@ -139,7 +139,10 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
         {
             if (_attachmentTasks.TryGetValue(dataCollectionContext, out var tasks))
             {
-                Task.WhenAll(tasks.ToArray()).Wait();
+                // Use GetAwaiter().GetResult() instead of .Wait() so that a faulted task rethrows the
+                // original exception directly instead of wrapping it in an AggregateException, matching
+                // what the catch block below and its trace log expect.
+                Task.WhenAll(tasks.ToArray()).GetAwaiter().GetResult();
             }
         }
         catch (Exception ex)

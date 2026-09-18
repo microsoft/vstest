@@ -236,9 +236,12 @@ public class ProxyOperationManager
         try
         {
             // Launch the test host.
+            // Use GetAwaiter().GetResult() instead of .Result so that a faulted task rethrows the
+            // original exception directly instead of wrapping it in an AggregateException, matching
+            // what the catch block below and its trace log expect.
             _testHostLaunched = TestHostManager.LaunchTestHostAsync(
                 testHostStartInfo,
-                CancellationTokenSource.Token).Result;
+                CancellationTokenSource.Token).GetAwaiter().GetResult();
 
             if (_testHostLaunched && testHostConnectionInfo.Role == ConnectionRole.Host)
             {
@@ -354,7 +357,10 @@ public class ProxyOperationManager
             try
             {
                 // Please clean up test host.
-                TestHostManager.CleanTestHostAsync(CancellationToken.None).Wait();
+                // Use GetAwaiter().GetResult() instead of .Wait() so that a faulted task rethrows the
+                // original exception directly instead of wrapping it in an AggregateException, matching
+                // what the catch block below and its trace log expect.
+                TestHostManager.CleanTestHostAsync(CancellationToken.None).GetAwaiter().GetResult();
             }
             catch (Exception ex)
             {
