@@ -7,16 +7,16 @@ description: >
 engine:
   id: copilot
   # tools.bash stays false so this workflow never picks up gh-aw's implicit command
-  # grants. Everything the agent may run is listed explicitly below, and the
-  # "Tools Available to You" prompt section must be kept in sync with this list.
+  # grants. Everything granted here is read-only, and the "Tools Available to You"
+  # prompt section must be kept in sync with this list.
   #
   # jq is required because large GitHub MCP responses (a Dependabot bump of the
   # generated `.lock.yml` files is enough) are spilled to a one-line escaped-JSON
   # payload file instead of being returned inline. Without a JSON reader the agent
   # burns its whole budget retrying python3/node/sed/awk and never reaches the review.
   #
-  # The read-only file and git commands are granted explicitly rather than relying on
-  # Copilot CLI's built-in defaults, so that the allowlist and the prompt cannot drift.
+  # These are all non-stem commands, so the bare `shell(name)` form prefix-matches any
+  # invocation without needing a `:*` wildcard that would also admit writing flags.
   args:
     - --allow-tool=shell(github:*)
     - --allow-tool=shell(safeoutputs:*)
@@ -27,10 +27,6 @@ engine:
     - --allow-tool=shell(head)
     - --allow-tool=shell(tail)
     - --allow-tool=shell(wc)
-    - --allow-tool=shell(git diff:*)
-    - --allow-tool=shell(git log:*)
-    - --allow-tool=shell(git show:*)
-    - --allow-tool=shell(git merge-base:*)
 
 on:
   pull_request:
@@ -120,19 +116,16 @@ command cannot be escalated — the denial is final.** Retrying the same idea wi
 utility only burns the run budget; a previous run spent its entire 15-minute timeout doing
 exactly that and published no review.
 
-This is the complete list of **shell commands** you can run. It matches the `engine.args`
-allowlist exactly:
+These shell commands are explicitly granted in `engine.args`. Rely only on these:
 
 - `github ...` — the GitHub MCP wrapper (PR details, diffs, files, reviews, file contents)
 - `safeoutputs ...` — the safe-output wrapper used to publish review comments and the verdict
 - `jq ...` — for reading MCP payload files (see below)
 - `cat`, `ls`, `grep`, `head`, `tail`, `wc` — read-only inspection
-- `git diff`, `git log`, `git show`, `git merge-base` — read-only history inspection
 
-No other shell command is permitted. In particular `python3`, `node`, `sed`, `awk`, `perl`,
-`tr`, `find`, `xargs`, `curl`, `gh`, and network or writing git subcommands such as `git fetch`
-are all unavailable — do not attempt them. Do not invoke a shell interpreter or the MCP bridge
-scripts directly either.
+Do not rely on anything else. `python3`, `node`, `sed`, `awk`, `perl`, `tr`, `find`, `xargs`,
+`curl`, `gh` and `git fetch` are all denied — a previous run wasted its entire budget
+rediscovering that. Do not invoke a shell interpreter or the MCP bridge scripts directly.
 
 Separately from the shell, you have the native file **read** and **write** tools. Use `write`
 for the cache-memory files in Step 6 — that is the intended way to update them, not a shell
@@ -143,7 +136,8 @@ redirect. Prefer the native GitHub and safe-output MCP tools over the `github` a
 
 When a `github` response is too large to return inline it is written to a payload file under
 `/tmp/gh-aw/mcp-payloads/` as a single line of escaped JSON. The path is reported in the tool
-output. This is the primary way to read a large diff. Use `jq`:
+output. **This is how you read a large diff** — there is no other supported path, so do not
+abandon it and go looking for one. Use `jq`:
 
 ```bash
 jq -r '(if type == "array" then .[0] else . end).content[].text' /tmp/gh-aw/mcp-payloads/<...>/payload.json
@@ -152,23 +146,10 @@ jq -r '(if type == "array" then .[0] else . end).content[].text' /tmp/gh-aw/mcp-
 If that shape does not match, run `jq 'keys'` (or `jq '.[0] | keys'`) on the file first and
 adjust the path. Do not try to unescape the JSON by hand with `grep`.
 
-### Git fallback
-
-The PR head branch is also checked out. The checkout is shallow: it fetches the PR's own
-commits plus one more, so **the merge base is present but older history and arbitrary base
-branch commits are not**. Resolve the boundary commit yourself rather than assuming the
-`base.sha` from the PR details is in the clone:
-
-```bash
-git log --oneline            # oldest entry is the merge base
-git diff <merge-base>..HEAD
-```
-
-If a base commit is missing, that is expected from the shallow fetch — go back to the payload
-file and `jq` instead of trying to deepen the clone, because `git fetch` is denied.
-
-This fallback applies to review *input* only. The review *instructions* in Step 4 must still
-come from the base-SHA copies fetched via the GitHub tools, never from the checkout.
+If you still cannot read the diff, request the changes in smaller pieces — for example
+per-file contents via the `github` tools — rather than spending turns on shell workarounds. If
+that also fails, report it with the `missing_data` safe-output tool instead of guessing or
+silently reviewing less than the full change.
 
 ## Scope Boundaries
 
