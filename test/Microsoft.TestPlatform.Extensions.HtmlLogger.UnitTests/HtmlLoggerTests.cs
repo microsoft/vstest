@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Runtime.Serialization;
 using System.Threading;
 using System.Threading.Tasks;
@@ -459,6 +460,49 @@ public class HtmlLoggerTests
         _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
         _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
         Assert.Contains("TestResult", _htmlLogger.HtmlFilePath!);
+    }
+
+    [TestMethod]
+    public void TestCompleteHandlerShouldConfineLogFileNameToTestResultsDirectoryWhenPathTraversalIsAttempted()
+    {
+        var testResultsDir = Path.Combine(Path.GetTempPath(), "TestResults");
+        var parameters = new Dictionary<string, string?>
+        {
+            [HtmlLoggerConstants.LogFileNameKey] = "../../evil.html",
+            [DefaultLoggerParameterNames.TestRunDirectory] = testResultsDir
+        };
+
+        var testCase1 = CreateTestCase("TestCase1");
+        var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+        var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+        _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+        _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        Assert.AreEqual(Path.Combine(testResultsDir, "evil.html"), _htmlLogger.HtmlFilePath);
+    }
+
+    [TestMethod]
+    public void TestCompleteHandlerShouldConfineLogFileNameToTestResultsDirectoryWhenRootedPathIsProvided()
+    {
+        var testResultsDir = Path.Combine(Path.GetTempPath(), "TestResults");
+        var rootedPath = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? @"C:\evil.html" : "/tmp/evil.html";
+        var parameters = new Dictionary<string, string?>
+        {
+            [HtmlLoggerConstants.LogFileNameKey] = rootedPath,
+            [DefaultLoggerParameterNames.TestRunDirectory] = testResultsDir
+        };
+
+        var testCase1 = CreateTestCase("TestCase1");
+        var result1 = new ObjectModel.TestResult(testCase1) { Outcome = TestOutcome.Failed };
+        var resultEventArg1 = new Mock<TestResultEventArgs>(result1);
+        _htmlLogger.TestResultHandler(new object(), resultEventArg1.Object);
+
+        _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        Assert.AreEqual(Path.Combine(testResultsDir, "evil.html"), _htmlLogger.HtmlFilePath);
     }
 
     [TestMethod]

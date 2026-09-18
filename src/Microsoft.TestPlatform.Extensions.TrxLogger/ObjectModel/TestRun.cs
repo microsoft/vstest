@@ -61,7 +61,7 @@ internal sealed class TestRun
     internal TestRun(Guid runId)
     {
         _id = Guid.NewGuid();
-        _name = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.GetEnvironmentVariable("UserName"), Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
+        _name = string.Format(CultureInfo.CurrentCulture, TrxLoggerResources.Common_TestRunName, Environment.UserName, Environment.MachineName, FormatDateTimeForRunName(DateTime.Now));
 
         // Fix for issue (https://github.com/Microsoft/vstest/issues/213). Since there is no way to find current user in linux machine.
         // We are catching PlatformNotSupportedException for non windows machine.
