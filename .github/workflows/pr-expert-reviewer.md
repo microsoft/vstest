@@ -12,7 +12,9 @@ engine:
   #
   # `safeoutputs` publishes review comments and the verdict, so it is write-capable
   # by design; its writes are constrained by the safe-outputs config below. Every
-  # other grant is read-only.
+  # other shell grant is read-only. gh-aw additionally emits the native `write`
+  # tool, which is not a shell command and is used for the cache-memory files in
+  # Step 6.
   #
   # jq is required because large GitHub MCP responses (a Dependabot bump of the
   # generated `.lock.yml` files is enough) are spilled to a one-line escaped-JSON
