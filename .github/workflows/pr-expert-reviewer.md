@@ -6,34 +6,23 @@ description: >
 
 engine:
   id: copilot
-  # tools.bash stays false so this workflow never picks up gh-aw's implicit command
-  # grants. The "Tools Available to You" prompt section must be kept in sync with
-  # this list.
+  # With tools.bash disabled, permit only the MCP wrappers without implicit command
+  # grants, plus jq.
   #
-  # `safeoutputs` publishes review comments and the verdict, so it is write-capable
-  # by design; its writes are constrained by the safe-outputs config below. Every
-  # other shell grant is read-only. gh-aw additionally emits the native `write`
-  # tool, which is not a shell command and is used for the cache-memory files in
-  # Step 6.
+  # jq is required because a GitHub MCP response larger than
+  # MCP_GATEWAY_PAYLOAD_SIZE_THRESHOLD (512KB) is spilled to a payload file as a
+  # single line of escaped JSON rather than returned inline. The agent reads files
+  # by line range, so a one-line file is all-or-nothing and effectively unreadable.
+  # `jq -r` decodes the escaped newlines back into real lines, which is what makes
+  # the payload pageable. Without it the agent burns its whole budget retrying
+  # python3/node/sed/awk and never reaches the review.
   #
-  # jq is required because large GitHub MCP responses (a Dependabot bump of the
-  # generated `.lock.yml` files is enough) are spilled to a one-line escaped-JSON
-  # payload file instead of being returned inline. Without a JSON reader the agent
-  # burns its whole budget retrying python3/node/sed/awk and never reaches the review.
-  #
-  # jq and the inspection commands are non-stem, so the bare `shell(name)` form
-  # prefix-matches any invocation without needing a `:*` wildcard that would also
-  # admit writing flags.
+  # jq is not one of Copilot CLI's stem commands, so the bare `shell(jq)` form
+  # prefix-matches any invocation without a `:*` wildcard that would widen this.
   args:
     - --allow-tool=shell(github:*)
     - --allow-tool=shell(safeoutputs:*)
     - --allow-tool=shell(jq)
-    - --allow-tool=shell(cat)
-    - --allow-tool=shell(ls)
-    - --allow-tool=shell(grep)
-    - --allow-tool=shell(head)
-    - --allow-tool=shell(tail)
-    - --allow-tool=shell(wc)
 
 on:
   pull_request:
@@ -123,29 +112,26 @@ command cannot be escalated — the denial is final.** Retrying the same idea wi
 utility only burns the run budget; a previous run spent its entire 15-minute timeout doing
 exactly that and published no review.
 
-These shell commands are explicitly granted in `engine.args`. Rely only on these:
+Work through the native MCP tools and the native file read/write tools. The `github` and
+`safeoutputs` CLI wrappers are a fallback for when native tool discovery fails; `safeoutputs`
+is your only way to write anything back to the PR. Use the native `write` tool for the
+cache-memory files in Step 6, not a shell redirect.
 
-- `github ...` — the GitHub MCP wrapper, read-only (PR details, diffs, files, reviews, file contents)
-- `safeoutputs ...` — the safe-output wrapper used to publish review comments and the verdict.
-  This is your **only** way to write anything back to the PR
-- `jq ...` — for reading MCP payload files (see below)
-- `cat`, `ls`, `grep`, `head`, `tail`, `wc` — read-only inspection
-
-Do not rely on anything else. `python3`, `node`, `sed`, `awk`, `perl`, `tr`, `find`, `xargs`,
-`curl`, `gh` and `git fetch` are all denied — a previous run wasted its entire budget
-rediscovering that. Do not invoke a shell interpreter or the MCP bridge scripts directly.
-
-Separately from the shell, you have the native file **read** and **write** tools. Use `write`
-for the cache-memory files in Step 6 — that is the intended way to update them, not a shell
-redirect. Prefer the native GitHub and safe-output MCP tools over the `github` and
-`safeoutputs` CLI wrappers; the wrappers exist as a fallback when native discovery fails.
+Beyond those wrappers, `jq` is the one shell command this workflow grants, for reading MCP
+payload files. Treat every other shell utility as unavailable: `python3`, `node`, `sed`, `awk`,
+`perl`, `tr`, `find`, `xargs`, `curl` and `gh` were all denied in a previous run that then
+wasted its entire budget rediscovering that, one utility at a time. If a command is denied,
+do not look for another way to spell it. Do not invoke a shell interpreter or the MCP bridge
+scripts directly.
 
 ### Reading large MCP responses
 
-When a `github` response is too large to return inline it is written to a payload file under
-`/tmp/gh-aw/mcp-payloads/` as a single line of escaped JSON. The path is reported in the tool
-output. **This is how you read a large diff** — there is no other supported path, so do not
-abandon it and go looking for one.
+A `github` response over 512KB is not returned inline. It is written to a payload file under
+`/tmp/gh-aw/mcp-payloads/`, and the path is reported in the tool output.
+
+That file is a **single line** of escaped JSON. Reading it directly is useless — you read files
+by line range, and a one-line file gives you all of it or none of it. `jq -r` is what makes it
+readable: it decodes the escaped newlines into real lines, so the result can be paged normally.
 
 Inspect the shape first, then extract. Do not assume a shape:
 
@@ -166,12 +152,14 @@ If the envelope differs, this pulls every text node regardless of nesting:
 jq -r '[.. | objects | select(.type == "text") | .text] | join("\n")' /tmp/gh-aw/mcp-payloads/<...>/payload.json
 ```
 
-Do not try to unescape the JSON by hand with `grep` — `jq` already returns the decoded text.
+Do not try to unescape the JSON by hand — `jq` already returns the decoded text.
 
-If you still cannot read the diff, request the changes in smaller pieces — for example
-per-file contents via the `github` tools — rather than spending turns on shell workarounds. If
-that also fails, report it with the `missing_data` safe-output tool instead of guessing or
-silently reviewing less than the full change.
+A spilled payload is over 512KB by definition, and a large diff can exceed what you can hold
+in context even once it is readable. Do not try to swallow it whole. Narrow with `jq` instead:
+select a single file's entry from a `get_files` response and review the changes file by file,
+rather than printing the entire blob. If you still cannot obtain the changes, report it with
+the `missing_data` safe-output tool instead of guessing or silently reviewing less than the
+full change.
 
 ## Scope Boundaries
 
@@ -287,8 +275,7 @@ Skip this check for dependency update PRs (maestro) — their descriptions are a
 
 ### Step 6: Update Memory Cache
 
-After the review, use the native `write` tool (not a shell redirect — see
-[Tools Available to You](#tools-available-to-you)) to update:
+After the review, use the native `write` tool (not a shell redirect) to update:
 
 - **`/tmp/gh-aw/cache-memory/architecture.json`**: Record new architectural patterns observed
 - **`/tmp/gh-aw/cache-memory/perf-hotspots.json`**: Add files/methods identified as performance-sensitive
@@ -327,4 +314,4 @@ For PRs titled `[main] Update dependencies from dotnet/...`:
 
 **Important**: Every run must produce a safe output. Use `noop` only for the explicit skip cases above; otherwise submit a review. Check the tool result. If a tool is missing or fails, report the failure rather than claiming the review or noop succeeded.
 
-Use native MCP tools when available. If native discovery fails, the same configured GitHub and safe-output tools are available through the `github` and `safeoutputs` CLI wrappers. Use their help/schema to invoke the intended tool, including `noop`, `create_pull_request_review_comment`, and `submit_pull_request_review`. Do not invoke a shell interpreter or the bridge script directly; see [Tools Available to You](#tools-available-to-you) for the full list of permitted shell commands.
+Use native MCP tools when available. If native discovery fails, the same configured GitHub and safe-output tools are available through the `github` and `safeoutputs` CLI wrappers. Use their help/schema to invoke the intended tool, including `noop`, `create_pull_request_review_comment`, and `submit_pull_request_review`. These two wrappers and `jq` are the only allowed shell commands; do not invoke a shell interpreter or the bridge script directly.
