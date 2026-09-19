@@ -57,6 +57,7 @@ _Last updated: 2026-09-12_
 |---|---|---|---|
 | MEDIUM | Code | Run settings XML parsed 5-6× per test run — could be reduced to 1 pass | Requires API changes; saves maybe 2-5ms; may not meet bar |
 | MEDIUM | Code | XmlRunSettingsUtilities.ReaderSettings property allocates new XmlReaderSettings per call (~15 startup call sites) | Easy fix; minor GC reduction |
+| MEDIUM | Code | `RunSpecificTestsArgumentProcessor.DiscoveryRequest_OnDiscoveredTests` (src/vstest.console/Processors/RunSpecificTestsArgumentProcessor.cs:291-300) does nested loop: per discovered test, scans full `_selectedTestNames` list with culture-aware IndexOf. Only active with `--Tests` filter. O(discoveredTests × filterNames), uncached. | Only edge case (large filter lists + large suites) would show effect; typical filter lists are 1-10 names so unlikely to clear 15-20% bar |
 
 ## Backlog Cursor
 - All key hot paths fully scanned (IPC serialization V1+V2, filter eval, discovery aggregator, test run cache, parallel runners)
@@ -65,16 +66,16 @@ _Last updated: 2026-09-12_
 - NuGet.Frameworks: vendored, skip
 - TRX logger: scanned 2026-08-29 — cold path, no actionable findings
 - **2026-09-12 scan**: Scanned CrossPlatEngine (ParallelRunDataAggregator, DiscovererEnumerator), Common, Client, vstest.console arg processors, and new TestIdsLogger (#16443) for O(n²) patterns. All nested-loop/Contains patterns found operate on small fixed-size collections (adapters, data collectors, search dirs), not test-count-scaled — LOW priority, no new backlog items. TestIdsLogger confirmed clean (StringBuilder-per-row, single linear pass) and opt-in (`--logger` flag), so not a default-path concern.
-- Recent commit since last run: only 1 new commit "Test ids report logger (#16443)" (repo is shallow-cloned locally so full history unavailable; verified via `git log`)
-- Only 2 open perf/efficiency-tagged issues found: #15295 (MSBuild target optimization — already has merged/pending PR #16043 from maintainers, not an energy-focused code path we'd touch) and #16433 (test parallelism/shared state — explicitly says "no speed to gain here", not an efficiency target)
+- **2026-09-19 scan**: No new commits since last run (repo HEAD unchanged at "Preserve OutputType for Android test projects (#16496)"). Delegated a fresh sub-agent scan of CommunicationUtilities, Common, vstest.console, testhost/testhost.x86, Client, ObjectModel, datacollector explicitly excluding already-confirmed-clean areas. Found one new MEDIUM item (see backlog table) and confirmed no HIGH-impact findings — no per-call Regex re-creation, no repeated GetTypes()/reflection scans, no blocking sync I/O on handshake path found beyond what's already known.
+- Only 2 open perf/efficiency-tagged issues found: #15295 (MSBuild target optimization — still "State: In-PR" label, no new maintainer activity, not an application code path we'd touch) and #16433 (test parallelism/shared state — explicitly says "no speed to gain here", not an efficiency target). No new comments on either since last check.
 - Next area to investigate: HTML logger performance, or any new code areas added in upcoming commits
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
 - Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — CLOSED 2026-08-01
 - Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — CLOSED 2026-09-12
-- New issue: [efficiency-improver] Monthly Activity 2026-09 — created via safe-output, active
-- Last run: 2026-09-12 (run ID 34705856016)
+- Issue #16479: [efficiency-improver] Monthly Activity 2026-09 — active, updated 2026-09-19
+- Last run: 2026-09-19 (run ID 35455638439)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
