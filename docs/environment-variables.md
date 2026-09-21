@@ -140,6 +140,7 @@ This document lists environment variables that are currently handled by VSTest s
 - **Example**: `VSTEST_DISABLE_XXHASH128_TESTCASE_ID=0`
 - **Note**: xxHash128 is intended to become the default in a later release, at which point the default of this variable flips to `0`. The meaning of each value stays the same, so setting `1` pins today's ids across that change.
 - **Migrating stored ids**: To find out which of your stored ids change when you opt in, and which do not, use the temporary [test id report logger](test-ids-logger.md) (`/logger:testids`). It reports every test once with both the SHA1 and the xxHash128 id, and flags the tests whose id an adapter assigned and which therefore do not change at all.
+- **Reported on the wire**: Every test case carries a `TestCase.IdAlgorithm` property saying how its id was produced - `Sha1`, `XxHash128`, or `SelfAssigned` when the adapter assigned the id and the platform hashed nothing. A tool that caches test ids can read it to tell that the platform has started hashing a different way and that the ids it holds have to be discovered again. It is absent on test cases reported by a vstest that predates the property.
 
 ### VSTEST_DISABLE_ARTIFACTS_POSTPROCESSING
 - **Description**: Disables artifact post-processing functionality.
