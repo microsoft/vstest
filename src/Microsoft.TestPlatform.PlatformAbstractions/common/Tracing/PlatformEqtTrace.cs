@@ -346,7 +346,8 @@ public partial class PlatformEqtTrace : IPlatformEqtTrace
             try
             {
                 // If we point to a folder we create default filename
-                if (LogFile.EndsWith(@"\", StringComparison.Ordinal) || LogFile.EndsWith("/", StringComparison.Ordinal))
+                if (LogFile.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+                    || LogFile.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal))
                 {
                     if (!Directory.Exists(LogFile))
                     {
