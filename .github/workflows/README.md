@@ -50,7 +50,7 @@ personal PAT**. Authentication flows through org-owned credentials instead:
 | --- | --- | --- |
 | `copilot-requests: write` (permission) | GitHub Copilot CLI (model inference) | **Preferred.** Declared in every agentic workflow's `permissions:` block; gh-aw authenticates inference with the per-run `GITHUB_TOKEN` and bills through the org's Copilot subscription. Replaces the `COPILOT_GITHUB_TOKEN` repository secret. |
 | `COPILOT_GITHUB_TOKEN` (secret) | *(legacy)* Copilot inference | No compiled workflow reads `secrets.COPILOT_GITHUB_TOKEN`, so the repository secret is safe to delete after this change ships. The compiler still emits a `COPILOT_GITHUB_TOKEN` environment variable populated from `${{ github.token }}` because that is the Copilot harness input name. |
-| `APP_ID` (variable containing the App Client ID) + `APP_PRIVATE_KEY` (secret) | Org-owned GitHub App for safe-output write-backs | **Preferred write path.** Every workflow with a mutating safe output references this pair with `ignore-if-missing: true`. The App mints a short-lived token per run with the exact repository permissions gh-aw derives from the enabled safe outputs, and auto-revokes it when the run ends. |
+| `APP_ID` (variable containing the App Client ID) + `APP_PRIVATE_KEY` (secret) | Org-owned GitHub App for safe-output write-backs | **Preferred write path.** Every workflow with a mutating safe output references this pair with `ignore-if-missing: true`. For each safe-output job, the App mints an installation token with the exact repository permissions gh-aw derives from the enabled safe outputs. The token expires after one hour and the action revokes it in its post step when the job completes. |
 | `GH_AW_GITHUB_TOKEN` (secret) | *(legacy, compiler-generated fallback)* Safe-output and GitHub API access beyond `GITHUB_TOKEN` | No workflow source references it. gh-aw emits the optional fallback chain in generated locks; when unset, operations fall back to the per-run `GITHUB_TOKEN`. Removable after this change merges. |
 | `GH_AW_GITHUB_MCP_SERVER_TOKEN` (secret) | *(legacy, compiler-generated fallback)* GitHub MCP reads | No workflow source references it. gh-aw emits the optional chain `GH_AW_GITHUB_MCP_SERVER_TOKEN \|\| GH_AW_GITHUB_TOKEN \|\| GITHUB_TOKEN`; current workflows only require same-repository reads, so it is removable after this change merges. |
 | `GH_AW_CI_TRIGGER_TOKEN` (secret) | *(legacy)* Trigger CI after a write-back push | PR creation and branch-push outputs now explicitly use `github-token-for-extra-empty-commit: app`, so gh-aw no longer emits this secret in their manifests. Safe to delete after this change merges. In `app` mode this secret is not a fallback: until the App is provisioned, PR creation still falls back to `GITHUB_TOKEN`, but the extra commit cannot trigger downstream Actions. |
@@ -92,11 +92,12 @@ permissions:
 > write` (equivalent read surface, plus the one write the compiler needs).
 
 **2. Replace `GH_AW_GITHUB_TOKEN` with an org-owned GitHub App.**
-A GitHub App mints a **short-lived token at the start of each run with explicit
-`permission-*` inputs derived by gh-aw from the enabled safe outputs, and automatically
-revokes it when the run ends** — satisfying the org's short-PAT policy without manual
-rotation. These App-token permissions are separate from the safe-output job's
-`permissions:` block, which scopes its built-in `GITHUB_TOKEN`. Only
+A GitHub App mints an **installation token for each safe-output job with explicit
+`permission-*` inputs derived by gh-aw from the enabled safe outputs. The token expires
+after one hour, and the action revokes it in its post step when the job completes** —
+satisfying the org's short-PAT policy without manual rotation. These App-token permissions
+are separate from the safe-output job's `permissions:` block, which scopes its built-in
+`GITHUB_TOKEN`. Only
 `COPILOT_GITHUB_TOKEN` cannot use an App (covered by option 1 instead).
 
 Set it up once (requires org admin to create/install the App):
