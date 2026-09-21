@@ -52,11 +52,9 @@ public class TestRunnerConnectionInfoExtensionsTests
     }
 
     [TestMethod]
-    [DataRow(null)]
-    [DataRow("")]
-    public void ToCommandLineOptionsShouldNotIncludeDiagnosticsOptionIfNotEnabled(string? logFile)
+    public void ToCommandLineOptionsShouldNotIncludeDiagnosticsOptionIfNotEnabled()
     {
-        var connectionInfo = new TestRunnerConnectionInfo { LogFile = logFile };
+        var connectionInfo = default(TestRunnerConnectionInfo);
 
         var options = connectionInfo.ToCommandLineOptions();
 
@@ -64,18 +62,12 @@ public class TestRunnerConnectionInfoExtensionsTests
     }
 
     [TestMethod]
-    [DataRow("log.txt", "\"log.txt\"")]
-    [DataRow(@"C:\Users\Jane Doe\log.txt", "\"C:\\Users\\Jane Doe\\log.txt\"")]
-    [DataRow("/tmp/test logs/log.txt", "\"/tmp/test logs/log.txt\"")]
-    [DataRow("log\"name.txt", "\"log\\\"name.txt\"")]
-    [DataRow(@"D:\", "\"D:\\\\\"")]
-    [DataRow("log\\\"name.txt", "\"log\\\\\\\"name.txt\"")]
-    public void ToCommandLineOptionsShouldIncludeDiagnosticsOptionIfEnabled(string logFile, string expectedArgument)
+    public void ToCommandLineOptionsShouldIncludeDiagnosticsOptionIfEnabled()
     {
-        var connectionInfo = new TestRunnerConnectionInfo { LogFile = logFile, TraceLevel = 3 };
+        var connectionInfo = new TestRunnerConnectionInfo { LogFile = "log.txt", TraceLevel = 3 };
 
         var options = connectionInfo.ToCommandLineOptions();
 
-        Assert.EndsWith($"--diag {expectedArgument} --tracelevel 3", options);
+        Assert.EndsWith("--diag log.txt --tracelevel 3", options);
     }
 }

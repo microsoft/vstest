@@ -13,6 +13,7 @@ using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
@@ -472,7 +473,7 @@ public class ProxyOperationManager
                     "host.{0}_{1}{2}",
                     DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff", CultureInfo.InvariantCulture),
                     new PlatformEnvironment().GetCurrentManagedThreadId(),
-                    Path.GetExtension(logFile)));
+                    Path.GetExtension(logFile))).AddDoubleQuote();
     }
 
     private void CompatIssueWithVersionCheckAndRunsettings()
