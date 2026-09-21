@@ -25,6 +25,7 @@ pr:
       - README.md
       - SECURITY.md
       - azure-pipelines-official.yml
+      - azure-pipelines-insertion.yml
 
 variables:
   # Cannot use key:value syntax in root defined variables
@@ -75,9 +76,6 @@ stages:
             Release:
               _BuildConfig: Release
         steps:
-        - pwsh: eng\test-vs-insertion.ps1
-          displayName: 'Test VS insertion wrapper offline'
-
         # This steps help to understand versions of .NET runtime installed on the machine,
         # which is useful to diagnose some governance issues.
         - task: DotNetCoreCLI@2
