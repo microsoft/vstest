@@ -14,7 +14,6 @@ using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.ObjectModel;
-using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.DataCollection.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
@@ -326,14 +325,14 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
 
     private static string GetTimestampedLogFile(string logFile)
     {
-        return Path.ChangeExtension(
+        return CommandLineArgumentEncoder.Encode(Path.ChangeExtension(
             logFile,
             string.Format(
                 CultureInfo.InvariantCulture,
                 "datacollector.{0}_{1}{2}",
                 DateTime.Now.ToString("yy-MM-dd_HH-mm-ss_fffff", CultureInfo.CurrentCulture),
                 new PlatformEnvironment().GetCurrentManagedThreadId(),
-                Path.GetExtension(logFile))).AddDoubleQuote();
+                Path.GetExtension(logFile))));
     }
 
     /// <summary>
