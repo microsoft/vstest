@@ -3,6 +3,7 @@
 
 using System;
 
+using Microsoft.TestPlatform.Hashing;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -49,8 +50,8 @@ public class TestCaseIdAlgorithmTests
     [TestMethod]
     [DataRow(OptIn)]
     [DataRow(" 0 ")]
-    public void TestCaseIdUsesXxHash128WhenTheFeatureFlagOptsIn(string value)
-        => RunWithFlag(value, () => Assert.AreEqual(XxHash128Id, CreateTestCase().Id.ToString()));
+    public void ResolveSelectsXxHash128WhenTheDeclaredValueOptsIn(string value)
+        => Assert.AreEqual(TestCaseIdAlgorithm.XxHash128, TestCaseIdAlgorithmResolver.Resolve(value));
 
     /// <summary>
     /// Every value other than <c>0</c> sets the flag, and therefore selects SHA1.
@@ -80,8 +81,8 @@ public class TestCaseIdAlgorithmTests
     [DataRow("true")]
     [DataRow("nonsense")]
     [DataRow("00")]
-    public void TestCaseIdUsesSha1ForEveryValueOtherThanZero(string value)
-        => RunWithFlag(value, () => Assert.AreEqual(Sha1Id, CreateTestCase().Id.ToString()));
+    public void ResolveSelectsSha1ForEveryDeclaredValueOtherThanZero(string value)
+        => Assert.AreEqual(TestCaseIdAlgorithm.Sha1, TestCaseIdAlgorithmResolver.Resolve(value));
 
     [TestMethod]
     public void TestCaseIdAlgorithmIsReadLazilyRatherThanAtTypeLoad()
