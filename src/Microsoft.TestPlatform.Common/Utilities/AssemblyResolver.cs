@@ -49,7 +49,10 @@ internal class AssemblyResolver : IDisposable
     [System.Security.SecurityCritical]
     public AssemblyResolver(IEnumerable<string> directories)
     {
-        EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
+        if (EqtTrace.IsInfoEnabled)
+        {
+            EqtTrace.Info($"AssemblyResolver.ctor: Creating AssemblyResolver with searchDirectories {string.Join(",", directories)}");
+        }
 
         _searchDirectories = directories == null || !directories.Any() ? new HashSet<string>() : new HashSet<string>(directories);
 
@@ -66,7 +69,10 @@ internal class AssemblyResolver : IDisposable
     [System.Security.SecurityCritical]
     internal void AddSearchDirectories(IEnumerable<string> directories)
     {
-        EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
+        if (EqtTrace.IsInfoEnabled)
+        {
+            EqtTrace.Info($"AssemblyResolver.AddSearchDirectories: Adding more searchDirectories {string.Join(",", directories)}");
+        }
 
         foreach (var directory in directories)
         {

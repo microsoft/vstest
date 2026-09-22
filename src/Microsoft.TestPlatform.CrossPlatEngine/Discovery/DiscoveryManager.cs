@@ -302,7 +302,10 @@ public class DiscoveryManager : IDiscoveryManager
         }
 
         // Log the sources from where tests are being discovered
-        EqtTrace.Info("TestDiscoveryManager: Discovering tests from sources {0}", string.Join(",", verifiedSources.ToArray()));
+        if (EqtTrace.IsInfoEnabled)
+        {
+            EqtTrace.Info("TestDiscoveryManager: Discovering tests from sources {0}", string.Join(",", verifiedSources.ToArray()));
+        }
 
         return verifiedSources;
     }

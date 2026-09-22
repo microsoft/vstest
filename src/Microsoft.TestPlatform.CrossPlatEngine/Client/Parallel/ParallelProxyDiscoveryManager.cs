@@ -277,7 +277,11 @@ internal sealed class ParallelProxyDiscoveryManager : IParallelProxyDiscoveryMan
         // Kick off the discovery task for the next source.
         Task.Run(() =>
             {
-                EqtTrace.Verbose($"ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager: Discovery started for: {string.Join(", ", discoveryCriteria.Sources)}");
+                if (EqtTrace.IsVerboseEnabled)
+                {
+                    EqtTrace.Verbose($"ParallelProxyDiscoveryManager.DiscoverTestsOnConcurrentManager: Discovery started for: {string.Join(", ", discoveryCriteria.Sources)}");
+                }
+
                 proxyDiscoveryManager.Initialize(_skipDefaultAdapters);
                 proxyDiscoveryManager.InitializeDiscovery(discoveryCriteria, eventHandler, _skipDefaultAdapters);
                 proxyDiscoveryManager.DiscoverTests(discoveryCriteria, eventHandler);

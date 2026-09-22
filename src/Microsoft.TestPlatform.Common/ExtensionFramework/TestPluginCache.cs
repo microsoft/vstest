@@ -87,18 +87,27 @@ public class TestPluginCache
     {
         var extensions = GetFilteredExtensions(_filterableExtensionPaths, endsWithPattern);
 
-        EqtTrace.Verbose(
-            "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
+        if (EqtTrace.IsVerboseEnabled)
+        {
+            EqtTrace.Verbose(
+                "TestPluginCache.GetExtensionPaths: Filtered extension paths: {0}", string.Join(Environment.NewLine, extensions));
+        }
 
         if (!skipDefaultExtensions)
         {
             extensions = extensions.Concat(_defaultExtensionPaths);
-            EqtTrace.Verbose(
-                "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, _defaultExtensionPaths));
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "TestPluginCache.GetExtensionPaths: Added default extension paths: {0}", string.Join(Environment.NewLine, _defaultExtensionPaths));
+            }
         }
 
-        EqtTrace.Verbose(
-            "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, _unfilterableExtensionPaths));
+        if (EqtTrace.IsVerboseEnabled)
+        {
+            EqtTrace.Verbose(
+                "TestPluginCache.GetExtensionPaths: Added unfilterableExtensionPaths: {0}", string.Join(Environment.NewLine, _unfilterableExtensionPaths));
+        }
 
         return extensions.Concat(_unfilterableExtensionPaths).ToList();
     }
@@ -147,8 +156,11 @@ public class TestPluginCache
             // Combine all the possible extensions - both default and additional.
             var allExtensionPaths = GetExtensionPaths(endsWithPattern);
 
-            EqtTrace.Verbose(
-                "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "TestPluginCache.DiscoverTestExtensions: Discovering the extensions using allExtensionPaths: {0}", string.Join(Environment.NewLine, allExtensionPaths));
+            }
 
             // Discover the test extensions from candidate assemblies.
             pluginInfos = GetTestExtensions<TPluginInfo, TExtension>(allExtensionPaths);
@@ -415,9 +427,12 @@ public class TestPluginCache
     {
         if (additionalExtensions.Count == extensionsList.Count && additionalExtensions.All(extensionsList.Contains))
         {
-            EqtTrace.Verbose(
-                "TestPluginCache: Ignoring extensions merge as there is no change. Current additionalExtensions are '{0}'.",
-                string.Join(",", extensionsList));
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose(
+                    "TestPluginCache: Ignoring extensions merge as there is no change. Current additionalExtensions are '{0}'.",
+                    string.Join(",", extensionsList));
+            }
 
             mergedExtensionsList = extensionsList;
             return false;
