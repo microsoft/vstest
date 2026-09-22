@@ -102,4 +102,42 @@ public class ProgressIndicatorTests
         _consoleOutput.Verify(m => m.Write(clearMessage, OutputLevel.Information), Times.Once);
         _consoleHelper.Verify(ch => ch.SetCursorPosition(0, 20), Times.Exactly(2));
     }
+
+    [TestMethod]
+    public void RepeatedPauseStartCyclesShouldNotDuplicateTimerElapsedSubscription()
+    {
+        // Regression test: Start() used to re-subscribe to _timer.Elapsed on every call
+        // without Pause()/Stop() ever unsubscribing, so a single timer tick after several
+        // Pause()/Start() cycles (as ConsoleLogger performs around every logged message)
+        // would fire the handler once per accumulated subscription instead of once.
+        _consoleHelper.Setup(c => c.CursorLeft).Returns(30);
+
+        _indicator.Start();
+        _indicator.Pause();
+        _indicator.Start();
+        _indicator.Pause();
+        _indicator.Start();
+
+        _steppableTimer.Step();
+
+        _consoleOutput.Verify(m => m.Write(".", OutputLevel.Information), Times.Once);
+    }
+
+    [TestMethod]
+    public void ClearShouldClampNegativeStartPositionInstadOfThrowing()
+    {
+        // Regression test: a race between Timer_Elapsed and Pause()/Start() could previously
+        // compute a negative cursor position and pass it straight to Console.SetCursorPosition,
+        // which throws ArgumentOutOfRangeException. Clear() now clamps to 0 defensively.
+        _consoleHelper.Setup(c => c.CursorLeft).Returns(1);
+
+        _indicator.Start();
+
+        // CursorLeft - 3 => -2, forcing _dotCounter to 0 on the third tick triggers Clear(-2).
+        _steppableTimer.Step();
+        _steppableTimer.Step();
+        _steppableTimer.Step();
+
+        _consoleHelper.Verify(ch => ch.SetCursorPosition(0, It.IsAny<int>()), Times.AtLeastOnce);
+    }
 }

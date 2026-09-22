@@ -40,6 +40,11 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
         ConsoleOutput = output;
         ConsoleHelper = consoleHelper;
         _testRunProgressString = string.Format(CultureInfo.CurrentCulture, "{0}...", Resources.Resources.ProgressIndicatorString);
+
+        // Subscribe exactly once for the lifetime of this instance. Start() used to
+        // re-subscribe on every call, and since Pause()/Start() are invoked around every
+        // logged console message, that caused the handler to be registered many times over.
+        _timer.Elapsed += Timer_Elapsed;
     }
 
     /// <inheritdoc />
@@ -47,7 +52,6 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
     {
         lock (_syncObject)
         {
-            _timer.Elapsed += Timer_Elapsed;
             _timer.Start();
 
             // Print the string based on the previous state, that is dotCounter
@@ -65,9 +69,15 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
     /// <param name="startPos">the starting position</param>
     private void Clear(int startPos)
     {
+        // Defensively clamp a negative start position (can happen if Timer_Elapsed observes a
+        // cursor position that hasn't caught up yet) so we never pass a negative value to
+        // Console.SetCursorPosition, which would throw ArgumentOutOfRangeException.
+        startPos = Math.Max(0, startPos);
+
         var currentLineCursor = ConsoleHelper.CursorTop;
         ConsoleHelper.SetCursorPosition(startPos, ConsoleHelper.CursorTop);
-        ConsoleOutput.Write(new string(' ', ConsoleHelper.WindowWidth - startPos), OutputLevel.Information);
+        var fillLength = Math.Max(0, ConsoleHelper.WindowWidth - startPos);
+        ConsoleOutput.Write(new string(' ', fillLength), OutputLevel.Information);
         ConsoleHelper.SetCursorPosition(startPos, currentLineCursor);
     }
 
@@ -98,17 +108,23 @@ internal sealed class ProgressIndicator : IProgressIndicator, IDisposable
 
     private void Timer_Elapsed(object? sender, System.Timers.ElapsedEventArgs e)
     {
-        if (IsRunning)
+        // Run under the same lock as Start/Pause/Stop so that reading IsRunning and clearing
+        // the console line are atomic with respect to state transitions triggered from other
+        // threads, closing a race that could otherwise compute a stale/negative cursor position.
+        lock (_syncObject)
         {
-            // If running, prints dot every second.
-            ConsoleOutput.Write(".", OutputLevel.Information);
-            _dotCounter = ++_dotCounter % 3;
-
-            // When counter reaches 3, that is 3 dots have been printed
-            // Clear and start printing again
-            if (_dotCounter == 0)
+            if (IsRunning)
             {
-                Clear(ConsoleHelper.CursorLeft - 3);
+                // If running, prints dot every second.
+                ConsoleOutput.Write(".", OutputLevel.Information);
+                _dotCounter = ++_dotCounter % 3;
+
+                // When counter reaches 3, that is 3 dots have been printed
+                // Clear and start printing again
+                if (_dotCounter == 0)
+                {
+                    Clear(ConsoleHelper.CursorLeft - 3);
+                }
             }
         }
     }
