@@ -3,6 +3,8 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
@@ -25,6 +27,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests;
 public class ProcessHelperTests
 {
     private const int BudgetMs = 500;
+
+    public TestContext TestContext { get; set; } = null!;
 
     [TestMethod]
     public void GetCurrentProcessFileNameShouldReturnThePathOfTheRunningExecutable()
@@ -107,6 +111,78 @@ public class ProcessHelperTests
         Assert.AreEqual(mainModuleFileName, currentProcessFileName);
         Assert.AreEqual(1, mainModuleReads);
     }
+
+    [TestMethod]
+    public void LaunchProcessShouldSetUtf8StandardOutputAndErrorEncodingByDefault()
+    {
+        var processHelper = new ProcessHelper();
+        using var exited = new ManualResetEventSlim(initialState: false);
+
+        var process = (Process)processHelper.LaunchProcess(
+            GetShellExecutable(),
+            GetShellNoOpArguments(),
+            workingDirectory: null,
+            envVariables: null,
+            errorCallback: (_, _) => { },
+            exitCallBack: _ => exited.Set(),
+            outputCallBack: (_, _) => { });
+
+        try
+        {
+            Assert.AreEqual(Encoding.UTF8, process.StartInfo.StandardOutputEncoding,
+                "Standard output must be captured as UTF-8 to match the encoding vstest.console forces on its own console (see issue #16508).");
+            Assert.AreEqual(Encoding.UTF8, process.StartInfo.StandardErrorEncoding,
+                "Standard error must be captured as UTF-8 to match the encoding vstest.console forces on its own console (see issue #16508).");
+        }
+        finally
+        {
+            exited.Wait(TimeSpan.FromSeconds(10), TestContext.CancellationToken);
+            process.Dispose();
+        }
+    }
+
+    [TestMethod]
+    public void LaunchProcessShouldNotSetStandardOutputEncodingWhenUtf8ConsoleEncodingIsDisabled()
+    {
+        Environment.SetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING", "1");
+        try
+        {
+            var processHelper = new ProcessHelper();
+            using var exited = new ManualResetEventSlim(initialState: false);
+
+            var process = (Process)processHelper.LaunchProcess(
+                GetShellExecutable(),
+                GetShellNoOpArguments(),
+                workingDirectory: null,
+                envVariables: null,
+                errorCallback: (_, _) => { },
+                exitCallBack: _ => exited.Set(),
+                outputCallBack: (_, _) => { });
+
+            try
+            {
+                Assert.IsNull(process.StartInfo.StandardOutputEncoding,
+                    "The VSTEST_DISABLE_UTF8_CONSOLE_ENCODING opt-out must also disable the child-process UTF-8 encoding fix.");
+                Assert.IsNull(process.StartInfo.StandardErrorEncoding,
+                    "The VSTEST_DISABLE_UTF8_CONSOLE_ENCODING opt-out must also disable the child-process UTF-8 encoding fix.");
+            }
+            finally
+            {
+                exited.Wait(TimeSpan.FromSeconds(10), TestContext.CancellationToken);
+                process.Dispose();
+            }
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING", null);
+        }
+    }
+
+    private static string GetShellExecutable()
+        => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd.exe" : "/bin/sh";
+
+    private static string GetShellNoOpArguments()
+        => RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 0" : "-c \"exit 0\"";
 
     [TestMethod]
     public void WaitForErrorStreamToDrainShouldReturnOnceTheErrorStreamCloses()

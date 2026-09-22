@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.Text;
 using System.Threading;
 #if !NET
 using System.Threading.Tasks;
@@ -79,6 +80,15 @@ public partial class ProcessHelper : IProcessHelper
             process.StartInfo.Arguments = arguments;
             process.StartInfo.RedirectStandardError = true;
 
+            // Match the UTF-8 encoding vstest.console already forces on its own console output
+            // (see vstest.console/Program.cs), so text captured from testhost/datacollector/dump-tool
+            // child processes doesn't get mangled through the OS default code page. Opt out with the
+            // same env var used to opt out of the console's own UTF-8 switch.
+            if (Environment.GetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING") != "1")
+            {
+                process.StartInfo.StandardErrorEncoding = Encoding.UTF8;
+            }
+
             process.EnableRaisingEvents = true;
 
             // Set additional environment variables.
@@ -93,6 +103,11 @@ public partial class ProcessHelper : IProcessHelper
             if (outputCallBack != null)
             {
                 process.StartInfo.RedirectStandardOutput = true;
+                if (Environment.GetEnvironmentVariable("VSTEST_DISABLE_UTF8_CONSOLE_ENCODING") != "1")
+                {
+                    process.StartInfo.StandardOutputEncoding = Encoding.UTF8;
+                }
+
                 process.OutputDataReceived += (sender, args) => outputCallBack(sender as Process, args.Data);
             }
 
