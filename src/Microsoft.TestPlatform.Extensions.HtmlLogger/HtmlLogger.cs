@@ -297,7 +297,10 @@ public class HtmlLogger : ITestLoggerWithParameters
         {
             if (_parametersDictionary.TryGetValue(HtmlLoggerConstants.LogFileNameKey, out string? logFileNameValue) && !logFileNameValue.IsNullOrWhiteSpace())
             {
-                HtmlFilePath = Path.Combine(TestResultsDirPath!, logFileNameValue);
+                // Strip any directory component from a user-supplied LogFileName, matching
+                // TrxLogger.AcquireTrxFileNamePath's guard against directory traversal
+                // (e.g. LogFileName=../../evil.html escaping TestResultsDirPath).
+                HtmlFilePath = Path.Combine(TestResultsDirPath!, Path.GetFileName(logFileNameValue));
             }
         }
 
@@ -309,7 +312,7 @@ public class HtmlLogger : ITestLoggerWithParameters
         try
         {
             var fileName = string.Format(CultureInfo.InvariantCulture, "{0}_{1}_{2}",
-                Environment.GetEnvironmentVariable("UserName"), Environment.MachineName,
+                Environment.UserName, Environment.MachineName,
                 FormatDateTimeForRunName(DateTime.Now));
 
             XmlFilePath = GenerateUniqueFilePath(fileName, HtmlLoggerConstants.XmlFileExtension);

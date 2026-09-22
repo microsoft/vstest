@@ -462,6 +462,39 @@ public class HtmlLoggerTests
     }
 
     [TestMethod]
+    public void TestCompleteHandlerShouldConfineLogFileNameToTestResultsDirectoryWhenPathTraversalIsAttempted()
+    {
+        var testResultsDirectory = DefaultTestRunDirectory;
+        var parameters = new Dictionary<string, string?>
+        {
+            [HtmlLoggerConstants.LogFileNameKey] = Path.Combine("..", "..", "evil.html"),
+            [DefaultLoggerParameterNames.TestRunDirectory] = testResultsDirectory
+        };
+
+        _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        Assert.AreEqual(Path.Combine(testResultsDirectory, "evil.html"), _htmlLogger.HtmlFilePath);
+    }
+
+    [TestMethod]
+    public void TestCompleteHandlerShouldConfineLogFileNameToTestResultsDirectoryWhenRootedPathIsProvided()
+    {
+        var testResultsDirectory = DefaultTestRunDirectory;
+        var rootedLogFileName = OperatingSystem.IsWindows() ? @"C:\evil\evil.html" : "/evil/evil.html";
+        var parameters = new Dictionary<string, string?>
+        {
+            [HtmlLoggerConstants.LogFileNameKey] = rootedLogFileName,
+            [DefaultLoggerParameterNames.TestRunDirectory] = testResultsDirectory
+        };
+
+        _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
+        _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero));
+
+        Assert.AreEqual(Path.Combine(testResultsDirectory, "evil.html"), _htmlLogger.HtmlFilePath);
+    }
+
+    [TestMethod]
     public void TestCompleteHandlerShouldCreateCustomHtmlFileNameWithLogPrefix()
     {
         var parameters = new Dictionary<string, string?>
