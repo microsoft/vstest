@@ -84,7 +84,7 @@ public partial class JsonDataSerializer
 
     private static partial (int version, string? messageType) ParseHeaderFromJson(string rawMessage)
     {
-        using var doc = JsonDocument.Parse(rawMessage);
+        using var doc = JsonDocument.Parse(JsonSurrogates.ReplaceUnpaired(rawMessage));
         var root = doc.RootElement;
         int version = root.TryGetProperty("Version", out var vProp)
             ? (vProp.ValueKind == JsonValueKind.Number ? vProp.GetInt32() : int.TryParse(vProp.GetString(), out var v) ? v : 0)
@@ -97,18 +97,22 @@ public partial class JsonDataSerializer
     {
         var payloadOptions = GetPayloadOptions(message.Version);
 
+        // .NET Framework testhosts can send unpaired surrogate escapes, which System.Text.Json
+        // rejects. Repair them instead of failing the whole message. See JsonSurrogates.
+        var rawMessage = JsonSurrogates.ReplaceUnpaired(message.RawMessage!);
+
         T? result;
         if (payloadOptions == PayloadOptionsV2)
         {
             // Fast path: deserialize payload directly from raw message
-            var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(message.RawMessage!);
+            var messageWithPayload = DeserializeObjectFast<PayloadedMessage<T>>(rawMessage);
             result = messageWithPayload is null ? default : messageWithPayload.Payload;
         }
         else
         {
             // V1 path: need to parse the Payload field as a separate step
             // because V1 converters (TestCaseConverter, TestResultConverter) need special handling
-            using var doc = JsonDocument.Parse(message.RawMessage!);
+            using var doc = JsonDocument.Parse(rawMessage);
             if (doc.RootElement.TryGetProperty("Payload", out var payloadElement))
             {
                 result = StjSafe.Deserialize<T>(payloadElement, payloadOptions);
@@ -234,7 +238,7 @@ public partial class JsonDataSerializer
     /// <returns>Deserialized data.</returns>
     private static T? Deserialize<T>(JsonSerializerOptions options, string data)
     {
-        return StjSafe.Deserialize<T>(data, options);
+        return StjSafe.Deserialize<T>(JsonSurrogates.ReplaceUnpaired(data), options);
     }
 
     private static JsonSerializerOptions GetPayloadOptions(int? version)
