@@ -172,6 +172,28 @@ public class XmlReaderWriterTests
     }
 
     /// <summary>
+    /// Verify Read test sequence rejects a sequence file containing an external DTD (XXE) instead
+    /// of silently resolving it.
+    /// </summary>
+    [TestMethod]
+    public void ReadTestSequenceShouldNotResolveExternalEntitiesInSequenceFile()
+    {
+        var maliciousXml = "<?xml version=\"1.0\"?>" +
+            "<!DOCTYPE BlameTestRoot [<!ENTITY xxe SYSTEM \"file:///nonexistent-xxe-probe-file\">]>" +
+            "<BlameTestRoot>&xxe;</BlameTestRoot>";
+        var bytes = Encoding.UTF8.GetBytes(maliciousXml);
+
+        _mockFileHelper.Setup(m => m.Exists(It.IsAny<string>())).Returns(true);
+        _mockFileHelper.Setup(m => m.GetStream(It.IsAny<string>(), FileMode.Open, FileAccess.ReadWrite)).Returns(new MemoryStream(bytes));
+
+        // Parsing catches XmlException internally and returns an empty list rather than
+        // resolving the external entity.
+        var testCaseList = _xmlReaderWriter.ReadTestSequence("path.xml");
+
+        Assert.IsEmpty(testCaseList);
+    }
+
+    /// <summary>
     /// The testable xml reader writer.
     /// </summary>
     internal class TestableXmlReaderWriter : XmlReaderWriter

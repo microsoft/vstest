@@ -7,6 +7,7 @@ using System.IO;
 using System.Xml;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
@@ -115,8 +116,9 @@ public class XmlReaderWriter : IBlameReaderWriter
             // Reading test sequence
             var xmlDocument = new XmlDocument();
             using (var stream = _fileHelper.GetStream(filePath, FileMode.Open))
+            using (var reader = XmlReader.Create(stream, XmlRunSettingsUtilities.ReaderSettings))
             {
-                xmlDocument.Load(stream);
+                xmlDocument.Load(reader);
             }
 
             var root = xmlDocument.LastChild;

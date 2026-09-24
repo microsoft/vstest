@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Xml;
 using System.Xml.XPath;
 
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.Utilities;
 
@@ -48,7 +50,11 @@ public class CodeCoverageRunSettingsProcessor
 
         // Load current settings from string.
         var document = new XmlDocument();
-        document.LoadXml(currentSettings);
+        using (var stringReader = new StringReader(currentSettings))
+        using (var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings))
+        {
+            document.Load(reader);
+        }
 
         return Process(document.DocumentElement);
     }

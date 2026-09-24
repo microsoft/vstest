@@ -40,9 +40,11 @@ public static class FakesUtilities
         ValidateArg.NotNull(runSettingsXml, nameof(runSettingsXml));
 
         var doc = new XmlDocument();
+        var xmlReaderSettings = XmlRunSettingsUtilities.ReaderSettings;
+        xmlReaderSettings.CloseInput = true;
         using (var xmlReader = XmlReader.Create(
                    new StringReader(runSettingsXml),
-                   new XmlReaderSettings() { CloseInput = true }))
+                   xmlReaderSettings))
         {
             doc.Load(xmlReader);
         }

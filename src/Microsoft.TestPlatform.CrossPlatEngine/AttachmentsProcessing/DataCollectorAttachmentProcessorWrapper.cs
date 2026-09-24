@@ -19,6 +19,7 @@ using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
+using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 
 namespace Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.TestRunAttachmentsProcessing;
 
@@ -61,7 +62,11 @@ internal sealed class DataCollectorAttachmentProcessorRemoteWrapper : MarshalByR
         string attachments)
     {
         var doc = new XmlDocument();
-        doc.LoadXml(configurationElement);
+        using (var stringReader = new StringReader(configurationElement))
+        using (var reader = XmlReader.Create(stringReader, XmlRunSettingsUtilities.ReaderSettings))
+        {
+            doc.Load(reader);
+        }
         AttachmentSet[] attachmentSets = JsonDataSerializer.Instance.Deserialize<AttachmentSet[]>(attachments)!;
         SynchronousProgress progress = new(Report);
         _processAttachmentCts = new CancellationTokenSource();
