@@ -125,6 +125,15 @@ public static class OutputExtensions
         }
 #endif
 
+        if (!IsColorSupported())
+        {
+            // NO_COLOR is set, or output is redirected (e.g. piped to a file or CI log
+            // aggregator): skip touching Console.ForegroundColor so we don't emit
+            // meaningless escape sequences or mutate state for a stream nobody reads as a terminal.
+            action.Invoke();
+            return;
+        }
+
         var previousForegroundColor = Console.ForegroundColor;
         try
         {
@@ -135,5 +144,26 @@ public static class OutputExtensions
         {
             Console.ForegroundColor = previousForegroundColor;
         }
+    }
+
+    /// <summary>
+    /// Determines whether it is appropriate to write ANSI/console color to the current output.
+    /// Honors the community "NO_COLOR" convention (https://no-color.org/) and skips coloring
+    /// when output is redirected (e.g. piped to a file or a CI log aggregator).
+    /// </summary>
+    private static bool IsColorSupported()
+    {
+        // NO_COLOR convention: presence of the variable (regardless of value) disables color.
+        if (Environment.GetEnvironmentVariable("NO_COLOR") != null)
+        {
+            return false;
+        }
+
+        if (Console.IsOutputRedirected)
+        {
+            return false;
+        }
+
+        return true;
     }
 }

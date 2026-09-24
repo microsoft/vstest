@@ -17,6 +17,7 @@ public class OutputExtensionsTests
     private ConsoleColor _color;
     private readonly ConsoleColor _previousColor;
     private readonly ConsoleColor _newColor;
+    private readonly string? _previousNoColor;
 
     public OutputExtensionsTests()
     {
@@ -30,6 +31,12 @@ public class OutputExtensionsTests
             : ConsoleColor.Blue;
         Console.ForegroundColor = _newColor;
 
+        // NO_COLOR may be set in the ambient environment (e.g. some CI runners). Clear it here so
+        // existing color-assertion tests keep exercising the color path; tests that specifically
+        // cover the NO_COLOR behavior set it explicitly and restore it themselves.
+        _previousNoColor = Environment.GetEnvironmentVariable("NO_COLOR");
+        Environment.SetEnvironmentVariable("NO_COLOR", null);
+
         _mockOutput = new Mock<IOutput>();
         _color = Console.ForegroundColor;
         _mockOutput.Setup(o => o.WriteLine(It.IsAny<string>(), It.IsAny<OutputLevel>())).Callback(() => _color = Console.ForegroundColor);
@@ -39,6 +46,7 @@ public class OutputExtensionsTests
     public void CleanUp()
     {
         Console.ForegroundColor = _previousColor;
+        Environment.SetEnvironmentVariable("NO_COLOR", _previousNoColor);
     }
 
     [TestMethod]
@@ -142,8 +150,53 @@ public class OutputExtensionsTests
         Assert.AreEqual(color2, color1);
     }
 
+    [TestMethod]
+    public void OutputErrorShouldNotSetConsoleColorWhenNoColorEnvironmentVariableIsSet()
+    {
+        if (CanNotSetConsoleForegroundColor())
+        {
+            return;
+        }
+
+        var previousNoColor = Environment.GetEnvironmentVariable("NO_COLOR");
+        try
+        {
+            Environment.SetEnvironmentVariable("NO_COLOR", "1");
+            _mockOutput.Object.Error(false, "HelloError", null);
+            Assert.AreEqual(_newColor, _color, "Console color should not change when NO_COLOR is set.");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("NO_COLOR", previousNoColor);
+        }
+    }
+
+    [TestMethod]
+    public void OutputErrorShouldStillWriteMessageWhenNoColorEnvironmentVariableIsSet()
+    {
+        var previousNoColor = Environment.GetEnvironmentVariable("NO_COLOR");
+        try
+        {
+            Environment.SetEnvironmentVariable("NO_COLOR", "1");
+            _mockOutput.Object.Error(false, "HelloError", null);
+            _mockOutput.Verify(o => o.WriteLine("HelloError", OutputLevel.Error), Times.Once());
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("NO_COLOR", previousNoColor);
+        }
+    }
+
     private bool CanNotSetConsoleForegroundColor()
     {
+        if (Console.IsOutputRedirected)
+        {
+            // SetColorForAction intentionally skips applying color when output is redirected
+            // (e.g. piped to a file or CI log aggregator), so there is nothing meaningful to assert here.
+            Assert.Inconclusive("Can't verify Console foreground color when process output is redirected.");
+            return true;
+        }
+
         if (Console.ForegroundColor != _newColor)
         {
             Assert.Inconclusive("Can't set Console foreground color. Might be because process output redirect to file.");
