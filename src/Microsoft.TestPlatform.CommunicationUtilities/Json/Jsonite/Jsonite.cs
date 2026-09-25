@@ -1177,15 +1177,29 @@ namespace Jsonite
                         default:
                             if (c < ' ')
                             {
-                                writer.Write('\\');
-                                writer.Write('u');
-                                writer.Write(((int)c).ToString("X4", CultureInfo.InvariantCulture));
+                                WriteUnicodeEscape(c);
                             }
-                            else if (IsHighSurrogate(c) || IsLowSurrogate(c))
+                            else if (IsHighSurrogate(c))
                             {
-                                writer.Write('\\');
-                                writer.Write('u');
-                                writer.Write(((int)c).ToString("X4", CultureInfo.InvariantCulture));
+                                // Keep a complete pair, but never emit an unpaired surrogate escape:
+                                // System.Text.Json based runners reject it and abort the whole run.
+                                // See https://github.com/microsoft/vstest/issues/16512.
+                                if (i + 1 < text.Length && IsLowSurrogate(text[i + 1]))
+                                {
+                                    WriteUnicodeEscape(c);
+                                    WriteUnicodeEscape(text[i + 1]);
+                                    i++;
+                                }
+                                else
+                                {
+                                    WriteUnicodeEscape(UnicodeReplacementCharacter);
+                                }
+                            }
+                            else if (IsLowSurrogate(c))
+                            {
+                                // A low surrogate that follows a high one was already consumed above,
+                                // so reaching here means it is unpaired.
+                                WriteUnicodeEscape(UnicodeReplacementCharacter);
                             }
                             else
                             {
@@ -1196,7 +1210,16 @@ namespace Jsonite
                 }
                 writer.Write('"');
             }
+
+            private void WriteUnicodeEscape(char c)
+            {
+                writer.Write('\\');
+                writer.Write('u');
+                writer.Write(((int)c).ToString("X4", CultureInfo.InvariantCulture));
+            }
         }
+
+        private const char UnicodeReplacementCharacter = '\uFFFD';
 
         [MethodImpl((MethodImplOptions)256)]
         private static bool IsHighSurrogate(char c)
