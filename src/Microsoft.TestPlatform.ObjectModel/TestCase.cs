@@ -85,6 +85,18 @@ public sealed class TestCase : TestObject
         _source = source;
         LineNumber = -1;
         _defaultId = Guid.Empty;
+
+        // Record how this test case's id is going to be produced. Construction is the right moment
+        // for it: this instance's id has not been assigned, so it will be computed, and it will be
+        // computed with this process's algorithm - which is fixed for the lifetime of the process,
+        // so recording it now cannot disagree with the value Id eventually hashes with. Doing it
+        // here rather than from the Id getter also keeps that getter free of side effects.
+        //
+        // The serialization constructor deliberately does not do this. A test case being
+        // deserialized already carries whatever the sending process recorded, and a test case sent
+        // by a vstest that predates this property must keep carrying nothing rather than have this
+        // process invent an answer on its behalf.
+        SetPropertyValue(TestCaseProperties.IdAlgorithm, IdAlgorithmName(IdAlgorithm));
     }
     /// <summary>
     /// LocalExtensionData which can be used by Adapter developers for local transfer of extended properties.
@@ -113,7 +125,25 @@ public sealed class TestCase : TestObject
             return _id;
         }
 
-        set => _id = value;
+        set
+        {
+            _id = value;
+
+            // An id that is assigned is an id the platform did not hash, so whatever this instance
+            // recorded about hashing it no longer holds.
+            //
+            // This only ever downgrades a value this instance recorded for itself, which is what
+            // keeps deserialization honest: a test case built by the serialization constructor
+            // carries nothing here, so restoring its id cannot invent a claim its sender never made,
+            // and the recorded value then arrives with the rest of the property bag. The platform
+            // itself assigns an id in one place - the Microsoft.Testing.Platform converter, which
+            // computes the hash in the runner rather than letting this type compute it - and that
+            // is not self assignment, so it records the algorithm it used afterwards.
+            if (GetPropertyValue<string?>(TestCaseProperties.IdAlgorithm, null) is not null)
+            {
+                SetPropertyValue(TestCaseProperties.IdAlgorithm, TestCaseIdAlgorithms.SelfAssigned);
+            }
+        }
     }
 
     /// <summary>
@@ -202,6 +232,33 @@ public sealed class TestCase : TestObject
     /// happened to be loaded, and caching keeps an id stable for the lifetime of the process.
     /// </remarks>
     private static TestCaseIdAlgorithm IdAlgorithm => TestCaseIdAlgorithmResolver.Ambient;
+
+    /// <summary>
+    /// The value <see cref="TestCaseProperties.IdAlgorithm"/> carries for <paramref name="algorithm"/>.
+    /// </summary>
+    private static string IdAlgorithmName(TestCaseIdAlgorithm algorithm)
+        => algorithm switch
+        {
+            TestCaseIdAlgorithm.XxHash128 => TestCaseIdAlgorithms.XxHash128,
+            TestCaseIdAlgorithm.Sha1 => TestCaseIdAlgorithms.Sha1,
+
+            // Naming both members above means adding a third one surfaces here as a deliberate
+            // decision rather than being silently reported as SHA1.
+            _ => throw new ArgumentOutOfRangeException(nameof(algorithm), algorithm, null),
+        };
+
+    /// <summary>
+    /// Records that the platform computed <see cref="Id"/> with <paramref name="algorithm"/>, for a
+    /// caller that hashed the id itself and assigned it rather than letting this type compute it.
+    /// </summary>
+    /// <remarks>
+    /// Only the Microsoft.Testing.Platform path does that, because there the runner builds the test
+    /// case and so has to hash it in a process that is not the one the test ran in. Such an id is
+    /// platform computed with a known algorithm, not self assigned, and assigning <see cref="Id"/>
+    /// has just recorded the opposite - so this has to be called after it, not before.
+    /// </remarks>
+    internal void SetIdAlgorithm(TestCaseIdAlgorithm algorithm)
+        => SetPropertyValue(TestCaseProperties.IdAlgorithm, IdAlgorithmName(algorithm));
 
     /// <summary>
     /// Clears every cached feature flag, so <see cref="IdAlgorithm"/> reads its own again. For tests
@@ -383,6 +440,7 @@ public static class TestCaseProperties
     private const string SourceLabel = "Source";
     private const string FilePathLabel = "File Path";
     private const string LineNumberLabel = "Line Number";
+    private const string IdAlgorithmLabel = "Id Algorithm";
 
     public static readonly TestProperty Id = TestProperty.Register("TestCase.Id", IdLabel, string.Empty, string.Empty, typeof(Guid), ValidateGuid, TestPropertyAttributes.Hidden, typeof(TestCase));
     public static readonly TestProperty FullyQualifiedName = TestProperty.Register("TestCase.FullyQualifiedName", FullyQualifiedNameLabel, string.Empty, string.Empty, typeof(string), ValidateName, TestPropertyAttributes.Hidden, typeof(TestCase));
@@ -392,8 +450,35 @@ public static class TestCaseProperties
     public static readonly TestProperty CodeFilePath = TestProperty.Register("TestCase.CodeFilePath", FilePathLabel, typeof(string), typeof(TestCase));
     public static readonly TestProperty LineNumber = TestProperty.Register("TestCase.LineNumber", LineNumberLabel, typeof(int), TestPropertyAttributes.Hidden, typeof(TestCase));
 
+    /// <summary>
+    /// How the id a test case carries was produced: one of the values on
+    /// <see cref="TestCaseIdAlgorithms"/>, or absent when the test case comes from a vstest that
+    /// predates this property.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// vstest computes <see cref="TestCase.Id"/> by hashing a seed string, and which hash it uses is
+    /// changing - see <c>docs/environment-variables.md</c>. When it changes, the id of every test
+    /// whose id the platform computes changes with it, and a consumer that cached those ids cannot
+    /// match its cache against the results it gets back. Reading this tells such a consumer that the
+    /// ids it holds were produced a different way and have to be discovered again, rather than
+    /// leaving it to notice that nothing matches.
+    /// </para>
+    /// <para>
+    /// Deliberately not one of the core properties above. It is an ordinary entry in the property
+    /// bag, so it travels on every protocol version through the mechanism that already carries
+    /// custom properties, needs no change to any serializer, and is simply absent - rather than
+    /// wrong - on a payload written before it existed.
+    /// </para>
+    /// </remarks>
+    public static readonly TestProperty IdAlgorithm = TestProperty.Register("TestCase.IdAlgorithm", IdAlgorithmLabel, typeof(string), TestPropertyAttributes.Hidden, typeof(TestCase));
+
     internal static TestProperty[] Properties { get; } =
     [
+        // IdAlgorithm is deliberately absent. This array is the set of core properties that a
+        // serializer writes as fields of its own, and that TestCase answers from a backing field
+        // rather than from the property bag. IdAlgorithm lives in the bag instead, which is what
+        // makes it travel on every protocol version without a serializer knowing about it.
         CodeFilePath,
         DisplayName,
         ExecutorUri,
@@ -441,4 +526,40 @@ public static class TestCaseProperties
             return false;
         }
     }
+}
+
+/// <summary>
+/// The values <see cref="TestCaseProperties.IdAlgorithm"/> can carry.
+/// </summary>
+/// <remarks>
+/// <para>
+/// A test case that carries none of these carries nothing at all: it was produced by a vstest that
+/// predates the property, and a consumer has to fall back on whatever it assumed before.
+/// </para>
+/// <para>
+/// The vocabulary matches the <c>IdSource</c> column of the test id report logger - see
+/// <c>docs/test-ids-logger.md</c> - on purpose, because the two answer the same question. The logger
+/// infers it by comparing a test's id against both candidates, which is all a report written after
+/// the fact can do; this is stated by the code that produced the id, so it is right even for an
+/// adapter that assigns an id which happens to collide with a computed one.
+/// </para>
+/// </remarks>
+public static class TestCaseIdAlgorithms
+{
+    /// <summary>
+    /// The platform computed the id by hashing the test case's seed with SHA1. This is the id
+    /// vstest has always produced by default.
+    /// </summary>
+    public const string Sha1 = "Sha1";
+
+    /// <summary>
+    /// The platform computed the id by hashing the test case's seed with xxHash128.
+    /// </summary>
+    public const string XxHash128 = "XxHash128";
+
+    /// <summary>
+    /// The adapter assigned the id itself and the platform hashed nothing, so the id does not move
+    /// when the platform changes the algorithm it hashes with. MSTest v3 and later do this.
+    /// </summary>
+    public const string SelfAssigned = "SelfAssigned";
 }

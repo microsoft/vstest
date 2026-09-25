@@ -265,6 +265,58 @@ public class MtpTestNodeConverterTestIdTests
         }
     }
 
+    /// <summary>
+    /// An id this converter computed is platform computed, and must be recorded as the algorithm it
+    /// used - not as self assigned.
+    /// </summary>
+    /// <remarks>
+    /// This is the trap the property has to avoid. Everywhere else, assigning <c>TestCase.Id</c>
+    /// means an adapter produced the id itself and it will not move when the platform changes
+    /// algorithm. Here the platform is the one assigning it, because the runner has to hash on
+    /// behalf of an application that is its own host. Recording that as self assigned would tell a
+    /// consumer that every MTP test's id is stable when in fact all of them move.
+    /// </remarks>
+    [TestMethod]
+    [DataRow(OptOut, TestCaseIdAlgorithms.Sha1)]
+    [DataRow(OptIn, TestCaseIdAlgorithms.XxHash128)]
+    public void ToTestCaseRecordsTheDeclaredAlgorithmRatherThanSelfAssigned(string value, string expected)
+    {
+        var algorithm = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring(value));
+
+        TestCase testCase = MtpTestNodeConverter.ToTestCase(Node(), Source, algorithm);
+
+        Assert.AreEqual(expected, IdAlgorithmOf(testCase));
+    }
+
+    [TestMethod]
+    [DataRow(OptOut, TestCaseIdAlgorithms.Sha1)]
+    [DataRow(OptIn, TestCaseIdAlgorithms.XxHash128)]
+    public void ToTestResultRecordsTheDeclaredAlgorithmOnItsTestCase(string value, string expected)
+    {
+        var algorithm = MtpTestNodeConverter.ResolveTestCaseIdAlgorithm(Declaring(value));
+
+        TestCase testCase = MtpTestNodeConverter.ToTestResult(Node(), Source, algorithm).TestCase;
+
+        Assert.AreEqual(expected, IdAlgorithmOf(testCase));
+    }
+
+    /// <summary>
+    /// With nothing declared the id is left to the test case, so the algorithm it records for itself
+    /// is the right answer and this converter must not overwrite it.
+    /// </summary>
+    [TestMethod]
+    public void ToTestCaseLeavesTheRecordedAlgorithmAloneWhenNothingIsDeclared()
+    {
+        TestCase converted = MtpTestNodeConverter.ToTestCase(Node(), Source, testCaseIdAlgorithm: null);
+        var equivalent = new TestCase(converted.FullyQualifiedName, converted.ExecutorUri, converted.Source);
+
+        Assert.AreEqual(IdAlgorithmOf(equivalent), IdAlgorithmOf(converted));
+        Assert.AreNotEqual(TestCaseIdAlgorithms.SelfAssigned, IdAlgorithmOf(converted));
+    }
+
+    private static string? IdAlgorithmOf(TestCase testCase)
+        => testCase.GetPropertyValue<string?>(TestCaseProperties.IdAlgorithm, null);
+
 #pragma warning disable CS0618 // ResetFeatureFlagCacheForTesting is what its name says it is.
     private static void ResetFeatureFlagCache() => TestCase.ResetFeatureFlagCacheForTesting();
 #pragma warning restore CS0618
