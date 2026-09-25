@@ -248,10 +248,16 @@ public class ProxyOperationManager
         }
         catch (Exception ex)
         {
-            EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", ex);
+            // Blocking on .Result above wraps a faulted task's exception in an
+            // AggregateException. Unwrap it so the user-facing message shows the real
+            // root cause instead of a "System.AggregateException: One or more errors
+            // occurred. (...)" prefix.
+            var reportedException = ex is AggregateException { InnerException: { } innerException } ? innerException : ex;
+
+            EqtTrace.Error("ProxyOperationManager: Failed to launch testhost :{0}", reportedException);
 
             CancellationTokenSource.Token.ThrowTestPlatformExceptionIfCancellationRequested();
-            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FailedToLaunchTestHost, ex.ToString()));
+            throw new TestPlatformException(string.Format(CultureInfo.CurrentCulture, CrossPlatEngineResources.FailedToLaunchTestHost, reportedException.ToString()));
         }
 
         // Warn the user that execution will wait for debugger attach.

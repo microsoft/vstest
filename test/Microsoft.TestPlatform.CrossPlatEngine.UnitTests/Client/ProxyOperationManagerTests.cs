@@ -296,6 +296,20 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     }
 
     [TestMethod]
+    public void SetupChannelShouldUnwrapAggregateExceptionWhenLaunchTestHostAsyncFaults()
+    {
+        var rootCause = new InvalidOperationException("boom");
+        _mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
+            .Returns(Task.FromException<bool>(rootCause));
+
+        var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
+
+        var ex = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings));
+        Assert.Contains(rootCause.Message, ex.Message);
+        Assert.DoesNotContain(nameof(AggregateException), ex.Message);
+    }
+
+    [TestMethod]
     public void SetupChannelShouldThrowTestPlatformExceptionIfRequestCancelledDuringLaunchOfTestHost()
     {
         SetupTestHostLaunched(true);
