@@ -11,6 +11,7 @@ using System.Linq;
 
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Internal;
 using Microsoft.VisualStudio.TestPlatform.CommandLine.Processors.Utilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Abstraction::Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
@@ -130,7 +131,7 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
         // Get diag file path.
         // Note: Even though semi colon is valid file path, we are not respecting the file name having semi-colon [As we are separating arguments based on semi colon].
         var diagFilePathArg = diagArgumentList[0];
-        var diagFilePath = GetDiagFilePath(diagFilePathArg);
+        var diagFilePath = GetDiagFilePath(diagFilePathArg, exceptionMessage);
 
         // Get diag parameters.
         var diagParameterArgs = diagArgumentList.Skip(1);
@@ -210,14 +211,20 @@ internal class EnableDiagArgumentExecutor : IArgumentExecutor
     /// Gets diag file path.
     /// </summary>
     /// <param name="diagFilePathArgument">Diag file path argument.</param>
+    /// <param name="exceptionMessage">Error message for the complete diagnostic argument.</param>
     /// <returns>Diag file path.</returns>
-    private string GetDiagFilePath(string diagFilePathArgument)
+    private string GetDiagFilePath(string diagFilePathArgument, string exceptionMessage)
     {
-        // Remove double quotes if present.
-        diagFilePathArgument = diagFilePathArgument.Replace("\"", "");
+        diagFilePathArgument = DiagnosticLogPath.RemoveLegacyQuotes(diagFilePathArgument);
+        if (diagFilePathArgument.IsNullOrWhiteSpace()
+            || (Path.DirectorySeparatorChar == '\\' && diagFilePathArgument.IndexOf('"') >= 0))
+        {
+            throw new CommandLineException(exceptionMessage);
+        }
 
         // If we provide a directory we don't need to create the base directory.
-        if (!diagFilePathArgument.EndsWith(@"\", StringComparison.Ordinal) && !diagFilePathArgument.EndsWith("/", StringComparison.Ordinal))
+        if (!diagFilePathArgument.EndsWith(Path.DirectorySeparatorChar.ToString(), StringComparison.Ordinal)
+            && !diagFilePathArgument.EndsWith(Path.AltDirectorySeparatorChar.ToString(), StringComparison.Ordinal))
         {
             // Create base directory for diag file path (if doesn't exist)
             CreateDirectoryIfNotExists(diagFilePathArgument);
