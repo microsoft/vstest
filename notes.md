@@ -1,5 +1,5 @@
 # Efficiency Improver — vstest Repo Memory
-_Last updated: 2026-09-12_
+_Last updated: 2026-09-26_
 
 ## Build / Test Commands
 - Bootstrap + full build: `./build.sh` (downloads pinned .NET 11 SDK to `.dotnet/`)
@@ -68,14 +68,15 @@ _Last updated: 2026-09-12_
 - **2026-09-12 scan**: Scanned CrossPlatEngine (ParallelRunDataAggregator, DiscovererEnumerator), Common, Client, vstest.console arg processors, and new TestIdsLogger (#16443) for O(n²) patterns. All nested-loop/Contains patterns found operate on small fixed-size collections (adapters, data collectors, search dirs), not test-count-scaled — LOW priority, no new backlog items. TestIdsLogger confirmed clean (StringBuilder-per-row, single linear pass) and opt-in (`--logger` flag), so not a default-path concern.
 - **2026-09-19 scan**: No new commits since last run (repo HEAD unchanged at "Preserve OutputType for Android test projects (#16496)"). Delegated a fresh sub-agent scan of CommunicationUtilities, Common, vstest.console, testhost/testhost.x86, Client, ObjectModel, datacollector explicitly excluding already-confirmed-clean areas. Found one new MEDIUM item (see backlog table) and confirmed no HIGH-impact findings — no per-call Regex re-creation, no repeated GetTypes()/reflection scans, no blocking sync I/O on handshake path found beyond what's already known.
 - Only 2 open perf/efficiency-tagged issues found: #15295 (MSBuild target optimization — still "State: In-PR" label, no new maintainer activity, not an application code path we'd touch) and #16433 (test parallelism/shared state — explicitly says "no speed to gain here", not an efficiency target). No new comments on either since last check.
-- Next area to investigate: HTML logger performance, or any new code areas added in upcoming commits
+- **2026-09-26 scan**: Only 1 commit since last run (8c8561a, "Mark the xxHash128 test id API as experimental (#16465)" — attribute-only change, no perf impact). No new open issues labeled `efficiency` or `Area: Performance` beyond the Monthly Activity issue itself. No open efficiency-improver PRs to maintain. Delegated a fresh sub-agent scan of previously-unscanned areas: HtmlLogger (XSLT/DataContractSerializer only run once at TestRunComplete, cold path — clean), TrxLogger (re-confirmed cold/post-completion path), BlameDataCollector (per-test handlers are O(1) ConcurrentQueue/Dictionary ops, dump-file loops bounded by small dump count on crash path only — clean), CoreUtilities (StringBuilderExtensions/StringExtensions/Helpers — simple O(1)/O(len) utilities, no issues), and remaining CrossPlatEngine subdirs (EventHandlers, DataCollection, Client, Execution — TestCaseEventsHandler, InProcDataCollectionExtensionManager/Sink, TestLoggerManager, ParallelOperationManager, ProxyDataCollectionManager, BaseRunTests — all O(1) per-test-result ops bounded by adapter/logger/collector count, not test count). No new HIGH or MEDIUM findings. Backlog unchanged (still MEDIUM-only).
+- Next area to investigate: any new code areas added in upcoming commits; otherwise backlog is nearly exhausted for this codebase snapshot — consider Task 6 (measurement infrastructure) on a future run if Task 2 keeps returning empty.
 
 ## Monthly Activity Issues
 - Issue #16140: [efficiency-improver] Monthly Activity 2026-06 — CLOSED 2026-07-03
 - Issue #16211: [efficiency-improver] Monthly Activity 2026-07 — CLOSED 2026-08-01
 - Issue #16332: [efficiency-improver] Monthly Activity 2026-08 — CLOSED 2026-09-12
-- Issue #16479: [efficiency-improver] Monthly Activity 2026-09 — active, updated 2026-09-19
-- Last run: 2026-09-19 (run ID 35455638439)
+- Issue #16479: [efficiency-improver] Monthly Activity 2026-09 — active, updated 2026-09-26
+- Last run: 2026-09-26 (run ID 36256339866)
 
 ## Maintainer-Checked Items (do not include in Suggested Actions)
 - (none yet)
