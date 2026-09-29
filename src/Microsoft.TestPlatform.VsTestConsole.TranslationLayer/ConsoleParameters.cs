@@ -7,6 +7,7 @@ using System.IO;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
@@ -60,28 +61,37 @@ public class ConsoleParameters
     public TraceLevel TraceLevel { get; set; } = TraceLevel.Verbose;
 
     /// <summary>
-    /// Full path for the log file
+    /// Path for the diagnostic log file, or a directory ending in a directory separator.
+    /// A directory uses generated filenames for the console, testhost and data collector logs.
+    /// Use '/' as the directory suffix on Unix, and '/' or '\' on Windows.
+    /// On Unix, quotes and backslashes are literal filename characters.
+    /// On Windows, one surrounding pair of double quotes is accepted for compatibility.
+    /// The getter includes a surrounding pair of double quotes for compatibility;
+    /// pass an unencoded path to the setter.
     /// </summary>
     public string? LogFilePath
     {
         get
         {
-            return _logFilePath;
+            return _logFilePath?.AddDoubleQuote();
         }
 
         set
         {
-            ValidateArg.NotNullOrEmpty(value!, "LogFilePath");
-            var directoryPath = Path.GetDirectoryName(value);
+            ValidateArg.NotNullOrEmpty(value!, nameof(LogFilePath));
+            var path = DiagnosticLogPath.RemoveLegacyQuotes(value!);
+            ValidateArg.NotNullOrEmpty(path, nameof(LogFilePath));
+            var directoryPath = Path.GetDirectoryName(path);
             if (!directoryPath.IsNullOrEmpty() && !_fileHelper.DirectoryExists(directoryPath))
             {
                 Directory.CreateDirectory(directoryPath);
             }
 
-            // Ensure path is double quoted. if path has white space then it can create problem.
-            _logFilePath = value!.AddDoubleQuote();
+            _logFilePath = path;
         }
     }
+
+    internal string? UnquotedLogFilePath => _logFilePath;
 
     /// <summary>
     /// Port Number for communication

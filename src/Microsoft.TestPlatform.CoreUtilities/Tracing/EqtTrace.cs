@@ -7,6 +7,7 @@ using System.Globalization;
 using System.Text;
 
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 
 namespace Microsoft.VisualStudio.TestPlatform.ObjectModel;
 
@@ -161,9 +162,7 @@ public static class EqtTrace
     /// <returns>Trace initialized flag.</returns>
     public static bool InitializeTrace(string? customLogFile, PlatformTraceLevel traceLevel)
     {
-        // Remove extra quotes if we get them passed on the parameter,
-        // System.IO.File does not ignore them when checking the file existence.
-        customLogFile = customLogFile?.Trim('"');
+        customLogFile = customLogFile is null ? null : DiagnosticLogPath.RemoveLegacyQuotes(customLogFile);
         if (!TraceImpl.InitializeTrace(customLogFile, traceLevel))
         {
             ErrorOnInitialization = PlatformEqtTrace.ErrorOnInitialization;

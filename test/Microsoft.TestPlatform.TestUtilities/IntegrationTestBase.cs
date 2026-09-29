@@ -872,24 +872,6 @@ public class IntegrationTestBase
             consoleParameters.LogFilePath = logFilePath;
         }
 
-        var consoleRunnerPath = IsNetCoreRunner()
-                ? GetDotnetRunnerPath()
-                : GetConsoleRunnerPath();
-        var executablePath = OSUtils.IsWindows ? @".dotnet\dotnet.exe" : @".dotnet/dotnet";
-        var dotnetPath = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, executablePath);
-
-        if (!File.Exists(dotnetPath))
-        {
-            throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
-        }
-
-        if (!File.Exists(consoleRunnerPath))
-        {
-            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
-        }
-
-        Console.WriteLine($"Console runner path: {consoleRunnerPath}");
-
         // When testing with older vstest.console.dll they need to have an older runtime installed to run, but there are rarely
         // incompatibilities between runtimes, so we roll forward to latest major to minimize the amount of runtimes we need to install.
         // Especially very old runtimes like netcoreapp2.1, which makes us flagged by compliance.
@@ -929,10 +911,31 @@ public class IntegrationTestBase
             consoleParameters.EnvironmentVariables = environmentVariables;
         }
 
-        var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
+        var vstestConsoleWrapper = CreateVsTestConsoleWrapper(consoleParameters);
         vstestConsoleWrapper.StartSession();
 
         return vstestConsoleWrapper;
+    }
+
+    protected IVsTestConsoleWrapper CreateVsTestConsoleWrapper(ConsoleParameters consoleParameters)
+    {
+        var consoleRunnerPath = IsNetCoreRunner()
+            ? GetDotnetRunnerPath()
+            : GetConsoleRunnerPath();
+        var dotnetPath = Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, ".dotnet", OSUtils.IsWindows ? "dotnet.exe" : "dotnet");
+        if (!File.Exists(dotnetPath))
+        {
+            throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
+        }
+
+        if (!File.Exists(consoleRunnerPath))
+        {
+            throw new FileNotFoundException($"File '{consoleRunnerPath}' was not found.");
+        }
+
+        Console.WriteLine($"Console runner path: {consoleRunnerPath}");
+
+        return new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, consoleParameters);
     }
 
     /// <summary>

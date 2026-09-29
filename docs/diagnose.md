@@ -29,6 +29,40 @@ Allowed values for tracelevel are: off, error, warning, info and verbose. The de
 
 Since v17.2.0, environment variable `VSTEST_DIAG` can be used to specify the path to the log file. 
 
+### File and directory paths
+
+`--diag`, `VSTEST_DIAG`, and the Translation Layer's `ConsoleParameters.LogFilePath`
+accept the same file and directory paths. Parent directories are created as needed.
+To select a directory, include a trailing `/` on Unix, or `/` or `\` on Windows.
+An existing directory without that suffix is treated as a file path and cannot be
+opened as a log file.
+
+For directory input, the runner creates a file named
+`<process>_<pid>.<timestamp>.diag`. Testhost and data collector logs are created
+in that directory with `.host.<timestamp>_<thread>` and
+`.datacollector.<timestamp>_<thread>` suffixes. For file input such as `log.txt`,
+the runner writes `log.txt`, and child logs use `log.host.*.txt` and
+`log.datacollector.*.txt`.
+
+On Unix, every quote and backslash that reaches VSTest is a literal filename
+character, including matching outer quotes and a final backslash. This changes
+the older behavior that removed quotes and treated a final backslash as a
+directory marker. Shell quotes used to group an argument are removed by the
+shell before VSTest sees it. For example, in Bash:
+
+```bash
+dotnet vstest testApp.dll --diag:'log with spaces.txt' # log with spaces.txt
+dotnet vstest testApp.dll --diag:'"log.txt"'           # "log.txt", quotes included
+dotnet vstest testApp.dll --diag:'logs/'              # generated files in logs
+dotnet vstest testApp.dll --diag:'log\'               # file ending in a backslash
+```
+
+On Windows, one matching surrounding pair of quotes is accepted for legacy
+callers. Embedded, unmatched, or extra quotes remain invalid filename characters.
+Set `ConsoleParameters.LogFilePath` to the path itself, not a command-line-encoded
+argument. Semicolons remain reserved for diagnostic options, such as
+`;tracelevel=verbose`, and are not supported in diagnostic paths.
+
 ### Dotnet test
 
 The `--diag` and `VSTEST_DIAG` option is supported on the `dotnet test` command as well. This will also produce same
@@ -159,5 +193,4 @@ Go to Output > Tests window:
 Please provide all files from the listed folder, and complete content of the Tests window.
 
 ![image](https://github.com/user-attachments/assets/c942642d-e10a-4bf3-9920-8ddd22d99ba8)
-
 

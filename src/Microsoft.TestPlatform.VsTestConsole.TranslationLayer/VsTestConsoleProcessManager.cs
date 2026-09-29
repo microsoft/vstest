@@ -12,6 +12,7 @@ using System.Threading;
 
 using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
+using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
@@ -269,10 +270,10 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
             string.Format(CultureInfo.InvariantCulture, PortArgument, parameters.PortNumber)
         };
 
-        if (!parameters.LogFilePath.IsNullOrEmpty())
+        if (!parameters.UnquotedLogFilePath.IsNullOrEmpty())
         {
             // Extra args: --diag|/diag:<PathToLogFile>;tracelevel=<tracelevel>
-            args.Add(string.Format(CultureInfo.InvariantCulture, DiagArgument, parameters.LogFilePath, parameters.TraceLevel));
+            args.Add(string.Format(CultureInfo.InvariantCulture, DiagArgument, CommandLineArgumentEncoder.Encode(parameters.UnquotedLogFilePath), parameters.TraceLevel));
         }
 
         if (_isNetCoreRunner)
