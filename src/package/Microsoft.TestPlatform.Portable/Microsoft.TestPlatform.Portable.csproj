@@ -250,7 +250,12 @@
       <_PortableNetFxEventLog Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.EventLogCollector\$(Configuration)\net48\**\Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll">
         <PackagePath>tools\net462\Extensions\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
       </_PortableNetFxEventLog>
-      <TfmSpecificPackageFile Include="@(_PortableNetFxBlame);@(_PortableNetFxHtml);@(_PortableNetFxTrx);@(_PortableNetFxTestHostProvider);@(_PortableNetFxEventLog)" />
+      <!-- Blame's hang dumper uses DiagnosticsClient from Microsoft.Diagnostics.NETCore.Client for every
+           .NET (Core) target framework, so the assembly has to sit next to the collector that loads it. -->
+      <_PortableNetFxDiagnosticsClient Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.BlameDataCollector\$(Configuration)\net48\Microsoft.Diagnostics.NETCore.Client.dll">
+        <PackagePath>tools\net462\Extensions\%(Filename)%(Extension)</PackagePath>
+      </_PortableNetFxDiagnosticsClient>
+      <TfmSpecificPackageFile Include="@(_PortableNetFxBlame);@(_PortableNetFxHtml);@(_PortableNetFxTrx);@(_PortableNetFxTestHostProvider);@(_PortableNetFxEventLog);@(_PortableNetFxDiagnosticsClient)" />
     </ItemGroup>
   </Target>
 
@@ -324,7 +329,12 @@
       <_PortableNetTestHostProvider Include="$(ArtifactsBinDir)Microsoft.TestPlatform.TestHostProvider\$(Configuration)\netstandard2.0\**\Microsoft.TestPlatform.TestHostRuntimeProvider*.dll">
         <PackagePath>tools\net8.0\Extensions\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
       </_PortableNetTestHostProvider>
-      <TfmSpecificPackageFile Include="@(_PortableNetBlame);@(_PortableNetHtml);@(_PortableNetTrx);@(_PortableNetTestHostProvider)" />
+      <!-- Blame's hang dumper uses DiagnosticsClient from Microsoft.Diagnostics.NETCore.Client for every
+           .NET (Core) target framework, so the assembly has to sit next to the collector that loads it. -->
+      <_PortableNetDiagnosticsClient Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.BlameDataCollector\$(Configuration)\netstandard2.0\Microsoft.Diagnostics.NETCore.Client.dll">
+        <PackagePath>tools\net8.0\Extensions\%(Filename)%(Extension)</PackagePath>
+      </_PortableNetDiagnosticsClient>
+      <TfmSpecificPackageFile Include="@(_PortableNetBlame);@(_PortableNetHtml);@(_PortableNetTrx);@(_PortableNetTestHostProvider);@(_PortableNetDiagnosticsClient)" />
     </ItemGroup>
   </Target>
 
