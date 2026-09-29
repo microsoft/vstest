@@ -125,7 +125,9 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestMatrix(console: Net)]
+    // Both consoles: the .NET Framework console runs from the Microsoft.TestPlatform package layout, which
+    // has to carry Microsoft.Diagnostics.NETCore.Client next to the blame collector for NetClientHangDumper.
+    [TestMatrix]
     public void HangDumpOnTimeout(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
