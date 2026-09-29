@@ -420,7 +420,13 @@
       <_EventLogCollectorContent Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.EventLogCollector\$(Configuration)\net48\Microsoft.TestPlatform.Extensions.EventLogCollector.dll">
         <PackagePath>tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\%(Filename)%(Extension)</PackagePath>
       </_EventLogCollectorContent>
-      <TfmSpecificPackageFile Include="@(_TrxLoggerContent);@(_HtmlLoggerContent);@(_TestIdsLoggerContent);@(_TestHostRuntimeProviderContent);@(_BlameDataCollectorContent);@(_EventLogCollectorContent)" />
+      <!-- Blame's hang dumper uses DiagnosticsClient from Microsoft.Diagnostics.NETCore.Client for every
+           .NET (Core) target framework, so the assembly has to sit next to the collector that loads it.
+           Taken from the collector's own build output, which copies it locally. -->
+      <_BlameDiagnosticsClientContent Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.BlameDataCollector\$(Configuration)\net48\Microsoft.Diagnostics.NETCore.Client.dll">
+        <PackagePath>tools\net462\Common7\IDE\Extensions\TestPlatform\Extensions\%(Filename)%(Extension)</PackagePath>
+      </_BlameDiagnosticsClientContent>
+      <TfmSpecificPackageFile Include="@(_TrxLoggerContent);@(_HtmlLoggerContent);@(_TestIdsLoggerContent);@(_TestHostRuntimeProviderContent);@(_BlameDataCollectorContent);@(_EventLogCollectorContent);@(_BlameDiagnosticsClientContent)" />
     </ItemGroup>
   </Target>
   <!--
