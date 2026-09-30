@@ -25,6 +25,9 @@ using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using CrossPlatResources = Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources;
 using ObjectModelConstants = Microsoft.VisualStudio.TestPlatform.ObjectModel.Constants;
 
+// This type physically lives in the CrossPlatEngine project but keeps the CommunicationUtilities
+// namespace for backward compatibility, since it is shipped public API (see PublicAPI.Shipped.txt).
+// Do not "fix" this by moving the namespace or the file; that would be a breaking change.
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 
 /// <summary>
