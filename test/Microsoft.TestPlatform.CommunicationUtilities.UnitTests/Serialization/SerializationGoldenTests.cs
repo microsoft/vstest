@@ -185,6 +185,17 @@ public class SerializationGoldenTests
             },
             {
               "Key": {
+                "Id": "TestCase.IdAlgorithm",
+                "Label": "Id Algorithm",
+                "Category": "",
+                "Description": "",
+                "Attributes": 1,
+                "ValueType": "System.String"
+              },
+              "Value": "SelfAssigned"
+            },
+            {
+              "Key": {
                 "Id": "TestObject.Traits",
                 "Label": "Traits",
                 "Category": "",
@@ -218,6 +229,17 @@ public class SerializationGoldenTests
           "CodeFilePath": "/user/src/testFile.cs",
           "LineNumber": 999,
           "Properties": [
+            {
+              "Key": {
+                "Id": "TestCase.IdAlgorithm",
+                "Label": "Id Algorithm",
+                "Category": "",
+                "Description": "",
+                "Attributes": 1,
+                "ValueType": "System.String"
+              },
+              "Value": "SelfAssigned"
+            },
             {
               "Key": {
                 "Id": "TestObject.Traits",
@@ -323,6 +345,17 @@ public class SerializationGoldenTests
                   "ValueType": "System.Int32"
                 },
                 "Value": 999
+              },
+              {
+                "Key": {
+                  "Id": "TestCase.IdAlgorithm",
+                  "Label": "Id Algorithm",
+                  "Category": "",
+                  "Description": "",
+                  "Attributes": 1,
+                  "ValueType": "System.String"
+                },
+                "Value": "SelfAssigned"
               },
               {
                 "Key": {
@@ -475,6 +508,17 @@ public class SerializationGoldenTests
             "Properties": [
               {
                 "Key": {
+                  "Id": "TestCase.IdAlgorithm",
+                  "Label": "Id Algorithm",
+                  "Category": "",
+                  "Description": "",
+                  "Attributes": 1,
+                  "ValueType": "System.String"
+                },
+                "Value": "SelfAssigned"
+              },
+              {
+                "Key": {
                   "Id": "TestObject.Traits",
                   "Label": "Traits",
                   "Category": "",
@@ -614,6 +658,17 @@ public class SerializationGoldenTests
                 },
                 {
                   "Key": {
+                    "Id": "TestCase.IdAlgorithm",
+                    "Label": "Id Algorithm",
+                    "Category": "",
+                    "Description": "",
+                    "Attributes": 1,
+                    "ValueType": "System.String"
+                  },
+                  "Value": "SelfAssigned"
+                },
+                {
+                  "Key": {
                     "Id": "TestObject.Traits",
                     "Label": "Traits",
                     "Category": "",
@@ -663,6 +718,17 @@ public class SerializationGoldenTests
               "CodeFilePath": "/user/src/testFile.cs",
               "LineNumber": 999,
               "Properties": [
+                {
+                  "Key": {
+                    "Id": "TestCase.IdAlgorithm",
+                    "Label": "Id Algorithm",
+                    "Category": "",
+                    "Description": "",
+                    "Attributes": 1,
+                    "ValueType": "System.String"
+                  },
+                  "Value": "SelfAssigned"
+                },
                 {
                   "Key": {
                     "Id": "TestObject.Traits",
@@ -960,16 +1026,7 @@ public class SerializationGoldenTests
     }
 
     private static void AssertJsonEqual(string expected, string actual)
-    {
-        // Normalize both strings by parsing and re-serializing to remove whitespace differences
-        static string Normalize(string json)
-            => Newtonsoft.Json.Linq.JToken.Parse(json).ToString(Newtonsoft.Json.Formatting.None);
-
-        var normalizedExpected = Normalize(expected);
-        var normalizedActual = Normalize(actual);
-        Assert.AreEqual(normalizedExpected, normalizedActual,
-            $"JSON mismatch.\nExpected:\n{expected}\nActual:\n{actual}");
-    }
+        => SerializationTestHelpers.AssertJsonEqual(expected, actual);
 
     #endregion
 }
