@@ -273,7 +273,7 @@ public class RunConfiguration : TestRunSettings
     /// <summary>
     /// Gets or sets the target Framework this run is targeting. Possible values are Framework3.5|Framework4.0|Framework4.5
     /// </summary>
-    [Obsolete("Use TargetFramework instead")]
+    [Obsolete("Use TargetFramework instead", error: true)]
     public FrameworkVersion TargetFrameworkVersion
     {
         get => _framework?.Name switch
