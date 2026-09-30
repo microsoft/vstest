@@ -471,7 +471,7 @@ internal abstract class BaseRunTests
                     break;
                 }
 
-                var timeStartNow = DateTime.UtcNow;
+                var runStopwatch = Stopwatch.StartNew();
 
                 var currentTotalTests = TestRunCache.TotalExecutedTests;
                 _testPlatformEventSource.AdapterExecutionStart(executorUri);
@@ -484,7 +484,7 @@ internal abstract class BaseRunTests
 
                 _testPlatformEventSource.AdapterExecutionStop(TestRunCache.TotalExecutedTests - currentTotalTests);
 
-                var totalTimeTaken = DateTime.UtcNow - timeStartNow;
+                var totalTimeTaken = runStopwatch.Elapsed;
 
                 // Identify whether the executor did run any tests at all
                 if (TestRunCache.TotalExecutedTests > totalTests)

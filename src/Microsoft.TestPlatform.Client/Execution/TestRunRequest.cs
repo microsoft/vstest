@@ -67,7 +67,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
     /// <summary>
     /// Execution Start Time
     /// </summary>
-    private DateTime _executionStartTime;
+    private Stopwatch _executionStopwatch = new();
 
     /// <summary>
     /// Request Data
@@ -118,7 +118,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 throw new InvalidOperationException(ClientResources.InvalidStateForExecution);
             }
 
-            _executionStartTime = DateTime.UtcNow;
+            _executionStopwatch = Stopwatch.StartNew();
 
             // Collecting Number of sources Sent For Execution
             var numberOfSources = (uint)(TestRunCriteria.Sources?.Count() ?? 0);
@@ -435,7 +435,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
                 // Notify the waiting handle that run is complete
                 _runCompletionEvent.Set();
 
-                var executionTotalTimeTaken = DateTime.UtcNow - _executionStartTime;
+                var executionTotalTimeTaken = _executionStopwatch.Elapsed;
 
                 // Fill in the time taken to complete the run
                 _requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenInSecForRun, executionTotalTimeTaken.TotalSeconds);
@@ -602,7 +602,7 @@ public class TestRunRequest : ITestRunRequest, IInternalTestRunEventsHandler
             }
 
             // Fill in the time taken to complete the run
-            var executionTotalTimeTakenForDesignMode = DateTime.UtcNow - _executionStartTime;
+            var executionTotalTimeTakenForDesignMode = _executionStopwatch.Elapsed;
             testRunCompletePayload.TestRunCompleteArgs.Metrics[TelemetryDataConstants.TimeTakenInSecForRun] = executionTotalTimeTakenForDesignMode.TotalSeconds;
 
             // Add extensions discovered by vstest.console.

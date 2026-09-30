@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -81,7 +82,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
             DiscoveryInProgress = true;
             try
             {
-                _discoveryStartTime = DateTime.UtcNow;
+                _discoveryStopwatch = Stopwatch.StartNew();
 
                 // Collecting Data Point Number of sources sent for discovery
                 RequestData.MetricsCollection.Add(TelemetryDataConstants.NumberOfSourcesSentForDiscovery, DiscoveryCriteria.Sources.Count());
@@ -285,7 +286,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 }
 
                 DiscoveryInProgress = false;
-                var discoveryFinalTimeTaken = DateTime.UtcNow - _discoveryStartTime;
+                var discoveryFinalTimeTaken = _discoveryStopwatch.Elapsed;
 
                 // Fill in the Metrics From Test Host Process
                 var metrics = discoveryCompleteEventArgs.Metrics;
@@ -425,7 +426,7 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
                 }
             }
 
-            var discoveryFinalTimeTakenForDesignMode = DateTime.UtcNow - _discoveryStartTime;
+            var discoveryFinalTimeTakenForDesignMode = _discoveryStopwatch.Elapsed;
 
             // Collecting Total Time Taken
             discoveryCompletePayload.Metrics[TelemetryDataConstants.TimeTakenInSecForDiscovery] = discoveryFinalTimeTakenForDesignMode.TotalSeconds;
@@ -514,6 +515,6 @@ public sealed class DiscoveryRequest : IDiscoveryRequest, ITestDiscoveryEventsHa
     /// <summary>
     /// Discovery Start Time
     /// </summary>
-    private DateTime _discoveryStartTime;
+    private Stopwatch _discoveryStopwatch = new();
 
 }

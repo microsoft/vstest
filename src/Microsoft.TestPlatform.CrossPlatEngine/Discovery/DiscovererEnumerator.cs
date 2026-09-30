@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
@@ -124,10 +125,10 @@ internal class DiscovererEnumerator
     private void LoadTestsFromAnExtension(string extensionAssembly, IEnumerable<string> sources, IRunSettings? settings, string? testCaseFilter, IMessageLogger logger)
     {
         // Stopwatch to collect metrics
-        var timeStart = DateTime.UtcNow;
+        var loadStopwatch = Stopwatch.StartNew();
 
         var discovererToSourcesMap = GetDiscovererToSourcesMap(extensionAssembly, sources, logger, _assemblyProperties);
-        var totalAdapterLoadTIme = DateTime.UtcNow - timeStart;
+        var totalAdapterLoadTIme = loadStopwatch.Elapsed;
 
         // Collecting Data Point for TimeTaken to Load Adapters
         _requestData.MetricsCollection.Add(TelemetryDataConstants.TimeTakenToLoadAdaptersInSec, totalAdapterLoadTIme.TotalSeconds);
@@ -219,12 +220,12 @@ internal class DiscovererEnumerator
             }
 
             var currentTotalTests = _discoveryResultCache.TotalDiscoveredTests;
-            var newTimeStart = DateTime.UtcNow;
+            var runStopwatch = Stopwatch.StartNew();
 
             _testPlatformEventSource.AdapterDiscoveryStart(discoverer.Metadata.DefaultExecutorUri.AbsoluteUri);
             discoverer.Value.DiscoverTests(discovererToSourcesMap[discoverer], context, logger, discoverySink);
 
-            var totalAdapterRunTime = DateTime.UtcNow - newTimeStart;
+            var totalAdapterRunTime = runStopwatch.Elapsed;
 
             _testPlatformEventSource.AdapterDiscoveryStop(_discoveryResultCache.TotalDiscoveredTests -
                                                          currentTotalTests);
