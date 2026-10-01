@@ -209,18 +209,20 @@ public class EventLogDataCollector : DataCollector
     /// </returns>
     internal string WriteEventLogs(List<EventLogEntry> eventLogEntries, int maxLogEntries, DataCollectionContext dataCollectionContext, TimeSpan requestedDuration, DateTime timeRequestReceived)
     {
-        // Generate a unique but friendly Directory name in the temp directory
+        // Generate a unique, unpredictable directory name in the temp directory. Avoid
+        // machine-name + timestamp based naming, which is predictable and could allow
+        // other local users to pre-create or race the directory.
         string eventLogDirName = string.Format(
             CultureInfo.InvariantCulture,
-            "{0}-{1}-{2:yyyy}{2:MM}{2:dd}-{2:HH}{2:mm}{2:ss}.{2:fff}",
+            "{0}-{1}",
             "Event Log",
-            Environment.MachineName,
-            DateTime.UtcNow);
+            Guid.NewGuid());
 
         string eventLogDirPath = Path.Combine(Path.GetTempPath(), eventLogDirName);
 
         // Create the directory
         _fileHelper.CreateDirectory(eventLogDirPath);
+        PlatformFileHelper.SetOwnerOnlyUnixDirectoryPermissions(eventLogDirPath);
 
         string eventLogBasePath = Path.Combine(eventLogDirPath, EventLogFileName);
         bool unusedFilenameFound = false;

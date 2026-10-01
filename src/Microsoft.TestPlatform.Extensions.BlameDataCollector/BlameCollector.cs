@@ -713,6 +713,7 @@ public class BlameCollector : DataCollector, ITestExecutionEnvironmentSpecifier
             var temp = Environment.GetEnvironmentVariable("VSTEST_DUMP_TEMP_PATH") ?? Environment.GetEnvironmentVariable("AGENT_TEMPDIRECTORY") ?? Path.GetTempPath();
             _tempDirectory = Path.Combine(temp, Guid.NewGuid().ToString());
             Directory.CreateDirectory(_tempDirectory);
+            PlatformFileHelper.SetOwnerOnlyUnixDirectoryPermissions(_tempDirectory);
             return _tempDirectory;
         }
 

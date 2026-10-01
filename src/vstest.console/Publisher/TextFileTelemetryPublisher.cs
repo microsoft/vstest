@@ -65,6 +65,7 @@ public class TextFileTelemetryPublisher : IMetricsPublisher
         if (!fileHelper.DirectoryExists(resultDirectory))
         {
             fileHelper.CreateDirectory(resultDirectory);
+            PlatformFileHelper.SetOwnerOnlyUnixDirectoryPermissions(resultDirectory);
         }
 
         var telemetryData = string.Join(";", metrics.Select(x => x.Key + "=" + x.Value));

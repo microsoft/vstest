@@ -1,4 +1,6 @@
 ﻿#nullable enable
+Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.PlatformFileHelper
+static Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.PlatformFileHelper.SetOwnerOnlyUnixDirectoryPermissions(string! path) -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.StartTestSessionStart() -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.StartTestSessionStop() -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.StopTestSessionStart() -> void

@@ -16,6 +16,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
+using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector;
@@ -103,7 +104,8 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
 
         _messageSink = messageSink;
 
-        if (outputDirectory.IsNullOrEmpty())
+        bool usingDefaultTempDirectory = outputDirectory.IsNullOrEmpty();
+        if (usingDefaultTempDirectory)
         {
             SessionOutputDirectory = Path.Combine(Path.GetTempPath(), DefaultOutputDirectoryName, id.Id.ToString());
         }
@@ -121,6 +123,14 @@ internal class DataCollectionAttachmentManager : IDataCollectionAttachmentManage
             if (!Directory.Exists(SessionOutputDirectory))
             {
                 Directory.CreateDirectory(SessionOutputDirectory);
+            }
+
+            // The default output directory is under the shared OS temp path, which is
+            // world-writable on Unix. Restrict it to the owning user only. Custom,
+            // user-specified output directories are left untouched.
+            if (usingDefaultTempDirectory)
+            {
+                PlatformFileHelper.SetOwnerOnlyUnixDirectoryPermissions(SessionOutputDirectory);
             }
         }
         catch (UnauthorizedAccessException accessException)
