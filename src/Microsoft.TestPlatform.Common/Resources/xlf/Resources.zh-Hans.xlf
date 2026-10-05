@@ -187,9 +187,9 @@
         <target state="translated">找不到友好名称为“{0}”的 datacollector。</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToLoadAdapaterFile">
-        <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
-        <target state="translated">未能从文件 "{0}" 加载扩展。有关详细信息，请使用 /diag。</target>
+      <trans-unit id="FailedToLoadExtensionFile">
+        <source>Failed to load extensions from file '{0}'. Reason: {1}</source>
+        <target state="new">Failed to load extensions from file '{0}'. Reason: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="AccessDenied">
