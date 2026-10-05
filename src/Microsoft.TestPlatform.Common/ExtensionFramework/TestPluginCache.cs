@@ -264,6 +264,11 @@ public class TestPluginCache
         _filterableExtensionPaths?.Clear();
         _unfilterableExtensionPaths?.Clear();
         TestExtensions?.InvalidateCache();
+
+        // Extensions are discovered from scratch after this, so a load failure the user was already told
+        // about is news again. Without this the runner reports a broken extension on the first request and
+        // then stays quiet about it for the rest of a design mode session that can last hours.
+        TestPluginDiscoverer.ClearReportedFiles();
     }
 
     /// <summary>
