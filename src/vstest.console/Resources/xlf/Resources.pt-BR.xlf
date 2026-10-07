@@ -498,6 +498,15 @@ Altere o prefixo de nível de diagnóstico do agente de console, como mostrado a
         <target state="translated">O pacote do aplicativo '{0}' não tem o ponto de entrada do executor de teste. Para executar testes de unidade para aplicativos da Windows Store, crie o pacote do aplicativo usando o projeto de Biblioteca de Teste de Unidade de aplicativo da Windows Store.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">A cobertura do teste não está disponível para aplicativos da Windows Store. Análise de cobertura de código ignorada nesta execução de teste.</target>

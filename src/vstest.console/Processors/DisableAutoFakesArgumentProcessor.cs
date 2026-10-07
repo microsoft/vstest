@@ -46,6 +46,8 @@ internal class DisableAutoFakesArgumentProcessorCapabilities : BaseArgumentProce
     public override ArgumentProcessorPriority Priority => ArgumentProcessorPriority.Normal;
 
     public override HelpContentPriority HelpPriority => HelpContentPriority.DisableAutoFakesArgumentProcessorHelpPriority;
+
+    public override string HelpContentResourceName => CommandLineResources.DisableAutoFakesArgumentHelp;
 }
 
 internal class DisableAutoFakesArgumentExecutor : IArgumentExecutor

@@ -500,6 +500,15 @@
         <target state="translated">El paquete de la aplicación '{0}' no tiene un punto de entrada de ejecutor de pruebas. Para ejecutar pruebas unitarias de aplicaciones de la Tienda Windows, cree un paquete de aplicación usando el proyecto Biblioteca de pruebas unitarias para aplicaciones de la Tienda Windows.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">La cobertura de código no está disponible para aplicaciones de la Tienda Windows. Se omitirá el análisis de cobertura de código para esta serie de pruebas.</target>

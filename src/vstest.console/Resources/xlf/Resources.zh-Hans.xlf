@@ -498,6 +498,15 @@
         <target state="translated">应用包“{0}”没有测试执行器入口点。为对 Windows 应用商店应用运行单元测试，使用 Windows 应用商店应用单元测试库项目创建应用包。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">代码覆盖率不适用于 Windows 应用商店应用。已对此测试运行跳过代码覆盖率分析。</target>

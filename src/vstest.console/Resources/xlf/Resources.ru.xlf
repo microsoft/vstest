@@ -498,6 +498,15 @@
         <target state="translated">У пакета приложения "{0}" нет точки входа исполнителя тестов. Для запуска модульных тестов приложений для Магазина Windows создайте пакет приложения с помощью проекта библиотеки модульных тестов приложений для Магазина Windows.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">Покрытие кода недоступно для приложений для Магазина Windows. Анализ покрытия кода пропущен для этого тестового запуска.</target>

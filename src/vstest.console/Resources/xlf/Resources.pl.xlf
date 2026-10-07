@@ -498,6 +498,15 @@
         <target state="translated">Pakiet aplikacji „{0}” nie ma punktu wejścia modułu wykonywania testów. Aby uruchamiać testy jednostkowe dla aplikacji ze Sklepu Windows, utwórz pakiet aplikacji za pomocą projektu biblioteki testów jednostkowych aplikacji ze Sklepu Windows.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">Pokrycie kodu nie jest dostępne dla aplikacji ze Sklepu Windows. Pominięto analizę pokrycia kodu dla tego przebiegu testu.</target>

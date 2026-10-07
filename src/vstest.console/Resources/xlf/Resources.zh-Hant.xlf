@@ -498,6 +498,15 @@
         <target state="translated">應用程式套件 '{0}' 沒有測試執行程式進入點。若要執行 Windows 市集應用程式的單元測試，請使用 Windows 市集應用程式單元測試程式庫專案建立應用程式套件。</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">Windows 市集應用程式無法使用程式碼涵蓋範圍。將略過這個測試回合的程式碼涵蓋範圍分析。</target>

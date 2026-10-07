@@ -29,6 +29,7 @@ public class DisableAutoFakesArgumentProcessorTests
         Assert.IsNull(_disableAutoFakesArgumentProcessor.Metadata.Value.ShortCommandName);
         Assert.AreEqual(ArgumentProcessorPriority.Normal, _disableAutoFakesArgumentProcessor.Metadata.Value.Priority);
         Assert.AreEqual(HelpContentPriority.DisableAutoFakesArgumentProcessorHelpPriority, _disableAutoFakesArgumentProcessor.Metadata.Value.HelpPriority);
+        Assert.IsNotNull(_disableAutoFakesArgumentProcessor.Metadata.Value.HelpContentResourceName);
     }
 
 

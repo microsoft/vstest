@@ -498,6 +498,15 @@
         <target state="translated">Le package d'application '{0}' n'a pas de point d'entrée pour l'exécuteur de tests. Pour exécuter les tests unitaires des applications du Windows Store, créez un package de l'application à l'aide du projet de bibliothèque de tests unitaires d'applications du Windows Store.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">La couverture du code n'est pas disponible pour les applications du Windows Store. L'analyse de la couverture du code a été ignorée pour cette série de tests.</target>

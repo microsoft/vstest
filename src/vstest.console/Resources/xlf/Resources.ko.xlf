@@ -498,6 +498,15 @@
         <target state="translated">앱 패키지 '{0}'에 테스트 Executor 진입점이 없습니다. Windows 스토어 앱에 대한 단위 테스트를 실행하려면 Windows 스토어 앱 단위 테스트 라이브러리 프로젝트를 사용하여 앱 패키지를 만드세요.</target>
         <note />
       </trans-unit>
+      <trans-unit id="DisableAutoFakesArgumentHelp">
+        <source>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</source>
+        <target state="new">--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</target>
+        <note />
+      </trans-unit>
       <trans-unit id="DisablingCodeCoverageInAppContainerTestExecution">
         <source>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</source>
         <target state="translated">Windows 스토어 앱에서는 코드 검사를 사용할 수 없습니다. 이 테스트 실행에 대해 코드 검사 분석을 건너뛰었습니다.</target>

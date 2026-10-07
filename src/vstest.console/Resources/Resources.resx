@@ -197,6 +197,11 @@
   <data name="DesignModeClientTimeoutError" xml:space="preserve">
     <value>Timeout to connect or process request for DesignModeClient on port: {0}</value>
   </data>
+  <data name="DisableAutoFakesArgumentHelp" xml:space="preserve">
+    <value>--DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+      Disable the auto-generation of fakes configuration.
+      Example: /DisableAutoFakes:true</value>
+  </data>
   <data name="DisablingCodeCoverageInAppContainerTestExecution" xml:space="preserve">
     <value>Code coverage is not available for Windows Store apps. Code coverage analysis skipped for this test run.</value>
   </data>

@@ -356,6 +356,17 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.Resources {
         
         /// <summary>
         ///   Looks up a localized string similar to --DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
+        ///       Disable the auto-generation of fakes configuration.
+        ///       Example: /DisableAutoFakes:true.
+        /// </summary>
+        internal static string DisableAutoFakesArgumentHelp {
+            get {
+                return ResourceManager.GetString("DisableAutoFakesArgumentHelp", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to --DisableAutoFakes|/DisableAutoFakes:&lt;true/false&gt;
         ///     Example: /DisableAutoFakes:true.
         /// </summary>
         internal static string DisableAutoFakesUsage {
