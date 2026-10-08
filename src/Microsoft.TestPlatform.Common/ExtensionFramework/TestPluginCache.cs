@@ -45,6 +45,8 @@ public class TestPluginCache
 
     private static TestPluginCache? s_instance;
 
+    private static readonly object InstanceLockObject = new();
+
     private readonly List<string> _defaultExtensionPaths = new();
 
     /// <summary>
@@ -63,7 +65,17 @@ public class TestPluginCache
     {
         get
         {
-            return s_instance ??= new TestPluginCache();
+            if (s_instance is not null)
+            {
+                return s_instance;
+            }
+
+            lock (InstanceLockObject)
+            {
+                s_instance ??= new TestPluginCache();
+            }
+
+            return s_instance;
         }
 
         internal set

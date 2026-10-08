@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -25,6 +26,8 @@ public class TestPluginCacheTests
 
     private readonly TestableTestPluginCache _testablePluginCache;
 
+    public TestContext TestContext { get; set; }
+
     public TestPluginCacheTests()
     {
         // Reset the singleton.
@@ -41,6 +44,25 @@ public class TestPluginCacheTests
     public void InstanceShouldNotReturnANull()
     {
         Assert.IsNotNull(TestPluginCache.Instance);
+    }
+
+    [TestMethod]
+    public void InstanceShouldReturnSameObjectOnConcurrentFirstAccess()
+    {
+        // Reset the singleton so the first access below races to construct it.
+        TestPluginCache.Instance = null;
+
+        const int taskCount = 50;
+        var tasks = new Task<TestPluginCache>[taskCount];
+        for (int i = 0; i < taskCount; i++)
+        {
+            tasks[i] = Task.Run(() => TestPluginCache.Instance, TestContext.CancellationToken);
+        }
+
+        Task.WaitAll(tasks, TestContext.CancellationToken);
+
+        var first = tasks[0].Result;
+        Assert.IsTrue(tasks.All(t => ReferenceEquals(t.Result, first)), "All concurrent callers must observe the exact same TestPluginCache instance.");
     }
 
     [TestMethod]

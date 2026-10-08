@@ -17,11 +17,28 @@ internal class TestPluginManager
 {
     private static TestPluginManager? s_instance;
 
+    private static readonly object InstanceLockObject = new();
+
     /// <summary>
     /// Gets the singleton instance of TestPluginManager.
     /// </summary>
     public static TestPluginManager Instance
-        => s_instance ??= new TestPluginManager();
+    {
+        get
+        {
+            if (s_instance is not null)
+            {
+                return s_instance;
+            }
+
+            lock (InstanceLockObject)
+            {
+                s_instance ??= new TestPluginManager();
+            }
+
+            return s_instance;
+        }
+    }
 
     /// <summary>
     /// Gets data type of test extension with given assembly qualified name.

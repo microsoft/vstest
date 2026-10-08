@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 using Microsoft.TestPlatform.TestUtilities;
 using Microsoft.VisualStudio.TestPlatform.Common;
@@ -21,6 +22,24 @@ namespace TestPlatform.Common.UnitTests.ExtensionFramework;
 [TestClass]
 public class TestPluginManagerTests
 {
+    public TestContext TestContext { get; set; }
+
+    [TestMethod]
+    public void InstanceShouldReturnSameObjectOnConcurrentFirstAccess()
+    {
+        const int taskCount = 50;
+        var tasks = new Task<TestPluginManager>[taskCount];
+        for (int i = 0; i < taskCount; i++)
+        {
+            tasks[i] = Task.Run(() => TestPluginManager.Instance, TestContext.CancellationToken);
+        }
+
+        Task.WaitAll(tasks, TestContext.CancellationToken);
+
+        var first = tasks[0].Result;
+        Assert.IsTrue(tasks.All(t => ReferenceEquals(t.Result, first)), "All concurrent callers must observe the exact same TestPluginManager instance.");
+    }
+
     [TestMethod]
     public void GetTestExtensionTypeShouldReturnExtensionType()
     {
