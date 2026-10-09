@@ -141,6 +141,15 @@ public class TestRequestSenderTests
         _mockServer.Verify(mc => mc.Stop(), Times.Once);
     }
 
+    // Regression test for #16560 — TestRequestSender leaked the ManualResetEventSlim
+    // fields (_connected, _clientExited) because Dispose() never released them.
+    [TestMethod]
+    public void DisposeCalledTwiceShouldNotThrow()
+    {
+        _testRequestSender.Dispose();
+        _testRequestSender.Dispose();
+    }
+
     [TestMethod]
     public void EndSessionShouldSendSessionEndMessage()
     {

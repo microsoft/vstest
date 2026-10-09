@@ -197,6 +197,7 @@ public partial class ProcessHelper : IProcessHelper
                         // exit callback consumes it. WaitForExit(timeout)/WaitForExitAsync do not guarantee
                         // the ErrorDataReceived callbacks have run.
                         WaitForErrorStreamToDrain(errorStreamClosed, timeout, stopwatch.ElapsedMilliseconds);
+                        errorStreamClosed?.Dispose();
                     }
 
                     // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.

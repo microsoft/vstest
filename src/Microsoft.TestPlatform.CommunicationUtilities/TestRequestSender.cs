@@ -311,6 +311,7 @@ public class TestRequestSender : ITestRequestSender
         finally
         {
             _channel.MessageReceived.Unsubscribe(onMessageReceived);
+            protocolNegotiated.Dispose();
         }
     }
 
@@ -542,6 +543,8 @@ public class TestRequestSender : ITestRequestSender
         }
 
         _communicationEndpoint.Stop();
+        _connected.Dispose();
+        _clientExited.Dispose();
         GC.SuppressFinalize(this);
     }
 

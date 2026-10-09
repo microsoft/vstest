@@ -116,4 +116,29 @@ public class TrackableEventRegressionTests
             // Expected — ManualResetEventSlim.Wait throws on cancellation
         }
     }
+
+    // Regression test for #16560 — TrackableEvent previously leaked its backing
+    // ManualResetEventSlim because the class wasn't disposable (CA1001 was suppressed).
+    [TestMethod]
+    public void Dispose_ShouldDisposeUnderlyingWaitHandle()
+    {
+        var trackableEvent = new TrackableEvent<MessageReceivedEventArgs>();
+
+        trackableEvent.Dispose();
+
+        // The underlying ManualResetEventSlim is disposed, so any further wait should
+        // throw ObjectDisposedException instead of silently leaking the handle.
+        using var cts = new CancellationTokenSource();
+        Assert.ThrowsExactly<ObjectDisposedException>(() => trackableEvent.WaitForSubscriber(50, cts.Token));
+    }
+
+    // Regression test for #16560
+    [TestMethod]
+    public void Dispose_CalledTwice_ShouldNotThrow()
+    {
+        var trackableEvent = new TrackableEvent<MessageReceivedEventArgs>();
+
+        trackableEvent.Dispose();
+        trackableEvent.Dispose();
+    }
 }

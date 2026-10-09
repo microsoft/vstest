@@ -118,6 +118,8 @@ public class LengthPrefixCommunicationChannel : ICommunicationChannel
             // We don't own the underlying stream lifecycle so it's possible that it's already disposed.
         }
 
+        MessageReceived.Dispose();
+
         GC.SuppressFinalize(this);
     }
 }

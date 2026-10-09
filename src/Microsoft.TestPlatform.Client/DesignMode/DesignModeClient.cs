@@ -304,7 +304,7 @@ public class DesignModeClient : IDesignModeClient
     {
         lock (_lockObject)
         {
-            var waitHandle = new AutoResetEvent(false);
+            using var waitHandle = new AutoResetEvent(false);
             Message? ackMessage = null;
             onCustomTestHostLaunchAckReceived = (ackRawMessage) =>
             {
@@ -346,7 +346,7 @@ public class DesignModeClient : IDesignModeClient
 
         lock (_lockObject)
         {
-            var waitHandle = new AutoResetEvent(false);
+            using var waitHandle = new AutoResetEvent(false);
             Message? ackMessage = null;
             onAttachDebuggerAckRecieved = ackRawMessage =>
             {

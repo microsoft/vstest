@@ -1,1 +1,2 @@
 #nullable enable
+Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Interfaces.TrackableEvent<T>.Dispose() -> void

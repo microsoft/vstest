@@ -30,11 +30,10 @@ public interface ICommunicationChannel : IDisposable
     Task NotifyDataAvailable(CancellationToken cancellationToken);
 }
 
-#pragma warning disable CA1001 // Types that own disposable fields should be disposable
-public class TrackableEvent<T>
-#pragma warning restore CA1001 // Types that own disposable fields should be disposable
+public class TrackableEvent<T> : IDisposable
 {
     private readonly ManualResetEventSlim _slim;
+    private bool _isDisposed;
 
     internal event EventHandler<T>? Event;
 
@@ -73,5 +72,17 @@ public class TrackableEvent<T>
         {
             _slim.Reset();
         }
+    }
+
+    public void Dispose()
+    {
+        if (_isDisposed)
+        {
+            return;
+        }
+
+        _slim.Dispose();
+        _isDisposed = true;
+        GC.SuppressFinalize(this);
     }
 }
