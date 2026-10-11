@@ -169,6 +169,9 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
         {
             _communicationEndPoint?.Stop();
             _channel?.Dispose();
+            _requestSenderConnected.Dispose();
+            _testHostManagerFactoryReady.Dispose();
+            _sessionCompleted.Dispose();
         }
 
         _isDisposed = true;

@@ -109,7 +109,16 @@ public partial class ProcessHelper : IProcessHelper
                 {
                     if (args.Data is null)
                     {
-                        errorStreamClosed.Set();
+                        // The event may have already been disposed if WaitForErrorStreamToDrain's
+                        // bounded budget expired before this callback ran (e.g. a grandchild process
+                        // keeps the pipe open past our wait window).
+                        try
+                        {
+                            errorStreamClosed.Set();
+                        }
+                        catch (ObjectDisposedException)
+                        {
+                        }
                     }
 
                     errorCallback(sender as Process, args.Data);
@@ -197,6 +206,7 @@ public partial class ProcessHelper : IProcessHelper
                         // exit callback consumes it. WaitForExit(timeout)/WaitForExitAsync do not guarantee
                         // the ErrorDataReceived callbacks have run.
                         WaitForErrorStreamToDrain(errorStreamClosed, timeout, stopwatch.ElapsedMilliseconds);
+                        errorStreamClosed?.Dispose();
                     }
 
                     // If exit callback has code that access Process object, ensure that the exceptions handling should be done properly.
