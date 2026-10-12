@@ -67,13 +67,13 @@ internal class TestRunAttachmentsProcessingManager : ITestRunAttachmentsProcessi
             var cancelAttachmentProcessingCompletionSource = new TaskCompletionSource<Collection<AttachmentSet>>();
             using (cancellationToken.Register(() => cancelAttachmentProcessingCompletionSource.TrySetCanceled()))
             {
-                Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, localAttachments, invokedDataCollector, eventHandler, cancellationToken));
+                Task<Collection<AttachmentSet>> task = Task.Run(async () => await ProcessAttachmentsAsync(runSettingsXml, localAttachments, invokedDataCollector, eventHandler, cancellationToken).ConfigureAwait(false));
 
                 var completedTask = await Task.WhenAny(task, cancelAttachmentProcessingCompletionSource.Task).ConfigureAwait(false);
 
                 if (completedTask == task)
                 {
-                    return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, null), await task, stopwatch, eventHandler);
+                    return FinalizeOperation(requestData, new TestRunAttachmentsProcessingCompleteEventArgs(false, null), await task.ConfigureAwait(false), stopwatch, eventHandler);
                 }
                 else
                 {

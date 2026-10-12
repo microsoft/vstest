@@ -143,7 +143,7 @@ public partial class ProcessHelper : IProcessHelper
                             // behavior using the parameterless 'WaitForExit()' combined with an awaited Task.Run call.
                             var cts = new CancellationTokenSource(timeout);
 #if NET
-                            await p.WaitForExitAsync(cts.Token);
+                            await p.WaitForExitAsync(cts.Token).ConfigureAwait(false);
 #else
                             // NOTE: In case we run on Windows we must call 'WaitForExit(timeout)' instead of calling
                             // the parameterless overload. The reason for this requirement stems from the behavior of

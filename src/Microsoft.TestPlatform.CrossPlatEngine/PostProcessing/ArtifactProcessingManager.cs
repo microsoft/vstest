@@ -149,7 +149,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         {
             try
             {
-                await DataCollectorsAttachmentsPostProcessing(testArtifacts);
+                await DataCollectorsAttachmentsPostProcessing(testArtifacts).ConfigureAwait(false);
             }
             finally
             {
@@ -186,7 +186,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         {
             using var artifactStream = _fileHelper.GetStream(runsettingsFile, FileMode.Open, FileAccess.Read);
             using var streamReader = new StreamReader(artifactStream);
-            runsettingsXml = await streamReader.ReadToEndAsync();
+            runsettingsXml = await streamReader.ReadToEndAsync().ConfigureAwait(false);
             EqtTrace.Verbose($"ArtifactProcessingManager.MergeDataCollectorAttachments: Chosen runsettings \n{runsettingsXml}");
         }
         else
@@ -202,7 +202,7 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         {
             using var artifactStream = _fileHelper.GetStream(artifact.FileName, FileMode.Open, FileAccess.Read);
             using var streamReader = new StreamReader(artifactStream);
-            string executionCompleteMessage = await streamReader.ReadToEndAsync();
+            string executionCompleteMessage = await streamReader.ReadToEndAsync().ConfigureAwait(false);
             EqtTrace.Verbose($"ArtifactProcessingManager.MergeDataCollectorAttachments: ExecutionComplete message \n{executionCompleteMessage}");
             TestRunCompleteEventArgs? eventArgs = _dataSerialized.DeserializePayload<TestRunCompleteEventArgs>(_dataSerialized.DeserializeMessage(executionCompleteMessage));
             foreach (var invokedDataCollector in eventArgs?.InvokedDataCollectors ?? Enumerable.Empty<InvokedDataCollector>())

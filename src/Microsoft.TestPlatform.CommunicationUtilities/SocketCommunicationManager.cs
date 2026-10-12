@@ -118,7 +118,7 @@ public class SocketCommunicationManager : ICommunicationManager
 
         _clientConnectedEvent.Reset();
 
-        var client = await _tcpListener.AcceptTcpClientAsync();
+        var client = await _tcpListener.AcceptTcpClientAsync().ConfigureAwait(false);
         _socket = client.Client;
         _socket.NoDelay = true;
 
@@ -184,7 +184,7 @@ public class SocketCommunicationManager : ICommunicationManager
             try
             {
                 EqtTrace.Verbose("SocketCommunicationManager : SetupClientAsync : Attempting to connect to the server.");
-                await _tcpClient.ConnectAsync(endpoint.Address, endpoint.Port);
+                await _tcpClient.ConnectAsync(endpoint.Address, endpoint.Port).ConfigureAwait(false);
 
                 if (_tcpClient.Connected)
                 {
@@ -303,7 +303,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </returns>
     public async Task<Message?> ReceiveMessageAsync(CancellationToken cancellationToken)
     {
-        var rawMessage = await ReceiveRawMessageAsync(cancellationToken);
+        var rawMessage = await ReceiveRawMessageAsync(cancellationToken).ConfigureAwait(false);
         return !rawMessage.IsNullOrEmpty()
             ? _dataSerializer.DeserializeMessage(rawMessage)
             : null;
@@ -333,7 +333,7 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </returns>
     public async Task<string?> ReceiveRawMessageAsync(CancellationToken cancellationToken)
     {
-        var str = await Task.Run(() => TryReceiveRawMessage(cancellationToken));
+        var str = await Task.Run(() => TryReceiveRawMessage(cancellationToken)).ConfigureAwait(false);
         return str;
     }
 
