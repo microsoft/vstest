@@ -163,6 +163,7 @@ extends:
                   displayName: Publish ReleasePackages
                   targetPath: '$(Build.ArtifactStagingDirectory)\ReleasePackages'
                   artifactName: ReleasePackages
+                  sbomEnabled: false
                   condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
             steps:
             # This steps help to understand versions of .NET runtime installed on the machine,
