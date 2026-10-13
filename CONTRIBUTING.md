@@ -109,6 +109,22 @@ You can use those packages in your own test projects to test your changes, by im
 
 Before using these packages directly, consider writing an Integration test instead, integration tests already do lot of the work for you automatically, and you can debug there easily as well.
 
+### Official release packages
+
+In `azure-pipelines-official.yml`, successful internal builds with **Produce RTM version**
+enabled publish an additional pipeline artifact named `ReleasePackages` from the `Windows` job.
+Pull-request builds do not publish it.
+
+`ReleasePackages` contains only the final signed `.nupkg` files from
+`artifacts\packages\Release\Shipping`, flat at the artifact root. Symbols packages,
+non-shipping packages, and other files are excluded. A missing or empty shipping
+package folder, a failed copy, or a failed upload fails the job.
+
+The existing `PackageArtifacts` artifact and its consumers remain unchanged.
+Release automation can download `ReleasePackages` from a successful RTM run without
+rebuilding or changing the package files. Keep the artifact name, producer job, and
+flat layout stable for those consumers.
+
 ## Debugging Integration Tests
 
 Integration tests (in `test/Microsoft.TestPlatform.Acceptance.IntegrationTests`) run vstest.console and testhost as separate processes. You can attach Visual Studio to those processes automatically by using the `DebugInfo` properties on the test data source attributes.
