@@ -29,6 +29,36 @@ public sealed class DotnetHostHelperTest : IDisposable
     private readonly MockMuxerHelper _muxerHelper = new();
 
     [TestMethod]
+    public void GetDotnetPath_ResolvesFromPathEnvironmentVariableHelper()
+    {
+        // Arrange: verifies TryGetExecutablePath reads PATH through the injected
+        // IEnvironmentVariableHelper abstraction rather than the real process environment.
+        var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
+        _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("PATH")).Returns("/fake/first:/fake/second");
+        _fileHelper.Setup(x => x.Exists("/fake/second/dotnet")).Returns(true);
+
+        // Act
+        var found = dotnetHostHelper.GetDotnetPath();
+
+        // Assert
+        Assert.AreEqual("/fake/second/dotnet", found);
+        _environmentVariableHelper.Verify(x => x.GetEnvironmentVariable("PATH"), Times.Once);
+    }
+
+    [TestMethod]
+    public void GetDotnetPath_NotFoundOnPath_Throws()
+    {
+        // Arrange
+        var dotnetHostHelper = new DotnetHostHelper(_fileHelper.Object, _environmentHelper.Object, _windowsRegistrytHelper.Object, _environmentVariableHelper.Object, _processHelper.Object);
+        _environmentHelper.SetupGet(x => x.OperatingSystem).Returns(PlatformOperatingSystem.Unix);
+        _environmentVariableHelper.Setup(x => x.GetEnvironmentVariable("PATH")).Returns("/fake/first:/fake/second");
+
+        // Act & Assert
+        Assert.ThrowsExactly<FileNotFoundException>(() => dotnetHostHelper.GetDotnetPath());
+    }
+
+    [TestMethod]
     public void GetDotnetPathByArchitecture_SameArchitecture()
     {
         // Arrange

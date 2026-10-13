@@ -99,7 +99,7 @@ internal class TestRequestManager : ITestRequestManager
             TestPlatformEventSource.Instance,
             new InferHelper(AssemblyMetadataProvider.Instance),
             MetricsPublisherFactory.GetMetricsPublisher(
-                IsTelemetryOptedIn(),
+                IsTelemetryOptedIn(new EnvironmentVariableHelper()),
                 commandLineOptions.IsDesignMode),
             new ProcessHelper(),
             new TestRunAttachmentsProcessingManager(TestPlatformEventSource.Instance, new DataCollectorAttachmentsProcessorsFactory()),
@@ -1335,8 +1335,11 @@ internal class TestRequestManager : ITestRequestManager
     /// By Default opting out
     /// </summary>
     /// <returns>Returns Telemetry Opted out or not</returns>
-    private static bool IsTelemetryOptedIn()
-        => Environment.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")?.Equals("1", StringComparison.Ordinal) == true;
+    private bool IsTelemetryOptedIn()
+        => IsTelemetryOptedIn(_environmentVariableHelper);
+
+    private static bool IsTelemetryOptedIn(IEnvironmentVariableHelper environmentVariableHelper)
+        => environmentVariableHelper.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")?.Equals("1", StringComparison.Ordinal) == true;
 
     /// <summary>
     /// Log Command Line switches for Telemetry purposes

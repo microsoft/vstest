@@ -115,14 +115,6 @@ public class TestRequestManagerTests
         _mockProcessHelper.Setup(x => x.GetProcessName(It.IsAny<int>())).Returns("dotnet.exe");
     }
 
-    [TestCleanup]
-    public void Cleanup()
-    {
-
-        // Opt out the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "0");
-    }
-
     [TestMethod]
     public void TestRequestManagerShouldNotInitializeConsoleLoggerIfDesignModeIsSet()
     {
@@ -285,7 +277,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectMetrics()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -342,7 +334,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectTargetDeviceLocalMachineIfTargetDeviceStringisEmpty()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -387,7 +379,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectTargetDeviceIfTargetDeviceIsDevice()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -432,7 +424,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectTargetDeviceIfTargetDeviceIsEmulator()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -477,7 +469,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectCommands()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -534,7 +526,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectTestSettings()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -582,7 +574,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectVsmdiFile()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -630,7 +622,7 @@ public class TestRequestManagerTests
     public void DiscoverTestsShouldCollectTestRunConfigFile()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new DiscoveryRequestPayload()
         {
@@ -941,7 +933,7 @@ public class TestRequestManagerTests
     public void RunTestsShouldCollectCommands()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new TestRunRequestPayload()
         {
@@ -991,7 +983,7 @@ public class TestRequestManagerTests
     public void RunTestsShouldCollectTelemetryForLegacySettings()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new TestRunRequestPayload()
         {
@@ -1051,7 +1043,7 @@ public class TestRequestManagerTests
     public void RunTestsShouldCollectTelemetryForTestSettingsEmbeddedInsideRunSettings()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new TestRunRequestPayload()
         {
@@ -1093,7 +1085,7 @@ public class TestRequestManagerTests
     public void RunTestsShouldCollectMetrics()
     {
         // Opt in the Telemetry
-        Environment.SetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN", "1");
+        _mockEnvironmentVariableHelper.Setup(x => x.GetEnvironmentVariable("VSTEST_TELEMETRY_OPTEDIN")).Returns("1");
 
         var payload = new TestRunRequestPayload()
         {

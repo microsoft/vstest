@@ -110,7 +110,7 @@ public class DotnetHostHelper : IDotnetHostHelper
             executableBaseName += ".exe";
         }
 
-        var pathString = Environment.GetEnvironmentVariable("PATH")!;
+        var pathString = _environmentVariableHelper.GetEnvironmentVariable("PATH")!;
         foreach (string path in pathString.Split(Path.PathSeparator))
         {
             string exeFullPath = Path.Combine(path.Trim(), executableBaseName);
