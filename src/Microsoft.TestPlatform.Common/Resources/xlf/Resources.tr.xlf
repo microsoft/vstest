@@ -187,9 +187,9 @@
         <target state="translated">'{0}' kolay adına sahip bir datacollector bulunamadı.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToLoadAdapaterFile">
-        <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
-        <target state="translated">Uzantılar '{0}' dosyasından yüklenemedi. Daha fazla bilgi için lütfen /diag kullanın.</target>
+      <trans-unit id="FailedToLoadExtensionFile">
+        <source>Failed to load extensions from file '{0}'. Reason: {1}</source>
+        <target state="new">Failed to load extensions from file '{0}'. Reason: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="AccessDenied">

@@ -187,9 +187,9 @@
         <target state="translated">Não é possível localizar um datacollector com o nome amigável '{0}'.</target>
         <note />
       </trans-unit>
-      <trans-unit id="FailedToLoadAdapaterFile">
-        <source>Failed to load extensions from file '{0}'. Please use /diag for more information.</source>
-        <target state="translated">Falha ao carregar as extensões do arquivo '{0}'. Use /diag para obter mais informações.</target>
+      <trans-unit id="FailedToLoadExtensionFile">
+        <source>Failed to load extensions from file '{0}'. Reason: {1}</source>
+        <target state="new">Failed to load extensions from file '{0}'. Reason: {1}</target>
         <note />
       </trans-unit>
       <trans-unit id="AccessDenied">
