@@ -124,6 +124,13 @@ After packaging changes, regenerate `eng/expected-nupkg-file-counts.json` and `e
 - Doc-only PRs skip CI builds
 - Windows builds finish first (~15 min), macOS/Ubuntu take longer
 
+### Snap (branding to a new version)
+
+- After a snap, publishing from `main` breaks until dnceng adds the new `VS <version>` Maestro channel to the Arcade publishing configuration. Every official build of `main` fails at `Publish Using Darc`.
+- A red `Publish Using Darc` on `main` within a couple of days of a `Branding as <version>` commit is this, not a regression. It clears with no change in this repository.
+- The snap also leaves the new `rel/<version>` branch without a Maestro default channel, so its builds go green and publish nothing.
+- Full checklist: [docs/snap.md](docs/snap.md).
+
 ### Git Workflow
 
 - Never commit to `main`
