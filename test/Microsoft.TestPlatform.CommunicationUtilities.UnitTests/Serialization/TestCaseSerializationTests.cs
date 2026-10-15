@@ -54,8 +54,11 @@ public class TestCaseSerializationTests
         Assert.AreEqual(999, (int)properties[6]!["Value"]!);
 
         // Traits require special handling with TestPlatformContract resolver. It should be null without it.
-        Assert.AreEqual("TestObject.Traits", properties[7]!["Key"]!["Id"]!.ToString());
-        Assert.AreNotEqual(JTokenType.Null, properties[7]!["Value"]!.Type);
+        Assert.AreNotEqual(JTokenType.Null, FindProperty(properties, "TestObject.Traits")!["Value"]!.Type);
+
+        // This test case was given an id rather than letting the platform hash one, which is what
+        // an adapter assigning its own id does, so that is what travels.
+        Assert.AreEqual(TestCaseIdAlgorithms.SelfAssigned, FindProperty(properties, "TestCase.IdAlgorithm")!["Value"]!.ToString());
     }
 
     [TestMethod]
@@ -118,8 +121,7 @@ public class TestCaseSerializationTests
         // Use raw deserialization to validate basic properties
         var data = JObject.Parse(json);
         var properties = (JArray)data["Properties"]!;
-        Assert.AreEqual(@"TestObject.Traits", properties[7]!["Key"]!["Id"]!.ToString());
-        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[7]!["Value"]!.ToString(Newtonsoft.Json.Formatting.None));
+        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", FindProperty(properties, "TestObject.Traits")!["Value"]!.ToString(Newtonsoft.Json.Formatting.None));
     }
 
     [TestMethod]
@@ -150,8 +152,9 @@ public class TestCaseSerializationTests
         var properties = (JArray)data["Properties"]!;
 
         // Traits require special handling with TestPlatformContract resolver. It should be null without it.
-        Assert.AreEqual("TestObject.Traits", properties[0]!["Key"]!["Id"]!.ToString());
-        Assert.AreNotEqual(JTokenType.Null, properties[0]!["Value"]!.Type);
+        Assert.AreNotEqual(JTokenType.Null, FindProperty(properties, "TestObject.Traits")!["Value"]!.Type);
+
+        Assert.AreEqual(TestCaseIdAlgorithms.SelfAssigned, FindProperty(properties, "TestCase.IdAlgorithm")!["Value"]!.ToString());
 
         Assert.AreEqual("be78d6fc-61b0-4882-9d07-40d796fd96ce", data["Id"]!.ToString());
         Assert.AreEqual("sampleTestClass.sampleTestCase", data["FullyQualifiedName"]!.ToString());
@@ -191,8 +194,7 @@ public class TestCaseSerializationTests
         // Use raw deserialization to validate basic properties
         var data = JObject.Parse(json);
         var properties = (JArray)data["Properties"]!;
-        Assert.AreEqual(@"TestObject.Traits", properties[0]!["Key"]!["Id"]!.ToString());
-        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", properties[0]!["Value"]!.ToString(Newtonsoft.Json.Formatting.None));
+        Assert.AreEqual("[{\"Key\":\"t\",\"Value\":\"SDJDDHW>,:&^%//\\\\\\\\\\\\\\\\\"}]", FindProperty(properties, "TestObject.Traits")!["Value"]!.ToString(Newtonsoft.Json.Formatting.None));
     }
 
     [TestMethod]
@@ -251,6 +253,22 @@ public class TestCaseSerializationTests
     }
 
     #endregion
+
+    /// <summary>
+    /// Finds a serialized property by its id.
+    /// </summary>
+    /// <remarks>
+    /// Properties that are not core test case fields come out of a <c>ConcurrentDictionary</c>, whose
+    /// enumeration order is not stable between processes, so they have to be looked up by id rather
+    /// than by position. It only looked positional while there happened to be exactly one of them.
+    /// </remarks>
+    private static JToken FindProperty(JArray properties, string id)
+    {
+        var property = properties.FirstOrDefault(p => p["Key"]?["Id"]?.ToString() == id);
+
+        Assert.IsNotNull(property, $"No property with id '{id}' was serialized.");
+        return property;
+    }
 
     private static string Serialize<T>(T data, int version = 1)
     {
