@@ -257,9 +257,16 @@ public class RollingFileTraceListener : TextWriterTraceListener
                 {
                     _managedWriter = OpenTextWriter(_owner.TraceFileName);
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    // there's a slight chance of error here - abort if this occurs and just let TWTL handle it without attempting to roll
+                    // there's a slight chance of error here - abort if this occurs and just let TWTL handle it without attempting to roll.
+                    // Do not use EqtTrace here, this *is* the trace listener, so a recursive failure could occur. Write to
+                    // Trace/Debug instead, so a debugger or an attached System.Diagnostics listener still gets a signal that
+                    // log rolling silently stopped working. Reuse the existing failed-roll throttle so this doesn't spam on
+                    // every subsequent write while the file remains inaccessible.
+                    Trace.WriteLine($"RollingFileTraceListener: Failed to reopen trace file '{_owner.TraceFileName}'. {ex}");
+                    _lastRollFailed = true;
+                    _sinceLastRoll.Restart();
                     return false;
                 }
 

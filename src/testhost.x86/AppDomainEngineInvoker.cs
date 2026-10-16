@@ -281,9 +281,9 @@ internal class CustomAssemblySetup : MarshalByRefObject
                             assembly = Assembly.LoadFrom(testPlatformFilePath);
                             break;
                         }
-                        catch (Exception)
+                        catch (Exception ex)
                         {
-                            // ignore
+                            EqtTrace.Verbose("CurrentDomain_AssemblyResolve: Failed to load assembly from '{0}'. {1}", testPlatformFilePath, ex);
                         }
                     }
                 }

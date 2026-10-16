@@ -521,6 +521,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
 
             if (!TryCreateFileUri(path!, out Uri? fileUri))
             {
+                EqtTrace.Warning("MtpProxyExecutionManager.CollectAttachments: Skipping artifact '{0}' because its path could not be converted to a file URI.", path);
                 continue;
             }
 
@@ -548,6 +549,7 @@ internal sealed class MtpProxyExecutionManager : IProxyExecutionManager, IDispos
         }
         catch (Exception ex) when (ex is ArgumentException or UriFormatException or NotSupportedException or PathTooLongException)
         {
+            EqtTrace.Warning("MtpProxyExecutionManager.TryCreateFileUri: Failed to create a file URI for path '{0}'. {1}", path, ex);
             uri = null;
             return false;
         }

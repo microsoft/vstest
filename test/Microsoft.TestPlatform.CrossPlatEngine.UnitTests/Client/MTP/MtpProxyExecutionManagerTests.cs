@@ -3,7 +3,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 using Microsoft.Testing.Platform.ServerMode.Client;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Client.MTP;
@@ -163,5 +165,40 @@ public class MtpProxyExecutionManagerTests
             _client.ExitToken.IsCancellationRequested,
             "Exit must not be driven by the cancelled run token, or it would be skipped.");
         Assert.IsTrue(_client.Disposed, "The launched test application must never outlive a cancelled run.");
+    }
+
+    /// <summary>
+    /// <c>MtpProxyExecutionManager.TryCreateFileUri</c> used to drop a malformed attachment path
+    /// with zero diagnostic trail: the caller just <c>continue</c>d, silently removing the artifact from
+    /// the attachment set with no record of which artifact or why. A warning must now be traced so a
+    /// missing attachment is diagnosable from /diag logs instead of appearing to have never existed.
+    /// </summary>
+    [TestMethod]
+    [DataRow("")]
+    [DataRow("\0invalid\0path")]
+    public void TryCreateFileUriTracesAWarningWhenThePathCannotBeConvertedToAFileUri(string invalidPath)
+    {
+        EqtTrace.InitializeTrace(Path.Combine(Path.GetTempPath(), Path.GetRandomFileName() + ".log"), PlatformTraceLevel.Verbose);
+        try
+        {
+            MethodInfo tryCreateFileUri = typeof(MtpProxyExecutionManager).GetMethod(
+                "TryCreateFileUri",
+                BindingFlags.NonPublic | BindingFlags.Static)!;
+
+            object?[] args = [invalidPath, null];
+            var result = (bool)tryCreateFileUri.Invoke(null, args)!;
+
+            Assert.IsFalse(result, "A malformed path must not be converted to a file URI.");
+
+            string logContent = File.ReadAllText(EqtTrace.LogFile!);
+            Assert.Contains(
+                "TryCreateFileUri",
+                logContent,
+                "A warning identifying the failed conversion must be traced instead of being silently dropped.");
+        }
+        finally
+        {
+            EqtTrace.TraceLevel = PlatformTraceLevel.Off;
+        }
     }
 }
