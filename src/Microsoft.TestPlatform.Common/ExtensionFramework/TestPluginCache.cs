@@ -264,6 +264,13 @@ public class TestPluginCache
         _filterableExtensionPaths?.Clear();
         _unfilterableExtensionPaths?.Clear();
         TestExtensions?.InvalidateCache();
+
+        // Extensions are discovered from scratch after this, so a file that failed to load is worth another try,
+        // and a load failure the user was already told about is news again. Without this the runner reports a
+        // broken extension on the first request and then stays quiet about it for the rest of a design mode
+        // session that can last hours, and an extension whose missing dependency has since appeared stays
+        // skipped until the process exits.
+        TestPluginDiscoverer.ClearLoadFailures();
     }
 
     /// <summary>
@@ -472,7 +479,7 @@ public class TestPluginCache
         // BUT for some unknown reason the point 10 is not working as explained.
         // Satellite resolution should fallback to the NeutralResourcesLanguageAttribute
         // that we set to en-US but don't and we fail with FileNotFoundException.
-        _ = Resources.Resources.FailedToLoadAdapaterFile;
+        _ = Resources.Resources.FailedToLoadExtensionFile;
 
         IList<string> resolutionPaths = extensionAssembly.IsNullOrEmpty()
             ? GetDefaultResolutionPaths()
