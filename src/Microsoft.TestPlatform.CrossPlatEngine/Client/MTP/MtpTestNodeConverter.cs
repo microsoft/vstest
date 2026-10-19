@@ -124,6 +124,8 @@ internal static class MtpTestNodeConverter
         // Only a run that declared an algorithm needs an explicit assignment. Leaving the id alone
         // otherwise lets TestCase compute it lazily, exactly as it does on the classic path, so the
         // default stays in one place and this does not have to be revisited when the default moves.
+        // The test case has already recorded the runner's own algorithm for itself in that case,
+        // which is the one it will compute with, so nothing has to be recorded here either.
         // The seed is composed with TestIdSeed, from the test case's own properties rather than the
         // raw wire values, because this must hash precisely the bytes TestCase would have hashed
         // itself - notably ExecutorUri, which Uri normalizes (it lowercases the scheme and host, so
@@ -147,6 +149,14 @@ internal static class MtpTestNodeConverter
                 // decision rather than silently resolving to SHA1.
                 _ => throw new ArgumentOutOfRangeException(nameof(testCaseIdAlgorithm), algorithm, null),
             };
+
+            // This id was computed by the platform, with an algorithm that is known here, so say so.
+            // Assigning Id above has just recorded it as self assigned - which is what an assignment
+            // means everywhere else, and is what an adapter setting its own id has to keep meaning -
+            // so this correction has to come after it. Without it every test on this path would be
+            // reported as an id that never moves, and a consumer caching ids would never learn that
+            // they had.
+            testCase.SetIdAlgorithm(algorithm);
         }
 
         return testCase;
