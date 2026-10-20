@@ -33,4 +33,30 @@ public sealed class SessionId
     public override int GetHashCode() => Id.GetHashCode();
 
     public override string ToString() => Id.ToString("B");
+
+    /// <summary>
+    /// Compares the two session IDs for value equality.
+    /// </summary>
+    /// <param name="left">The left-hand session ID</param>
+    /// <param name="right">The right-hand session ID</param>
+    /// <returns>True if equal, false otherwise</returns>
+    public static bool operator ==(SessionId? left, SessionId? right)
+    {
+        return
+            ReferenceEquals(left, right) ||
+            left is not null &&
+            right is not null &&
+            left.Id == right.Id;
+    }
+
+    /// <summary>
+    /// Compares the two session IDs for value inequality.
+    /// </summary>
+    /// <param name="left">The left-hand session ID</param>
+    /// <param name="right">The right-hand session ID</param>
+    /// <returns>True if unequal, false otherwise</returns>
+    public static bool operator !=(SessionId? left, SessionId? right)
+    {
+        return !(left == right);
+    }
 }
