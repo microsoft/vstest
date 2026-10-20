@@ -1,1 +1,5 @@
 ﻿#nullable enable
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.SessionId.operator !=(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.SessionId? left, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.SessionId? right) -> bool
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.SessionId.operator ==(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.SessionId? left, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.SessionId? right) -> bool
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestExecId.operator !=(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestExecId? left, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestExecId? right) -> bool
+static Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestExecId.operator ==(Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestExecId? left, Microsoft.VisualStudio.TestPlatform.ObjectModel.DataCollection.TestExecId? right) -> bool
