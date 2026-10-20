@@ -36,9 +36,10 @@ public class TestHostContentTests : AcceptanceTestBase
         var arguments = $"""
             msbuild "{projectPath}" -t:GetTestHostContent -nologo -nr:false -p:Configuration=Release -p:Platform={platform} -p:PlatformTarget={platformTarget} -p:OS={os} -p:MSBuildEnableWorkloadResolver=false -p:MSBuildProjectExtensionsPath="{intermediatePath}{Path.AltDirectorySeparatorChar}" -p:TestHostPropsPath="{propsPath}"
             """;
+        var frameworks = new[] { "net11.0", "net11.0-android", "net11.0-windows" };
 
         // Check single-target evaluation as well as MSBuild's dispatch to each inner build.
-        foreach (var framework in new[] { "net11.0", "net11.0-android", "net11.0-windows" })
+        foreach (var framework in frameworks)
         {
             ExecuteApplication(
                 dotnetPath, $"{arguments} -p:SingleTargetFramework={framework}",
@@ -53,7 +54,7 @@ public class TestHostContentTests : AcceptanceTestBase
             out var multiTargetOutput, out var multiTargetError, out var multiTargetExitCode, workingDirectory: TempDirectory.Path);
 
         Assert.AreEqual(0, multiTargetExitCode, $"{multiTargetOutput}\n{multiTargetError}");
-        foreach (var framework in new[] { "net11.0", "net11.0-android", "net11.0-windows" })
+        foreach (var framework in frameworks)
         {
             AssertContent(framework);
         }
