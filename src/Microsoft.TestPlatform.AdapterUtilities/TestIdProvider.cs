@@ -27,6 +27,7 @@ public class TestIdProvider
     public TestIdProvider()
     {
         _sha = SHA1.Create();
+        // CodeQL [SM02196] SHA1 is used only to derive a non-security test identifier, never for integrity or authentication. It is being phased out: the xxHash128 provider (TestIdProviderXxHash128) is available behind an opt-in flag, will become the default, and SHA1 will then be removed.
     }
 
     /// <summary>
