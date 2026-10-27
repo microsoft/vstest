@@ -125,7 +125,7 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
         var report = Directory.GetFiles(deployment.Path, "*.cobertura.xml", SearchOption.AllDirectories).Single();
         var coverage = new XmlDocument();
         coverage.Load(report);
-        Assert.IsGreaterThan(0, int.Parse(coverage.DocumentElement!.GetAttribute("lines-covered"), System.Globalization.CultureInfo.InvariantCulture), report);
+        Assert.IsGreaterThan(0, int.Parse(coverage.DocumentElement!.GetAttribute("lines-covered"), System.Globalization.CultureInfo.InvariantCulture), $"{report}{Environment.NewLine}{File.ReadAllText(report)}");
 
         var diagnostics = string.Join(Environment.NewLine, Directory.GetFiles(DiagLogsDirectory, "*.log").Select(File.ReadAllText));
         Assert.Contains(collectorPath, diagnostics);

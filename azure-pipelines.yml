@@ -136,6 +136,23 @@ stages:
             ArtifactName: TestResults
           condition: and(failed(), eq(variables['HasTestResults'], 'true'))
 
+        # Acceptance tests write their working files (binlogs, diag logs, and attachments
+        # like generated coverage reports) under Agent.TempDirectory/vstest, not under
+        # artifacts/TestResults, so that content is otherwise lost when a test fails.
+        - pwsh: |
+            $dir = "$(Agent.TempDirectory)/vstest"
+            $hasFiles = (Test-Path -LiteralPath $dir) -and (@(Get-ChildItem -LiteralPath $dir -File -Recurse -ErrorAction SilentlyContinue).Count -gt 0)
+            Write-Host "##vso[task.setvariable variable=HasTestDiagnostics]$($hasFiles.ToString().ToLowerInvariant())"
+          displayName: 'Check for Test Diagnostics folder'
+          condition: failed()
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Test Diagnostics (coverage reports, diag logs)'
+          inputs:
+            PathtoPublish: '$(Agent.TempDirectory)/vstest'
+            ArtifactName: TestDiagnostics
+          condition: and(failed(), eq(variables['HasTestDiagnostics'], 'true'))
+
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Shipping Packages'
           inputs:
@@ -230,3 +247,20 @@ stages:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
           condition: and(failed(), eq(variables['HasTestResults'], 'true'))
+
+        # Acceptance tests write their working files (binlogs, diag logs, and attachments
+        # like generated coverage reports) under Agent.TempDirectory/vstest, not under
+        # artifacts/TestResults, so that content is otherwise lost when a test fails.
+        - pwsh: |
+            $dir = "$(Agent.TempDirectory)/vstest"
+            $hasFiles = (Test-Path -LiteralPath $dir) -and (@(Get-ChildItem -LiteralPath $dir -File -Recurse -ErrorAction SilentlyContinue).Count -gt 0)
+            Write-Host "##vso[task.setvariable variable=HasTestDiagnostics]$($hasFiles.ToString().ToLowerInvariant())"
+          displayName: 'Check for Test Diagnostics folder'
+          condition: failed()
+
+        - task: PublishBuildArtifacts@1
+          displayName: 'Publish Test Diagnostics (coverage reports, diag logs)'
+          inputs:
+            PathtoPublish: '$(Agent.TempDirectory)/vstest'
+            ArtifactName: TestDiagnostics
+          condition: and(failed(), eq(variables['HasTestDiagnostics'], 'true'))
