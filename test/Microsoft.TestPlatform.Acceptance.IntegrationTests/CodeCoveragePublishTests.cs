@@ -123,9 +123,14 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
         Assert.Contains("Failed: 1", output);
         Assert.Contains("Skipped: 1", output);
         var report = Directory.GetFiles(deployment.Path, "*.cobertura.xml", SearchOption.AllDirectories).Single();
+        // The deployment directory is deleted when the test ends, so keep a copy next to the diagnostic logs.
+        File.Copy(report, Path.Combine(DiagLogsDirectory, "reported.cobertura.xml"), overwrite: true);
+        var reportContent = File.ReadAllText(report);
         var coverage = new XmlDocument();
-        coverage.Load(report);
-        Assert.IsGreaterThan(0, int.Parse(coverage.DocumentElement!.GetAttribute("lines-covered"), System.Globalization.CultureInfo.InvariantCulture), $"{report}{Environment.NewLine}{File.ReadAllText(report)}");
+        coverage.LoadXml(reportContent);
+        var linesCovered = coverage.DocumentElement!.GetAttribute("lines-covered");
+        Assert.IsFalse(string.IsNullOrEmpty(linesCovered), $"lines-covered is missing or empty in {report}{Environment.NewLine}{reportContent}");
+        Assert.IsGreaterThan(0, int.Parse(linesCovered, System.Globalization.CultureInfo.InvariantCulture), $"{report}{Environment.NewLine}{reportContent}");
 
         var diagnostics = string.Join(Environment.NewLine, Directory.GetFiles(DiagLogsDirectory, "*.log").Select(File.ReadAllText));
         Assert.Contains(collectorPath, diagnostics);
