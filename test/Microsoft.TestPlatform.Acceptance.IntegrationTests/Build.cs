@@ -7,8 +7,8 @@ using System.Collections.Specialized;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -49,32 +49,11 @@ public class Build : IntegrationTestBase
 
     private static void CopyAndPatchDotnet()
     {
-        var patchedDotnetDir = Path.GetFullPath(Path.Combine(Root, "artifacts", "tmp", ".dotnet"));
-
-        // Copy dotnet.
-        DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
-
-        // Copy target file and build task dll into it.
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
         var packageName = $"Microsoft.TestPlatform.Build.{netTestSdkVersion}.nupkg";
         var packagePath = Path.GetFullPath(Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName));
 
-        // e.g. artifacts\tmp\.dotnet\sdk\
-        var sdkDirectory = Path.Combine(patchedDotnetDir, "sdk");
-        // e.g. artifacts\tmp\.dotnet\sdk\8.0.100-preview.6.23330.14
-        var dotnetSdkDirectories = Directory.GetDirectories(sdkDirectory);
-        if (dotnetSdkDirectories.Length == 0)
-        {
-            throw new InvalidOperationException($"No .NET SDK directories found in '{sdkDirectory}'.");
-        }
-        if (dotnetSdkDirectories.Length > 1)
-        {
-            throw new InvalidOperationException($"More than 1 .NET SDK directories found in '{sdkDirectory}': {string.Join(", ", dotnetSdkDirectories)}.");
-        }
-
-        var dotnetSdkDirectory = dotnetSdkDirectories.Single();
-        DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "lib", "netstandard2.0"), dotnetSdkDirectory);
-        DirectoryUtils.CopyDirectory(Path.Combine(packagePath, "runtimes", "any", "native"), dotnetSdkDirectory);
+        PatchedDotnet.CopyAndPatch(DotnetDir, IntegrationTestEnvironment.PatchedDotnetDirectory, packagePath);
     }
 
     private static void BuildTestAssetsCompatibility()
@@ -192,7 +171,10 @@ public class Build : IntegrationTestBase
 
             File.Copy(Path.Combine(testAssetsDir, "Directory.Build.targets"), Path.Combine(generated, "Directory.Build.targets"));
 
-            ExecuteApplication2(Dotnet, $"""new sln --name CompatibilityTestAssets --output "{generated}""");
+            // The .NET 10+ solution template defaults to the .slnx format, but generatedSln above
+            // is a classic .sln path, so the following 'sln add' would not find the file. Pin the
+            // format rather than letting the installed SDK decide it.
+            ExecuteApplication2(Dotnet, $"""new sln --format sln --name CompatibilityTestAssets --output "{generated}""");
 
             var projectsToAdd = new List<string>();
             foreach (var project in projects)

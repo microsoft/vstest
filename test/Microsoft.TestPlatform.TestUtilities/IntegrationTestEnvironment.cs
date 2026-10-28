@@ -26,6 +26,45 @@ public class IntegrationTestEnvironment
         // Get root directory from test assembly output directory
         ?? Path.GetFullPath(@"..\..\..\..\..".Replace('\\', Path.DirectorySeparatorChar));
 
+    /// <summary>
+    /// The copied and patched dotnet the acceptance suite runs against, one directory per target framework.
+    ///
+    /// This used to be a fixed path, artifacts/tmp/.dotnet, shared by every run. The acceptance
+    /// suite executes its target frameworks at the same time and both copied into it, so one run
+    /// executed hostfxr.dll out of the directory while the other overwrote it, and every test in
+    /// the losing run failed in AssemblyInitialize with
+    ///
+    ///   IOException: The process cannot access the file
+    ///   '...\artifacts\tmp\.dotnet\host\fxr\...\hostfxr.dll' because it is being used by another process.
+    ///
+    /// This branch has not been seen failing that way, and that is not reassuring. The race was
+    /// hidden on every branch by one half failing first on the compatibility version matrix, which
+    /// suppressed the other half entirely so the two never overlapped. Filtering those rows out
+    /// removes exactly that cover. 18.0 hit it once its half started passing, and 17.12 then
+    /// measured it directly: build 3077696, 625 failures, almost all that one exception. This
+    /// branch has the same shared path, the same two halves and the same filter, so it is one
+    /// passing half away from the same collision. Fixing it before it is observed is cheaper than
+    /// reading another 600-failure run.
+    ///
+    /// A mutex around the copy does not fix it: the conflict is one run EXECUTING from the
+    /// directory while another OVERWRITES it, which outlives the copy.
+    ///
+    /// AppContext.BaseDirectory already differs per target framework, so hashing it gives one
+    /// directory per target framework without inventing a discriminator. That is sufficient here because each
+    /// target framework of this suite runs at exactly one architecture; a suite that ran the same
+    /// target framework at two architectures would share one output directory and would need the
+    /// architecture folded in as well. GetPathHash is the same helper the acceptance suite already
+    /// uses to shorten its compatibility asset names.
+    /// Sequential invocations of the same framework reuse this directory. CopyAndPatchDotnet
+    /// keeps an unchanged SDK rather than overwriting runtime files that may still be in use.
+    ///
+    /// COMPUTED HERE AND ONLY HERE. Two places used to derive this path independently - Build.cs
+    /// wrote it and IntegrationTestBase read it - and discriminating in one of them would have left
+    /// the other looking in the old shared location for something no longer there.
+    /// </summary>
+    public static string PatchedDotnetDirectory { get; } = Path.GetFullPath(
+        Path.Combine(RepoRootDirectory, "artifacts", "tmp", $".dotnet-{GetPathHash(AppContext.BaseDirectory)}"));
+
     public static string ArtifactsTempDirectory { get; } = Path.Combine(RepoRootDirectory, "artifacts", "tmp", BuildConfiguration);
 
     public static string LocalPackageSource { get; } = Path.Combine(RepoRootDirectory, "artifacts", "packages", BuildConfiguration, "Shipping").TrimEnd(Path.DirectorySeparatorChar);

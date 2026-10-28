@@ -267,6 +267,24 @@ public class TestRequestSenderTests
     }
 
     [TestMethod]
+    public async Task CheckVersionWithTestHostShouldReportProtocolErrorFromReceiveThread()
+    {
+        Environment.SetEnvironmentVariable(EnvironmentHelper.VstestConnectionTimeout, "5");
+        SetupDeserializeMessage(MessageType.ProtocolError, string.Empty);
+        SetupFakeCommunicationChannel();
+        Task? received = null;
+        _mockChannel.Setup(mc => mc.Send(It.IsAny<string>()))
+            .Callback(() => received = Task.Run(RaiseMessageReceivedEvent));
+
+        var exception = Assert.ThrowsException<TestPlatformException>(
+            () => _testRequestSender.CheckVersionWithTestHost());
+
+        StringAssert.Contains(exception.Message, "Protocol version check failed");
+        Assert.IsNotNull(received);
+        await received;
+    }
+
+    [TestMethod]
     public void CheckVersionWithTestHostShouldThrowIfUnexpectedResponseIsReceived()
     {
         SetupDeserializeMessage(MessageType.TestCasesFound, string.Empty);

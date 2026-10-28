@@ -28,6 +28,29 @@
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.Package.dll" CertificateName="3PartySHA2" />
 
+    <!--
+      Arcade 11 added .cab to its default Microsoft400 extension list, and Sign.proj now rejects
+      two certificates for the same extension. Arcade 9 did not define .cab at all, so the line
+      below was the only definition and the IntelliTrace cab in Microsoft.TestPlatform shipped
+      unsigned. Remove Arcade's default first so this stays the single definition and the cab
+      keeps shipping unsigned - deleting it outright would start signing it with Microsoft400.
+    -->
+    <FileExtensionSignInfo Remove=".cab" />
     <FileExtensionSignInfo Include=".cab" CertificateName="None" />
+
+    <!--
+      Same class of change, found by comparing the delivered packages byte for byte rather than by
+      file list. Arcade 11 also added .dylib to its defaults, as MacDeveloperHarden; Arcade 9 had no
+      .dylib entry, so the two macOS dylibs Microsoft.CodeCoverage carries shipped with the signature
+      their producer gave them. Under Arcade 11 they came back re-signed: same size, same Mach-O
+      signature offset, different signature payload.
+
+      Unlike .cab this produced no build error, because nothing here declared .dylib - an extension a
+      repo does not declare is exactly where a new Arcade default lands silently. Restore the previous
+      behaviour and leave the producer's signature intact; signing macOS binaries on this line should
+      be a deliberate decision, not a side effect of an infrastructure bump.
+    -->
+    <FileExtensionSignInfo Remove=".dylib" />
+    <FileExtensionSignInfo Include=".dylib" CertificateName="None" />
   </ItemGroup>
 </Project>

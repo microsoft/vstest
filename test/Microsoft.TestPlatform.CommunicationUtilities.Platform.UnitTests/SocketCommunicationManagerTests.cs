@@ -118,6 +118,18 @@ public class SocketCommunicationManagerTests : IDisposable
         Assert.ThrowsException<AggregateException>(() => _tcpClient.ConnectAsync(IPAddress.Loopback, port).Wait());
     }
 
+    [TestMethod]
+    public async Task StopServerShouldCompletePendingAcceptWithoutFault()
+    {
+        _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
+        var acceptClientTask = _communicationManager.AcceptClientAsync();
+
+        _communicationManager.StopServer();
+
+        Assert.AreSame(acceptClientTask, await Task.WhenAny(acceptClientTask, Task.Delay(5000)));
+        await acceptClientTask;
+    }
+
     #endregion
 
     #region Client tests

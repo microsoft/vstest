@@ -1,6 +1,6 @@
 {
   "sdk": {
-    "version": "9.0.104",
+    "version": "11.0.100-preview.6.26359.118",
     "rollForward": "minor",
     "allowPrerelease": false,
     "architecture": "x64"
@@ -13,7 +13,8 @@
         "5.0.17",
         "6.0.32",
         "7.0.20",
-        "8.0.7"
+        "8.0.7",
+        "9.0.3"
       ],
       "dotnet/x86": [
         "2.1.30",
@@ -21,16 +22,17 @@
         "5.0.17",
         "6.0.32",
         "7.0.20",
-        "8.0.7"
+        "8.0.7",
+        "9.0.3"
       ]
     },
     "vs": {
       "version": "17.8.0"
     },
     "vswhere": "2.2.7",
-    "dotnet": "9.0.104"
+    "dotnet": "11.0.100-preview.6.26359.118"
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "9.0.0-beta.25164.2"
+    "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.26421.2"
   }
 }

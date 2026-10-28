@@ -60,6 +60,8 @@
       Because I don't want to complexify further the logic on VSTest just for that, I will set it to NetMinimum.
     -->
     <NetPrevious Condition=" $(NetPrevious) == '' ">$(NetMinimum)</NetPrevious>
+    <!-- The source-build nuspec packs NetPrevious and NetCurrent into separate package paths. -->
+    <NetPrevious Condition="'$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildOrchestrator)' != 'true' and '$(NetPrevious)' == '$(NetCurrent)'">$(NetCoreAppStable)</NetPrevious>
 
     <!--
       vstest.console.exe is shipped with VS, we can use the version of .NET Framework that VS requires to run (this might differ from the version is requires to install).
