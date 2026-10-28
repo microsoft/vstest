@@ -7,8 +7,8 @@ using System.Collections.Specialized;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
-using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -49,7 +49,7 @@ public class Build : IntegrationTestBase
 
     private static void CopyAndPatchDotnet()
     {
-        var patchedDotnetDir = Path.GetFullPath(Path.Combine(Root, "artifacts", "tmp", ".dotnet"));
+        var patchedDotnetDir = IntegrationTestEnvironment.PatchedDotnetDirectory;
 
         // Copy dotnet.
         DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
@@ -182,7 +182,10 @@ public class Build : IntegrationTestBase
 
             File.Copy(Path.Combine(testAssetsDir, "Directory.Build.targets"), Path.Combine(generated, "Directory.Build.targets"));
 
-            ExecuteApplication2(Dotnet, $"""new sln --name CompatibilityTestAssets --output "{generated}""");
+            // The .NET 10+ solution template defaults to the .slnx format, but generatedSln above
+            // is a classic .sln path, so the following 'sln add' would not find the file. Pin the
+            // format rather than letting the installed SDK decide it.
+            ExecuteApplication2(Dotnet, $"""new sln --format sln --name CompatibilityTestAssets --output "{generated}""");
 
             var projectsToAdd = new List<string>();
             foreach (var project in projects)

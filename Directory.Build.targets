@@ -7,9 +7,18 @@
     CI source build leg: this needs to build the current and previous source build TFM. Both are
     necessary as the output of this leg is used in other CI source build legs. Those could be
     targeting NetCurrent or NetPrevious hence we must produce both.
+
+    Guard against the two being equal. Under Arcade 11 they evaluate to the same TFM, which made
+    this list 'net11.0;net11.0', built the same leg twice, and packed every file twice - NU5050,
+    "Attempted to pack multiple files into the same location(s)", on both
+    Microsoft.TestPlatform.Build (14 destinations, all of lib/net11.0/) and
+    Microsoft.TestPlatform.CLI (222 destinations, all of contentFiles/any/net11.0/). In both cases
+    it was 100% of a single TFM's output, not a partial overlap, which is what duplication looks
+    like. The condition is a no-op wherever the two properties differ.
   -->
   <PropertyGroup Condition=" '$(DotNetBuildSourceOnly)' == 'true' and '$(DotNetBuildOrchestrator)' != 'true' ">
-    <TargetFrameworks>$(NetPrevious);$(NetCurrent)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(NetPrevious)' != '$(NetCurrent)' ">$(NetPrevious);$(NetCurrent)</TargetFrameworks>
+    <TargetFrameworks Condition=" '$(NetPrevious)' == '$(NetCurrent)' ">$(NetCurrent)</TargetFrameworks>
   </PropertyGroup>
 
   <!--

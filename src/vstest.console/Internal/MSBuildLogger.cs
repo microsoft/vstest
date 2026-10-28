@@ -200,7 +200,7 @@ internal class MSBuildLogger : ITestLoggerWithParameters
                         {
                             // if there are no symbols but we collect source info, us the source info.
                             file = result.TestCase.CodeFilePath;
-                            line = result.TestCase.LineNumber > 0 ? result.TestCase.LineNumber.ToString(CultureInfo.InvariantCulture) : null;
+                            line = result.TestCase.LineNumber > 0 ? result.TestCase.LineNumber.ToString(CultureInfo.InvariantCulture) : string.Empty;
                         }
                         else
                         {

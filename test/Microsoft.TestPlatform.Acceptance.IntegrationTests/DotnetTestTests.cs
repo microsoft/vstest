@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using System.Collections.Generic;
 using System.IO;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -13,7 +14,9 @@ public class DotnetTestTests : AcceptanceTestBase
 {
     private static string GetFinalVersion(string version)
     {
-        var end = version.IndexOf("-release");
+        // Mirrors PrintSplashScreen in vstest.console: the banner drops the whole version suffix,
+        // so the expected version here has to drop it the same way.
+        var end = version.IndexOf("-");
         return (end >= 0) ? version.Substring(0, end) : version;
     }
 
@@ -26,7 +29,20 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} -p:VSTestUseMSBuildOutput=false --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
+        // Same inherited MSBUILDENSURESTDOUTFORTASKPROCESSES=1 as in DotnetTestMSBuildOutputTests. It does not change
+        // which target runs here (VSTestUseMSBuildOutput=false selects _VSTestConsole either way) but it does change how
+        // MSBuild handles the task process stdout, and on the modern agents the vstest.console banner line carrying the
+        // version - the only thing this test asserts beyond the summary - is absent from the captured output while
+        // RunDotnetTestWithDll, which reaches vstest.console without the MSBuild task, still shows it. Neutralizing the
+        // variable tests that mechanism; if the banner is still missing the cause is separate and is not this variable.
+        // Build 3067650 answered the question this comment poses, in the negative: with the variable pinned to "0"
+        // the vstest.console banner carrying the version was STILL absent, so - by this comment's own terms - the
+        // cause is separate and is not this variable. RunDotnetTestWithDll asserts the SAME version string and
+        // PASSES on the same build, and it differs only by reaching vstest.console without the MSBuild task, so the
+        // banner is being lost specifically on the VSTestTask path. -v:detailed makes MSBuild report the task
+        // invocation and the Low-importance "VSTestNoLogo = ..." dump the targets already emit, which distinguishes
+        // "the banner was never requested" from "the banner was written but not captured".
+        InvokeDotnetTest($@"{projectPath} -p:VSTestUseMSBuildOutput=false -v:detailed --logger:""Console;Verbosity=normal"" /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", environmentVariables: new Dictionary<string, string?> { ["MSBUILDENSURESTDOUTFORTASKPROCESSES"] = "0" });
 
         // ensure our dev version is used
         StdOutputContains(GetFinalVersion(IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion));

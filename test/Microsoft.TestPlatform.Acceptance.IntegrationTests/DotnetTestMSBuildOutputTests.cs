@@ -23,7 +23,27 @@ public class DotnetTestMSBuildOutputTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("TerminalLoggerTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} -nodereuse:false /p:VsTestUseMSBuildOutput=true /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}");
+        // The 1ES agent sets MSBUILDENSURESTDOUTFORTASKPROCESSES=1 in the environment. Microsoft.TestPlatform.targets
+        // calls _VSTestConsole when "!$(VsTestUseMSBuildOutput) OR $(MSBUILDENSURESTDOUTFORTASKPROCESSES) == '1'", so
+        // with that variable inherited the console logger runs first, fails the build on the failing test, and
+        // _VSTestMSBuild - the target under test here - never runs at all. MSBuildLoggerCanBeDisabledByEnvironmentVariableProperty
+        // below documents that this variable disables the MSBuild logger BY DESIGN, so a test that asks for the logger
+        // to be ENABLED has to neutralize it. "0" is used rather than null so the value deterministically fails the
+        // '== 1' comparison instead of relying on null-removal semantics of ProcessStartInfo.EnvironmentVariables.
+        // Passing the value through ProcessStartInfo.EnvironmentVariables does NOT work, and build 3067671 measured
+        // exactly why rather than inferring it. At -v:detailed MSBuild printed, from the very line that owns the
+        // condition, "Microsoft.TestPlatform.targets(32,42): message : Property
+        // 'MSBUILDENSURESTDOUTFORTASKPROCESSES' with value '1' expanded from the environment." So the child process
+        // read '1', not the '0' set here, and consequently "_VSTestMSBuild" appeared 0 times in the whole log while
+        // "_VSTestConsole" appeared 8 times and ended in "Done building target "_VSTestConsole" ... -- FAILED".
+        // _VSTestConsole is called first, so once it fails the build stops and the target under test never runs.
+        // The fix is MSBuild property precedence, not a different environment value: environment variables are the
+        // LOWEST precedence source of a property, and a global property set with /p: overrides them and cannot be
+        // overwritten by the environment. The targets read $(MSBUILDENSURESTDOUTFORTASKPROCESSES) as an ordinary
+        // property, so a global property makes the '== 1' comparison deterministically false no matter who exports
+        // the variable - the 1ES agent or the dotnet CLI. This only changes the value the CONDITION sees; MSBuild's
+        // own stdout handling still reads the real environment variable, so engine behaviour is untouched.
+        InvokeDotnetTest($@"{projectPath} -nodereuse:false -v:detailed /p:VsTestUseMSBuildOutput=true /p:MSBUILDENSURESTDOUTFORTASKPROCESSES=0 /p:PackageVersion={IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion}", environmentVariables: new Dictionary<string, string?> { ["MSBUILDENSURESTDOUTFORTASKPROCESSES"] = "0" });
 
         // The output:
         // Determining projects to restore...

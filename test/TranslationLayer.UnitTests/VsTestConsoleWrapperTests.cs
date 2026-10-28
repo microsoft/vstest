@@ -88,6 +88,25 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
+    [Obsolete("The async APIs don't work, use the sync API instead.", false)]
+    public async Task StartSessionAsyncShouldListenThenLaunchThenWaitForConnection()
+    {
+        var order = new List<string>();
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication())
+            .Callback(() => order.Add("listen")).Returns(123);
+        _mockProcessManager.Setup(pm => pm.StartProcess(_consoleParameters))
+            .Callback(() => order.Add("launch"));
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>()))
+            .Callback(() => order.Add("wait")).Returns(true);
+
+        await _consoleWrapper.StartSessionAsync();
+
+        CollectionAssert.AreEqual(new[] { "listen", "launch", "wait" }, order);
+        Assert.AreEqual(123, _consoleParameters.PortNumber);
+        _mockRequestSender.Verify(rs => rs.InitializeCommunicationAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [TestMethod]
     public void StartSessionShouldCallWhenProcessNotInitialized()
     {
         _mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);

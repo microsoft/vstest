@@ -8,8 +8,8 @@
         is trying to parse that version and will consider any version with more than 4 `.` in it as invalid.
     -->
     <SemanticVersioningV1>true</SemanticVersioningV1>
-    <VersionPrefix>17.11.1</VersionPrefix>
-    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
+    <VersionPrefix>17.11.2</VersionPrefix>
+    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
   </PropertyGroup>
   <PropertyGroup Label="Arcade settings">
     <!-- Ensure we use xliff task tool - true is the default but we make it explicit here -->
