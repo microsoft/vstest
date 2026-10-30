@@ -222,7 +222,7 @@ public class IntegrationTestEnvironment
         // Update the path to be taken from the compatibility matrix instead of from the root folder.
         if (automaticallyResolveCompatibilityTestAsset && DllInfos.Count > 0)
         {
-            // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkPreviousStable-17.14.1--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkPreviousStable-17.14.1--MSTestMostDownloaded-2.1.0.dll
+            // The path is really ugly: S:\p\vstest3\test\GeneratedTestAssets\NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0--MSTestProject2\bin\Debug\net462\MSTestProject2-NETTestSdkLegacyStable-15.9.2--MSTestMostDownloaded-2.1.0.dll
             // And we need to hash the versions in it to get shorter path as well.
             var versions = string.Join("--", DllInfos.Select(d => d.Path));
             var versionsHash = GetPathHash(versions);
