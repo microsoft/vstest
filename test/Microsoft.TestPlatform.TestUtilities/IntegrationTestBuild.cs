@@ -292,7 +292,6 @@ public class IntegrationTestBuild : IntegrationTestBase
             "VSTestConsoleRecentStableVersion",
             "VSTestConsoleMostDownloadedVersion",
             "VSTestConsolePreviousStableVersion",
-            "VSTestConsoleLegacyStableVersion",
         };
 
         var projects = new[]
@@ -307,7 +306,6 @@ public class IntegrationTestBuild : IntegrationTestBase
             "MSTestFrameworkRecentStableVersion",
             "MSTestFrameworkMostDownloadedVersion",
             "MSTestFrameworkPreviousStableVersion",
-            "MSTestFrameworkLegacyStableVersion",
         };
 
         var nugetFeeds = GetNugetSourceParameters(Root);

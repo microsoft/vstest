@@ -42,9 +42,9 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string HOST_NET = Core11TargetFramework;
     public const string HOST_NETFX_AND_NET = "net481;net11.0";
 
-    public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATEST_TO_LEGACY = "Latest;LatestPreview;LatestStable;RecentStable;    MostDownloaded;PreviousStable";
     public const string LATEST_TO_RECENT_STABLE = "Latest;LatestPreview;LatestStable;RecentStable";
-    public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable;LegacyStable";
+    public const string LATESTPREVIEW_TO_LEGACY = "LatestPreview;LatestStable;RecentStable;MostDownloaded;PreviousStable";
     public const string LATEST = "Latest";
     // "Special" version for runner, to take the latest from VSIX we don't ship any other component that way, so we need separate value to control it.
     public const string LATESTVSIX = "LatestVsix";
