@@ -121,6 +121,17 @@ public class TestCasesFoundSerializationTests
                 },
                 {
                   "Key": {
+                    "Id": "TestCase.IdAlgorithm",
+                    "Label": "Id Algorithm",
+                    "Category": "",
+                    "Description": "",
+                    "Attributes": 1,
+                    "ValueType": "System.String"
+                  },
+                  "Value": "SelfAssigned"
+                },
+                {
+                  "Key": {
                     "Id": "TestObject.Traits",
                     "Label": "Traits",
                     "Category": "",
@@ -162,6 +173,17 @@ public class TestCasesFoundSerializationTests
               "CodeFilePath": "C:\\src\\Contoso.Math.Tests\\CalculatorTests.cs",
               "LineNumber": 42,
               "Properties": [
+                {
+                  "Key": {
+                    "Id": "TestCase.IdAlgorithm",
+                    "Label": "Id Algorithm",
+                    "Category": "",
+                    "Description": "",
+                    "Attributes": 1,
+                    "ValueType": "System.String"
+                  },
+                  "Value": "SelfAssigned"
+                },
                 {
                   "Key": {
                     "Id": "TestObject.Traits",
