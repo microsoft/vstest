@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
@@ -24,6 +25,30 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.ExtensionFramework;
 internal static class TestPluginDiscoverer
 {
     private static readonly HashSet<string> UnloadableFiles = new();
+
+    /// <summary>
+    /// Files we already told the user about, so that a file that fails for every extension type is
+    /// reported once per run instead of once per scan. <see cref="TestPluginCache.ClearExtensions"/>
+    /// empties it, which is what makes this once per run rather than once per process: the runner clears
+    /// the extension cache before every discovery or run request, so an editor that keeps the runner alive
+    /// for hours still hears about a broken extension on each request, and the set cannot grow past the
+    /// files of a single request.
+    ///
+    /// Paths are compared ignoring case. On Windows two spellings of the same path are the same file and
+    /// warning about both would be a duplicate the user cannot act on. Elsewhere they can be two files,
+    /// but the only cost of merging them is one warning less about a file that is broken anyway.
+    /// </summary>
+    private static readonly ConcurrentDictionary<string, byte> ReportedFiles = new(StringComparer.OrdinalIgnoreCase);
+
+    /// <summary>
+    /// Extensions that are probed speculatively when no other extension was found, see <see cref="AddKnownExtensions"/>.
+    /// They are absent in every environment except UWP, so failing to load them is expected and is not reported.
+    /// </summary>
+    private static readonly string[] KnownExtensions =
+    {
+        "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll",
+        "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll",
+    };
 
     /// <summary>
     /// Gets information about each of the test extensions available.
@@ -56,8 +81,43 @@ internal static class TestPluginDiscoverer
         // For C++ UWP adapter, & OLD C# UWP(MSTest V1) adapter
         // In UWP .Net Native Compilation mode managed dll's are packaged differently, & File.Exists() fails.
         // Include these two dll's if so far no adapters(extensions) were found, & let Assembly.Load() fail if they are not present.
-        extensionPaths = extensionPaths.Concat(new[] { "Microsoft.VisualStudio.TestTools.CppUnitTestFramework.CppUnitTestExtension.dll", "Microsoft.VisualStudio.TestPlatform.Extensions.MSAppContainerAdapter.dll" });
+        extensionPaths = extensionPaths.Concat(KnownExtensions);
     }
+
+    /// <summary>
+    /// Tells the user that an extension file did not load. Extension scanning is best effort, so this is a
+    /// warning and never stops the run, but staying silent leaves the user with fewer extensions than they
+    /// expect and no way to find out why short of re-running with /diag.
+    /// </summary>
+    /// <param name="file">The file that failed to load.</param>
+    private static void ReportExtensionLoadFailure(string file)
+    {
+        // Many files are scanned per run, and the same file is scanned once per extension type, so report it once.
+        if (!ReportedFiles.TryAdd(file, 0))
+        {
+            return;
+        }
+
+        // This runs inside a catch block. Reporting a load failure must never turn into a second failure that
+        // escapes and takes down a run that would otherwise have finished, so swallow anything that goes wrong
+        // here, for instance a satellite assembly that cannot be resolved while formatting the message.
+        try
+        {
+            string message = string.Format(CultureInfo.CurrentCulture, CommonResources.FailedToLoadAdapaterFile, file);
+            TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, message);
+        }
+        catch (Exception e)
+        {
+            EqtTrace.Warning("TestPluginDiscoverer: Failed to report the load failure of file '{0}'. Error: {1}", file, e);
+        }
+    }
+
+    /// <summary>
+    /// Forgets which files were already reported, so the next request reports them again. Called when the
+    /// extension cache is cleared, because extensions are then discovered from scratch and a failure the
+    /// user was told about before the clear is news again.
+    /// </summary>
+    internal static void ClearReportedFiles() => ReportedFiles.Clear();
 
     /// <summary>
     /// Gets test extension information from the given collection of files.
@@ -101,13 +161,25 @@ internal static class TestPluginDiscoverer
             catch (FileLoadException e)
             {
                 EqtTrace.Warning("TestPluginDiscoverer-FileLoadException: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
-                string fileLoadErrorMessage = string.Format(CultureInfo.CurrentCulture, CommonResources.FailedToLoadAdapaterFile, file);
-                TestSessionMessageLogger.Instance.SendMessage(TestMessageLevel.Warning, fileLoadErrorMessage);
+                ReportExtensionLoadFailure(file);
                 UnloadableFiles.Add(file);
             }
             catch (Exception e)
             {
                 EqtTrace.Warning("TestPluginDiscoverer: Failed to load extensions from file '{0}'.  Skipping test extension scan for this file.  Error: {1}", file, e);
+
+                // This is the handler that catches FileNotFoundException, which is what Assembly.Load throws when
+                // the extension, or one of its dependencies, cannot be found. That is a real problem for the user,
+                // so report it instead of only tracing it. The file is deliberately not added to UnloadableFiles:
+                // unlike FileLoadException this also catches failures from scanning an assembly that did load, and
+                // resolution can succeed on a later pass once more extension directories are registered.
+                //
+                // The speculatively probed extensions are the exception, they are expected to be missing everywhere
+                // except UWP and reporting them would warn on every run.
+                if (!KnownExtensions.Contains(file, StringComparer.OrdinalIgnoreCase))
+                {
+                    ReportExtensionLoadFailure(file);
+                }
             }
         }
     }
@@ -124,7 +196,7 @@ internal static class TestPluginDiscoverer
     /// <typeparam name="TExtension">
     /// Type of Extensions.
     /// </typeparam>
-    private static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath)
+    internal static void GetTestExtensionsFromAssembly<TPluginInfo, TExtension>(Assembly assembly, Dictionary<string, TPluginInfo> pluginInfos, string filePath)
         where TPluginInfo : TestPluginInformation
     {
         TPDebug.Assert(assembly != null, "null assembly");
@@ -162,6 +234,12 @@ internal static class TestPluginDiscoverer
         catch (ReflectionTypeLoadException e)
         {
             EqtTrace.Warning("TestPluginDiscoverer: Failed to get types from assembly '{0}'. Error: {1}", assembly.FullName, e.ToString());
+
+            // The assembly itself loaded, but some of its types did not, usually because a dependency is
+            // missing. Scanning continues with the types that did load, so without this the user silently
+            // gets fewer extensions than the assembly declares. The file is deliberately not added to
+            // UnloadableFiles, the types that did load are still worth scanning on the next pass.
+            ReportExtensionLoadFailure(filePath);
 
             if (e.Types?.Length > 0)
             {
