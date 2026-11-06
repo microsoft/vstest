@@ -21,7 +21,7 @@ public class CustomCompatibilityDataSource : CompatibilityDataSourceAttribute
         string adapterVersions = AcceptanceTestBase.LATESTPREVIEW_TO_LEGACY,
         string adapters = AcceptanceTestBase.MSTEST)
     {
-        _builder = new CompatibilityRowsBuilder(runnerFrameworks, runnerVersions, hostFrameworks, hostVersions, adapterVersions, adapters);
+        _builder = new CompatibilityRowsBuilder(runnerVersions, runnerFrameworks, hostVersions, hostFrameworks, adapterVersions, adapters);
         // Do not generate the data rows here, properties (e.g. DebugVSTestConsole) are not populated until after constructor is done.
     }
 

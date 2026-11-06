@@ -14,6 +14,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer.Resources;
@@ -68,6 +69,9 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
 
     /// <inheritdoc/>
     public int? ProcessId { get; set; }
+
+    /// <inheritdoc/>
+    public DateTime? ProcessStartTimeUtc { get; private set; }
 
     /// <inheritdoc/>
     public string? ErrorOutput => _vstestConsoleError.ToString();
@@ -127,6 +131,7 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
 
         ProcessName = null;
         ProcessId = null;
+        ProcessStartTimeUtc = null;
         ExitCode = null;
         _vstestConsoleError.Clear();
 
@@ -157,7 +162,14 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
                     // Not printing the value on purpose, env variables can contain secrets and we don't need to know the values
                     // most of the time.
                     // EqtTrace.Verbose("VsTestCommandLineWrapper.StartProcess: Setting environment variable: {0}", envVariable.Key);
-                    info.EnvironmentVariables[envVariable.Key] = envVariable.Value?.ToString();
+                    if (envVariable.Value is null)
+                    {
+                        info.EnvironmentVariables.Remove(envVariable.Key);
+                    }
+                    else
+                    {
+                        info.EnvironmentVariables[envVariable.Key] = envVariable.Value.ToString();
+                    }
                 }
             }
         }
@@ -166,6 +178,7 @@ internal sealed class VsTestConsoleProcessManager : IProcessManager, IDisposable
         {
             _process = Process.Start(info);
             ProcessId = _process!.Id;
+            ProcessStartTimeUtc = _process.StartTime.ToUniversalTime();
             ProcessName = _process.ProcessName;
             EqtTrace.Info($"VsTestConsoleProcessManager.StartProcess: Started process id:{_process.Id}"); // Not normally needed, but if you run multiple instances of wrapper it helps to also add {Environment.StackTrace}
         }

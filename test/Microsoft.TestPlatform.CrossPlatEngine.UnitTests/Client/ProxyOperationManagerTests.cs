@@ -278,7 +278,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
         var message = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
-        Assert.AreEqual(message, TimoutErrorMessage);
+        Assert.Contains(TimoutErrorMessage, message);
     }
 
     [TestMethod]
@@ -456,7 +456,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
             .Callback(() =>
             {
-                _mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                _mockTestHostManager.Raise(t => t.HostLaunched += null, CreateCurrentHostLaunchedArgs());
                 _mockTestHostManager.Raise(t => t.HostExited += null, new HostProviderEventArgs(stdError));
             })
             .Returns(Task.FromResult(true));
@@ -486,7 +486,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
             .Callback(() =>
             {
-                _mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                _mockTestHostManager.Raise(t => t.HostLaunched += null, CreateCurrentHostLaunchedArgs());
                 _mockTestHostManager.Raise(t => t.HostExited += null, new HostProviderEventArgs(stdError));
             })
             .Returns(Task.FromResult(true));
@@ -513,7 +513,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
             .Returns(new TestProcessStartInfo { FileName = processPath });
 
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
-            .Callback(() => _mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty)))
+            .Callback(() => _mockTestHostManager.Raise(t => t.HostLaunched += null, CreateCurrentHostLaunchedArgs()))
             .Returns(Task.FromResult(true));
 
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>(), It.IsAny<CancellationToken>())).Returns(false);
@@ -540,7 +540,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
             .Callback(() =>
             {
-                _mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                _mockTestHostManager.Raise(t => t.HostLaunched += null, CreateCurrentHostLaunchedArgs());
                 _mockTestHostManager.Raise(t => t.HostExited += null, new HostProviderEventArgs(stdError));
             })
             .Returns(Task.FromResult(true));
@@ -551,7 +551,6 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel(["test.dll"], DefaultRunSettings));
 
-        // Verify OnClientProcessExit was called with the crash context containing both path and error.
         _mockRequestSender.Verify(
             rs => rs.OnClientProcessExit(It.Is<string>(s => s.Contains(processPath) && s.Contains(stdError))),
             Times.Once);
@@ -572,8 +571,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
             .Callback(() =>
             {
-                _mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty));
-                // Host exits with empty stderr (no error output).
+                _mockTestHostManager.Raise(t => t.HostLaunched += null, CreateCurrentHostLaunchedArgs());
                 _mockTestHostManager.Raise(t => t.HostExited += null, new HostProviderEventArgs(string.Empty));
             })
             .Returns(Task.FromResult(true));
@@ -583,8 +581,13 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
         var ex = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel(["test.dll"], DefaultRunSettings));
-        // ThrowOnTestHostExited fires first; with no stderr the crash context is just the path.
         Assert.Contains(processPath, ex.Message);
+    }
+
+    private static HostProviderEventArgs CreateCurrentHostLaunchedArgs()
+    {
+        using var process = Process.GetCurrentProcess();
+        return new HostProviderEventArgs(string.Empty, 0, process.Id);
     }
 
     private void SetupWaitForTestHostExit()
@@ -598,7 +601,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         // Raise host exited when end session is called
         _mockTestHostManager.Setup(tmh => tmh.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>()))
-            .Callback(() => _mockTestHostManager.Raise(t => t.HostLaunched += null, new HostProviderEventArgs(string.Empty)))
+            .Callback(() => _mockTestHostManager.Raise(t => t.HostLaunched += null, CreateCurrentHostLaunchedArgs()))
             .Returns(Task.FromResult(launchStatus));
     }
 

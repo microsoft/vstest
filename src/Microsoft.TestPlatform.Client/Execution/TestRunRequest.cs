@@ -25,6 +25,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities;
 using Microsoft.VisualStudio.TestPlatform.Utilities;
 
 using ClientResources = Microsoft.VisualStudio.TestPlatform.Client.Resources.Resources;
+using TPDebug = Microsoft.VisualStudio.TestPlatform.Common.TPDebug;
 
 namespace Microsoft.VisualStudio.TestPlatform.Client.Execution;
 

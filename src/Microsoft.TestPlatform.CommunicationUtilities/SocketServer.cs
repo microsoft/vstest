@@ -141,6 +141,8 @@ public class SocketServer : ICommunicationEndPoint
                 return;
             }
 
+            client.Client.NoDelay = true;
+
             lock (_stateSyncObject)
             {
                 if (_stopRequested != 0)
@@ -164,20 +166,43 @@ public class SocketServer : ICommunicationEndPoint
 
     private void OnClientConnected(TcpClient client)
     {
-        client.Client.NoDelay = true;
-
         if (Connected is null)
         {
             return;
         }
 
-        _channel = _channelFactory(client.GetStream());
-        Connected.SafeInvoke(this, new ConnectedEventArgs(_channel), "SocketServer: ClientConnected");
+        var channel = _channelFactory(client.GetStream());
+        bool stopRequested;
+        lock (_stateSyncObject)
+        {
+            // Stop can complete while the channel factory is running.
+            stopRequested = _stopRequested != 0;
+            if (!stopRequested)
+            {
+                _channel = channel;
+            }
+        }
+
+        if (stopRequested)
+        {
+            try
+            {
+                channel.Dispose();
+            }
+            finally
+            {
+                client.Close();
+            }
+
+            return;
+        }
+
+        Connected.SafeInvoke(this, new ConnectedEventArgs(channel), "SocketServer: ClientConnected");
 
         EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", _endPoint);
 
         // Start the message loop
-        _ = Task.Run(() => client.MessageLoopAsync(_channel, error => StopOnError(error), _cancellation.Token));
+        _ = Task.Run(() => client.MessageLoopAsync(channel, error => StopOnError(error), _cancellation.Token));
     }
 
     /// <summary>
