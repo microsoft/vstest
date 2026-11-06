@@ -6,6 +6,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
 
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
@@ -37,6 +38,30 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void Cleanup()
         {
             this.vstestConsoleWrapper?.EndSession();
+        }
+
+        [TestMethod]
+        [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
+        [NetCoreTargetFrameworkDataSource(useCoreRunner: false)]
+        public async Task RunAllTestsWithAsyncWrapper(RunnerInfo runnerInfo)
+        {
+            AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var wrapper = new Microsoft.TestPlatform.VsTestConsole.TranslationLayer.VsTestConsoleWrapperAsync(this.GetConsoleRunnerPath());
+            try
+            {
+                var handler = new RunEventHandler();
+                await wrapper.StartSessionAsync();
+                await wrapper.RunTestsAsync(this.GetTestAssemblies(), this.GetDefaultRunSettings(), handler);
+
+                Assert.AreEqual(6, handler.TestResults.Count);
+                Assert.AreEqual(2, handler.TestResults.Count(result => result.Outcome == TestOutcome.Passed));
+                Assert.AreEqual(2, handler.TestResults.Count(result => result.Outcome == TestOutcome.Failed));
+                Assert.AreEqual(2, handler.TestResults.Count(result => result.Outcome == TestOutcome.Skipped));
+            }
+            finally
+            {
+                wrapper.EndSession();
+            }
         }
 
         [TestMethod]

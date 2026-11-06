@@ -379,7 +379,13 @@ namespace Microsoft.TestPlatform.TestUtilities
             }
             else if (this.IsNetCoreRunner())
             {
-                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+                // Arcade installs the SDK to <repo>\.dotnet. The historic location was
+                // <repo>\tools\dotnet, populated by scripts/build.ps1's Install-DotNetCli.
+                // Prefer the Arcade location and fall back so both build paths work.
+                var arcadeDotnet = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, @".dotnet\dotnet.exe");
+                consoleRunnerPath = File.Exists(arcadeDotnet)
+                    ? arcadeDotnet
+                    : Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
             }
             else
             {
@@ -570,3 +576,5 @@ namespace Microsoft.TestPlatform.TestUtilities
         }
     }
 }
+
+

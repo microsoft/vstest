@@ -1,6 +1,4 @@
 @echo off
-
-REM Copyright (c) Microsoft. All rights reserved.
-
-powershell -ExecutionPolicy Bypass -NoProfile -NoLogo -Command "%~dp0scripts\test.ps1 %*; exit $LastExitCode;" 
-if %errorlevel% neq 0 exit /b %errorlevel% 
+if not defined MSBUILDTERMINALLOGGER set MSBUILDTERMINALLOGGER=off
+powershell -ExecutionPolicy ByPass -NoProfile -File "%~dp0eng\build.ps1" -test %*
+exit /b %ErrorLevel%

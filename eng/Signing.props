@@ -1,0 +1,259 @@
+<Project>
+
+  <!--
+    Third-party assemblies shipped by 15.9 that are signed with a 3rd party certificate.
+
+    Main's list covers Arcade's own tooling dependencies (Wix, Octokit, AWSSDK and so on).
+    15.9 ships none of those, so they are not listed here.
+
+    THE ORIGINAL COMMENT HERE READ "even though they arrive already signed". MEASURED
+    2026-09-02 AND THAT IS FALSE for the one file this rule names: Newtonsoft.Json.9.0.1
+    arrives NOT signed, in all seven of its lib\* copies. The sentence is kept in this note
+    rather than silently deleted, because it was the stated justification for the rule and it
+    was never true.
+
+    AND THE SHIPPED ARTIFACT PASSES THE FILE THROUGH UNTOUCHED, which is the stronger form and
+    forecloses the obvious defence that the 2018 build stripped or re-signed it. Measured
+    against the package as published on dotnet-public:
+
+      AS PUBLISHED lib/net45   526,336 b  NotSigned  sha256 575E30F98E4EA42C9E516EDC...
+      SHIPPED 15.9 VSIX        526,336 b  NotSigned  sha256 575E30F98E4EA42C9E516EDC...  SAME
+      OURS 3064417 VSIX        536,440 b  Valid      sha256 7FB205EFC17F3622A3A4AEA6...  +10,104
+
+    The 2018 build did not sign it and did not modify it. It shipped the bytes it was given.
+
+    KNOWN EXPECTED DIFFERENCE FROM THE SHIPPED ARTIFACT. All four containers, measured:
+
+      shipped Newtonsoft.Json.9.0.1.nupkg    NotSigned   all 7 lib\* copies
+      shipped 15.9 VSIX                      NotSigned
+      OUR nupkgs, before 2026-09-02          Valid       already deviating, unmeasured
+      OUR VSIX,   before 2026-09-02          NotSigned
+      OUR VSIX,   after  2026-09-02          Valid
+
+    So this entry has ALWAYS produced a deviation - it applied to the nupkg containers from
+    the beginning. Adding the VSIX to ItemsToSign did not create it; it extended it to the
+    second container. Before that, our two containers DISAGREED WITH EACH OTHER about the
+    same file. They now agree, and both differ from shipped.
+
+    THE DEVIATION CANNOT BE FIXED PER-CONTAINER. FileSignInfo is global, so there is no
+    configuration in which the VSIX matches shipped and the packages keep their signature.
+    Matching the baseline in both places is one word - CertificateName="None" - and that is a
+    signing-policy decision, not a build fix: it asks whether a Microsoft product should ship
+    an unsigned third-party redistributable because the 2018 build did.
+
+    RULED 2026-09-02: KEEP the signature. It is harmless - measured as exactly one file, a
+    10,104-byte Authenticode blob, with AssemblyVersion 9.0.0.0, public key token
+    30ad4fe6b2a6aeed and FileVersion 9.0.1.19813 identical on both sides. But it IS a
+    difference, and a content comparison against the shipped artifacts will show
+    Newtonsoft.Json.dll differing in BOTH the VSIX and the packages. That is not a regression.
+
+    Recorded here rather than in a conversation because the person who investigates a one-file
+    hash difference will be reading this file, at an hour when nobody is available to ask.
+  -->
+  <ItemGroup>
+    <FileSignInfo Include="Newtonsoft.Json.dll" CertificateName="3PartySHA2" />
+  </ItemGroup>
+
+  <!--
+    Point ItemsToSign at where this line actually packs.
+
+    Arcade's default glob is $(ArtifactsPackagesDir)**\*.nupkg, which RepoLayout.props:44 defines as
+    artifacts\packages\$(Configuration)\. This line packs through scripts\build.ps1, which writes to
+    artifacts\$(Configuration)\packages\ - the same two segments, transposed. So the default glob
+    matches nothing and Sign.proj:67 fails with "List of files to sign is empty" after an otherwise
+    clean compile, which is exactly what a -sign run does today.
+
+    Declared here rather than fixed by moving or copying the packages. eng\Signing.props is Arcade's
+    repo extension point and is imported by Sign.props:149, AFTER the default ItemsToSign are added
+    at :62, so this is additive. Moving the pack output would change the layout that the whole
+    artifact-alignment comparison is keyed on; copying would duplicate 40 MB of nupkg and create a
+    second set that can drift from the first. Naming the real location does neither.
+
+    ItemsToSign entries are containers: SignTool opens each nupkg and signs the files inside.
+
+    THE VSIX IS LISTED FOR THE SAME REASON AND IT WAS MISSING UNTIL 2026-09-02.
+
+    Arcade already knows how to sign one - Sign.props:88 declares
+    FileExtensionSignInfo .vsix -> VsixSHA2 - but its default globs at Sign.props:55 and :63 look
+    under $(VisualStudioSetupOutputPath), and this line builds its VSIX into
+    artifacts\$(Configuration)\VSIX\ through scripts\build.ps1 -s Vsix. Same mismatch as the
+    packages above: the glob matched nothing, and because ItemsToSign was not EMPTY the signing
+    step had nothing to complain about.
+
+    WHAT THAT SHIPPED, measured byte-for-byte on build 3064282 by comparing the SAME assembly in
+    the nupkg and in the VSIX:
+
+      nupkg copy   Authenticode Valid   sn -vf VALID   128-byte strong name signature, all non-zero
+      VSIX copy    NotSigned            sn -vf FAILED  the same 128 bytes, ALL ZERO
+      difference   +10,040 bytes of Authenticode blob, the PE checksum, the certificate table
+                   data directory, and that 128-byte run. Nothing else.
+
+    So the compiler emits DELAY-SIGNED assemblies and SignTool completes them when it processes a
+    container. The VSIX was never a container it processed, so its payload kept the zeroed strong
+    name and never received Authenticode. 18 repo-built product binaries and 182 satellites were
+    affected.
+
+    It was not noticed because the payload RUNS: .NET Framework bypasses strong-name verification
+    for full-trust assemblies, so the unsigned VSIX discovered and executed tests correctly. A
+    working artifact is not evidence of a signed one.
+  -->
+  <ItemGroup>
+    <ItemsToSign Include="$(ArtifactsDir)$(Configuration)\packages\**\*.nupkg" />
+    <ItemsToSign Include="$(ArtifactsDir)$(Configuration)\VSIX\**\*.vsix" />
+  </ItemGroup>
+
+  <!--
+    Do not sign .js, and do not treat their presence as an error.
+
+    Modern Arcade stopped signing .js by default and raises an error for each one it finds inside a
+    container, telling the repo to either declare FileExtensionSignInfo for .js or set NoSignJS. On
+    this line that fires four times, on IntelliTrace WebViews content:
+
+      CallDurationView.js   plugin.js   JSTreeGridControl.js   MicrosoftAjax-4.0.0.0.debug.js
+
+    All four are CARRIED payload and all four are byte-identical to their counterparts in the
+    shipped 15.9.2 packages - measured, not assumed. So the shipped artifact does not carry a
+    signature on them either, and NOT signing them is what reproduces what shipped.
+
+    Chosen over declaring FileExtensionSignInfo for .js because that would sign files the shipped
+    artifact left unsigned, which changes the artifact to satisfy the tool. The setting that matches
+    the baseline wins over the setting that looks more thorough.
+  -->
+  <PropertyGroup>
+    <NoSignJS>true</NoSignJS>
+  </PropertyGroup>
+
+  <!--
+    DO NOT SIGN .cab. THE SAME RULE AS .js ABOVE, AND UNLIKE .js IT FAILED SILENTLY.
+
+    Arcade 11 signs .cab by default - Sign.props:86 declares
+
+      <FileExtensionSignInfo Include=".dll;.exe;.mibc;.msi;.cab" CertificateName="Microsoft400" />
+
+    and Arcade 9 had no .cab entry at all. This repo declares no FileExtensionSignInfo, so .cab fell
+    through to that default and the one cab in the product was re-signed.
+
+    MEASURED on build 3065146's delivered Microsoft.TestPlatform package, against the shipped
+    15.9.2 nupkg and against this build's own INPUT:
+
+      input   staged-payload Microsoft.Internal.Intellitrace 15.9.0-preview-20180924-02
+              IntelliTraceCollection.cab  2,429,204 bytes  SHA CB358CC3...  signer CN=VS Bld Lab
+      shipped same 2,429,204 bytes, same SHA CB358CC3...  - byte-identical to the input
+      built   2,432,100 bytes  SHA 037102A6...  signer CN=Microsoft Corporation,
+              certificate serial 330000021CFACDC59BE82F7EC400000000021C, notBefore 2026-04-16
+
+    So the input was already correctly signed by VS Bld Lab in 2017, shipped that way, and this
+    pipeline replaced that signature with a 2026 certificate. The build was GREEN.
+
+    WHY NOTHING CAUGHT IT. Of the 421 files present in both the built and the shipped package, 286
+    differ - but 267 .dll and 15 .exe differ because this build compiles them at a new version. The
+    cab is the ONLY file the build does not compile that changed. Every check this line ran until
+    now compared PATHS or package ENTRY LISTS, and a path comparison cannot see a file whose name is
+    identical and whose bytes are not. An entry list reported this package correct.
+
+    The asymmetry that makes this class dangerous, and the reason it is written here rather than in
+    a note: a DECLARED extension colliding with an Arcade default is a hard build error nobody can
+    miss, while an UNDECLARED extension picking up a new default is a silent content change on a
+    green build. The loud half was fixed on a sibling line in minutes; this half shipped.
+
+    Remove-then-re-add rather than deletion, for the reason recorded above for .js: the goal is the
+    bytes the product shipped, not the setting that looks more thorough.
+  -->
+  <ItemGroup>
+    <FileExtensionSignInfo Remove=".cab" />
+    <FileExtensionSignInfo Include=".cab" CertificateName="None" />
+  </ItemGroup>
+
+  <!--
+    Assert the resolved ItemsToSign SET against the packages actually produced, BY NAME.
+
+    Sign.proj:67 errors when ItemsToSign is entirely empty, and that is the good case - it is loud.
+    The dangerous case is a glob that matches SOME of them: signing then exits 0 having signed a
+    subset, and the packages that were skipped are indistinguishable from the ones that were signed
+    until someone opens them. An unsigned assembly inside a signed-looking package is exactly the
+    failure this whole effort exists to prevent.
+
+    So this compares two sets and names every discrepancy. It never reports a count as the verdict:
+    "9 items" is true of the right nine and of any other nine, and every count-based check on this
+    project has eventually concealed a compensating pair.
+
+    Runs before Execute, so a mismatch stops the build before anything is submitted for signing.
+  -->
+  <Target Name="AssertSigningSetMatchesProducedPackages" BeforeTargets="Execute">
+
+    <ItemGroup>
+      <!--
+        DELIBERATELY NOT the same glob text as ItemsToSign above.
+
+        A mutation test caught this: narrowing "packages\**\*.nupkg" narrowed BOTH sides at once, so
+        the comparison found them equal and passed while signing only one package of nine. Two sides
+        of a comparison that share a source of truth cannot disagree, which makes the check vacuous
+        in exactly the case it exists for.
+
+        Written with a distinct pattern so a single edit cannot silently change both. If the
+        DIRECTORY is wrong rather than the pattern, both sides do go empty together - and that case
+        is caught by the empty-population Error below, which is why that Error is not optional.
+      -->
+      <_ProducedPackage Include="$(ArtifactsDir)$(Configuration)\packages\*.nupkg;$(ArtifactsDir)$(Configuration)\packages\*\*.nupkg" />
+
+      <!--
+        The VSIX belongs on this side too, and its absence is why this assertion could not catch
+        the unsigned VSIX shipped up to 2026-09-02.
+
+        Both sides of the comparison enumerated NUPKGS ONLY. ItemsToSign listed nine nupkgs, the
+        produced set found the same nine, the sets matched exactly, and the check passed - while a
+        17 MB VSIX full of delay-signed assemblies sat beside them, in neither set.
+
+        AN AGREEMENT BETWEEN TWO INCLUSION LISTS SAYS NOTHING ABOUT A CATEGORY THAT IS ABSENT FROM
+        BOTH. This check was never wrong about what it compared; it was silent about what it did
+        not enumerate, which is the harder failure to see because it produces a clean pass rather
+        than a wrong answer.
+      -->
+      <_ProducedPackage Include="$(ArtifactsDir)$(Configuration)\VSIX\*.vsix;$(ArtifactsDir)$(Configuration)\VSIX\*\*.vsix" />
+      <_SigningSetNames Include="@(ItemsToSign->'%(Filename)%(Extension)')" />
+      <_ProducedNames Include="@(_ProducedPackage->'%(Filename)%(Extension)')" />
+    </ItemGroup>
+
+    <!-- Both directions, separately, never netted against each other. -->
+    <ItemGroup>
+      <_MissingFromSigningSet Include="@(_ProducedNames)" Exclude="@(_SigningSetNames)" />
+      <_UnexpectedInSigningSet Include="@(_SigningSetNames)" Exclude="@(_ProducedNames)" />
+    </ItemGroup>
+
+    <!--
+      An empty produced set would make both differences empty and this check vacuously green - the
+      same "match over an empty comparison set" defect that a match count without its population
+      hides. Assert the population before asserting the comparison.
+    -->
+    <Error Condition="'@(_ProducedPackage)' == ''"
+           Text="Signing set assertion cannot run: no packages found under $(ArtifactsDir)$(Configuration)\packages\ and no vsix under $(ArtifactsDir)$(Configuration)\VSIX\. This is NOT a pass - the comparison had nothing on one side." />
+
+    <!--
+      Assert each CATEGORY is non-empty, not just their union.
+
+      The union being non-empty is satisfied by nine nupkgs and zero vsix, which is exactly the
+      state that shipped an unsigned VSIX while every check reported green. A category that
+      disappears entirely cannot be caught by a check on the total.
+    -->
+    <ItemGroup>
+      <_ProducedNupkg Include="$(ArtifactsDir)$(Configuration)\packages\**\*.nupkg" />
+      <_ProducedVsix Include="$(ArtifactsDir)$(Configuration)\VSIX\**\*.vsix" />
+    </ItemGroup>
+
+    <Error Condition="'@(_ProducedNupkg)' == ''"
+           Text="No .nupkg was produced under $(ArtifactsDir)$(Configuration)\packages\. The signing-set comparison would still pass on the vsix alone, so this is asserted separately." />
+
+    <Error Condition="'@(_ProducedVsix)' == ''"
+           Text="No .vsix was produced under $(ArtifactsDir)$(Configuration)\VSIX\. The signing-set comparison would still pass on the packages alone - which is precisely how an unsigned VSIX shipped from this line until 2026-09-02." />
+
+    <Error Condition="'@(_MissingFromSigningSet)' != ''"
+           Text="These produced packages are NOT in ItemsToSign and would ship unsigned: @(_MissingFromSigningSet, ', ')" />
+
+    <Error Condition="'@(_UnexpectedInSigningSet)' != ''"
+           Text="ItemsToSign names entries that were not produced here: @(_UnexpectedInSigningSet, ', ')" />
+
+    <Message Importance="high"
+             Text="Signing set verified by name: @(_ProducedNames->Count()) produced, all present in ItemsToSign - @(_ProducedNames, ', ')" />
+  </Target>
+
+</Project>

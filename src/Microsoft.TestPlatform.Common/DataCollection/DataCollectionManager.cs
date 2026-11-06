@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
@@ -643,7 +643,10 @@ namespace Microsoft.VisualStudio.TestPlatform.Common.DataCollector
                         if (EqtTrace.IsVerboseEnabled)
                         {
                             // new variable, add to the list.
-                            EqtTrace.Verbose("DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'", namevaluepair.Key, namevaluepair.Value);
+                            EqtTrace.Verbose(
+                                "DataCollectionManager.AddCollectionEnvironmentVariables: Adding Environment variable '{0}' value '{1}'",
+                                namevaluepair.Key,
+                                SecretRedaction.RedactIfSecret(namevaluepair.Key, namevaluepair.Value));
                         }
 
                         dataCollectorEnvironmentVariables.Add(

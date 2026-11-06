@@ -1,0 +1,239 @@
+<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. -->
+<Project>
+
+  <!--
+    RUN THE NETCORE SUITES THROUGH THE CONSOLE THIS BUILD PRODUCED.
+
+    Arcade's RunTests shells out to `dotnet test`, which drives the SDK's own vstest.console rather
+    than this build's console. That runner may not match the testhost and provider built in this
+    checkout, so its result does not verify the current product. A failing Core suite also suppresses
+    the .NET Framework half: Arcade fails a project with <Error/> rather than
+    ContinueOnError="ErrorAndContinue", abandoning the remaining target frameworks of that project.
+
+    THE EXTENSION POINT, verified on this line's Arcade rather than assumed. Microsoft.DotNet.Arcade.Sdk
+    11.0.0-beta.26421.2, tools/Tests.targets:
+
+        L160  <Import Project="$(TestRunnerTargets)" ... />          the runner, defines RunTests
+        L163  <Import Project="$(RepositoryEngineeringDir)Tests.targets" ... />   this file
+
+    This file is imported after the runner, and the last definition of a target wins, so the
+    RunTests below replaces Arcade's.
+
+    A clean Build does not populate Extensions. eng/Prepare-TestRunner.ps1 stages the extensions
+    from this build's netstandard1.5 outputs and the host provider's restored dependency before
+    any test starts:
+
+        artifacts\bin\vstest.console\<config>\netcoreapp2.0\vstest.console.dll
+        artifacts\bin\vstest.console\<config>\netcoreapp2.0\Extensions\
+            Microsoft.TestPlatform.TestHostRuntimeProvider.dll
+            Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll
+            Microsoft.TestPlatform.Extensions.BlameDataCollector.dll
+
+    No published console package or SDK-runner fallback is used.
+
+    NO html LOGGER. Arcade asks for one; that Extensions folder has a trx logger and no html logger,
+    and vstest.console fails the whole run on a logger it cannot resolve. Nothing downstream needs
+    the html file - the gates read the .trx, and Arcade's own _ResultsFileToDisplay already falls
+    back to the captured stdout when the html file is absent.
+
+    A non-zero exit still fails the build. Continue through the remaining target frameworks so
+    a failed Core suite cannot suppress its Framework results.
+  -->
+
+  <Target Name="RunTests"
+          Outputs="%(TestToRun.ResultsStdOutPath)"
+          Condition="'$(SkipTests)' != 'true' and '@(TestToRun)' != ''">
+
+    <PropertyGroup>
+      <_TestEnvironment>%(TestToRun.EnvironmentDisplay)</_TestEnvironment>
+      <_TestAssembly>%(TestToRun.Identity)</_TestAssembly>
+      <_TestRuntime>%(TestToRun.TestRuntime)</_TestRuntime>
+      <_TestTimeout>%(TestToRun.TestTimeout)</_TestTimeout>
+      <_TestRunnerAdditionalArguments>%(TestToRun.TestRunnerAdditionalArguments)</_TestRunnerAdditionalArguments>
+
+      <_TargetDir>$([System.IO.Path]::GetDirectoryName('$(_TestAssembly)'))\</_TargetDir>
+
+      <_TestResultDirectory>$([System.IO.Path]::GetDirectoryName('%(TestToRun.ResultsTrxPath)'))</_TestResultDirectory>
+      <_TestResultTrxFileName>$([System.IO.Path]::GetFileName('%(TestToRun.ResultsTrxPath)'))</_TestResultTrxFileName>
+      <_TestResultHtmlFileName>$([System.IO.Path]::GetFileName('%(TestToRun.ResultsHtmlPath)'))</_TestResultHtmlFileName>
+
+      <!--
+        Computed from the build output, not supplied by the pipeline. netcoreapp2.0 is this line's
+        console target framework.
+      -->
+      <_LocalVSTestConsolePath Condition="'$(_LocalVSTestConsolePath)' == ''">$(ArtifactsBinDir)vstest.console\$(Configuration)\netcoreapp2.0\vstest.console.dll</_LocalVSTestConsolePath>
+      <_LocalVSTestConsoleDir>$([System.IO.Path]::GetDirectoryName('$(_LocalVSTestConsolePath)'))</_LocalVSTestConsoleDir>
+
+      <!--
+        Microsoft.TestPlatform.TestHostRuntimeProvider
+        sits in Extensions and needs Microsoft.Extensions.DependencyModel, which the console resolves
+        from its own folder. A netstandard project does not copy package dependencies to its output,
+        so the build tree never has it and the console aborts before launching a testhost with
+
+            System.IO.FileNotFoundException: Could not load file or assembly
+            'Microsoft.Extensions.DependencyModel, Version=1.0.1.0'
+               at DotnetTestHostManager.GetTestHostPath(...)
+
+        The shipping layout has it because packaging assembles it. It is staged ONCE, by the
+        pipeline, before any test step - NOT from here. This target is batched: it runs once per
+        test project, concurrently, and every one of them would be writing the same console
+        directory. SkipUnchangedFiles is not cross-process synchronisation, and a copy can overlap
+        another copy or a process already loading that assembly. Checked here, written there.
+      -->
+      <_HostProviderDependency>$(_LocalVSTestConsoleDir)\Microsoft.Extensions.DependencyModel.dll</_HostProviderDependency>
+
+      <!--
+        NETCORE MUST USE THIS RUNNER. There is deliberately no fallback to Arcade's command here.
+        Falling back would re-enter the SDK-console route, which aborts and writes an empty trx -
+        so a missing prerequisite would reproduce the old partial run. A setup problem has to
+        look like a setup problem.
+
+        .NET Framework keeps Arcade's command unchanged; that is a separate, intentional path.
+      -->
+      <_UseLocalConsole>false</_UseLocalConsole>
+      <_UseLocalConsole Condition="'$(_TestRuntime)' == 'Core'">true</_UseLocalConsole>
+    </PropertyGroup>
+
+    <!--
+      PRECONDITIONS, CHECKED LOUDLY AND BEFORE ANYTHING RUNS. These fail the build with the exact
+      missing path rather than degrading into a run that produces no results. The dependency is
+      staged once by the pipeline before the test steps - see "Prepare the test runner" in
+      azure-pipelines-official.yml - precisely so that it is not written from inside this target,
+      which is batched and runs concurrently for every test project against one shared console
+      directory.
+    -->
+    <Error Condition="'$(_UseLocalConsole)' == 'true' and !Exists('$(_LocalVSTestConsolePath)')"
+           File="VSTestSetup"
+           Text="SETUP FAILURE: the console this build produces was not found at $(_LocalVSTestConsolePath). The netcore suites on this line must use the locally built console to test the matching runner, testhost and provider. Build vstest.console before running tests." />
+
+    <Error Condition="'$(_UseLocalConsole)' == 'true' and !Exists('$(_HostProviderDependency)')"
+           File="VSTestSetup"
+           Text="SETUP FAILURE: $(_HostProviderDependency) is missing. Microsoft.TestPlatform.TestHostRuntimeProvider needs Microsoft.Extensions.DependencyModel and the console resolves it from its own folder; a netstandard project does not copy package dependencies to its output, so it has to be staged. Run eng/Prepare-TestRunner.ps1 before the test steps." />
+
+    <ItemGroup Condition="'$(_UseLocalConsole)' == 'true'">
+      <_RequiredLocalConsoleExtension Include="$(_LocalVSTestConsoleDir)\Extensions\Microsoft.TestPlatform.TestHostRuntimeProvider.dll" />
+      <_RequiredLocalConsoleExtension Include="$(_LocalVSTestConsoleDir)\Extensions\Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.dll" />
+      <_RequiredLocalConsoleExtension Include="$(_LocalVSTestConsoleDir)\Extensions\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll" />
+    </ItemGroup>
+    <Error Condition="'$(_UseLocalConsole)' == 'true' and !Exists('%(_RequiredLocalConsoleExtension.Identity)')"
+           File="VSTestSetup"
+           Text="SETUP FAILURE: %(_RequiredLocalConsoleExtension.Identity) is missing. Run eng/Prepare-TestRunner.ps1 before the test steps." />
+
+    <!--
+      ARCADE'S COMMAND, unchanged, for .NET Framework.
+    -->
+    <PropertyGroup Condition="'$(_UseLocalConsole)' != 'true'">
+      <_TestRunnerCommand>&quot;$(DotNetTool)&quot; test $(_TestAssembly) --arch %(TestToRun.Architecture) --logger:"console%3Bverbosity=normal" --logger:"trx%3BLogFileName=$(_TestResultTrxFileName)" --logger:"html%3BLogFileName=$(_TestResultHtmlFileName)" "--ResultsDirectory:$(_TestResultDirectory)" "--Framework:%(TestToRun.TargetFrameworkIdentifier),Version=%(TestToRun.TargetFrameworkVersion)"</_TestRunnerCommand>
+      <_TestRunnerCommand Condition="'%(TestToRun.TestRunSettingsFile)' != ''">$(_TestRunnerCommand) "--settings:%(TestToRun.TestRunSettingsFile)"</_TestRunnerCommand>
+    </PropertyGroup>
+
+    <!--
+      THE CONSOLE DIRECTLY. Same results directory and framework, spelled the way vstest.console
+      spells them. `dotnet exec` rather than `dotnet test`, so no CLI sits in the path to append
+      arguments this console cannot parse.
+    -->
+    <PropertyGroup Condition="'$(_UseLocalConsole)' == 'true'">
+      <_TestRunnerCommand>&quot;$(DotNetTool)&quot; exec "$(_LocalVSTestConsolePath)" "$(_TestAssembly)" /logger:"console%3Bverbosity=normal" /logger:"trx%3BLogFileName=$(_TestResultTrxFileName)" "/ResultsDirectory:$(_TestResultDirectory)" "/Framework:%(TestToRun.TargetFrameworkIdentifier),Version=%(TestToRun.TargetFrameworkVersion)" "/Platform:%(TestToRun.Architecture)"</_TestRunnerCommand>
+      <_TestRunnerCommand Condition="'%(TestToRun.TestRunSettingsFile)' != ''">$(_TestRunnerCommand) "/Settings:%(TestToRun.TestRunSettingsFile)"</_TestRunnerCommand>
+    </PropertyGroup>
+
+    <!--
+      DOTNET_ROOT, and it is load-bearing - measured on 16.11 build 3076338, which is the same fix.
+
+      testhost.exe is a native apphost, not a managed dll. It does not inherit the runtime of
+      whatever launched it: it resolves Microsoft.NETCore.App itself, from DOTNET_ROOT when that is
+      set and from the default install location otherwise. On the hosted agent the default location
+      carries only current runtimes, so every old netcore suite dies with
+
+          Testhost process exited with error: You must install or update .NET to run this
+          application.  Framework: 'Microsoft.NETCore.App', version '1.0.x' / '2.0.x'
+
+      The runtimes ARE present: global.json asks for 1.0.16, 1.1.13, 2.0.9 and 2.1.30 under
+      tools.runtimes and Arcade installs them into the repo-local .dotnet. Nothing points the
+      apphost at them, because the modern console that used to launch it set DOTNET_ROOT and this
+      line's console predates that behaviour.
+
+      SCOPED TO THE LOCAL-CONSOLE PATH ON PURPOSE, so Arcade's unchanged command keeps an empty
+      environment and the .NET Framework suites that already work are not touched.
+
+      ONLY DOTNET_ROOT, NOT DOTNET_ROOT(x86). FAILURE CONDITION TO WATCH: if an x86 netcore suite is
+      ever added here this is the wrong variable and the same error returns, and DOTNET_ROOT(x86)
+      must then point at the x86 install Arcade makes from the dotnet/x86 runtimes in global.json.
+    -->
+    <PropertyGroup Condition="'$(_UseLocalConsole)' == 'true'">
+      <_LocalConsoleEnvironment>DOTNET_ROOT=$([System.IO.Path]::GetDirectoryName('$(DotNetTool)'))</_LocalConsoleEnvironment>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <!--
+        TRANSLATE THE ADDITIONAL ARGUMENTS FOR THE CONSOLE. eng\build.ps1 builds the category
+        exclusions in dotnet test spelling, as a double-dash "filter" option; vstest.console spells
+        the same thing /TestCaseFilter:. Passing it through untranslated makes the console treat the
+        option itself as a test source, and the run fails with
+
+            The test source file "...\(the option)" provided was not found.
+
+        Measured on a full pass on this branch, which is how it was found: a single project run
+        invoked through msbuild directly carries no filter and hides this completely.
+
+        DROPPING THE FILTER WOULD BE WORSE THAN FAILING. It carries TestCategory exclusions such as
+        Compatibility, TelemetryPerf and Performance; losing it would silently widen the run.
+      -->
+      <_LocalConsoleAdditionalArguments>$(_TestRunnerAdditionalArguments)</_LocalConsoleAdditionalArguments>
+      <_LocalConsoleAdditionalArguments Condition="'$(_UseLocalConsole)' == 'true' and '$(_TestRunnerAdditionalArguments)' != ''">$(_TestRunnerAdditionalArguments.Replace('--filter ', '/TestCaseFilter:'))</_LocalConsoleAdditionalArguments>
+
+      <_TestRunnerCommand Condition="'$(_LocalConsoleAdditionalArguments)' != ''">$(_TestRunnerCommand) $(_LocalConsoleAdditionalArguments)</_TestRunnerCommand>
+      <_TestRunnerCommand Condition="'$(TestCaptureOutput)' != 'false'">$(_TestRunnerCommand) &gt;&gt; "%(TestToRun.ResultsStdOutPath)" 2&gt;&amp;1</_TestRunnerCommand>
+    </PropertyGroup>
+
+    <!--
+      If a spelling this does not translate ever appears, fail by name rather than let the console
+      mistake it for a test source and report it as a test failure.
+    -->
+    <Error Condition="'$(_UseLocalConsole)' == 'true' and $(_LocalConsoleAdditionalArguments.Contains('--filter'))"
+           File="VSTestSetup"
+           Text="SETUP FAILURE: an untranslated dotnet test argument reached vstest.console: $(_LocalConsoleAdditionalArguments). vstest.console spells the filter /TestCaseFilter:. Update the translation in eng/Tests.targets alongside whatever changed in eng/build.ps1." />
+
+    <ItemGroup>
+      <_OutputFiles Include="%(TestToRun.ResultsTrxPath)" />
+      <_OutputFiles Include="%(TestToRun.ResultsHtmlPath)" />
+      <_OutputFiles Include="%(TestToRun.ResultsStdOutPath)" />
+    </ItemGroup>
+
+    <MakeDir Directories="@(_OutputFiles-&gt;'%(RootDir)%(Directory)')"/>
+    <Delete Files="@(_OutputFiles)" />
+
+    <Exec Command="echo === COMMAND LINE === &gt; %(TestToRun.ResultsStdOutPath)
+                   echo $(_TestRunnerCommand) &gt;&gt; %(TestToRun.ResultsStdOutPath)" />
+
+    <Message Text="Running tests: $(_TestAssembly) [$(_TestEnvironment)]" Importance="high"/>
+    <Message Condition="'$(_UseLocalConsole)' == 'true'" Text="  using the console this build produced: $(_LocalVSTestConsolePath)" Importance="high"/>
+
+    <Exec Command='$(_TestRunnerCommand)'
+          EnvironmentVariables='$(_LocalConsoleEnvironment)'
+          LogStandardErrorAsError="false"
+          WorkingDirectory="$(_TargetDir)"
+          IgnoreExitCode="true"
+          Timeout="$(_TestTimeout)"
+          ContinueOnError="WarnAndContinue">
+      <Output TaskParameter="ExitCode" PropertyName="_TestErrorCode" />
+    </Exec>
+
+    <Message Text="Tests succeeded: $(_TestAssembly) [$(_TestEnvironment)]" Condition="'$(_TestErrorCode)' == '0'" Importance="high" />
+
+    <PropertyGroup>
+      <_ResultsFileToDisplay>%(TestToRun.ResultsHtmlPath)</_ResultsFileToDisplay>
+      <_ResultsFileToDisplay Condition="!Exists('$(_ResultsFileToDisplay)')">%(TestToRun.ResultsStdOutPath)</_ResultsFileToDisplay>
+    </PropertyGroup>
+
+    <Error Text="Tests failed: $(_ResultsFileToDisplay) [$(_TestEnvironment)]"
+           Condition="'$(_TestErrorCode)' != '0'"
+           File="VSTest"
+           ContinueOnError="ErrorAndContinue" />
+
+    <ItemGroup>
+      <FileWrites Include="@(_OutputFiles)"/>
+    </ItemGroup>
+  </Target>
+
+</Project>

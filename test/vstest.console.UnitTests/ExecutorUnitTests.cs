@@ -55,7 +55,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine.UnitTests
                     .Message.Contains(CommandLineResources.MicrosoftCommandLineTitle.Substring(0, 20)),
                 "First Printed message must be Microsoft Copyright");
 
-            Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(assemblyVersion));
+            // The banner always shows the short version. Asserting the absence of the version
+            // followed by a dash, rather than the absence of the full version, keeps this
+            // meaningful on an official build, whose version carries no suffix at all.
+            var suffixStart = assemblyVersion.IndexOf("-");
+            var shortVersion = suffixStart >= 0 ? assemblyVersion.Substring(0, suffixStart) : assemblyVersion;
+            Assert.IsTrue(mockOutput.Messages.First().Message.EndsWith(shortVersion));
+            Assert.IsFalse(
+                mockOutput.Messages.First().Message.Contains(shortVersion + "-"),
+                "The banner must show the short version; the suffix is only kept in diag mode.");
         }
 
         [TestMethod]

@@ -1,4 +1,4 @@
-﻿// Copyright (c) Microsoft Corporation. All rights reserved.
+// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace TestPlatform.CrossPlatEngine.UnitTests.Client
@@ -14,6 +14,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
@@ -44,6 +45,7 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(null)).Returns(new Message());
             this.mockDataSerializer.Setup(mds => mds.DeserializeMessage(string.Empty)).Returns(new Message());
             this.mockTestHostManager.SetupGet(th => th.Shared).Returns(true);
+
             this.mockTestHostManager.Setup(
                     m => m.GetTestHostProcessStartInfo(
                         It.IsAny<IEnumerable<string>>(),
@@ -54,7 +56,12 @@ namespace TestPlatform.CrossPlatEngine.UnitTests.Client
                 .Callback(
                     () =>
                     {
-                        this.mockTestHostManager.Raise(thm => thm.HostLaunched += null, new HostProviderEventArgs(string.Empty));
+                        using (var process = Process.GetCurrentProcess())
+                        {
+                            this.mockTestHostManager.Raise(
+                                thm => thm.HostLaunched += null,
+                                new HostProviderEventArgs(string.Empty, 0, process.Id));
+                        }
                     })
                 .Returns(Task.FromResult(true));
         }

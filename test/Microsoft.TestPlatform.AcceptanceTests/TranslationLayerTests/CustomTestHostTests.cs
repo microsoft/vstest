@@ -49,7 +49,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // Assert
             Assert.AreEqual(6, this.runEventHandler.TestResults.Count);
-            Assert.IsTrue(customTestHostLauncher.ProcessId != -1);
+            Assert.IsTrue(customTestHostLauncher.ProcessId > 0);
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Passed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Failed));
             Assert.AreEqual(2, this.runEventHandler.TestResults.Count(t => t.Outcome == TestOutcome.Skipped));

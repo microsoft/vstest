@@ -1,0 +1,75 @@
+{
+  "allChangesIncluded": true,
+  "changeCounts": { "Edit": 16 },
+  "changes": [
+    {
+      "item": { "objectId": "756cbf71ad6e89860a4a380463b7e66def094fa0", "originalObjectId": "84f80c90d815a43cea45fc5d8dc215ed664798ec", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/.corext", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "634c1d8fb2681a807a6c85e3674f8a85ce30b438", "originalObjectId": "f53163e82d4a1a0813fd3e9193adce2c6aecf1f6", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/.corext/Configs", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "5c20a92e80a924f31ee543363a411c9c56f7c524", "originalObjectId": "6eed097dd5d5345aa53464c308105e750a674928", "gitObjectType": "blob", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/.corext/Configs/components.json" },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "d84cf81788b95e08e87c108b996783052dcc1935", "originalObjectId": "f971a3c890f043c4e36fa55f1cf5b9e47fb02a32", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "fe895e3b2c25acd36213e2713690e090ad88c252", "originalObjectId": "120b524d893a582ff2ec41f8e69e398e18273352", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "db516264b13a2d7d101325b8dcb1d965389d75c2", "originalObjectId": "be7fe67bafc9871fb7fcf376c289e0e907f9fc6c", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages/TestTools", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "4416d63c9bca8e04d1720aff22d2789780be2f03", "originalObjectId": "a2614b9517f75ec3a60ce60fa171a549267bb5ec", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages/TestTools/TestPlatform", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "d39fafca758fb0c19dd3df21f1ac5a84542bd908", "originalObjectId": "e8d2bdce5e8587429e7ccee02b21cc6105451b31", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages/TestTools/TestPlatform/V1", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "b4c7c805525f207579a0f4c6d3f362c9b8244e35", "originalObjectId": "ca146814c729591f51cf971e67329b835c899585", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages/TestTools/TestPlatform/V1/CLI", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "778e26d1aaae51fc07489cd2f7bacacdbaac5924", "originalObjectId": "307e181f12c8b4f4b90ec2d80a842b15d9652a05", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages/TestTools/TestPlatform/V1/CLI/core", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "3b4a6e84b04dccd3292cf8a4b72b5485d73b7e4d", "originalObjectId": "3af99eeec11bbfeb1fc5514129c2cd6e97503dbd", "gitObjectType": "blob", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/SetupPackages/TestTools/TestPlatform/V1/CLI/core/revision.txt" },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "393140f717ebebad78d76d28fc61cb388cc87b0a", "originalObjectId": "e09a036123444f8ec543da92b4c2c4f8095fce39", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/vset", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "37eaed7f41806519e97b674c23c668453907c1d6", "originalObjectId": "7e5cc22f0ae2b7aae51526e6d12c8c0086beaab4", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/vset/Agile", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "e0df9157adc723ad4b7b393dd32a5107a6b485de", "originalObjectId": "0989247ec792d6a50e53fab7d961c4b9bdb6e7f6", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/vset/Agile/TestPlatform", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "539d83a6d2448cfc7e516bb8e4b198cea6a1430d", "originalObjectId": "73031fc6fcd866b9dd75ad5a039df6edf3e63955", "gitObjectType": "tree", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/vset/Agile/TestPlatform/RocksteadyCLI", "isFolder": true },
+      "changeType": "edit"
+    },
+    {
+      "item": { "objectId": "548d918a1eb1492703a3b96b297cec5f38f6c6e8", "originalObjectId": "6fec56704f6cae4a446765ddad4aa9aa2fa16ac9", "gitObjectType": "blob", "commitId": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c", "path": "/src/vset/Agile/TestPlatform/RocksteadyCLI/App.config" },
+      "changeType": "edit"
+    }
+  ],
+  "commonCommit": "40e83e259297215e34477be59c34140cccffe748",
+  "baseCommit": "40e83e259297215e34477be59c34140cccffe748",
+  "targetCommit": "d6dee0dca7867c621c0f209a0ed3ddea45171c7c",
+  "aheadCount": 1,
+  "behindCount": 0
+}

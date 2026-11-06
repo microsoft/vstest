@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net451</TargetFramework>
+    <AssemblyName>LocalCodedWebTest</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageDownload Include="Microsoft.TestPlatform" Version="[15.9.2]" />
+    <Reference Include="Microsoft.VisualStudio.QualityTools.WebTestFramework">
+      <HintPath>$(TestAssetsPackageRoot)microsoft.testplatform\15.9.2\tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.QualityTools.WebTestFramework.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+</Project>

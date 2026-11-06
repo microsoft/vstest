@@ -1,5 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- This project shares its file name with src\Microsoft.TestPlatform.Build. Arcade derives the
+         intermediate and output directories from the project name (ProjectLayout.props:
+         $(ArtifactsObjDir)$(OutDirName)\), so without this both projects write to
+         artifacts\obj\Microsoft.TestPlatform.Build\ and race each other. That surfaces as
+         intermittent CS2012 and MSB3554 "used by another process" errors which look like machine
+         contention, and it reproduces on a hosted CI agent with nothing else running. -->
+    <OutDirName>Microsoft.TestPlatform.Build.Package</OutDirName>
+
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp1.0</TargetFramework>
     <NuspecFile>TestPlatform.Build.nuspec</NuspecFile>

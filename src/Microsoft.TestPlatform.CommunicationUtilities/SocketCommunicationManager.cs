@@ -36,6 +36,13 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private TcpClient tcpClient;
 
         /// <summary>
+        /// The TCP client accepted by this endpoint, kept so it can be closed when the server stops.
+        /// </summary>
+        private TcpClient acceptedTcpClient;
+
+        private CancellationTokenSource connectionCancellation = new CancellationTokenSource();
+
+        /// <summary>
         /// Binary Writer to write to channel stream
         /// </summary>
         private BinaryWriter binaryWriter;
@@ -95,6 +102,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns>Port of the listener</returns>
         public IPEndPoint HostServer(IPEndPoint endpoint)
         {
+            this.ResetConnectionCancellation();
             this.tcpListener = new TcpListener(endpoint);
             this.tcpListener.Start();
             EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)this.tcpListener.LocalEndpoint);
@@ -106,28 +114,57 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// Accepts client async
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        private void ResetConnectionCancellation()
+        {
+            if (this.connectionCancellation.IsCancellationRequested)
+            {
+                this.connectionCancellation.Dispose();
+                this.connectionCancellation = new CancellationTokenSource();
+            }
+        }
+
         public async Task AcceptClientAsync()
         {
-            if (this.tcpListener != null)
+            var listener = this.tcpListener;
+            if (listener == null || this.connectionCancellation.IsCancellationRequested)
             {
-                this.clientConnectedEvent.Reset();
+                return;
+            }
 
-                var client = await this.tcpListener.AcceptTcpClientAsync();
-                this.socket = client.Client;
-                this.socket.NoDelay = true;
+            this.clientConnectedEvent.Reset();
+            TcpClient client;
+            try
+            {
+                client = await listener.AcceptTcpClientAsync();
+            }
+            catch (ObjectDisposedException) when (this.connectionCancellation.IsCancellationRequested)
+            {
+                return;
+            }
+            catch (SocketException) when (this.connectionCancellation.IsCancellationRequested)
+            {
+                return;
+            }
 
-                // Using Buffered stream only in case of write, and Network stream in case of read.
-                var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
-                var networkStream = client.GetStream();
-                this.binaryReader = new BinaryReader(networkStream);
-                this.binaryWriter = new BinaryWriter(bufferedStream);
+            client.Client.NoDelay = true;
+            if (this.connectionCancellation.IsCancellationRequested)
+            {
+                ((IDisposable)client).Dispose();
+                return;
+            }
 
-                this.clientConnectedEvent.Set();
-                if (EqtTrace.IsInfoEnabled)
-                {
-                    EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-                    EqtTrace.Info("Accepted Client request and set the flag");
-                }
+            this.acceptedTcpClient = client;
+            this.socket = client.Client;
+            var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
+            var networkStream = client.GetStream();
+            this.binaryReader = new BinaryReader(networkStream);
+            this.binaryWriter = new BinaryWriter(bufferedStream);
+
+            this.clientConnectedEvent.Set();
+            if (EqtTrace.IsInfoEnabled)
+            {
+                EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
+                EqtTrace.Info("Accepted client connection");
             }
         }
 
@@ -146,6 +183,15 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopServer()
         {
+            this.connectionCancellation.Cancel();
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.acceptedTcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netstandard1.5.
+            this.acceptedTcpClient?.Dispose();
+#endif
+            this.acceptedTcpClient = null;
             this.tcpListener?.Stop();
             this.tcpListener = null;
             this.binaryReader?.Dispose();
@@ -166,6 +212,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // ToDo: pass cancellationtoken, if user cancels the operation, so we don't wait 50 secs to connect
             // for now added a check for validation of this.tcpclient
             this.clientConnectionAcceptedEvent.Reset();
+            this.ResetConnectionCancellation();
             EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
             this.tcpClient = new TcpClient { NoDelay = true };
             this.socket = this.tcpClient.Client;
@@ -182,7 +229,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
                     if (this.tcpClient.Connected)
                     {
-                        // Using Buffered stream only in case of write, and Network stream in case of read.
+                        if (this.connectionCancellation.IsCancellationRequested)
+                        {
+                            ((IDisposable)this.tcpClient).Dispose();
+                            return;
+                        }
+
                         var bufferedStream = new PlatformStream().CreateBufferedStream(this.tcpClient.GetStream(), SocketConstants.BufferSize);
                         var networkStream = this.tcpClient.GetStream();
                         this.binaryReader = new BinaryReader(networkStream);
@@ -202,7 +254,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     EqtTrace.Error("Connection Failed with error {0}, retrying", ex.ToString());
                 }
             }
-            while ((this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < connectionTimeout);
+            while (!this.connectionCancellation.IsCancellationRequested &&
+                   (this.tcpClient != null) && !this.tcpClient.Connected && watch.ElapsedMilliseconds < connectionTimeout);
         }
 
         /// <summary>
@@ -222,6 +275,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopClient()
         {
+            this.connectionCancellation.Cancel();
 #if NET451
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();

@@ -30,6 +30,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
         private readonly ManualResetEventSlim clientExited;
 
+        private readonly ManualResetEventSlim connectionFailed;
+
         private readonly int clientExitedWaitTime;
 
         private ICommunicationEndPoint communicationEndpoint;
@@ -73,6 +75,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         {
             this.dataSerializer = serializer;
             this.connected = new ManualResetEventSlim(false);
+            this.connectionFailed = new ManualResetEventSlim(false);
             this.clientExited = new ManualResetEventSlim(false);
             this.clientExitedWaitTime = clientExitedWaitTime;
             this.operationCompleted = 0;
@@ -116,6 +119,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 
             // this.clientExitCancellationSource = new CancellationTokenSource();
             this.clientExitErrorMessage = string.Empty;
+            this.connectionFailed.Reset();
 
             this.communicationEndpoint.Connected += (sender, args) =>
                 {
@@ -124,6 +128,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                     if (args.Connected && this.channel != null)
                     {
                         this.connected.Set();
+                    }
+                    else if (args.Fault != null)
+                    {
+                        this.connectionFailed.Set();
                     }
                 };
             this.communicationEndpoint.Disconnected += (sender, args) =>
@@ -149,7 +157,9 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Wait until either connection is successful, handled by connected.WaitHandle
             // or operation is cancelled, handled by cancellationToken.WaitHandle
             // or testhost exits unexpectedly, handled by clientExited.WaitHandle
-            var waitIndex = WaitHandle.WaitAny(new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle }, connectionTimeout);
+            var waitIndex = WaitHandle.WaitAny(
+                new WaitHandle[] { this.connected.WaitHandle, cancellationToken.WaitHandle, this.clientExited.WaitHandle, this.connectionFailed.WaitHandle },
+                connectionTimeout);
 
             // Return true if connection was successful.
             return waitIndex == 0;
@@ -163,6 +173,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
             // Test host sends the version it can support (must be less than highest) to runner
             // Error case: test host can send a protocol error if it cannot find a supported version
             var protocolNegotiated = new ManualResetEvent(false);
+
+            // Captured so we can throw on the calling thread (after WaitOne) instead of throwing on the
+            // communication thread where the exception would not reach the caller.
+            TestPlatformException protocolError = null;
             this.onMessageReceived = (sender, args) =>
             {
                 var message = this.dataSerializer.DeserializeMessage(args.Data);
@@ -181,15 +195,16 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 else if (message.MessageType == MessageType.TestMessage)
                 {
                     // Ignore test messages. Currently we don't have handler(which sends messages to client/console.) here.
-                    // Above we are logging it to EqtTrace.
+                    // Above we are logging it to EqtTrace. Keep waiting for the actual negotiation response.
+                    return;
                 }
                 else if (message.MessageType == MessageType.ProtocolError)
                 {
-                    throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
+                    protocolError = new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckFailed));
                 }
                 else
                 {
-                    throw new TestPlatformException(string.Format(
+                    protocolError = new TestPlatformException(string.Format(
                         CultureInfo.CurrentUICulture,
                         CommonResources.UnexpectedMessage,
                         MessageType.VersionCheck,
@@ -212,6 +227,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 if (!protocolNegotiated.WaitOne(timeout * 1000))
                 {
                     throw new TestPlatformException(string.Format(CultureInfo.CurrentUICulture, CommonResources.VersionCheckTimedout, timeout, EnvironmentHelper.VstestConnectionTimeout));
+                }
+
+                if (protocolError != null)
+                {
+                    throw protocolError;
                 }
             }
             finally
@@ -397,7 +417,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 var rawMessage = messageReceived.Data;
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", rawMessage);
+                    EqtTrace.Verbose("TestRequestSender.OnExecutionMessageReceived: Received message: {0}", Microsoft.VisualStudio.TestPlatform.Common.Utilities.SecretRedaction.RedactSecretsInJson(rawMessage ?? string.Empty));
                 }
 
                 // Send raw message first to unblock handlers waiting to send message to IDEs
@@ -458,7 +478,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 // Currently each of the operations are not separate tasks since they should not each take much time. This is just a notification.
                 if (EqtTrace.IsVerboseEnabled)
                 {
-                    EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", rawMessage);
+                    // DO NOT ADD "?? string.Empty" HERE. The TPDebug.Assert above narrows rawMessage to
+                    // non-null, and re-introducing a null test widens it again - which breaks
+                    // HandleRawMessage below with CS8604, on a line the edit did not touch. The
+                    // execution-path call is guarded because its assert comes AFTER the trace.
+                    // Either way the helper returns string.Empty for null, so nothing can fault.
+                    EqtTrace.Verbose("TestRequestSender.OnDiscoveryMessageReceived: Received message: {0}", Microsoft.VisualStudio.TestPlatform.Common.Utilities.SecretRedaction.RedactSecretsInJson(rawMessage));
                 }
 
                 // Send raw message first to unblock handlers waiting to send message to IDEs

@@ -1,0 +1,2528 @@
+[
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogDataCollectorTests.InitializeShouldSubscribeToDataCollectionEvents",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "InitializeShouldSubscribeToDataCollectionEvents",
+    "skipReason": "Known EventLog subscription mismatch; quarantined for strict servicing validation.",
+    "cause": "PRODUCT AND TEST DISAGREE, AND HAVE SINCE THE SOURCE WAS WRITTEN. The test asserts FIVE subscriptions and the product makes FOUR: EventLogDataCollector.Initialize subscribes SessionStart, SessionEnd, TestCaseStart and TestCaseEnd, and never TestHostLaunched. The test's FIRST assertion calls GetTestHostLaunchedInvocationList(), which is GetInvocationList() on an event with no subscribers - that throws NullReferenceException before any Assert runs, so the NRE is the symptom and the five-versus-four mismatch is the finding. NOT FIXED, and both obvious fixes are wrong on this branch: subscribing the product to TestHostLaunched changes SHIPPED BEHAVIOUR on a branch whose mandate is to build shipped source unmodified, and relaxing the assertion to four decides on no evidence that the product is right and the test is wrong. Which one is correct is a question for the component owners. 16.11 reached the same failure independently, from the same cause, and adjudicated it identically. Listing it is NOT a judgement that it is acceptable.",
+    "classifiedOnRun": "Quarantine authorized by Jakub for strict passing-test validation",
+    "classifiedOn": "2026-09-18"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputErrorForSimpleMessageShouldSetConsoleColorToRed",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "By design, and not a skip. OutputExtensionsTests calls Assert.Inconclusive when the console foreground colour cannot be set, and MSTest maps Inconclusive to NotExecuted. The tests RUN and then declare themselves inconclusive on a redirected-output agent. The ADO results API reports errorMessage as null for these rows, so the signature is empty by measurement rather than by omission.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputWarningForSimpleMessageShouldSetConsoleColorToYellow",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "By design, and not a skip. Assert.Inconclusive on a redirected-output agent; MSTest maps Inconclusive to NotExecuted. errorMessage is null in the ADO results API for these rows.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputInformationForSimpleMessageShouldSetConsoleColorToGivenColor",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "By design, and not a skip. Assert.Inconclusive on a redirected-output agent; MSTest maps Inconclusive to NotExecuted. errorMessage is null in the ADO results API for these rows.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputInformationShouldNotChangeConsoleOutputColor",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "By design, and not a skip. Assert.Inconclusive on a redirected-output agent; MSTest maps Inconclusive to NotExecuted. errorMessage is null in the ADO results API for these rows.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "TestPlatform.Common.UnitTests.ExtensionFramework.TestPluginCacheTests.GetTestExtensionsShouldShouldThrowIfDiscovererThrows",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Disabled in the source since 2021. TestPluginCacheTests carries [Ignore] and the body holds a TODO saying the test needs an ITestDiscoverer interface to mock. Not an environmental condition and not a regression.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "TestPlatform.Common.UnitTests.ExtensionFramework.TestPluginCacheTests.UpdateAdditionalExtensionsShouldResetExtensionsDiscoveredFlag",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Disabled in the source since 2021. TestPluginCacheTests carries [Ignore] and the method body is EMPTY. Not an environmental condition and not a regression.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShouldAddLogs",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Carries [Ignore] in EventLogContainerTests. Declared here because an undeclared NotExecuted blocks signing, which is the designed behaviour of the gate.",
+    "classifiedOnRun": "3065539",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.CUITTest.CUITRunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CUITRunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. CUIT tests are not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. CUIT tests are not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.CUITTest.CUITRunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CUITRunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. CUIT tests are not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. CUIT tests are not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CPPRunAllTestExecution",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CPPRunAllTestExecution (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CPPRunAllTestExecution (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CPPRunAllTestExecution (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CPPRunAllTestExecutionPlatformx64",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CPPRunAllTestExecutionPlatformx64 (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CPPRunAllTestExecutionPlatformx64 (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CPPRunAllTestExecutionPlatformx64 (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. CPP tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CodedWebTestRunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CodedWebTestRunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CodedWebTestRunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CodedWebTestRunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.WebTestRunAllTestsWithRunSettings",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "WebTestRunAllTestsWithRunSettings (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.WebTestRunAllTestsWithRunSettings (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "WebTestRunAllTestsWithRunSettings (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. WebTests tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DisableAppdomainTests.DisableAppdomainTest",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DisableAppdomainTest (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DisableAppdomainTests.DisableAppdomainTest (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DisableAppdomainTest (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DisableAppdomainTests.NewtonSoftDependencyWithDisableAppdomainTest",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "NewtonSoftDependencyWithDisableAppdomainTest (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DisableAppdomainTests.NewtonSoftDependencyWithDisableAppdomainTest (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "NewtonSoftDependencyWithDisableAppdomainTest (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.EventLogCollectorTests.EventLogDataCollectorShoudCreateLogFileHavingEvents",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "EventLogDataCollectorShoudCreateLogFileHavingEvents",
+    "skipReason": "",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. The source carries [Ignore].",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = net451, InIsolation)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = net451, InIsolation)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = net451, InIsolation)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = net451, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionThreadApartmentStateTests.CancelTestExectionShouldWorkWhenApartmentStateIsSTA",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "CancelTestExectionShouldWorkWhenApartmentStateIsSTA",
+    "skipReason": "Issue with TestSessionTimeout: https://github.com/Microsoft/vstest/issues/980",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Issue with TestSessionTimeout: https://github.com/Microsoft/vstest/issues/980",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.OrderedTests.OlderOrderedTestsShouldWorkFine",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "OlderOrderedTestsShouldWorkFine (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Ordered tests are not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Ordered tests are not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.OrderedTests.OlderOrderedTestsShouldWorkFine (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "OlderOrderedTestsShouldWorkFine (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Ordered tests are not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Ordered tests are not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldPublishMetrics (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TestCaseFilterTests.DiscoverMstestV1TestsWithAndOperatorTrait",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverMstestV1TestsWithAndOperatorTrait (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Mstest v1 tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Mstest v1 tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TestCaseFilterTests.DiscoverMstestV1TestsWithAndOperatorTrait (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverMstestV1TestsWithAndOperatorTrait (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Mstest v1 tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Mstest v1 tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TestCaseFilterTests.DiscoverTmiTestsWithOnlyPropertyValue",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTmiTestsWithOnlyPropertyValue (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Tmi tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Tmi tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TestCaseFilterTests.DiscoverTmiTestsWithOnlyPropertyValue (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTmiTestsWithOnlyPropertyValue (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. Tmi tests not supported with .Netcore runner.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. Tmi tests not supported with .Netcore runner.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.CustomTestHostTests.RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithCustomTestHostLaunch (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithChutzpahAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithChutzpahAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithChutzpahAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithChutzpahAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithNunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DifferentTestFrameworkSimpleTests.RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithXunitAdapter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler1 (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingDiscoveryEventHandler2AndTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler1AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingEventHandler2AndBatchSize (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.DiscoverTests.DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingSourceNavigation (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "DiscoverTestsUsingLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.LiveUnitTestingTests.RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithLiveUnitTesting (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunSelectedTests.RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunSelectedTestsWithoutTestPlatformOptions (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunAllTests (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = net451, InIsolation)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = net451, InIsolation)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = net451, InIsolation)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = net451, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsShouldThrowOnStackOverflowException (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedIn (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTelemetryOptedOut (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithRunSettingsWithParallel (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestAdapterPath (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestSettings",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestSettings (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestSettings (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestSettings (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithX64Source (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithFastFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = net451, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp1.1, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithFilterTests.RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "RunTestsWithTestCaseFilter (RunnerFramework = netcoreapp2.0, TargetFramework = netcoreapp2.0, InProcess)",
+    "skipReason": "Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. Assert.Inconclusive failed. VsTestConsoleWrapper donot support .Net Core Runner",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientStartShouldThrowIfServerIsNotListening",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "SocketClientStartShouldThrowIfServerIsNotListening",
+    "skipReason": "",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. The source carries [Ignore].",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests.CommunicationLayerIntegrationTests.AfterTestRunShouldHandleSocketFailureGracefully",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "AfterTestRunShouldHandleSocketFailureGracefully",
+    "skipReason": "",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. The source carries [Ignore].",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests.CommunicationLayerIntegrationTests.AfterTestRunShouldSendGetAttachments",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "AfterTestRunShouldSendGetAttachments",
+    "skipReason": "",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. The source carries [Ignore].",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests.CommunicationLayerIntegrationTests.BeforeTestRunStartShouldGetEnviornmentVariables",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "displayName": "BeforeTestRunStartShouldGetEnviornmentVariables",
+    "skipReason": "",
+    "cause": "Existing source-declared skip, approved by Jakub on 2026-09-17. The source carries [Ignore].",
+    "classifiedOnRun": "15.9 local full integration run, source 324498f65",
+    "classifiedOn": "2026-09-17"
+  }
+]

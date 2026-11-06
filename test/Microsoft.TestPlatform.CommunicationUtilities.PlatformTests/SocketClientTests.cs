@@ -35,6 +35,7 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests
         public void Dispose()
         {
             this.socketClient.Stop();
+            this.tcpListener.Stop();
 #if NET451
             // tcpClient.Close() calls tcpClient.Dispose().
             this.tcpClient?.Close();

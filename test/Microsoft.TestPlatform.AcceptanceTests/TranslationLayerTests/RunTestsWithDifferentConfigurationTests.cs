@@ -71,7 +71,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            this.Setup();
+            var consoleProcessId = NumberOfProcessLaunchedUtility.CaptureStartedChildProcessId("vstest.console", this.Setup);
 
             string runSettingsXml = $@"<?xml version=""1.0"" encoding=""utf-8""?>
                                     <RunSettings>
@@ -105,7 +105,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testhostProcessName);
+                testhostProcessName,
+                consoleProcessId);
 
             this.vstestConsoleWrapper.RunTests(
                 this.GetTestAssemblies(),
@@ -164,7 +165,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.ExecuteNotSupportedRunnerFrameworkTests(runnerInfo.RunnerFramework, Netcoreapp, Message);
-            this.Setup();
+            var consoleProcessId = NumberOfProcessLaunchedUtility.CaptureStartedChildProcessId("vstest.console", this.Setup);
 
             var sources = new List<string>
                               {
@@ -195,7 +196,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testhostProcessName);
+                testhostProcessName,
+                consoleProcessId);
 
             this.vstestConsoleWrapper.RunTests(
                 sources,

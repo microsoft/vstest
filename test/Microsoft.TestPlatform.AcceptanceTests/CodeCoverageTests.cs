@@ -84,7 +84,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 @"scripts\vstest-codecoverage.runsettings");
 
             string traceDataCollectorDir = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory,
-                $@"src\DataCollectors\TraceDataCollector\bin\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
+                $@"artifacts\bin\Microsoft.VisualStudio.TraceDataCollector\{IntegrationTestEnvironment.BuildConfiguration}\netstandard2.0");
 
             string diagFileName = Path.Combine(this.resultsDirectory, "diaglog.txt");
             var arguments = PrepareArguments(assemblyPaths, this.GetTestAdapterPath(), string.Empty,

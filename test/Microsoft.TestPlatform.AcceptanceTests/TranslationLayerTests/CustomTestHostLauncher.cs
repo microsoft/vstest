@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
     using System.Threading;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// The custom test host launcher.
@@ -38,13 +39,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                 WorkingDirectory = defaultTestHostStartInfo.WorkingDirectory
                                       };
             processInfo.UseShellExecute = false;
+            if (defaultTestHostStartInfo.EnvironmentVariables != null)
+            {
+                foreach (var variable in defaultTestHostStartInfo.EnvironmentVariables)
+                {
+                    processInfo.AddEnvironmentVariable(variable.Key, variable.Value);
+                }
+            }
 
             var process = new Process { StartInfo = processInfo };
             process.Start();
 
             if (process != null)
             {
-                return process.Id;
+                this.ProcessId = process.Id;
+                return this.ProcessId;
             }
 
             return -1;

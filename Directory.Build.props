@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <!-- Arcade infers only .IntegrationTests, not the names used by this servicing branch. -->
+  <PropertyGroup Condition="$(MSBuildProjectName.EndsWith('.PlatformTests')) or $(MSBuildProjectName.EndsWith('.AcceptanceTests')) or $(MSBuildProjectName.EndsWith('.SmokeTests'))">
+    <IsIntegrationTestProject>true</IsIntegrationTestProject>
+    <IsUnitTestProject>false</IsUnitTestProject>
+  </PropertyGroup>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <!-- 15.9 targets package-based frameworks whose runtime packages carry known CVEs. A 2019
+       servicing line cannot be made CVE-free. NU1603 is deliberately NOT suppressed: silent
+       version substitution is how a 15.9 package ends up shipping 17.x content. -->
+  <PropertyGroup>
+    <NuGetAudit>false</NuGetAudit>
+    <!-- Only these two are actually required; the rest of a longer list turned out to be
+         unnecessary once NuGetAudit is off.
+         NETSDK1215 - "targeting netstandard < 2.0 is no longer recommended". True, and not
+                      fixable for a 2019 servicing line.
+         NU1504     - a package is declared twice with the same version. Harmless, pre-existing,
+                      and an error only under current NuGet. Worth fixing properly, not urgent.
+         NETSDK1023 - "a PackageReference for X was included; the SDK references it implicitly".
+                      A warning by default, promoted to an error by Arcade's /warnaserror on CI.
+                      The test asset projects pin deliberate old versions of Microsoft.NET.Test.Sdk
+                      because that is what they exist to exercise, and the SDK's own
+                      CheckForImplicitPackageReferenceOverrides drops the implicit reference in
+                      favour of the explicit one, so the pinned version is what gets used.
+                      Removing the explicit references would silently change what those assets
+                      test, which is the opposite of what this branch is for. -->
+    <NoWarn>$(NoWarn);NETSDK1215;NU1504;NETSDK1023</NoWarn>
+
+    <!-- Arcade's _ValidateLicenseFile compares the repository LICENSE file byte-for-byte against
+         the text it expects for the declared license expression. 15.9's LICENSE predates that
+         expectation, so the check fails with
+           RepositoryInfo.targets(143,5): License file content 'LICENSE' doesn't match the expected
+         The condition on _RepositoryValidation is ContinuousIntegrationBuild == true, which is why
+         this appears only on CI and never locally.
+
+         Suppressed rather than fixed on purpose. The alternative is editing the LICENSE file of a
+         shipped 2018 release to satisfy a 2026 build tool, and the licence a release shipped under
+         is not something a build system gets to rewrite. -->
+    <SuppressLicenseValidation>true</SuppressLicenseValidation>
+  </PropertyGroup>
+  <!-- Analyzers.props intentionally not imported: a 2019 servicing line should not gain new
+       analyzer diagnostics, and its versions are not tracked in this branch. -->
+
+  <PropertyGroup>
+    <RepoRoot Condition=" '$(RepoRoot)' == '' ">$([MSBuild]::NormalizeDirectory('$([MSBuild]::GetDirectoryNameOfFileAbove($(MSBuildProjectDirectory), 'LICENSE'))'))</RepoRoot>
+    <IsSourceFile>false</IsSourceFile>
+    <IsSourceFile Condition="$([MSBuild]::MakeRelative($(RepoRoot), $(MSBuildProjectFullPath)).StartsWith('src/')) OR $([MSBuild]::MakeRelative($(RepoRoot), $(MSBuildProjectFullPath)).StartsWith('src\'))">true</IsSourceFile>
+    <SrcPackageFolder>$(RepoRoot)src\package\</SrcPackageFolder>
+    <!-- Nullable is not enabled: 15.9 source predates nullable reference types. -->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- Override the AssemblyVersion as 15.0.0 since protocol depends on this version for serialization. This is also defined in build script. -->
+    <AssemblyVersion Condition="'$(AssemblyVersion)' == ''">15.0.0</AssemblyVersion>
+    <!-- Auto generating binding redirects breaks testhost when running under net8.0 vstest.console as .NET Framework net462.  -->
+    <AutoGenerateBindingRedirects>false</AutoGenerateBindingRedirects>
+    <!-- But not autogenerating binding redirects also breaks build occasionally, so we tell MSBuild to unify assembly versions,
+    without outputting binding redirectes. -->
+    <AutoUnifyAssemblyReferences>true</AutoUnifyAssemblyReferences>
+  </PropertyGroup>
+
+  <!-- Language configuration -->
+  <PropertyGroup>
+    <!-- default to allowing all language features -->
+    <LangVersion>preview</LangVersion>
+    <!-- enable strict mode for Roslyn compiler -->
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <CodeAnalysisTreatWarningsAsErrors>true</CodeAnalysisTreatWarningsAsErrors>
+    <EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild>
+    <EnableNETAnalyzers>true</EnableNETAnalyzers>
+    <!-- default to max warnlevel -->
+    <AnalysisLevel>preview</AnalysisLevel>
+    <!-- GenerateDocumentationFile is deliberately NOT set here.
+
+         main sets it true and it was carried over in the Arcade onboarding commit. rel/15.9 has no
+         such setting: scripts\build\TestPlatform.Settings.targets:19 has it commented out, so the
+         SDK default of false applies, and line 61 sets it false explicitly for test projects.
+
+         With it on, every product project emits an IntelliSense .xml which the publish step then
+         carries into the packages. Measured against the shipped Microsoft.TestPlatform.CLI 15.9.2:
+         24 added paths, almost all Microsoft.TestPlatform.*.xml. The shipped package contains
+         exactly one product .xml, for Microsoft.TestPlatform.VsTestConsole.TranslationLayer, which
+         that project requests for itself.
+
+         Fourth setting carried from main by the same commit that also brought DebugType=embedded,
+         TestCaptureOutput=false and the Moq/CodeCoverage package injection. -->
+    <NoWarn>$(NoWarn);CA1416;RS0037</NoWarn>
+  </PropertyGroup>
+
+  <!-- The TFMs to build and test against. -->
+  <PropertyGroup>
+    <!-- Naming is based on dotnet/runtime one -->
+    <NetFrameworkMinimum>net462</NetFrameworkMinimum>
+    <NetCoreAppMinimum>net8.0</NetCoreAppMinimum>
+    <NetCoreAppStable>net10.0</NetCoreAppStable>
+    <!--
+      Arcade is making things hard to work with. This property is unset when its value is equal to NetMinimum.
+      https://github.com/dotnet/arcade/blob/66c9c5397d599af40f2a94989241944f5a73442a/src/Microsoft.DotNet.Arcade.Sdk/tools/TargetFrameworkDefaults.props#L16-L18
+      Because I don't want to complexify further the logic on VSTest just for that, I will set it to NetMinimum.
+    -->
+    <NetPrevious Condition=" '$(NetPrevious)' == '' ">$(NetMinimum)</NetPrevious>
+
+    <!--
+      vstest.console.exe is shipped with VS, we can use the version of .NET Framework that VS requires to run (this might differ from the version is requires to install).
+      https://learn.microsoft.com/en-us/visualstudio/releases/2022/system-requirements#additional-requirements-and-guidance
+    -->
+    <NetFrameworkRunnerTargetFramework>net48</NetFrameworkRunnerTargetFramework>
+    <!--
+      vstest.console.dll or datacollector.dll are shipped with .NET SDK, target the tfms into which we insert.
+    -->
+    <NetSDKTargetFramework>$(NetCoreAppStable)</NetSDKTargetFramework>
+    <!--
+      vstest.console.dll and datacollector.dll are shipped in TestPlatform.Portable package, that should support
+      the oldest currently supported .NET, because we don't know with which runtime it will be used.
+      vstest.console.exe and datacollector.exe are shipped in there as well, choose the lowest version of
+      .NET Frameowork to support as well.
+    -->
+    <NetPortableTargetFrameworks>$(NetCoreAppMinimum)</NetPortableTargetFrameworks>
+    <NetRunnerTargetFrameworks>$(NetSDKTargetFramework);$(NetPortableTargetFrameworks)</NetRunnerTargetFrameworks>
+    <RunnerTargetFrameworks>$(NetFrameworkRunnerTargetFramework);$(NetRunnerTargetFrameworks)</RunnerTargetFrameworks>
+
+    <!--
+
+    -->
+    <BundledExtensionTargetFrameworks>$(RunnerTargetFrameworks)</BundledExtensionTargetFrameworks>
+    <!--
+      Extensions that are shipped as standalone packages need to be netstandard2.0, because we don't know on which runtime
+      we will run.
+
+      This is the same for bundled extensions that are shipped together with vstest.console or datacollector. In ideal case
+      they would not need netstandard, but we load the same dll into .NET and .NET Framework datacollector.
+      So the need to target netstandard2.0 as well.
+    -->
+    <ExtensionTargetFrameworks>netstandard2.0</ExtensionTargetFrameworks>
+
+    <!--
+      Testhosts need to run on all currently supported target frameworks and newer.
+      https://learn.microsoft.com/en-us/visualstudio/releases/2022/compatibility#-visual-studio-2022-support-for-net-development
+      https://dotnet.microsoft.com/en-us/platform/support/policy
+      https://learn.microsoft.com/en-us/lifecycle/products/microsoft-net-framework
+
+      Currently that is net8 (until November 10, 2026) and .NET Framework 4.6.2 (until Jan 12, 2027).
+    -->
+    <TestHostMinimumTargetFrameworks>$(NetCoreAppMinimum);$(NetFrameworkMinimum)</TestHostMinimumTargetFrameworks>
+    <!--
+      Testhost needs to support every target framework from the minimum, and it also needs to build
+      all the .NET Framework target frameworks that are newer than the minimum, because we ship each of those
+      executables separately, and use it to load dlls into specific version of .NET Framework based on user
+      settings.
+
+      https://learn.microsoft.com/en-us/dotnet/standard/frameworks#supported-target-frameworks
+    -->
+    <TestHostAllTargetFrameworks>$(TestHostMinimumTargetFrameworks);net47;net471;net472;net48;net481</TestHostAllTargetFrameworks>
+
+    <!--
+      Library that is loaded by others and by us. We don't know where it will run (e.b. TranslationLayer),
+      we need to support all frameworks from minimum, and also netstandard2.0.
+    -->
+    <LibraryTargetFrameworks>$(NetFrameworkMinimum);$(NetCoreAppMinimum);netstandard2.0</LibraryTargetFrameworks>
+  </PropertyGroup>
+
+  <!-- Build & pack config -->
+  <PropertyGroup>
+    <Copyright>$(CopyrightMicrosoft)</Copyright>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/microsoft/vstest</PackageProjectUrl>
+    <!-- Prevent warning about deprecated target frameworks -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <!-- PDB -->
+    <DebugSymbols>true</DebugSymbols>
+    <!-- rel/15.9 sets no DebugType at all. "embedded" arrived here from main, in the Arcade
+         onboarding commit, and is a port hazard rather than an Arcade default - do not restore it.
+
+         embedded puts the debug information inside the assembly and emits no separate .pdb. Two
+         consequences, both bad here:
+
+           1. scripts/build.ps1 moves and copies .pdb files explicitly - the Trx logger and the
+              testhost runtime provider out of the publish directory, the blame and event log
+              collectors and TraceDataCollector out of the build output. With no .pdb on disk those
+              calls fail and packaging aborts.
+           2. It changes the assembly bytes. Measured on Trx.TestLogger.dll, net451, Release:
+
+                embedded  94,208      no separate .pdb
+                portable  75,776      + separate .pdb
+                full      75,776      + separate .pdb
+                pdbonly   75,776      + separate .pdb
+                shipped   91,392
+
+              embedded inflates the assembly by 18,432 bytes, about 24%, against every alternative.
+
+         The three non-embedded values produce byte-identical assemblies, so this choice does not
+         affect the DLL - it only decides the PDB format. The shipped size matches none of them;
+         that difference comes from the 2018 compiler, not from DebugType, and is expected for a
+         rebuilt file. Do not chase it.
+
+         This must be set here in Directory.Build.props, not in Directory.Build.targets. The
+         compiler honours a late override - setting it in .targets does produce a 75,776 byte
+         portable assembly - but the decision to copy the .pdb to the output directory is made when
+         the SDK targets are imported, which happens first. Setting it late therefore yields a
+         portable assembly whose .pdb exists only in artifacts\obj and never reaches artifacts\bin,
+         which looks exactly like the embedded case at the point where packaging fails. -->
+    <DebugType>portable</DebugType>
+    <!-- Default to all packages generating a corresponding symbol package -->
+    <IncludeSymbols>true</IncludeSymbols>
+  </PropertyGroup>
+
+  <!-- Sign config -->
+  <PropertyGroup>
+    <StrongNameKeyId>Microsoft</StrongNameKeyId>
+  </PropertyGroup>
+
+  <!-- Test config -->
+  <PropertyGroup>
+    <!-- 15.9 test projects reference MSTest 1.3.1 explicitly. Letting Arcade add an implicit
+         reference produces NETSDK1023 on every test project. -->
+    <!-- Avoid making the TestRunnerAdditionalArguments a global property that we cannot change in the run, by passing TestRunnerExternalArguments externally instead. -->
+    <TestRunnerAdditionalArguments Condition=" '$(TestRunnerExternalArguments)' != ''">$(TestRunnerExternalArguments)</TestRunnerAdditionalArguments>
+    <!-- Skip windows only tests on non-windows systems. -->
+    <TestRunnerAdditionalArguments Condition=" '$(OS)' != 'Windows_NT' ">$(TestRunnerAdditionalArguments) --filter "TestCategory!=Windows&amp;TestCategory!=Windows-Review"</TestRunnerAdditionalArguments>
+    <!-- Arcade's default (capture the test runner's stdout to a file) is deliberately kept.
+
+         main sets this to false to see errors inline instead of in files, and that was carried here
+         in the Arcade onboarding commit. rel/15.9 has no such setting. It is safe on main and not
+         safe here, because the difference is the age of the product under test rather than anything
+         in the build system.
+
+         The TraceDataCollector tests exercise the native coverage collector, which writes its banner
+         to stdout as UTF-16. Captured as bytes that is "M\0i\0c\0r\0o\0s\0o\0f\0t\0 \0(\0R\0)\0..."
+         and 15.9's own HtmlLogger - the product being tested here - cannot serialise the null
+         characters, so it prints:
+
+           Html Logger error : '.', hexadecimal value 0x00, is an invalid character.
+
+         Nothing is actually wrong: all 37 tests pass, the .trx and .html are both written, and the
+         runner exits 0. But with output uncaptured that line reaches MSBuild's Exec, which matches
+         the canonical "<tool> error : <message>" shape and turns it into a build error, failing the
+         whole test leg for an assembly with no failing test.
+
+         With capture on, the same output goes to $(TestResultsLogDir)<name>.log, which Arcade lists
+         in _OutputFiles and the pipeline publishes, so nothing is lost - it moves from the inline
+         console to an artifact. Real test failures are unaffected: they are reported from the exit
+         code and the .trx.
+
+         Do not set this to false here without also solving the logger message, or the test leg will
+         fail again on a passing assembly. -->
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <!-- 15.9 ships hand-written Properties/AssemblyInfo.cs. Arcade generates the same attributes,
+         which gives CS0579. TestPlatform.Settings.targets already turns off Configuration, Company
+         and Product; Arcade adds Copyright on top. -->
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+  </PropertyGroup>
+
+</Project>

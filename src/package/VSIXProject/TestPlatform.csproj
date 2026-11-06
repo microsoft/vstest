@@ -6,7 +6,7 @@
     <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Dependencies.props" />
-  <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('($TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" />
+  <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -269,3 +269,4 @@
   </Target>
   -->
 </Project>
+

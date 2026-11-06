@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- The retired 15.9 QualityTools packages no longer restore by identity. Compile these
+       fixtures against the corresponding assemblies in the shipped 15.9.2 tool package. -->
+  <PropertyGroup Condition="'$(MSBuildProjectName)' == 'LegacySettingsUnitTestProject' or
+                            '$(MSBuildProjectName)' == 'MstestV1UnitTestProject' or
+                            '$(MSBuildProjectName)' == 'CUITTestProject'">
+    <_UseShippedLegacyTestReferences>true</_UseShippedLegacyTestReferences>
+    <_LegacyTestPlatformReferenceDir>$(TestAssetsPackageRoot)microsoft.testplatform\15.9.2\tools\net451\Common7\IDE\Extensions\TestPlatform\</_LegacyTestPlatformReferenceDir>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(_UseShippedLegacyTestReferences)' == 'true'">
+    <PackageReference Remove="Microsoft.VisualStudio.QualityTools;Microsoft.VisualStudio.cuit" />
+    <PackageDownload Include="Microsoft.TestPlatform" Version="[15.9.2]" />
+    <Reference Update="Microsoft.VisualStudio.QualityTools.UnitTestFramework;Microsoft.VisualStudio.QualityTools.CodedUITestFramework;Microsoft.VisualStudio.TestTools.UITest.Common;Microsoft.VisualStudio.TestTools.UITest.Extension;Microsoft.VisualStudio.TestTools.UITesting">
+      <HintPath>$(_LegacyTestPlatformReferenceDir)%(Reference.Identity).dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+  <!-- Normal acceptance fixtures must use the host being serviced. Keep their historic package
+       pins by default, and never replace the dedicated old-host compatibility fixture. -->
+  <PropertyGroup Condition="'$(UseCurrentTestHost)' == 'true' and
+                            ('$(MSBuildProjectName)' == 'SimpleTestProject' or '$(MSBuildProjectName)' == 'SimpleTestProject3' or
+                             '$(MSBuildProjectName)' == 'NUTestProject' or '$(MSBuildProjectName)' == 'XUTestProject') and
+                            $(TargetFramework.StartsWith('netcoreapp'))">
+    <_UseCurrentTestHostForAsset>true</_UseCurrentTestHostForAsset>
+    <IsTestProject>true</IsTestProject>
+    <GenerateRuntimeConfigurationFiles>true</GenerateRuntimeConfigurationFiles>
+  </PropertyGroup>
+  <ItemGroup Condition="'$(_UseCurrentTestHostForAsset)' == 'true'">
+    <PackageReference Remove="Microsoft.NET.Test.Sdk" />
+    <!-- Old adapters can also bring testhost transitively. Only the project-built host may run. -->
+    <PackageReference Include="Microsoft.TestPlatform.TestHost" Version="$(NETTestSdkPreviousVersion)" ExcludeAssets="All" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(TestPlatformExternalsVersion)" GeneratePathProperty="true" ExcludeAssets="All" PrivateAssets="All" />
+    <Reference Include="Microsoft.VisualStudio.CodeCoverage.Shim">
+      <HintPath>$(PkgMicrosoft_Internal_CodeCoverage)\contentFiles\any\any\Shim\netcoreapp1.0\Microsoft.VisualStudio.CodeCoverage.Shim.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <ProjectReference Include="$(RepoRoot)src\testhost\testhost.csproj">
+      <FromP2P>true</FromP2P>
+    </ProjectReference>
+  </ItemGroup>
+
+  <!-- Present so MSBuild does not continue searching upward and pick up the repository root
+       Directory.Build.targets, which carries the Arcade and product build rules. See the
+       reasoning in Directory.Build.props beside this file. -->
+
+  <!-- Arcade defines Test, IntegrationTest and PerformanceTest as empty targets for every project
+       it owns - tools\Empty.targets and tools\Tests.targets, where the real Test target carries a
+       Condition on IsUnitTestProject so it no-ops for anything that is not a test project.
+
+       These assets are isolated from Arcade but are still members of TestPlatform.sln, and the test
+       leg runs with -projects TestPlatform.sln, so MSBuild asks every project in the solution for
+       the Test target. Without these declarations the assets fail the whole test leg with:
+
+         error MSB4057: The target "Test" does not exist in the project.
+
+       Declaring them empty here restores exactly what the root Directory.Build.targets used to
+       provide, without importing it and undoing the isolation. This is the third setting the
+       isolation cut off - see also the net451 reference assemblies in Directory.Build.props and
+       ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch, which now lives in
+       scripts\build\TestPlatform.Settings.targets.
+
+       Publish is deliberately NOT declared here. Arcade lists it in Empty.targets because Arcade
+       owns publishing for its projects; for these assets Publish is the real SDK target and
+       overriding it would break them. Only the three Arcade-specific verbs belong here. -->
+  <Target Name="Test" />
+  <Target Name="IntegrationTest" />
+  <Target Name="PerformanceTest" />
+</Project>

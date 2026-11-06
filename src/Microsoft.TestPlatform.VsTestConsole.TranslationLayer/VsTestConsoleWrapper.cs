@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
@@ -7,6 +7,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System;
 
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Helpers;
@@ -275,12 +276,19 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
         private bool WaitForConnection()
         {
+            WaitForConnection(this.requestSender.WaitForRequestHandlerConnection, this.processHelper.GetCurrentProcessFileName);
+            this.testPlatformEventSource.TranslationLayerInitializeStop();
+            return true;
+        }
+
+        internal static bool WaitForConnection(Func<int, bool> waitForConnection, Func<string> getProcessName)
+        {
             EqtTrace.Info("VsTestConsoleWrapper.WaitForConnection: Waiting for connection to command line runner.");
 
             var timeout = EnvironmentHelper.GetConnectionTimeout();
-            if (!this.requestSender.WaitForRequestHandlerConnection(timeout * 1000))
+            if (!waitForConnection(timeout * 1000))
             {
-                var processName = this.processHelper.GetCurrentProcessFileName();
+                var processName = getProcessName();
                 throw new TransationLayerException(
                     string.Format(
                         CultureInfo.CurrentUICulture,
@@ -292,7 +300,6 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
                     );
             }
 
-            this.testPlatformEventSource.TranslationLayerInitializeStop();
             return true;
         }
     }

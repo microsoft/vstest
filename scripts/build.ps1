@@ -1,4 +1,4 @@
-﻿# Copyright (c) Microsoft. All rights reserved.
+# Copyright (c) Microsoft. All rights reserved.
 # Build script for Test Platform.
 
 [CmdletBinding()]
@@ -45,7 +45,22 @@ Param(
     # Build specific projects
     [Parameter(Mandatory=$false)]
     [Alias("p")]
-    [System.String[]] $ProjectNamePatterns = @()
+    [System.String[]] $ProjectNamePatterns = @(),
+
+    # Which of the build actions to run. Defaults to all of them, in the order below, which is
+    # exactly what this script did before this parameter existed - passing nothing is unchanged.
+    #
+    # Added so a pipeline that already builds through another build system can invoke only the
+    # packaging actions without redoing restore and build, and specifically so UpdateLocalization
+    # can be left out: it runs xlftool.exe update, which rewrites the checked-in .xlf files from
+    # the neutral .resx. For a servicing build we need the translations that shipped.
+    #
+    # Step names match the equivalent parameter on the 16.11 branch where the actions correspond,
+    # so the two scripts converge rather than drift.
+    [Parameter(Mandatory=$false)]
+    [Alias("s")]
+    [ValidateSet("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PublishTests", "Vsix", "NugetPackages")]
+    [System.String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PublishTests", "Vsix", "NugetPackages")
 )
 
 $ErrorActionPreference = "Stop"
@@ -57,7 +72,17 @@ Write-Verbose "Setup environment variables."
 $CurrentScriptDir = (Get-Item (Split-Path $MyInvocation.MyCommand.Path))
 $env:TP_ROOT_DIR = $CurrentScriptDir.Parent.FullName
 $env:TP_TOOLS_DIR = Join-Path $env:TP_ROOT_DIR "tools"
-$env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
+# The third-party payload directory. Historically this was <repo>\packages, filled by this script's
+# own nuget restore. Under Arcade that restore does not happen, and restoring these packages by
+# identity would be wrong anyway - the shipped msdia140.dll is 14.20.27106.0 while the restorable
+# package carries 14.26.28619.0, so a version-matched restore injects different bytes.
+#
+# The pipeline sets this to a payload directory staged from the shipped artifacts by
+# scripts\build\New-StagedPayload.ps1. Respect an existing value rather than overwriting it, so the
+# historic default still applies to anyone running this script standalone.
+if (-not $env:TP_PACKAGES_DIR) {
+    $env:TP_PACKAGES_DIR = Join-Path $env:TP_ROOT_DIR "packages"
+}
 $env:TP_OUT_DIR = Join-Path $env:TP_ROOT_DIR "artifacts"
 $env:TP_TESTARTIFACTS = Join-Path $env:TP_OUT_DIR "testArtifacts"
 $env:TP_PACKAGE_PROJ_DIR = Join-Path $env:TP_ROOT_DIR "src\package"
@@ -75,8 +100,23 @@ $Version = ($Version).Trim()
 # Disable first run since we want to control all package sources 
 Write-Verbose "Setup dotnet configuration."
 $env:DOTNET_SKIP_FIRST_TIME_EXPERIENCE = 1 
-# Dotnet build doesn't support --packages yet. See https://github.com/dotnet/cli/issues/2712
-$env:NUGET_PACKAGES = $env:TP_PACKAGES_DIR
+# NUGET_PACKAGES is deliberately NOT derived from TP_PACKAGES_DIR.
+#
+# It used to be, with the comment "Dotnet build doesn't support --packages yet", which pointed NuGet
+# at <repo>\packages - the folder this script's own restore filled. Two things make that wrong now:
+#
+#   1. TP_PACKAGES_DIR no longer names a restore folder. It names the staged third-party payload
+#      extracted from the shipped artifacts, because feed copies are not the shipped bytes: the
+#      shipped msdia140.dll is 14.20.27106.0 and the restorable package carries 14.26.28619.0.
+#      Pointing NuGet at that directory makes it restore packages into the payload tree.
+#   2. Arcade restores to the NuGet global packages folder and builds against it. Overriding
+#      NUGET_PACKAGES here makes the packaging steps resolve tasks from a different, empty location
+#      than the build did, which surfaced as XliffTasks MSB4018 "TranslateSource task failed" while
+#      the same build succeeded through Arcade.
+#
+# Leaving it unset lets NuGet use the same folder Arcade already restored into. Measured: setting it
+# created <repo>\packages with 159 package directories, which is also the untracked folder that
+# produced 45 false findings in the shared delivery guard on another line.
 $env:NUGET_EXE_Version = "3.4.3"
 $env:DOTNET_CLI_VERSION = "LATEST"
 # $env:DOTNET_RUNTIME_VERSION = "LATEST"
@@ -102,6 +142,27 @@ $TPB_Version = if ($VersionSuffix -ne '') { $Version + "-" + $VersionSuffix } el
 $TPB_CIBuild = $CIBuild
 $TPB_PublishTests = $PublishTestArtifacts
 $TPB_LocalizedBuild = !$DisableLocalizedBuild
+
+# $TPB_LocalizedBuild was doing two different jobs, and under Arcade they conflict.
+#
+#   1. Passed to MSBuild as -p:LocalizedBuild, it activates this repo's own localization ItemGroup
+#      in scripts\build\TestPlatform.Localization.targets, which adds culture-specific .resx to
+#      @(EmbeddedResource). Arcade's XliffTasks then treats Resources.cs.resx as a neutral file and
+#      looks for Resources\xlf\Resources.cs.cs.xlf - a doubled language code - and the build fails.
+#      Arcade already produces every satellite from the checked-in .xlf, verified by comparing
+#      5,018 resource entries against the shipped assemblies, so this must stay OFF.
+#
+#   2. Used as a PowerShell guard, it enables the Copy-Loc-Files and Move-Loc-Files calls that
+#      relocate extension satellites into the Extensions subfolder. That work is not done by
+#      anything else, so this must stay ON. Without it the satellites are packaged at
+#      contentFiles/any/netcoreapp2.0/<locale>/ where the shipped package has them at
+#      contentFiles/any/netcoreapp2.0/Extensions/<locale>/ - measured against the shipped
+#      Microsoft.TestPlatform.CLI 15.9.2 as 54 missing and 50 added paths.
+#
+# Split into two variables so each can take the value its consumer needs. -noloc still turns both
+# off, which is what a caller asking for no localized build means.
+$TPB_LocalizedResourceRelocation = $TPB_LocalizedBuild
+$TPB_LocalizedBuild = $false
 
 $language = @("cs", "de", "es", "fr", "it", "ja", "ko", "pl", "pt-BR", "ru", "tr", "zh-Hans", "zh-Hant")
 
@@ -285,7 +346,11 @@ function Publish-Package
     Set-ScriptFailedOnError
 
     # Publish platform abstractions
-    $platformAbstraction = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration"
+    # Arcade puts build output in artifacts\bin\<ProjectName>\<Configuration>\<tfm>, not in
+    # src\<Project>\bin\<Configuration>\<tfm>. The structure below the configuration is unchanged -
+    # the same net451, netcoreapp1.0, netstandard1.0 and uap10.0 subdirectories - so only the root
+    # moves and the copy sites below need no edits.
+    $platformAbstraction = Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.PlatformAbstractions\$TPB_Configuration"
     $platformAbstractionNetFull = Join-Path $platformAbstraction $TPB_TargetFramework
     $platformAbstractionNetCore = Join-Path $platformAbstraction $TPB_TargetFrameworkCore
     $platformAbstractionUap = Join-Path $platformAbstraction $TPB_TargetFrameworkUap
@@ -320,14 +385,14 @@ function Publish-Package
     }
 
     # Move trx logger resource dlls
-    if($TPB_LocalizedBuild) {
+    if($TPB_LocalizedResourceRelocation) {
         Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.VisualStudio.TestPlatform.Extensions.Trx.TestLogger.resources.dll"
     }
 
     # Copy Blame Datacollector to Extensions folder.
     $TPB_TargetFrameworkStandard = "netstandard1.5"
-    $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
+    $blameDataCollector = Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.Extensions.BlameDataCollector\$TPB_Configuration"
     $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
@@ -336,13 +401,13 @@ function Publish-Package
     Copy-Item $blameDataCollectorNetStandard\Microsoft.TestPlatform.Extensions.BlameDataCollector.pdb $coreCLRExtensionsDir -Force
 
     # Copy blame data collector resource dlls
-    if($TPB_LocalizedBuild) {
+    if($TPB_LocalizedResourceRelocation) {
         Copy-Loc-Files $blameDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
         Copy-Loc-Files $blameDataCollectorNetStandard $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.BlameDataCollector.resources.dll"
     }
 
     # Copy Event Log Datacollector to Extensions folder.
-    $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
+    $eventLogDataCollector = Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.Extensions.EventLogCollector\$TPB_Configuration"
     $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $fullCLRExtensionsDir -Force
@@ -350,7 +415,7 @@ function Publish-Package
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $coreCLRExtensionsDir -Force
 
     # Copy EventLogCollector resource dlls
-    if($TPB_LocalizedBuild) {
+    if($TPB_LocalizedResourceRelocation) {
         Copy-Loc-Files $eventLogDataCollectorNetFull $fullCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
         Copy-Loc-Files $eventLogDataCollectorNetFull $coreCLRExtensionsDir "Microsoft.TestPlatform.Extensions.EventLogCollector.resources.dll"
     }
@@ -366,7 +431,7 @@ function Publish-Package
     }
 
     # Move TestHostRuntimeProvider resource dlls
-    if($TPB_LocalizedBuild) {
+    if($TPB_LocalizedResourceRelocation) {
         Move-Loc-Files $fullCLRPackageDir $fullCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
         Move-Loc-Files $coreCLR20PackageDir $coreCLRExtensionsDir "Microsoft.TestPlatform.TestHostRuntimeProvider.resources.dll"
     }
@@ -434,8 +499,6 @@ function Publish-Tests
 		$xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
 		Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework $xunittest10kPerfProjectDir
 
-		$testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
-		Publish-PackageInternal $testPerfProject $TPB_TargetFramework $fullCLRTestDir
 	}
 }
 
@@ -534,12 +597,86 @@ function Create-VsixPackage
         Update-VsixVersion $vsixProjectDir
 
         # Build vsix project to get TestPlatform.vsix
-        Write-Verbose "$msbuildPath\msbuild.exe $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
-        & $msbuildPath\msbuild.exe "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
+        #
+        # TargetFrameworkRootPath is supplied from a restored package rather than relying on an
+        # installed targeting pack. The project sets <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+        # and modern machines no longer carry the 4.6 pack, so msbuild failed with MSB3644. The
+        # leftover Reference Assemblies\.NETFramework\v4.6 directory holds 126 files and no
+        # mscorlib.dll; the package holds 259 files WITH mscorlib.dll, which is the profile of a
+        # real pack. Supplying the reference assemblies is infrastructure - it does not retarget
+        # the project and does not change what the VSIX contains. Retargeting would.
+        # Same resolution as build-time tooling elsewhere in this script: prefer the package cache,
+        # fall back to TP_PACKAGES_DIR. $toolRoot is a local in the two functions that already use
+        # it, so it is recomputed here rather than assumed to be in scope.
+        $toolRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { $env:TP_PACKAGES_DIR }
+        $refAsmRoot = Join-Path $toolRoot 'microsoft.netframework.referenceassemblies.net46\1.0.3\build'
+        $msbuildArgs = @("$vsixProjectDir\TestPlatform.csproj", "-p:Configuration=$Configuration")
+        if (Test-Path -path (Join-Path $refAsmRoot '.NETFramework\v4.6\mscorlib.dll')) {
+            $msbuildArgs += "-p:TargetFrameworkRootPath=$refAsmRoot"
+            Write-Host "... .. Create-VsixPackage: using reference assemblies from '$refAsmRoot'."
+        }
+        else {
+            Write-Host "... .. Create-VsixPackage: no restored 4.6 reference assemblies at '$refAsmRoot'; relying on an installed targeting pack. Expect MSB3644 if none is present."
+        }
+        # The vsix project resolves Microsoft.VSSDK.BuildTools from $(TestPlatformRoot)packages\,
+        # the historic <repo>\packages layout, NOT from $toolRoot. TP_PACKAGES_DIR now points at
+        # the staged runtime payload, so that folder no longer exists and the project failed with
+        # "This project references NuGet package(s) that are missing on this computer."
+        # Place the restored package where the 2018 project expects it. <repo>\packages is
+        # gitignored, so nothing is committed. This is a THIRD build-time tool: the earlier
+        # statement that tooling is exactly two entries was scoped to $toolRoot resolution and
+        # missed this one, which resolves through an MSBuild property instead.
+        $vssdkVersion = '15.8.3247'
+        $vssdkSource = Join-Path $toolRoot "microsoft.vssdk.buildtools\$vssdkVersion"
+        $vssdkTarget = Join-Path $env:TP_ROOT_DIR "packages\microsoft.vssdk.buildtools\$vssdkVersion"
+        if ((Test-Path -path $vssdkSource) -and -not (Test-Path -path (Join-Path $vssdkTarget 'build\Microsoft.VSSDK.BuildTools.targets'))) {
+            Write-Host "... .. Create-VsixPackage: staging Microsoft.VSSDK.BuildTools $vssdkVersion from '$vssdkSource' to '$vssdkTarget'."
+            New-Item -ItemType Directory -Force -Path $vssdkTarget | Out-Null
+            Copy-Item -Path (Join-Path $vssdkSource '*') -Destination $vssdkTarget -Recurse -Force
+        }
+        if (-not (Test-Path -path (Join-Path $vssdkTarget 'build\Microsoft.VSSDK.BuildTools.targets'))) {
+            Write-Host "... .. Create-VsixPackage: Microsoft.VSSDK.BuildTools $vssdkVersion is not at '$vssdkTarget' and was not found at '$vssdkSource'. The vsix project will report missing NuGet packages."
+        }
+
+        Write-Verbose "$msbuildPath\msbuild.exe $($msbuildArgs -join ' ')"
+        & $msbuildPath\msbuild.exe @msbuildArgs
+        # The exit code of this invocation was never checked, so a FAILED vsix build still printed
+        # "Create-VsixPackage: Complete" and the script exited 0. Measured: msbuild reported
+        # "Build FAILED" with error MSB3644 and the run still exited 0. Same shape as the missing
+        # MSBuild branch below - the VSIX is the artifact VS inserts, so a build that did not
+        # produce one must not report success. Deferred rather than thrown so the remaining
+        # packaging steps still run.
+        Set-ScriptFailedOnError
+        $vsixProduced = @(Get-ChildItem -Path $vsixProjectDir -Recurse -Filter '*.vsix' -ErrorAction SilentlyContinue)
+        if ($vsixProduced.Count -eq 0) {
+            Write-Error ".. Create-VsixPackage: msbuild completed but produced no .vsix under '$vsixProjectDir'. Checking the exit code alone is not enough: assert the artifact exists, because the whole point of this step is the file."
+            $Script:ScriptFailed = $true
+        }
+        else {
+            Write-Host "... .. Create-VsixPackage: produced $($vsixProduced.Count) vsix: $(($vsixProduced | ForEach-Object { $_.Name }) -join ', ')."
+        }
     }
     else
     {
-        Write-Log ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe not found at '$msbuildPath'."
+        # This was a Write-Log, which meant a missing MSBuild SKIPPED VSIX generation silently and
+        # the step still reported success with exit 0. Measured: zero .vsix in the null-build
+        # reference (10,523 files), zero in artifacts, and the local run printed
+        # "Create-VsixPackage: Complete" followed by "Build complete" having produced nothing.
+        #
+        # The VSIX is the artifact VS inserts - the component pin
+        # Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI.vsman resolves to it, and
+        # VisualStudio.External.vsmanproj sets PreSignManifest=false, so nothing downstream
+        # re-creates or re-signs it. A drop built from a run with no VSIX is an empty insertion:
+        # every step green, nothing to insert. Fail instead, so the absence is visible where it
+        # happens rather than at the point of consumption.
+        # DEFERRED, not thrown. Create-VsixPackage runs BEFORE Create-NugetPackages (see the step
+        # list at the end of this script), so throwing here would short-circuit the nine nuspecs
+        # and hide whatever the packaging and signing path does next. That is exactly the defect
+        # fixed in the servicing delivery guard, where one route's throw short-circuited a later
+        # route: record the failure, let the remaining work run, and fail at the end. The script
+        # already has that mechanism - $Script:ScriptFailed, checked by the final Exit.
+        Write-Error ".. Create-VsixPackage: Cannot generate vsix as msbuild.exe was not found at '$msbuildPath'. Locate-VsInstallPath found no Visual Studio instance satisfying Microsoft.Component.MSBuild and Microsoft.VisualStudio.Component.VSSDK. A build that produces no VSIX cannot be inserted, so this is an error rather than a skip. The remaining packaging steps still run so this build reports everything that is wrong with it, not just the first thing."
+        $Script:ScriptFailed = $true
     }
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
@@ -588,23 +725,51 @@ function Create-NugetPackages
     Copy-Item $tpNuspecDir\uap\"Microsoft.TestPlatform.TestHost.Uap.targets" $testhostNS1_4PackageDir\Microsoft.TestPlatform.TestHost.targets -Force
 
     # Call nuget pack on these components.
-    $nugetExe = Join-Path $env:TP_PACKAGES_DIR -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
+    # nuget.exe and vswhere are build-time TOOLING, not payload. They do not ship, so they come from
+    # the NuGet package cache rather than from TP_PACKAGES_DIR, which now names the staged payload
+    # extracted from the shipped artifacts. Fall back to TP_PACKAGES_DIR so a standalone run against
+    # the historic <repo>\packages layout still works.
+    $toolRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { $env:TP_PACKAGES_DIR }
+    $nugetExe = Join-Path $toolRoot -ChildPath "Nuget.CommandLine" | Join-Path -ChildPath $env:NUGET_EXE_Version | Join-Path -ChildPath "tools\NuGet.exe"
 
     # Pass Newtonsoft.Json version to nuget pack to keep the version consistent across all nuget packages.
     $JsonNetVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.JsonNetVersion
 
     # package them from stagingDir
+    #
+    # The arguments are built as an array and splatted rather than appended as a string, because
+    # passing a variable that holds an empty string to a native command is host-dependent:
+    # Windows PowerShell 5.1 drops it, PowerShell 7 passes it as a literal "". This loop used to
+    # append $additionalArgs, which is empty for every package except the one in $skipAnalysis.
+    # Under PowerShell 7 that stray empty argument made nuget reject its own command line for the
+    # other eight, so one package of nine was produced. An array omits the entry entirely, which
+    # behaves identically on both hosts and does not depend on which one runs the script.
     foreach ($file in $nuspecFiles) {
-        $additionalArgs = ""
+        $packArgs = @(
+            "pack", (Join-Path $stagingDir $file),
+            "-OutputDirectory", $packageOutputDir,
+            "-Version", $TPB_Version,
+            "-Properties", "Version=$TPB_Version;JsonNetVersion=$JsonNetVersion;Runtime=$TPB_TargetRuntime;NetCoreTargetFramework=$TPB_TargetFrameworkCore20"
+        )
+
         if ($skipAnalysis -contains $file) {
-            $additionalArgs = "-NoPackageAnalysis"
+            $packArgs += "-NoPackageAnalysis"
         }
 
-        Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20 $additionalArgs
+        Write-Verbose "$nugetExe $($packArgs -join ' ')"
+        & $nugetExe @packArgs
 
         Set-ScriptFailedOnError
     }
+
+    # Verifies that every nuspec that went in came out as a package.
+    #
+    # nuget.exe 3.4.3 prints "pack: invalid arguments." with its usage banner and then returns exit
+    # code 0, so Set-ScriptFailedOnError above cannot see a pack that produced nothing. The exit
+    # code of a tool of this vintage is not a contract; the product is. Verify-Nuget-Packages below
+    # cannot cover this either, because it enumerates the packages that exist and a package that was
+    # never produced is outside the space it searches.
+    Verify-Nuget-Packages-Produced $stagingDir $nuspecFiles $packageOutputDir $TPB_Version
 
     # Verifies that expected number of files gets shipped in nuget packages.
     # Few nuspec uses wildcard characters.
@@ -620,7 +785,7 @@ function Copy-CodeCoverage-Package-Artifacts
 
     New-Item -ItemType directory -Path $microsoftCodeCoveragePackageDir -Force | Out-Null
 
-    $traceDataCollectorOutDir = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\TraceDataCollector\bin\$TPB_Configuration\$TPB_TargetFrameworkNS2_0"
+    $traceDataCollectorOutDir = Join-Path $env:TP_OUT_DIR "bin\Microsoft.VisualStudio.TraceDataCollector\$TPB_Configuration\$TPB_TargetFrameworkNS2_0"
 
     Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.dll $microsoftCodeCoveragePackageDir -Force
     Copy-Item $traceDataCollectorOutDir\Microsoft.VisualStudio.TraceDataCollector.pdb $microsoftCodeCoveragePackageDir -Force
@@ -628,7 +793,7 @@ function Copy-CodeCoverage-Package-Artifacts
     Copy-Item $traceDataCollectorOutDir\Shim $microsoftCodeCoveragePackageDir -Force -Recurse
 
     # Copy TraceDataCollector resource dlls
-    if($TPB_LocalizedBuild) {
+    if($TPB_LocalizedResourceRelocation) {
         Copy-Loc-Files $traceDataCollectorOutDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
         Copy-Loc-Files $traceDataCollectorOutDir $microsoftCodeCoveragePackageDir "Microsoft.VisualStudio.TraceDataCollector.resources.dll"
     }
@@ -636,10 +801,11 @@ function Copy-CodeCoverage-Package-Artifacts
 
 function Copy-PackageItems($packageName)
 {
-    # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
-    # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
-    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    # Packages published separately are copied into their own artifacts directory.
+    # Arcade builds to artifacts\bin\<PackageName>\<Configuration>\<tfm>, so that is the source;
+    # the destination layout artifacts\<Configuration>\<PackageName>\<tfm> is what the nuspecs read
+    # through basePath and is unchanged.
+    $binariesDirectory = [System.IO.Path]::Combine($env:TP_OUT_DIR, "bin", "$packageName", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
@@ -675,7 +841,16 @@ function Update-LocalizedResources
 #
 function Get-DotNetPath
 {
-    $dotnetPath = Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"
+    # Arcade installs the SDK to .dotnet\ at the repo root and pins its version in global.json.
+    # Install-DotNetCli in this script installs to tools\dotnet\ instead, and the pipeline does not
+    # run that step - it builds through Arcade. Prefer Arcade's copy so the packaging steps use the
+    # same SDK that produced the binaries they are packaging, and fall back to the historic location
+    # so a developer running this script standalone is unaffected.
+    $dotnetPath = Join-Path $env:TP_ROOT_DIR ".dotnet\dotnet.exe"
+    if (-not (Test-Path $dotnetPath)) {
+        $dotnetPath = Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"
+    }
+
     if (-not (Test-Path $dotnetPath)) {
         Write-Error "Dotnet.exe not found at $dotnetPath. Did the dotnet cli installation succeed?"
     }
@@ -747,27 +922,72 @@ function Locate-MSBuildPath
     $vsInstallPath = Resolve-Path -path $vsInstallPath
     $msbuildPath = Join-Path -path $vsInstallPath -childPath "MSBuild\$env:MSBUILD_VERSION\Bin"
 
+    # MSBUILD_VERSION is pinned to "15.0", which is the VS 2017 layout. Visual Studio 2019 and later
+    # install MSBuild under "Current" instead, so the pinned path does not exist on a modern agent
+    # and the build failed with "The term '...\MSBuild\15.0\Bin\msbuild.exe' is not recognized".
+    # Measured on the located instance: MSBuild\Current\Bin\msbuild.exe PRESENT,
+    # MSBuild\15.0 absent. Prefer the pin when it is really there, so a genuine VS 2017 machine
+    # keeps the original behaviour, and fall back to Current otherwise. Report which one was taken
+    # rather than silently substituting - a substituted toolchain is exactly the kind of change
+    # that must not be invisible.
+    if (-not (Test-Path -path (Join-Path $msbuildPath 'msbuild.exe'))) {
+        $currentPath = Join-Path -path $vsInstallPath -childPath "MSBuild\Current\Bin"
+        if (Test-Path -path (Join-Path $currentPath 'msbuild.exe')) {
+            Write-Host "... .. Locate-MSBuildPath: MSBuild $env:MSBUILD_VERSION is not present at '$msbuildPath'. Using '$currentPath' instead."
+            $msbuildPath = $currentPath
+        }
+        else {
+            Write-Host "... .. Locate-MSBuildPath: neither MSBuild $env:MSBUILD_VERSION nor Current holds msbuild.exe under '$vsInstallPath'. Subdirectories present: $((Get-ChildItem (Join-Path $vsInstallPath 'MSBuild') -Directory -ErrorAction SilentlyContinue | ForEach-Object { $_.Name }) -join ', ')."
+        }
+    }
+
     Write-Verbose "msbuildPath is : $msbuildPath"
     return $msbuildPath
 }
 
 function Locate-VsInstallPath
 {
-   $vswhere = Join-Path -path $env:TP_PACKAGES_DIR -ChildPath "vswhere\$env:VSWHERE_VERSION\tools\vswhere.exe"
+   # vswhere is build-time TOOLING, not payload. It does not ship, so it is not present in
+   # TP_PACKAGES_DIR, which now names the staged payload extracted from the shipped artifacts
+   # rather than a restore folder. Resolve it from the package cache and fall back to
+   # TP_PACKAGES_DIR so a standalone run against the historic <repo>\packages layout still works.
+   # Same distinction as nuget.exe in Create-NugetPackages: rebuilt / carried / build-time tooling,
+   # and the third must never be sourced from the second's tree.
+   $toolRoot = if ($env:NUGET_PACKAGES) { $env:NUGET_PACKAGES } else { $env:TP_PACKAGES_DIR }
+   $vswhere = Join-Path -path $toolRoot -ChildPath "vswhere\$env:VSWHERE_VERSION\tools\vswhere.exe"
    if (!(Test-Path -path $vswhere)) {
        throw "Unable to locate vswhere in path '$vswhere'."
    }
 
    Write-Verbose "Using '$vswhere' to locate VS installation path."
 
-   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.VisualStudio.Component.VSSDK")
+   # Microsoft.Net.Component.4.6.TargetingPack was in this list and has been REMOVED. A selector
+   # should select. Requiring it made vswhere return nothing on every current machine and on the
+   # build agent, and the resulting message named all three component ids without saying which one
+   # was missing or what to do about it. 16.11 measured the underlying cause: the
+   # Reference Assemblies .NETFramework\v4.6 directory still EXISTS but holds 126 files and no
+   # mscorlib.dll, while v4.6.2, v4.7.2 and v4.8 hold 258-260 files with mscorlib.dll. The 4.6
+   # targeting pack really is unavailable; testing that directory for EXISTENCE rather than for
+   # CONTENTS is what made the component id look like a false positive.
+   #
+   # Dropping it lets vswhere find the instance and moves the failure to reference resolution,
+   # where MSBuild says MSB3644 and names the missing pack and the remedy. Both stop the build at
+   # the same point, so nothing is lost by preferring the message that names the missing thing.
    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
    Try
    {
        Write-Verbose "VSWhere command line: $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath"
        if ($TPB_CIBuild) {
-           $vsInstallPath = & $vswhere -latest -products * -requires $requiredPackageIds -property installationPath
+           # -prerelease is required on modern CI. The 2018 code deliberately omitted it here so
+           # that CI used a stable VS while dev boxes could use previews. That premise no longer
+           # holds: the agent image for this definition is windows.vs2026preview.scout.amd64, and
+           # vswhere reports every preview install with isPrerelease=True, so a query that omits
+           # -prerelease returns NOTHING on a preview-only image. Measured on a preview-only box:
+           # no -requires and no -prerelease returns 0 instances; no -requires WITH -prerelease
+           # returns 4. This changes whether the VSIX can be produced at all, not what it contains.
+           $vsInstallPath = & $vswhere -latest -prerelease -products * -requires $requiredPackageIds -property installationPath
        }
        else {
            # Allow using pre release versions of VS for dev builds
@@ -780,6 +1000,29 @@ function Locate-VsInstallPath
    }
 
    Write-Verbose "VSInstallPath is : $vsInstallPath"
+
+   # When the query comes back empty, report WHICH requirement failed rather than only that the
+   # whole query matched nothing. A single bit ("no instance") costs one CI run per candidate
+   # cause; this names the culprit in the run that first hits it. Each component is counted
+   # separately, and the unfiltered population is printed beside them so a zero everywhere is
+   # distinguishable from a zero on one component.
+   # NOTE: Write-Host, not Write-Log. Write-Log is a Write-Output wrapper, so it emits to the
+   # PIPELINE - and this function returns its value by pipeline. Using Write-Log here appended the
+   # diagnostic lines to $vsInstallPath, and the caller then failed with
+   # "Cannot find drive. A drive with the name '... .. Locate-VsInstallPath' does not exist."
+   # Caught by running this locally; in CI it would have looked like a path defect, not a
+   # logging defect. Any diagnostic added inside a value-returning function in this script has
+   # the same hazard.
+   if ([string]::IsNullOrEmpty($vsInstallPath)) {
+       $anyPrerelease = @(& $vswhere -all -prerelease -products * -property installationPath 2>$null).Count
+       $anyStable     = @(& $vswhere -all -products * -property installationPath 2>$null).Count
+       Write-Host "... .. Locate-VsInstallPath: no instance matched. VS instances visible: $anyPrerelease including prerelease, $anyStable excluding prerelease."
+       foreach ($component in $requiredPackageIds) {
+           $matched = @(& $vswhere -all -prerelease -products * -requires $component -property installationPath 2>$null).Count
+           Write-Host "... .. Locate-VsInstallPath: $component matched $matched of $anyPrerelease instance(s)."
+       }
+   }
+
    return $vsInstallPath
 }
 
@@ -868,13 +1111,14 @@ Write-Log "Test platform environment variables: "
 Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | Format-Table
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
-Install-DotNetCli
-Restore-Package
-Update-LocalizedResources
-Invoke-Build
-Publish-Package
-Publish-Tests
-Create-VsixPackage
-Create-NugetPackages
+Write-Log "Build steps: $($Steps -join ', ')"
+if ($Steps -contains "InstallDotnet")      { Install-DotNetCli }
+if ($Steps -contains "Restore")            { Restore-Package }
+if ($Steps -contains "UpdateLocalization") { Update-LocalizedResources }
+if ($Steps -contains "Build")              { Invoke-Build }
+if ($Steps -contains "Publish")            { Publish-Package }
+if ($Steps -contains "PublishTests")       { Publish-Tests }
+if ($Steps -contains "Vsix")               { Create-VsixPackage }
+if ($Steps -contains "NugetPackages")      { Create-NugetPackages }
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

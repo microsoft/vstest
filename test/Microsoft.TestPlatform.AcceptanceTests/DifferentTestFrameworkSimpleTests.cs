@@ -5,6 +5,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 {
     using System;
     using System.IO;
+    using System.Xml;
     using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -153,24 +154,43 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\WebTest1.webtest";
 
             var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
-            var resultsDirectory = Path.Combine(Directory.GetCurrentDirectory(), Guid.NewGuid().ToString());
-            var arguments = PrepareArguments(
-                assemblyAbsolutePath,
-                string.Empty,
-                runSettingsFilePath, this.FrameworkArgValue, string.Empty, resultsDirectory);
-
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
-
-            if (minWebTestResultFileSizeInKB > 0)
+            var resultsDirectory = Path.Combine(Path.GetTempPath(), "vstest-web-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(resultsDirectory);
+            using (var server = new LoopbackWebTestServer())
             {
-                var dirInfo = new DirectoryInfo(resultsDirectory);
-                var webtestResultFile = "WebTest1.webtestResult";
-                var files = dirInfo.GetFiles(webtestResultFile, SearchOption.AllDirectories);
-                Assert.IsTrue(files.Length > 0, $"File {webtestResultFile} not found under results directory {resultsDirectory}");
+                var webTest = new XmlDocument();
+                using (var input = File.OpenRead(assemblyAbsolutePath))
+                {
+                    webTest.Load(input);
+                }
+                var request = (XmlElement)webTest.SelectSingleNode("//*[local-name()='Request']");
+                request.SetAttribute("Url", server.Url);
+                request.SetAttribute("ExpectedResponseUrl", server.Url);
+                webTest.DocumentElement.SetAttribute("Proxy", string.Empty);
+                assemblyAbsolutePath = Path.Combine(resultsDirectory, "WebTest1.webtest");
+                using (var output = File.Create(assemblyAbsolutePath))
+                {
+                    webTest.Save(output);
+                }
+                var arguments = PrepareArguments(
+                    assemblyAbsolutePath,
+                    string.Empty,
+                    runSettingsFilePath, this.FrameworkArgValue, string.Empty, resultsDirectory);
 
-                var fileSizeInKB = files[0].Length / 1024;
-                Assert.IsTrue(fileSizeInKB > minWebTestResultFileSizeInKB, $"Size of the file {webtestResultFile} is {fileSizeInKB} KB. It is not greater than {minWebTestResultFileSizeInKB} KB indicating iterationCount in run settings not honored.");
+                this.InvokeVsTest(arguments);
+                this.ValidateSummaryStatus(1, 0, 0);
+                Assert.AreEqual(5, server.RequestCount, "The runsettings iteration count must execute five local requests.");
+
+                if (minWebTestResultFileSizeInKB > 0)
+                {
+                    var dirInfo = new DirectoryInfo(resultsDirectory);
+                    var webtestResultFile = "WebTest1.webtestResult";
+                    var files = dirInfo.GetFiles(webtestResultFile, SearchOption.AllDirectories);
+                    Assert.IsTrue(files.Length > 0, $"File {webtestResultFile} not found under results directory {resultsDirectory}");
+
+                    var fileSizeInKB = files[0].Length / 1024;
+                    Assert.IsTrue(fileSizeInKB > minWebTestResultFileSizeInKB, $"Size of the file {webtestResultFile} is {fileSizeInKB} KB. It is not greater than {minWebTestResultFileSizeInKB} KB indicating iterationCount in run settings not honored.");
+                }
             }
         }
 
@@ -182,16 +202,29 @@ namespace Microsoft.TestPlatform.AcceptanceTests
                 return;
             }
 
-            string assemblyRelativePath =
-                @"microsoft.testplatform.qtools.assets\2.0.0\contentFiles\any\any\WebTestAssets\BingWebTest.dll";
-            var assemblyAbsolutePath = Path.Combine(this.testEnvironment.PackageDirectory, assemblyRelativePath);
+            var assemblyAbsolutePath = this.testEnvironment.GetTestAsset("LocalCodedWebTest.dll", "net451");
+            var resultsDirectory = Path.Combine(Path.GetTempPath(), "vstest-codedweb-" + Guid.NewGuid().ToString("N"));
             var arguments = PrepareArguments(
                 assemblyAbsolutePath,
                 string.Empty,
-                string.Empty, this.FrameworkArgValue);
+                string.Empty, this.FrameworkArgValue, resultsDirectory: resultsDirectory);
 
-            this.InvokeVsTest(arguments);
-            this.ValidateSummaryStatus(1, 0, 0);
+            var previousUrl = Environment.GetEnvironmentVariable("VSTEST_WEBTEST_URL");
+            try
+            {
+                using (var server = new LoopbackWebTestServer())
+                {
+                    Environment.SetEnvironmentVariable("VSTEST_WEBTEST_URL", server.Url);
+                    this.InvokeVsTest(arguments);
+                    Console.WriteLine("Loopback coded-web requests received: {0}", server.RequestCount);
+                    this.ValidateSummaryStatus(1, 0, 0);
+                    Assert.AreEqual(1, server.RequestCount);
+                }
+            }
+            finally
+            {
+                Environment.SetEnvironmentVariable("VSTEST_WEBTEST_URL", previousUrl);
+            }
         }
     }
 }

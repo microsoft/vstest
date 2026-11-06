@@ -396,7 +396,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         [TestMethod]
         public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
         {
-            var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
+            var sourcePath = this.GetUwpTestAssetPath("UnitTestApp8.build.appxrecipe");
             IEnumerable<string> sources = this.testHostManager.GetTestSources(new List<string> { sourcePath });
             Assert.IsTrue(sources.Any());
             Assert.IsTrue(sources.FirstOrDefault().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
@@ -405,7 +405,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         [TestMethod]
         public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
         {
-            var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
+            var appxManifestPath = this.GetUwpTestAssetPath("AppxManifest.xml");
             string source = AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
             Assert.AreEqual("UnitTestApp8.exe", source);
         }
@@ -565,6 +565,38 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
+        }
+
+        /// <summary>
+        /// Resolves a UWP test asset by walking up from the test assembly until the repository is
+        /// found, rather than assuming a fixed number of parent directories.
+        /// </summary>
+        /// <remarks>
+        /// These tests previously used a hard-coded "..\..\..\..\TestAssets\UWPTestAssets\" relative
+        /// to the assembly location. That depth is correct only for the historical output layout,
+        /// test\&lt;project&gt;\bin\&lt;config&gt;\&lt;tfm&gt;, where four levels up lands on test\.
+        /// Under Arcade the layout is artifacts\bin\&lt;project&gt;\&lt;config&gt;\&lt;tfm&gt;, so the
+        /// same four levels land on artifacts\ and the asset is not found:
+        ///   DirectoryNotFoundException: ...\artifacts\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe
+        /// Searching for the directory removes the dependency on either layout.
+        /// </remarks>
+        private string GetUwpTestAssetPath(string fileName)
+        {
+            var directory = new DirectoryInfo(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()));
+
+            while (directory != null)
+            {
+                var candidate = Path.Combine(directory.FullName, "test", "TestAssets", "UWPTestAssets", fileName);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                directory = directory.Parent;
+            }
+
+            throw new FileNotFoundException(
+                $"Could not locate test\\TestAssets\\UWPTestAssets\\{fileName} in any parent of the test assembly location.");
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()

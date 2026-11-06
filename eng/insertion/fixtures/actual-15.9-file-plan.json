@@ -1,0 +1,10 @@
+{
+  "TargetCommit": "40e83e259297215e34477be59c34140cccffe748",
+  "ComponentPath": "/.corext/Configs/components.json",
+  "Changes": [
+    { "Path": "/.corext/Configs/components.json" },
+    { "Path": "/src/vset/Agile/TestPlatform/RocksteadyCLI/App.config", "ContentType": "base64encoded" },
+    { "Path": "/src/SetupPackages/TestTools/TestPlatform/V1/CLI/core/revision.txt" }
+  ],
+  "SourceAppConfigBlobId": "548d918a1eb1492703a3b96b297cec5f38f6c6e8"
+}

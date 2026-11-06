@@ -15,6 +15,13 @@ namespace Microsoft.VisualStudio.TestPlatform.PlatformAbstractions
         /// <param name="value">Environment Variable value.</param>
         public static void AddEnvironmentVariable(this ProcessStartInfo startInfo, string name, string value)
         {
+            // A null value is an intentional tombstone that removes an inherited process variable.
+            if (value == null)
+            {
+                startInfo.Environment.Remove(name);
+                return;
+            }
+
             startInfo.Environment[name] = value;
         }
     }

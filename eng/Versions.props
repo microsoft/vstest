@@ -1,0 +1,90 @@
+<!-- Minimal Arcade version file for the 15.9 servicing line.
+
+     15.9 does NOT control product or dependency versions from here. Package versions live in
+     scripts/build/TestPlatform.Dependencies.props and the product version in
+     scripts/build/TestPlatform.Settings.targets, exactly as they always have. This file exists
+     only because the Arcade SDK requires it. Do not grow it into a second source of truth.
+
+     MEASURED 2026-09-02, AND THIS FILE IS ALREADY A SECOND SOURCE OF TRUTH. VersionPrefix below
+     says 15.9.3; scripts/build/TestPlatform.Settings.targets says TPVersionPrefix 15.9.2 and
+     appends -dev. Both are live, and a single build stamps BOTH strings:
+
+       artifacts\bin\datacollector\Release\net451\win7-x64\...CoreUtilities.dll   15.9.2-dev
+       artifacts\bin\datacollector\Release\netcoreapp1.0\...CoreUtilities.dll     15.9.3-ci
+
+     scripts/build.ps1 -s Publish republishes most components and stamps 15.9.2-dev from the
+     settings file. It does not republish Microsoft.TestPlatform.Extensions.BlameDataCollector or
+     ...EventLogCollector, so those keep Arcade's 15.9.3-ci. The delivered VSIX therefore carries
+     172 files at 15.9.2-dev and 28 at 15.9.3-ci. All 200 carry FileVersion 42.42.42.42424, which
+     is Arcade's placeholder, so ALL of them are compiled from this branch - nothing is restored,
+     stale, or missing, and a servicing change WILL reach the artifact.
+
+     The shipped 15.9.1 VSIX carries ONE version across all 200 files. This is a regression
+     introduced by placing Arcade beside the 2018 build.
+
+     FIXING IT IS A DECISION, NOT A CLEANUP: reconciling the two makes the line claim to be either
+     15.9.2 or 15.9.3, which is a servicing question. Whoever takes it should change ONE of these
+     two files and have the other read it - the two files are the finding, not the symptom.
+
+     RESOLVED 2026-09-02: use 15.9.3 in both places.
+     scripts/build/TestPlatform.Settings.targets TPVersionPrefix moved 15.9.2 -> 15.9.3. The VERSION
+     VALUES in this file were NOT changed; it is the source that was standardised on. The measurement
+     above is kept as written because it is what motivated the ruling, and it describes the state
+     BEFORE the change.
+
+     PRECISION ABOUT "NOT TOUCHED", because the looser wording was here first and was wrong. This
+     file HAS been modified - by these very appends. Verified against 57864a268^: of the 18 lines of
+     the pre-ruling measurement, 17 are byte-identical and the eighteenth is the line that CLOSED the
+     comment, which moved down because the appended text goes inside the same comment block.
+
+     That is a structural limit rather than an oversight, and it is worth naming: appending inside an
+     XML comment CANNOT be byte-append, because the closing marker has to move. 16.11's equivalent
+     record is Markdown, where append-only is literal and they proved all 408 original lines
+     byte-identical. The same guarantee is not available in this file, so claiming it here would have
+     been false. What IS true, and is what the guarantee is for: no line of the measurement was
+     edited to agree with the outcome that arrived after it.
+
+     AND WRITING THIS PARAGRAPH BROKE THE FILE ONCE. The first draft quoted the closing marker
+     literally, inside the comment, which ended the comment there and left the rest as stray text -
+     the build failed immediately. An XML comment cannot contain a double hyphen at all, so a comment
+     explaining comment terminators is the one place that sequence cannot be written. Same shape as a
+     grep for a fixed property matching the note that says it was fixed: the documentation of a
+     construct is where the construct is least able to appear.
+
+     THE RULING RECONCILES THE PREFIX, NOT THE SUFFIX. The artifact still carries two
+     ProductVersion strings. Since 2026-09-02 the majority one is release-<yyMMdd>-<rev>, computed
+     per build in azure-pipelines-official.yml, and the minority 28 still carry Arcade's -ci. The
+     28/172 split is unchanged and still unfixed: it is decided by which components
+     scripts/build.ps1 -s Publish regenerates, which is upstream of both the VSIX and the
+     packages. -->
+
+<Project>
+  <PropertyGroup>
+    <VersionPrefix>15.9.3</VersionPrefix>
+    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
+    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <!-- AssemblyVersion is pinned at 15.0.0 because the wire protocol serializes against it. -->
+    <AssemblyVersion>15.0.0</AssemblyVersion>
+    <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
+    <!-- 15.9 pins its own xunit / MSTest / NUnit versions in scripts/build/TestPlatform.Dependencies.props.
+         Arcade's defaults are far newer and are not compatible with netcoreapp1.0.
+
+         Select the test runner explicitly instead of setting the deprecated UsingToolXUnit=false.
+         Both keep Arcade's xunit packages away, because Arcade imports
+         tools\$(TestRunnerName)\$(TestRunnerName).targets and only the XUnit one adds those
+         references - but UsingToolXUnit=false does it by blanking TestRunnerName entirely, and
+         RunTests is defined inside the runner targets file. So blanking the name also removes the
+         target, and every test project then fails with
+           Tests.targets(30,23): error MSB4057: The target "RunTests" does not exist in the project.
+         Arcade's Tests.targets blanks the name with no guard on its current value, so setting
+         TestRunnerName while UsingToolXUnit=false is still false would not have worked either.
+
+         VSTest looks like the right name here because these are MSTest/VSTest tests, but there is
+         no tools\VSTest\ directory - VSTest.targets sits at the tools root and is *imported by*
+         the runner targets. tools\MSTest\MSTest.targets imports ..\VSTest.targets when
+         EnableMSTestRunner is false, and that import is what defines RunTests. So MSTest is the
+         name that works, and it is also what rel/17.14 sets. -->
+    <TestRunnerName>MSTest</TestRunnerName>
+  </PropertyGroup>
+</Project>
+

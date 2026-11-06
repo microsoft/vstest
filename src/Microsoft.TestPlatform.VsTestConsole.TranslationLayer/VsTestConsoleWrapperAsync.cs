@@ -15,6 +15,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 
     /// <summary>
     /// An implementation of <see cref="IVsTestConsoleWrapperAsync"/> to invoke test operations
@@ -92,9 +93,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         {
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
-            var timeout = EnvironmentHelper.GetConnectionTimeout();
-            // Start communication
-            var port = await this.requestSender.InitializeCommunicationAsync(timeout * 1000);
+            // Listen, launch the peer, then wait. Waiting for the peer before launching it cannot complete.
+            var port = this.requestSender.InitializeCommunication();
 
             if (port > 0)
             {
@@ -104,6 +104,10 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 // Start vstest.console.exe process
                 this.vstestConsoleProcessManager.StartProcess(this.consoleParameters);
+                await Task.Run(() => VsTestConsoleWrapper.WaitForConnection(
+                    this.requestSender.WaitForRequestHandlerConnection,
+                    () => new ProcessHelper().GetCurrentProcessFileName()));
+                this.testPlatformEventSource.TranslationLayerInitializeStop();
             }
             else
             {

@@ -88,6 +88,12 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 }
                 else
                 {
+                    if (this.cancellation.IsCancellationRequested)
+                    {
+                        ((IDisposable)this.tcpClient).Dispose();
+                        return;
+                    }
+
                     this.channel = this.channelFactory(this.tcpClient.GetStream());
                     this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketClient: ServerConnected");
 

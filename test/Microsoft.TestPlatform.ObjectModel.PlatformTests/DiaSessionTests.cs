@@ -37,7 +37,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "PassingTest");
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-            StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
+            StringAssert.EndsWith(diaNavigationData.FileName.Replace('\\', '/'), "/SimpleClassLibrary/Class1.cs");
 
             this.ValidateMinLineNumber(12, diaNavigationData.MinLineNumber);
             Assert.AreEqual(14, diaNavigationData.MaxLineNumber, "Incorrect max line number");
@@ -55,7 +55,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1+<AsyncTestMethod>d__1", "MoveNext");
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-            StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
+            StringAssert.EndsWith(diaNavigationData.FileName.Replace('\\', '/'), "/SimpleClassLibrary/Class1.cs");
 
             this.ValidateMinLineNumber(17, diaNavigationData.MinLineNumber);
             Assert.AreEqual(19, diaNavigationData.MaxLineNumber, "Incorrect max line number");
@@ -73,7 +73,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             DiaNavigationData diaNavigationData = diaSession.GetNavigationData("SimpleClassLibrary.Class1", "OverLoadedMethod");
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-            StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\Class1.cs");
+            StringAssert.EndsWith(diaNavigationData.FileName.Replace('\\', '/'), "/SimpleClassLibrary/Class1.cs");
 
             // Weird why DiaSession is now returning the first overloaded method
             // as compared to before when it used to  retun second method
@@ -113,7 +113,7 @@ namespace Microsoft.TestPlatform.ObjectModel.PlatformTests
             watch.Stop();
 
             Assert.IsNotNull(diaNavigationData, "Failed to get navigation data");
-            StringAssert.EndsWith(diaNavigationData.FileName, @"\SimpleClassLibrary\HugeMethodSet.cs");
+            StringAssert.EndsWith(diaNavigationData.FileName.Replace('\\', '/'), "/SimpleClassLibrary/HugeMethodSet.cs");
             this.ValidateMinLineNumber(9, diaNavigationData.MinLineNumber);
             Assert.AreEqual(10, diaNavigationData.MaxLineNumber);
             var expectedTime = 150;

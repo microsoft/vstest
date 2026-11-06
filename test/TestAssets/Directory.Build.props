@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Deliberately does NOT import the repository root Directory.Build.props.
+
+       MSBuild stops searching upward at the first Directory.Build.props it finds, so this file
+       isolates the test assets from Arcade. That is the same thing main does, for the reason
+       stated in main's copy of this file: these projects are meant to look like real-life
+       projects, and most people do not build with Arcade.
+
+       The isolation matters more here than it does on main, because the root file applies
+       StyleCop, analyzers, TreatWarningsAsErrors, assembly signing and an InternalsVisibleTo key
+       to everything beneath it. None of that belongs on a sample project whose whole purpose is
+       to be an ordinary consumer of the test platform.
+
+       Note the output path is left at the SDK default, so assets land in
+       test\TestAssets\<project>\bin\<configuration>\<tfm>\. That is where 15.9's
+       IntegrationTestEnvironment.GetTestAsset looks for them. Main redirects to
+       artifacts\bin\TestAssets\ instead, because main's test code was changed to match; 15.9's
+       was not, and changing product test code to suit the build system is the wrong direction. -->
+
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)..\..\</RepoRoot>
+    <WarningsAsErrors>$(WarningsAsErrors);NU1603</WarningsAsErrors>
+    <!-- PackageDownload-only fixtures need reference paths on the first evaluation, before
+         NuGet has generated the props that normally define NuGetPackageRoot. -->
+    <TestAssetsPackageRoot>$(RestorePackagesPath)</TestAssetsPackageRoot>
+    <TestAssetsPackageRoot Condition="'$(TestAssetsPackageRoot)' == ''">$(NUGET_PACKAGES)</TestAssetsPackageRoot>
+    <TestAssetsPackageRoot Condition="'$(TestAssetsPackageRoot)' == ''">$(NuGetPackageRoot)</TestAssetsPackageRoot>
+    <TestAssetsPackageRoot Condition="'$(TestAssetsPackageRoot)' == ''">$(UserProfile)\.nuget\packages</TestAssetsPackageRoot>
+    <TestAssetsPackageRoot>$([MSBuild]::EnsureTrailingSlash('$(TestAssetsPackageRoot)'))</TestAssetsPackageRoot>
+  </PropertyGroup>
+
+  <!-- The isolation above also cuts these projects off from the root file's net451 reference
+       assembly fix, and that matters because several of them are consumed by product test projects
+       through ProjectReference - Microsoft.TestPlatform.ObjectModel.PlatformTests references
+       SimpleClassLibrary, for example. Without this, building or packing TestPlatform.sln fails
+       with:
+
+         MSB3644: The reference assemblies for .NETFramework,Version=v4.5.1 were not found.
+
+       The installed v4.5.1 targeting pack directory exists but contains no mscorlib.dll, so the
+       reference has to come from the per-TFM package. Same reasoning as the root file; repeated
+       here rather than shared, because sharing it would mean importing the root file and undoing
+       the isolation. -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.5.1'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net451" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+</Project>

@@ -17,6 +17,16 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces
     internal interface ITranslationLayerRequestSenderAsync : IDisposable
     {
         /// <summary>
+        /// Starts listening before the console process is launched.
+        /// </summary>
+        int InitializeCommunication();
+
+        /// <summary>
+        /// Waits for the console connection after the process is launched.
+        /// </summary>
+        bool WaitForRequestHandlerConnection(int connectionTimeout);
+
+        /// <summary>
         /// Asynchronous equivalent of <see cref="ITranslationLayerRequestSender.InitializeCommunication"/>
         /// and <see cref="ITranslationLayerRequestSender.WaitForRequestHandlerConnection(int)"/>.
         /// </summary>

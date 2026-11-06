@@ -9,8 +9,12 @@
     <OutputType Condition=" '$(TargetFramework)' == 'netcoreapp1.0' ">Exe</OutputType>
     <TargetFrameworks>netcoreapp1.0;net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.AcceptanceTests</AssemblyName>
+    <!-- The pinned Coverage.Analysis library requires x86. -->
+    <TestArchitectures Condition="'$(TargetFramework)' == 'net451'">x86</TestArchitectures>
   </PropertyGroup>
   <ItemGroup>
+    <!-- The native and legacy web adapters are not built by this repository. -->
+    <PackageDownload Include="Microsoft.TestPlatform" Version="[15.9.2]" />
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
     <PackageReference Include="Chutzpah">
       <Version>$(ChutzpahAdapterVersion)</Version>
@@ -31,6 +35,10 @@
     <Reference Include="System.Reflection" />
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'net451' ">
+    <Reference Include="Microsoft.VisualStudio.Coverage.Interop">
+      <HintPath>$(NuGetPackageRoot)microsoft.testplatform\15.9.2\tools\net451\Common7\IDE\Extensions\TestPlatform\Microsoft.VisualStudio.Coverage.Interop.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
     <PackageReference Include="Microsoft.Internal.CodeCoverage" Version="$(TestPlatformExternalsVersion)" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0-preview2-26406-04" />
   </ItemGroup>

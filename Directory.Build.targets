@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <PropertyGroup>
+    <!-- Temporary workaround for Arcade issue in net9-preview5 -->
+    <_NetFrameworkHostedCompilersVersion Condition="'$(_NetFrameworkHostedCompilersVersion)' == ''">4.11.0-3.24280.3</_NetFrameworkHostedCompilersVersion>
+  </PropertyGroup>
+
+  <PropertyGroup>
+  </PropertyGroup>
+
+  <Import Project="Sdk.targets" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+  <!-- Publish-for-packaging: lets bundled products publish themselves once into a canonical
+       folder that the src/package/* tool packages harvest at pack time. Imported after the
+       Arcade/.NET SDK targets so the Build and Publish targets it hooks are defined. -->
+  <Import Project="$(RepositoryEngineeringDir)PublishForPackaging.targets" />
+  <!-- 15.9 pins Microsoft.VSSDK.BuildTools 15.8.3247 in scripts/build/TestPlatform.Dependencies.props. -->
+
+  <!-- Arcade injects Microsoft.NET.Test.Sdk and Microsoft.TestPlatform into test projects. This
+       repo must test the test platform with the version it has just built, not with whatever
+       Arcade brings, so remove them. rel/17.14 does the same thing for the same reason.
+
+       Three details, all load-bearing:
+
+       1. Scoped to real test projects, never to test ASSETS. The assets under test\TestAssets pin
+          deliberate old versions - SampleProjectWithOldTestHost pins Microsoft.NET.Test.Sdk
+          15.0.0-preview-20161024-02 precisely because exercising an old test host is the point of
+          that asset. Stripping that pin would leave the build green while the asset quietly tests
+          whatever the SDK injects, which is the same defect class as a silent package float.
+       2. The path exclusion is not redundant. On this branch all five pinned assets report
+          TestProject='', so the TestProject scope alone happens to spare them - but
+          SimpleTestProject3 reports IsTestProject='true', so an IsTestProject-based scope would
+          reach into TestAssets. The path exclusion makes the protection independent of which
+          property a future edit happens to set.
+       3. It lives in Directory.Build.targets, not .props. Remove cannot match items that do not
+          exist yet, so in .props it silently does nothing. -->
+  <ItemGroup Condition="('$(TestProject)' == 'true' OR '$(IsTestProject)' == 'true')
+                        AND !$([System.String]::Copy('$(MSBuildProjectDirectory)').Contains('TestAssets'))">
+    <PackageReference Remove="Microsoft.NET.Test.Sdk" />
+    <PackageReference Remove="Microsoft.TestPlatform" />
+  </ItemGroup>
+
+  <!-- Test project settings -->
+  <Choose>
+    <When Condition="'$(TestProject)' == 'true' AND '$(ExcludeRepoTestProjectSettings)' != 'true'">
+      <!-- ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch is deliberately NOT set here.
+           It lives in scripts\build\TestPlatform.Settings.targets, beside the testhost
+           ProjectReference that causes the mismatch, because the test assets under
+           test\TestAssets\ do not import this file and would not be covered. -->
+
+      <!-- Test projects are not discovered in test window without test container capability -->
+      <ItemGroup>
+        <ProjectCapability Include="TestContainer" />
+      </ItemGroup>
+
+      <!-- Test project references -->
+      <ItemGroup>
+        <!--
+          Test projects take a direct dependency on TestHost. Indirect dependencies must be included.
+          This is required to enable selfhost the latest testhost bits.
+
+          We don't want these references to be passed onto compiler. They are just required at runtime.
+          Mark them as content and copy to output directory.
+        -->
+        <ProjectReference Include="$(RepoRoot)src/testhost/testhost.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(RepoRoot)src/Microsoft.TestPlatform.CommunicationUtilities/Microsoft.TestPlatform.CommunicationUtilities.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(RepoRoot)src/Microsoft.TestPlatform.CrossPlatEngine/Microsoft.TestPlatform.CrossPlatEngine.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(RepoRoot)src/Microsoft.TestPlatform.Common/Microsoft.TestPlatform.Common.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+        <ProjectReference Include="$(RepoRoot)src/Microsoft.TestPlatform.ObjectModel/Microsoft.TestPlatform.ObjectModel.csproj">
+          <FromP2P>true</FromP2P>
+        </ProjectReference>
+
+        <!--
+          Main additionally injects Moq and Microsoft.CodeCoverage here. Both are omitted, because
+          15.9 supplies them itself from scripts/build/TestPlatform.Settings.targets, and main's
+          version properties do not exist on this line.
+
+          Moq was harmless duplication - both blocks use $(MoqVersion), which resolves to 4.7.63.
+          Microsoft.CodeCoverage was not: main uses $(MicrosoftCodeCoverageVersion), which is
+          undefined here, so the injected reference carried an empty version. Real test projects
+          survived that because 15.9's own reference supplies 1.0.3 and the duplicate was only a
+          suppressed NU1504 - but the projects under test\TestAssets got the empty-version
+          reference alone and failed restore outright:
+
+            NU1015: The following PackageReference item(s) do not have a version specified:
+                    Microsoft.CodeCoverage
+
+          That was the whole reason TestAssets.sln could not be built, which in turn is why the
+          15 performance tests and the acceptance suite had no assets to run against.
+        -->
+        <!--
+          The Arcade-injected Microsoft.NET.Test.Sdk and Microsoft.TestPlatform removal that main
+          performs here has been moved to a single guarded ItemGroup near the top of this file.
+          This block's condition is TestProject only, with no path guard, so it would reach into
+          test\TestAssets on any asset that sets TestProject - stripping the deliberate pins those
+          assets exist to exercise. It is inert on this branch only because every TestAssets project
+          happens to report TestProject='', which is luck rather than protection.
+        -->
+      </ItemGroup>
+    </When>
+  </Choose>
+
+  <ItemGroup>
+    <InternalsVisibleTo Update="@(InternalsVisibleTo)" Key="002400000480000094000000060200000024000052534131000400000100010007d1fa57c4aed9f0a32e84aa0faefd0de9e8fd6aec8f87fb03766c834c99921eb23be79ad9d5dcc1dd9ad236132102900b723cf980957fc4e177108fc607774f29e8320e92ea05ece4e821c0a5efe8f1645c4c0c93c1ab99285d622caa652c1dfad63d745d6f2de5f17e5eaf0fc4963d261c8a12436518206dc093344d5ad293" />
+  </ItemGroup>
+
+  <!-- scripts/build/TestPlatform.Settings.targets sets TreatWarningsAsErrors=true and is imported
+       by each csproj, so it overrides anything set in Directory.Build.props. Under Arcade the
+       StyleCop analyzers are restored and now fire on 2019 source that predates the current rules.
+       Those are pre-existing style diagnostics, not defects introduced here. -->
+  <PropertyGroup>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+    <!-- Arcade passes /warnaserror /p:TreatWarningsAsErrors=true on the command line, which beats
+         any file-level setting, so the style diagnostics have to be suppressed rather than
+         demoted. SA* are StyleCop; CS1572/CS1573/CS1574/CS1591 are XML doc comment rules. All are
+         pre-existing on 2019 source that predates the current analyzers. -->
+    <NoWarn>$(NoWarn);SA1600;SA1601;SA1602;SA1623;SA1611;SA1615;SA1618;SA1619;SA1642;CS0419;CS1570;CS1572;CS1573;CS1574;CS1587;CS1591</NoWarn>
+    <!-- Further pre-existing diagnostics on 2019 source, promoted to errors by Arcade's
+         /warnaserror. None is a defect introduced by this port:
+           SA1004 - documentation line must begin with a space (StyleCop).
+           CS1734 - a paramref names a parameter that does not exist. A stale doc comment.
+           CS8073 - comparison of a non-nullable struct against null is always true. Real dead
+                    code in the 2019 source, but changing it would alter product behaviour, and
+                    this branch must build the old code unchanged. -->
+    <NoWarn>$(NoWarn);SA1004;CS1734;CS8073</NoWarn>
+    <!-- The last three XML documentation diagnostics on this source. Local builds never showed
+         them as failures because they are warnings; only Arcade's /warnaserror on CI turns them
+         into errors.
+           SA1613 - element parameter documentation must declare a parameter name.
+           CS1712 - a type parameter has no matching typeparam tag.
+           CS1571 - an XML comment has a duplicate param tag.
+         All three are documentation defects in 2019 source, none changes behaviour, and
+         stylistic rules are extra on these lines: a solid product, not a perfect
+         one. Enumerated rather than blanket, so NU1603 and the real diagnostics keep failing. -->
+    <NoWarn>$(NoWarn);SA1613;CS1712;CS1571</NoWarn>
+
+    <!-- Do not fail the build when XliffTasks considers the checked-in .xlf files stale, and do
+         not regenerate them.
+
+         Modern XliffTasks wants to delete translation units whose source is non-translatable -
+         entries like AvailableExtensionFormat whose source is "    {0}", marked {Locked}. Those
+         ids are still present in Resources.resx, so this is not orphan cleanup: regenerating drops
+         2 of 165 units from each of the 13 locale files.
+
+         That would change all 13 localized satellite assemblies and break byte alignment with the
+         shipped 15.9 artifact, which is the thing this branch exists to preserve. The staleness is
+         a difference of opinion between the 2018 localization tool and the current one, not a
+         defect in the shipped translations.
+
+         ErrorOnOutOfDateXlf is only consulted on CI; a local build silently rewrites the files
+         instead, which is why 13 .xlf files appear modified after a local build and must not be
+         committed. -->
+    <ErrorOnOutOfDateXlf>false</ErrorOnOutOfDateXlf>
+    <UpdateXlfOnBuild>false</UpdateXlfOnBuild>
+
+    <!-- NU1603 must fail the build regardless of how TreatWarningsAsErrors or /warnaserror are
+         set. It is a warning by default, and it was only ever an error here as a side effect of
+         the global promotion, so passing -warnAsError $false silently turns it back into a
+         warning. That is not cosmetic: NU1603 means NuGet resolved a package version other than
+         the one requested, and suppressing it is exactly what let Microsoft.CodeCoverage 17.14.2
+         resolve into a 15.9 build unnoticed. Promote it explicitly so it survives on its own. -->
+    <WarningsAsErrors>$(WarningsAsErrors);NU1603</WarningsAsErrors>
+  </PropertyGroup>
+
+  <!-- net451 reference assemblies do not ship with a modern VS or SDK. The installed targeting
+       pack directory v4.5.1 exists but is empty (no mscorlib.dll), so FrameworkPathOverride points
+       at a real directory that contains nothing and every net4x project fails with CS0518.
+       rel/17.14 does not need this because the net462 pack is still populated.
+
+       Reference the per-TFM package directly, not the Microsoft.NETFramework.ReferenceAssemblies
+       meta-package. The meta-package carries no build assets at all; it only declares a dependency
+       on the per-TFM package, and MSBuild does not import build/ assets from transitive
+       dependencies (only buildTransitive/ flows, which this package does not use). The per-TFM
+       package's .targets sets TargetFrameworkRootPath, turns off FrameworkPathOverride and
+       references mscorlib explicitly, which is the actual cure. -->
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.5.1'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net451" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+
+  <!-- The modern SDK defaults MetadataUpdaterSupport to false in every non-Debug configuration
+       (Microsoft.NET.Sdk.targets:157) and emits it as a runtimeconfig switch whenever the property
+       is non-empty (:638). The 2018 SDK had neither, so every runtimeconfig.json this build produces
+       carries a key the shipped one does not:
+
+         "configProperties": { "System.Reflection.Metadata.MetadataUpdater.IsSupported": false }
+
+       Measured against shipped 15.9.2 as 4 differing runtimeconfig.json files, 260 bytes against
+       154. Same family as GenerateDocumentationFile and the DIA interop assembly: a modern SDK
+       emitting something the 2018 SDK did not, into an artifact that has to match.
+
+       Removed as an ITEM rather than by clearing the property. The property is defaulted inside the
+       SDK targets, so a value set in a props file is overwritten there and a value set in this file
+       depends on import order relative to Microsoft.NET.Sdk.targets. Removing the item in a target
+       that runs before the runtimeconfig is generated depends on neither.
+
+       Scoped to the one switch, never to the whole ItemGroup. A future SDK adding a different
+       switch must show up as a new difference rather than being swallowed silently by a broad
+       removal - which is the same argument as enumerating NoWarn codes above instead of blanketing
+       them. -->
+  <Target Name="RemoveMetadataUpdaterRuntimeConfigSwitch"
+          BeforeTargets="GenerateBuildRuntimeConfigurationFiles">
+    <ItemGroup>
+      <RuntimeHostConfigurationOption Remove="System.Reflection.Metadata.MetadataUpdater.IsSupported" />
+    </ItemGroup>
+  </Target>
+
+</Project>

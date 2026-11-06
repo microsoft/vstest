@@ -3,6 +3,7 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System;
     using System.IO;
     using System.IO.Compression;
     using System.Linq;
@@ -20,8 +21,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         public static void ClassInit(TestContext testContext)
         {
             var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
-            var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg").ToList();
-            portablePackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage[0]));
+            var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg")
+                .Where(path => !path.EndsWith(".symbols.nupkg", StringComparison.OrdinalIgnoreCase)).ToList();
+            // Keep Framework assembly paths below MAX_PATH even in a deeply nested worktree.
+            portablePackageFolder = Path.Combine(Path.GetTempPath(), "vstest-portable-" + Guid.NewGuid().ToString("N"));
             ZipFile.ExtractToDirectory(nugetPackage[0], portablePackageFolder);
         }
 
@@ -70,7 +73,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             }
             else if (this.IsNetCoreRunner())
             {
-                consoleRunnerPath = Path.Combine(this.testEnvironment.ToolsDirectory, @"dotnet\dotnet.exe");
+                consoleRunnerPath = base.GetConsoleRunnerPath();
             }
             else
             {

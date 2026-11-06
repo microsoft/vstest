@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using System.Collections.Generic;
@@ -78,9 +79,12 @@
 
         public override string GetConsoleRunnerPath()
         {
-            DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent;
-
-            return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+            // Name the root instead of counting six directories up from the test assembly. The
+            // count assumed the historic output layout; under Arcade the assembly sits one level
+            // deeper, in artifacts\bin\<Project>\<config>\<tfm>, so the same six parents land
+            // somewhere that is not the repository root and the path produced is not a location
+            // anything creates.
+            return Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
         }
     }
 }

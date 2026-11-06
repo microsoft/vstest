@@ -1,0 +1,138 @@
+parameters:
+- name: ComponentBranchName
+  type: string
+  default: internal/rel/15.9
+  values:
+  - internal/rel/15.9
+- name: CreateDraftPR
+  type: string
+  default: 'false'
+  values:
+  - 'false'
+  - 'true'
+- name: OptionalTitlePrefix
+  type: string
+  default: DO NOT MERGE
+  values:
+  - DO NOT MERGE
+- name: VisualStudioBranchName
+  type: string
+  default: rel/d15.9
+  values:
+  - rel/d15.9
+
+trigger: none
+pr: none
+
+variables:
+- template: /eng/common/templates-official/variables/pool-providers.yml@self
+- name: InsertionWork
+  value: $(Build.ArtifactStagingDirectory)/insertion
+- name: InsertionArtifact
+  value: $(Pipeline.Workspace)/selected-VSSetup
+
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    sdl:
+      policheck:
+        enabled: true
+      tsa:
+        enabled: false
+    pool:
+      name: $(DncEngInternalBuildPool)
+      image: windows.vs2026preview.scout.amd64
+      os: windows
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean
+    stages:
+    - stage: insert
+      displayName: Insert held VSTest 15.9 component
+      jobs:
+      - template: /eng/common/templates-official/jobs/jobs.yml@self
+        parameters:
+          jobs:
+          - job: insert
+            timeoutInMinutes: 90
+            templateContext:
+              outputs:
+              - output: pipelineArtifact
+                displayName: Retain insertion evidence
+                targetPath: $(InsertionWork)
+                artifactName: InsertionEvidence_$(System.StageAttempt)_$(System.JobAttempt)
+                condition: succeededOrFailed()
+            steps:
+            - checkout: self
+              clean: true
+            - task: PowerShell@2
+              displayName: Insertion driver self-tests
+              inputs:
+                pwsh: true
+                filePath: eng/insertion/Insertion.Tests.ps1
+            - task: AzureCLI@2
+              displayName: Select exact current successful producer
+              inputs:
+                azureSubscription: 'DncEng Insertion: Roslyn and Razor'
+                scriptType: pscore
+                scriptLocation: inlineScript
+                inlineScript: |
+                  $ErrorActionPreference = 'Stop'
+                  $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
+                  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($token)) { throw 'Azure DevOps token acquisition failed.' }
+                  $env:INSERTION_TOKEN = $token
+                  try {
+                    & eng/insertion/Invoke-Insertion.ps1 -Phase Select -WorkDirectory '$(InsertionWork)' `
+                      -ComponentBranchName '${{ parameters.ComponentBranchName }}' -VisualStudioBranchName '${{ parameters.VisualStudioBranchName }}'
+                  }
+                  finally { Remove-Item Env:INSERTION_TOKEN }
+            - task: DownloadPipelineArtifact@2
+              displayName: Download selected producer VSSetup
+              inputs:
+                buildType: specific
+                project: 7ea9116e-9fac-403d-b258-b31fcf1bb293
+                definition: '1222'
+                buildVersionToDownload: specific
+                pipelineId: $(InsertionProducerId)
+                artifactName: VSSetup
+                targetPath: $(InsertionArtifact)
+            - task: AzureCLI@2
+              displayName: Read-only cloud drop and insertion preflight
+              inputs:
+                azureSubscription: 'DncEng Insertion: Roslyn and Razor'
+                scriptType: pscore
+                scriptLocation: inlineScript
+                inlineScript: |
+                  $ErrorActionPreference = 'Stop'
+                  $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
+                  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($token)) { throw 'Azure DevOps token acquisition failed.' }
+                  $env:INSERTION_TOKEN = $token
+                  try {
+                    & eng/insertion/Invoke-Insertion.ps1 -Phase Validate -WorkDirectory '$(InsertionWork)' -ArtifactDirectory '$(InsertionArtifact)' `
+                      -ComponentBranchName '${{ parameters.ComponentBranchName }}' -VisualStudioBranchName '${{ parameters.VisualStudioBranchName }}' `
+                      -OptionalTitlePrefix '${{ parameters.OptionalTitlePrefix }}' -CreateDraftPR '${{ parameters.CreateDraftPR }}'
+                  }
+                  finally { Remove-Item Env:INSERTION_TOKEN }
+            - task: AzureCLI@2
+              displayName: Insert verified private component and matching configuration
+              inputs:
+                azureSubscription: 'DncEng Insertion: Roslyn and Razor'
+                scriptType: pscore
+                scriptLocation: inlineScript
+                inlineScript: |
+                  $ErrorActionPreference = 'Stop'
+                  $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
+                  if ($LASTEXITCODE -ne 0 -or [string]::IsNullOrWhiteSpace($token)) { throw 'Azure DevOps token acquisition failed.' }
+                  $env:INSERTION_TOKEN = $token
+                  try {
+                    & eng/insertion/Invoke-Insertion.ps1 -Phase Insert -WorkDirectory '$(InsertionWork)' -ArtifactDirectory '$(InsertionArtifact)' `
+                      -ComponentBranchName '${{ parameters.ComponentBranchName }}' -VisualStudioBranchName '${{ parameters.VisualStudioBranchName }}' `
+                      -OptionalTitlePrefix '${{ parameters.OptionalTitlePrefix }}' -CreateDraftPR '${{ parameters.CreateDraftPR }}'
+                  }
+                  finally { Remove-Item Env:INSERTION_TOKEN }

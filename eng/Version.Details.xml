@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Minimal. 15.9 takes no darc-managed dependencies; package versions are pinned in
+     scripts/build/TestPlatform.Dependencies.props. -->
+<Dependencies>
+  <ProductDependencies>
+  </ProductDependencies>
+  <ToolsetDependencies>
+  </ToolsetDependencies>
+</Dependencies>

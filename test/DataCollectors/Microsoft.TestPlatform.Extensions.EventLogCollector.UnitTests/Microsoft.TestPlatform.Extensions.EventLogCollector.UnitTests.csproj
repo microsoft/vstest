@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\..\</TestPlatformRoot>
@@ -8,9 +8,57 @@
   <PropertyGroup Label="Configuration">
     <RootNamespace>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</RootNamespace>
   </PropertyGroup>
-  <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-  </PropertyGroup>
+  <!--
+    DO NOT ADD <TargetFramework> (singular) BESIDE <TargetFrameworks> (plural) BELOW.
+
+    This project set BOTH from the commit that created it (468d4b232, 2017-09-07) until c38eef703.
+    For that whole time its 35 tests NEVER RAN - not "stopped running", never ran at all. The build
+    was green, the test step was green, and a .trx was produced and published on every single run.
+
+    MECHANISM. With both properties present MSBuild cannot tell an outer build from an inner build,
+    so the project builds as if it were single-targeted but does not import the per-inner-build
+    assets from NuGet's build/ folder. MSTest.TestAdapter ships the adapter that way. The assembly
+    compiled and ran, and vstest found no adapter in it, so it discovered zero tests.
+
+    HOW IT HID FOR NINE YEARS - this is the part worth keeping:
+
+      the .trx existed, was well-formed, and was published    so "no results" never looked like a gap
+      Counters/@total = 0 with 0 result nodes                 an empty run is not a failed run
+      the only signal was a <RunInfo> warning inside the file  which nothing read
+      of 54 test projects this was the ONLY one with both     16 of 17 in the same folder were fine
+
+    A green test step means the tests that ran passed. It does not mean any tests ran.
+
+    VERIFIED, both directions and in CI on a clean restore (build 3064664):
+
+      property present  ->  adapter absent   ->  total=0,  RunInfos: "No test is available"
+      property removed  ->  adapter present  ->  total=35, 33 passed, 1 failed, 1 NotExecuted
+      declared [TestMethod] 35  ==  discovered 35            nothing is left behind the adapter
+
+    The 1 failure is real and older than this fix - see the comment in EventLogDataCollectorTests.cs.
+    It is left failing on purpose. Making these tests run was the change; deciding a 2017 product
+    question was not.
+
+    16.11 carried the identical defect in the same file and fixed it the same way (36 declared,
+    36 discovered). If you are looking at a third branch, check this file there before assuming
+    its EventLogCollector tests have ever executed.
+
+    HOW TO CHECK THAT THE SINGULAR PROPERTY IS REALLY GONE - because a text search will lie to you.
+    This comment necessarily writes the token it warns about, so grepping the file for it MATCHES
+    THIS PARAGRAPH. A reader asking "is the duplicate still here" gets a hit, and the hit is the
+    sentence saying it was removed.
+
+    Ask the XML instead. Element counts are properties of the document and no amount of prose can
+    move them:
+
+      [xml](Get-Content <this file> -Raw).SelectNodes('//TargetFramework')    -> 0 elements
+      [xml](Get-Content <this file> -Raw).SelectNodes('//TargetFrameworks')   -> 1 element
+
+    Deliberately NO count of text matches is stated here. 16.11 tried that on their copy and the
+    number changed three times in three drafts - writing the explanation added mentions, and
+    rewriting it to remove the number changed it again. A count of occurrences that lives inside the
+    text being counted cannot stay true, because the act of explaining it alters what it counts.
+  -->
   <PropertyGroup>
     <TargetFrameworks>net451</TargetFrameworks>
     <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>    

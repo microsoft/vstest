@@ -101,7 +101,10 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
             }
             else
             {
-                this.PrintSplashScreen();
+                // Diagnostic runs keep the full informational version, which is what a bug report
+                // needs; an ordinary run prints the short version.
+                var isDiag = args != null && args.Any(arg => arg != null && arg.StartsWith("/diag:", StringComparison.OrdinalIgnoreCase));
+                this.PrintSplashScreen(isDiag);
             }
 
             int exitCode = 0;
@@ -380,10 +383,21 @@ namespace Microsoft.VisualStudio.TestPlatform.CommandLine
         /// <summary>
         /// Displays the Company and Copyright splash title info immediately after launch
         /// </summary>
-        private void PrintSplashScreen()
+        private void PrintSplashScreen(bool isDiag)
         {
-            string assemblyVersion = string.Empty;
-            assemblyVersion = Product.Version;
+            string assemblyVersion = Product.Version;
+            if (!isDiag)
+            {
+                // Drop the whole suffix, not just the -release one, so a -hotfix or any other build prints a
+                // clean version rather than 15.9.3-hotfixaaa23423. Diag mode keeps the full version,
+                // which is what a bug report needs.
+                var end = Product.Version?.IndexOf("-");
+
+                if (end >= 0)
+                {
+                    assemblyVersion = Product.Version?.Substring(0, end.Value);
+                }
+            }
 
             string commandLineBanner = string.Format(CultureInfo.CurrentUICulture, CommandLineResources.MicrosoftCommandLineTitle, assemblyVersion);
             this.Output.WriteLine(commandLineBanner, OutputLevel.Information);

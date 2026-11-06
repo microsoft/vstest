@@ -21,6 +21,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private readonly CancellationTokenSource cancellation;
 
         private readonly Func<Stream, ICommunicationChannel> channelFactory;
+        private readonly Func<TcpListener, Task<TcpClient>> acceptClientAsync;
+        private readonly object stateSyncObject = new object();
 
         private ICommunicationChannel channel;
 
@@ -29,6 +31,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         private TcpClient tcpClient;
 
         private bool stopped;
+        private int stopRequested;
 
         private string endPoint;
 
@@ -46,11 +49,19 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         /// <param name="channelFactory">Factory to create communication channel.</param>
         protected SocketServer(Func<Stream, ICommunicationChannel> channelFactory)
+            : this(channelFactory, listener => listener.AcceptTcpClientAsync())
+        {
+        }
+
+        internal SocketServer(
+            Func<Stream, ICommunicationChannel> channelFactory,
+            Func<TcpListener, Task<TcpClient>> acceptClientAsync)
         {
             // Used to cancel the message loop
             this.cancellation = new CancellationTokenSource();
 
             this.channelFactory = channelFactory;
+            this.acceptClientAsync = acceptClientAsync;
         }
 
         /// <inheritdoc />
@@ -59,18 +70,24 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <inheritdoc />
         public event EventHandler<DisconnectedEventArgs> Disconnected;
 
+        /// <inheritdoc />
         public string Start(string endPoint)
         {
-            this.tcpListener = new TcpListener(endPoint.GetIPEndPoint());
+            TcpListener listener;
+            lock (this.stateSyncObject)
+            {
+                if (this.stopRequested != 0)
+                {
+                    throw new ObjectDisposedException(nameof(SocketServer));
+                }
+                this.tcpListener = new TcpListener(endPoint.GetIPEndPoint());
+                this.tcpListener.Start();
+                listener = this.tcpListener;
+                this.endPoint = listener.LocalEndpoint.ToString();
+                EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", this.endPoint);
+            }
 
-            this.tcpListener.Start();
-
-            this.endPoint = this.tcpListener.LocalEndpoint.ToString();
-            EqtTrace.Info("SocketServer.Start: Listening on endpoint : {0}", this.endPoint);
-
-            // Serves a single client at the moment. An error in connection, or message loop just
-            // terminates the entire server.
-            this.tcpListener.AcceptTcpClientAsync().ContinueWith(t => this.OnClientConnected(t.Result));
+            _ = this.AcceptClientAsync(listener);
             return this.endPoint;
         }
 
@@ -78,59 +95,131 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         public void Stop()
         {
             EqtTrace.Info("SocketServer.Stop: Stop server endPoint: {0}", this.endPoint);
-            if (!this.stopped)
+            lock (this.stateSyncObject)
             {
+                if (this.stopRequested != 0)
+                {
+                    return;
+                }
+                this.stopRequested = 1;
                 EqtTrace.Info("SocketServer.Stop: Cancellation requested. Stopping message loop.");
-                this.cancellation.Cancel();
+                try
+                {
+                    this.cancellation.Cancel();
+                }
+                catch (ObjectDisposedException)
+                {
+                    // The message loop may have completed cleanup concurrently.
+                }
+                this.tcpListener?.Stop();
+            }
+        }
+
+        private async Task AcceptClientAsync(TcpListener listener)
+        {
+            TcpClient client = null;
+            try
+            {
+                try
+                {
+                    client = await this.acceptClientAsync(listener).ConfigureAwait(false);
+                }
+                catch (Exception ex) when (Volatile.Read(ref this.stopRequested) != 0 &&
+                                           (ex is InvalidOperationException || ex is SocketException))
+                {
+                    EqtTrace.Verbose("SocketServer.AcceptClientAsync: Listener stopped before a client connected: {0}", ex);
+                    return;
+                }
+
+                client.Client.NoDelay = true;
+                lock (this.stateSyncObject)
+                {
+                    if (this.stopRequested != 0)
+                    {
+                        ((IDisposable)client).Dispose();
+                        return;
+                    }
+                    this.tcpClient = client;
+                }
+                this.OnClientConnected(client);
+            }
+            catch (Exception ex)
+            {
+                EqtTrace.Error("SocketServer.AcceptClientAsync: Failed to accept a client: {0}", ex);
+                ((IDisposable)client)?.Dispose();
+                this.Stop();
             }
         }
 
         private void OnClientConnected(TcpClient client)
         {
-            this.tcpClient = client;
-            this.tcpClient.Client.NoDelay = true;
-
-            if (this.Connected != null)
+            if (this.Connected == null)
             {
-                this.channel = this.channelFactory(this.tcpClient.GetStream());
-                this.Connected.SafeInvoke(this, new ConnectedEventArgs(this.channel), "SocketServer: ClientConnected");
+                return;
+            }
 
-                if (EqtTrace.IsVerboseEnabled)
+            var connectedChannel = this.channelFactory(client.GetStream());
+            bool stopRequested;
+            lock (this.stateSyncObject)
+            {
+                // Stop can complete while the channel factory is running.
+                stopRequested = this.stopRequested != 0;
+                if (!stopRequested)
                 {
-                    EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", this.endPoint);
+                    this.channel = connectedChannel;
+                }
+            }
+
+            if (stopRequested)
+            {
+                try
+                {
+                    connectedChannel.Dispose();
+                }
+                finally
+                {
+                    ((IDisposable)client).Dispose();
                 }
 
-                // Start the message loop
-                Task.Run(() => this.tcpClient.MessageLoopAsync(this.channel, error => this.Stop(error), this.cancellation.Token)).ConfigureAwait(false);
+                return;
             }
+
+            this.Connected.SafeInvoke(this, new ConnectedEventArgs(connectedChannel), "SocketServer: ClientConnected");
+            if (EqtTrace.IsVerboseEnabled)
+            {
+                EqtTrace.Verbose("SocketServer.OnClientConnected: Client connected for endPoint: {0}, starting MessageLoopAsync:", this.endPoint);
+            }
+            _ = Task.Run(() => client.MessageLoopAsync(connectedChannel, error => this.Stop(error), this.cancellation.Token));
         }
 
         private void Stop(Exception error)
         {
             EqtTrace.Info("SocketServer.PrivateStop: Stopp server endPoint: {0} error: {1}", this.endPoint, error);
 
-            if (!this.stopped)
+            lock (this.stateSyncObject)
             {
-                // Do not allow stop to be called multiple times.
+                if (this.stopped)
+                {
+                    return;
+                }
                 this.stopped = true;
-
-                // Stop accepting any other connections
-                this.tcpListener.Stop();
-
-                // Close the client and dispose the underlying stream
-#if NET451
-                // tcpClient.Close() calls tcpClient.Dispose().
-                this.tcpClient?.Close();
-#else
-                // tcpClient.Close() not available for netstandard1.5.
-                this.tcpClient?.Dispose();
-#endif
-                this.channel.Dispose();
-                this.cancellation.Dispose();
-
-                EqtTrace.Info("SocketServer.Stop: Raise disconnected event endPoint: {0} error: {1}", this.endPoint, error);
-                this.Disconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
+                this.stopRequested = 1;
+                this.tcpListener?.Stop();
             }
+
+            // Close the client and dispose the underlying stream.
+#if NET451
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.tcpClient?.Close();
+#else
+            // tcpClient.Close() is not available for netstandard1.4.
+            this.tcpClient?.Dispose();
+#endif
+            this.channel?.Dispose();
+            this.cancellation.Dispose();
+
+            EqtTrace.Info("SocketServer.Stop: Raise disconnected event endPoint: {0} error: {1}", this.endPoint, error);
+            this.Disconnected?.SafeInvoke(this, new DisconnectedEventArgs { Error = error }, "SocketServer: ClientDisconnected");
         }
     }
 }

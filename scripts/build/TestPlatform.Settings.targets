@@ -1,8 +1,32 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
-    <TPVersionPrefix>15.9.2</TPVersionPrefix>
+    <!-- SECOND VERSION SOURCE. eng/Versions.props carries VersionPrefix 15.9.3 for Arcade; this
+         file carries 15.9.2 and appends -dev below. Both are live and a single build stamps both
+         strings, decided by whether scripts/build.ps1 -s Publish regenerated that copy. Measured
+         2026-09-02: the delivered VSIX carries 172 files at 15.9.2-dev and 28 at 15.9.3-ci, the 28
+         being BlameDataCollector and EventLogCollector plus their satellites, which Publish does
+         not republish. See the comment at the top of eng/Versions.props for the full measurement.
+         Reconciling the two is a servicing decision, not a cleanup.
+
+         RESOLVED 2026-09-02: use 15.9.3 in both places. The value below moved 15.9.2 ->
+         15.9.3 and eng/Versions.props was not touched. The measurement above describes the state
+         BEFORE that change and is kept because it is what motivated the ruling. Note that the
+         ruling reconciles the PREFIX only: the artifact still carries two ProductVersion strings.
+
+         SUPERSEDED IN PART, 2026-09-02 (later the same day). The suffix is no longer "dev" on a CI
+         build: azure-pipelines-official.yml computes release-<yyMMdd>-<rev> from
+         $(Build.BuildNumber) and passes it as -VersionSuffix, because a CONSTANT version meant
+         every build produced identically named packages and the feed kept the FIRST delivering
+         run's bytes while every later push still reported success. Measured on 3064417 the
+         majority string is 15.9.3-release-26902-41.
+
+         THE SPLIT ITSELF IS UNCHANGED AND STILL UNFIXED: 172 files take the Publish stamp and 28
+         keep Arcade's -ci, exactly as measured above. Only the string the 172 receive has moved.
+         The -dev default below is deliberately kept, because a developer's local build genuinely
+         is a dev build and should not claim to be a release one. -->
+    <TPVersionPrefix>15.9.3</TPVersionPrefix>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
@@ -27,8 +51,13 @@
          if localization is enabled, default inclusion ends up including the generated files by default. -->
     <EnableDefaultEmbeddedResourceItems>false</EnableDefaultEmbeddedResourceItems>
     <!-- .NetStandardLibrary1.6.0 brings in dependencies which are supported in UWP,
-         any higher version will bring in dependencies which are not supported by current UWP version -->
-    <NetStandardImplicitPackageVersion>1.6.0</NetStandardImplicitPackageVersion>
+         any higher version will bring in dependencies which are not supported by current UWP version.
+
+         Restricted to netstandard1.x. Applying it to a netstandard2.0 project pins the implicit
+         NETStandard.Library package to 1.6.0, which carries no netstandard2.0 contract assembly,
+         so the compiler gets no netstandard.dll and every predefined type is undefined. The UWP
+         constraint this guards against only concerns the netstandard1.x consumers. -->
+    <NetStandardImplicitPackageVersion Condition="$(TargetFramework.StartsWith('netstandard1'))">1.6.0</NetStandardImplicitPackageVersion>
   </PropertyGroup>
 
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -54,6 +83,19 @@
     <When Condition="$(TestProject) == 'true'"> 
       <PropertyGroup>
         <GenerateDocumentationFile>false</GenerateDocumentationFile>
+
+        <!-- The ProjectReference to testhost.csproj below builds win7-x64 (AMD64) while these
+             projects are AnyCPU (MSIL), so reference resolution reports MSB3270. The mismatch is
+             expected - testhost is referenced to be copied to the output directory at runtime, not
+             to be compiled against - so the check is turned off rather than the warning suppressed.
+
+             This lives here, beside the ProjectReference that causes it, rather than in the root
+             Directory.Build.targets. Every project that takes the testhost reference imports this
+             file: all 27 product test projects, and the 9 test assets that need it. The test assets
+             under test\TestAssets\ deliberately do not import the root Directory.Build.targets, so
+             a copy kept there would apply to the product test projects and miss the assets, which
+             is how this surfaced - MSB3270 became an error under -warnAsError on a clean build. -->
+        <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
       </PropertyGroup>
 
       <!-- Test projects are not discovered in test window without test container capability -->
@@ -109,6 +151,11 @@
     <!-- Disable code analysis by default. Ignore SA0001 until we've xml documentation enabled for
          all projects -->
     <EnableCodeAnalysis>false</EnableCodeAnalysis>
+
+    <!-- StyleCop is not run on this servicing branch. Its rules encode a house style that the
+         backported files do not follow, and reformatting them would enlarge the source diff
+         without altering behaviour. Remove this to turn the analyzers back on. -->
+    <EnableStyleCopAnalyzers>false</EnableStyleCopAnalyzers>
     <NoWarn>$(NoWarn);SA0001</NoWarn>
 
     <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>
