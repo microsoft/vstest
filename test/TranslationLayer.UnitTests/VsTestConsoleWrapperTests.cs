@@ -80,6 +80,21 @@ public class VsTestConsoleWrapperTests
     }
 
     [TestMethod]
+    public async Task StartSessionAsyncShouldLaunchConsoleBeforeWaitingForConnection()
+    {
+        var started = false;
+        _mockProcessManager.Setup(pm => pm.StartProcess(_consoleParameters)).Callback(() => started = true);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(() => started);
+
+        await ((VsTestConsoleWrapper)_consoleWrapper).StartSessionAsync();
+
+        Assert.IsTrue(started);
+        _mockRequestSender.Verify(rs => rs.InitializeCommunication(), Times.Once);
+        _mockRequestSender.Verify(rs => rs.InitializeCommunicationAsync(It.IsAny<int>()), Times.Never);
+        _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
+    }
+
+    [TestMethod]
     public void StartSessionShouldThrowExceptionOnBadPort()
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);

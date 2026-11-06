@@ -304,6 +304,27 @@ public class TestRequestSenderTests
         Assert.AreNotEqual(TimoutErrorMessage, message);
     }
 
+    [TestMethod]
+    public void CheckVersionWithTestHostShouldWaitForVersionAfterTestMessage()
+    {
+        _mockDataSerializer.Setup(ds => ds.DeserializeMessage("testMessageData"))
+            .Returns(new Message { MessageType = MessageType.TestMessage });
+        _mockDataSerializer.Setup(ds => ds.DeserializeMessage("versionData"))
+            .Returns(new Message { MessageType = MessageType.VersionCheck });
+        _mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.Is<Message>(m => m.MessageType == MessageType.VersionCheck)))
+            .Returns(Dummynegotiatedprotocolversion);
+        _mockChannel.Setup(mc => mc.Send(It.IsAny<string>())).Callback(() =>
+        {
+            _mockChannel.Object.MessageReceived.Notify(_mockChannel.Object, new MessageReceivedEventArgs { Data = "testMessageData" }, nameof(CheckVersionWithTestHostShouldWaitForVersionAfterTestMessage));
+            _mockChannel.Object.MessageReceived.Notify(_mockChannel.Object, new MessageReceivedEventArgs { Data = "versionData" }, nameof(CheckVersionWithTestHostShouldWaitForVersionAfterTestMessage));
+        });
+        SetupFakeCommunicationChannel();
+
+        _testRequestSender.CheckVersionWithTestHost();
+
+        _mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
+    }
+
     #endregion
 
     #region Discovery Protocol Tests

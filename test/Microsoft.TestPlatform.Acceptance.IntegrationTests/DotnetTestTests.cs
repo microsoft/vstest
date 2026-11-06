@@ -13,7 +13,9 @@ public class DotnetTestTests : AcceptanceTestBase
 {
     private static string GetFinalVersion(string version)
     {
-        var end = version.IndexOf("-release");
+        // Mirrors PrintSplashScreen in vstest.console: the banner drops the whole version suffix,
+        // so the expected version here has to drop it the same way.
+        var end = version.IndexOf("-");
         return (end >= 0) ? version.Substring(0, end) : version;
     }
 

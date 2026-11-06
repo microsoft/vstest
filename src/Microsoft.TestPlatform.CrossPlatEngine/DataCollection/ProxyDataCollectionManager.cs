@@ -201,8 +201,8 @@ internal class ProxyDataCollectionManager : IProxyDataCollectionManager
                 dataCollectionEventsPort = result.DataCollectionEventsPort;
 
                 EqtTrace.Info(
-                    "ProxyDataCollectionManager.BeforeTestRunStart: SendBeforeTestRunStartAndGetResult successful, env variable from datacollector: {0}  and testhost port: {1}",
-                    string.Join(";", environmentVariables),
+                    "ProxyDataCollectionManager.BeforeTestRunStart: SendBeforeTestRunStartAndGetResult successful, received {0} environment variables and testhost port: {1}",
+                    environmentVariables.Count,
                     dataCollectionEventsPort);
             },
             runEventsHandler);
