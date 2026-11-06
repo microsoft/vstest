@@ -11,7 +11,7 @@
     <!-- this version also needs to be "statically" readable because the test fixture will inspect this file for the version
     and because during the test `dotnet test` will run and re-build some of the test projects and at that time the version
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync -->
-    <NETTestSdkVersion>17.3.3-dev</NETTestSdkVersion>
+    <NETTestSdkVersion>17.3.4-dev</NETTestSdkVersion>
 
     <!-- These versions are used for running unit tests, and running acceptance tests. They are also used as the default version for projects
     in TestAssets.sln to allow running and debugging tests in that solution directly in VS without having to run them via AcceptanceTests. -->
@@ -82,6 +82,23 @@
     <DependencyVersionsImported>true</DependencyVersionsImported>
   </PropertyGroup>
 
-  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" />
+  <!--
+    Guarded because Arcade 11 imports this same file itself.
+
+    MEASURED on build 3066280 and reproduced locally: Arcade's tools\DefaultVersions.props(15)
+    imports $(VersionsPropsPath), which resolves to this repo's eng\Versions.props. Importing it
+    again here produced MSB4011 three times. Everywhere else that is only a warning, but the Package
+    step restores src\package\external\external.csproj with -warnaserror, so it was a hard error and
+    the step died on its FIRST action - which is why 17.3 produced no packages and no VSIX at all.
+
+    Guarded rather than deleted. 15.9 and 16.11 carry no such import and work, but they are not
+    proof this one is dead: deleting it unconditionally would leave eng\Versions.props unimported in
+    any context where Arcade has not already imported it. The sentinel makes the guard independent
+    of import ORDER, which a condition on an Arcade-owned property would not be.
+
+    Safe against precedence changes, and this was measured rather than assumed: the two files define
+    43 and 80 properties with ZERO names in common, so whichever import wins cannot change a value.
+  -->
+  <Import Project="$(MSBuildThisFileDirectory)..\..\eng\Versions.props" Condition="'$(TestPlatformEngVersionsImported)' != 'true'" />
   <Import Project="$(DotNetPackageVersionPropsPath)" Condition="'$(DotNetPackageVersionPropsPath)' != ''" />
 </Project>

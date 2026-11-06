@@ -183,6 +183,7 @@ public class AcceptanceTestBase : IntegrationTestBase
             }
         }
 
+        UseLocallyBuiltTestSdk(TempDirectory.Path);
         return Path.Combine(TempDirectory.Path, assetName);
     }
 }

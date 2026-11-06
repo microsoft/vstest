@@ -118,9 +118,9 @@ public static partial class ManagedNameHelper
         var typeBuilder = new StringBuilder();
         var methodBuilder = new StringBuilder();
 
-        // Namespace and Type Name (with arity designation)
+        // Offsets are namespace start, namespace end and type-name end, not hierarchy values.
         var hierarchyPos = AppendTypeString(typeBuilder, semanticType, closedType: false);
-        if (hierarchyPos is null || hierarchyPos.Length != HierarchyConstants.Levels.TotalLevelCount)
+        if (hierarchyPos is null || hierarchyPos.Length != 3)
         {
             // TODO: @Haplois, exception expects a message and not a param name.
             throw new NotSupportedException(nameof(method));

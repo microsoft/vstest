@@ -53,7 +53,6 @@ public class VsTestConsoleWrapperAsyncTests
 
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(true);
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(100);
-        _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(100));
     }
 
     [TestMethod]
@@ -67,7 +66,7 @@ public class VsTestConsoleWrapperAsyncTests
         using (var p = Process.GetCurrentProcess())
             expectedParentProcessId = p.Id;
 #endif
-        _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(inputPort));
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(inputPort);
 
         await _consoleWrapper.StartSessionAsync();
 
@@ -78,11 +77,27 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    public void StartSessionAsyncShouldThrowExceptionOnBadPort()
+    public async Task StartSessionAsyncShouldStartConsoleBeforeWaitingForConnection()
     {
-        _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(-1));
+        var consoleStarted = false;
+        _mockProcessManager.Setup(pm => pm.StartProcess(It.IsAny<ConsoleParameters>()))
+            .Callback(() => consoleStarted = true);
+        _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>()))
+            .Returns(() => consoleStarted);
 
-        Assert.ThrowsExceptionAsync<TransationLayerException>(async () => await _consoleWrapper.StartSessionAsync());
+        await _consoleWrapper.StartSessionAsync();
+
+        Assert.IsTrue(consoleStarted);
+        _mockRequestSender.Verify(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>()), Times.Once);
+        _mockRequestSender.Verify(rs => rs.InitializeCommunicationAsync(It.IsAny<int>()), Times.Never);
+    }
+
+    [TestMethod]
+    public async Task StartSessionAsyncShouldThrowExceptionOnBadPort()
+    {
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
+
+        await Assert.ThrowsExceptionAsync<TransationLayerException>(() => _consoleWrapper.StartSessionAsync());
     }
 
     [TestMethod]
@@ -239,8 +254,6 @@ public class VsTestConsoleWrapperAsyncTests
         await _consoleWrapper.InitializeExtensionsAsync(pathToExtensions);
 
         _mockProcessManager.Setup(pm => pm.IsProcessInitialized()).Returns(false);
-        _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(100));
-
         await _consoleWrapper.InitializeExtensionsAsync(pathToExtensions);
 
         _mockRequestSender.Verify(rs => rs.InitializeExtensions(pathToExtensions), Times.Exactly(3));
@@ -265,11 +278,12 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    public void InitializeExtensionsAsyncShouldThrowExceptionOnBadConnection()
+    public async Task InitializeExtensionsAsyncShouldThrowExceptionOnBadConnection()
     {
-        _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(-1));
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
 
-        Assert.ThrowsExceptionAsync<TransationLayerException>(async () => await _consoleWrapper.InitializeExtensionsAsync(new List<string> { "Hello", "World" }));
+        await Assert.ThrowsExceptionAsync<TransationLayerException>(
+            () => _consoleWrapper.InitializeExtensionsAsync(new List<string> { "Hello", "World" }));
         _mockRequestSender.Verify(rs => rs.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
 
@@ -307,11 +321,12 @@ public class VsTestConsoleWrapperAsyncTests
     }
 
     [TestMethod]
-    public void DiscoverTestsAsyncShouldThrowExceptionOnBadConnection()
+    public async Task DiscoverTestsAsyncShouldThrowExceptionOnBadConnection()
     {
-        _mockRequestSender.Setup(rs => rs.InitializeCommunicationAsync(It.IsAny<int>())).Returns(Task.FromResult(-1));
+        _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
 
-        Assert.ThrowsExceptionAsync<TransationLayerException>(async () => await _consoleWrapper.DiscoverTestsAsync(new List<string> { "Hello", "World" }, null, new TestPlatformOptions(), new Mock<ITestDiscoveryEventsHandler2>().Object));
+        await Assert.ThrowsExceptionAsync<TransationLayerException>(
+            () => _consoleWrapper.DiscoverTestsAsync(new List<string> { "Hello", "World" }, null, new TestPlatformOptions(), new Mock<ITestDiscoveryEventsHandler2>().Object));
         _mockRequestSender.Verify(rs => rs.DiscoverTestsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), It.IsAny<TestPlatformOptions>(), null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
     }
 

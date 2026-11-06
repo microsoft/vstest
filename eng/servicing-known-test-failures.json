@@ -1,0 +1,346 @@
+[
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputErrorForSimpleMessageShouldSetConsoleColorToRed",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "Environmental. The test calls Assert.Inconclusive by design when the console has no writable colour surface, which is always true on a hosted agent with redirected output. 16.11 carries this test under the SAME signature on a line whose gate passes.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputWarningForSimpleMessageShouldSetConsoleColorToYellow",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "Environmental, redirected console. Same self-declared Inconclusive path as the sibling above. 16.11 carries it under the SAME signature.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputInformationForSimpleMessageShouldSetConsoleColorToGivenColor",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "Environmental, redirected console. Same self-declared Inconclusive path as the sibling above. 16.11 carries it under the SAME signature.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputInformationShouldNotChangeConsoleOutputColor",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "Environmental, redirected console. Same self-declared Inconclusive path as the sibling above. 16.11 carries it under the SAME signature.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShouldAddLogs",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Environmental. Depends on a writable Windows event log on the agent. Carries NO message, and the empty signature asserts exactly that rather than acting as a wildcard. 16.11 carries this test with the SAME empty signature on a line whose gate passes.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "TestPlatform.Common.UnitTests.ExtensionFramework.TestPluginCacheTests.GetTestExtensionsShouldShouldThrowIfDiscovererThrows",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Carries no message; the empty signature asserts that, not a wildcard. 16.11 carries this test with the SAME empty signature on a line whose gate passes.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "TestPlatform.Common.UnitTests.ExtensionFramework.TestPluginCacheTests.UpdateAdditionalExtensionsShouldResetExtensionsDiscoveredFlag",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Carries no message; the empty signature asserts that, not a wildcard. 16.11 carries this test with the SAME empty signature on a line whose gate passes.",
+    "classifiedOnRun": "3066872",
+    "classifiedOn": "2026-09-04"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientShouldRaiseClientDisconnectedEventIfConnectionIsBroken",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientStartShouldConnectToLoopbackOnGivenPort",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientStartShouldThrowIfServerIsNotListening",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientStopShouldCloseChannel",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientStopShouldRaiseClientDisconnectedEventOnClientDisconnection",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketClientStopShouldStopCommunication",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketEndpointShouldNotifyChannelOnDataAvailable",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketClientTests.SocketEndpointStartShouldRaiseServerConnectedEventOnServerConnection",
+    "outcome": "NotExecuted",
+    "signature": "Flaky tests",
+    "cause": "Existing class-level Ignore(\"Flaky tests\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketClientTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketEndpointShouldInitializeChannelOnServerConnection",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketEndpointShouldNotifyChannelOnDataAvailable",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketEndpointStartShouldRaiseServerConnectedEventOnServerConnection",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketServerShouldRaiseClientDisconnectedEventIfConnectionIsBroken",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketServerStartShouldHostServer",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketServerStopShouldCloseChannel",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketServerStopShouldCloseClient",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketServerStopShouldRaiseClientDisconnectedEventOnClientDisconnection",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CommunicationUtilities.PlatformTests.SocketServerTests.SocketServerStopShouldStopListening",
+    "outcome": "NotExecuted",
+    "signature": "Flaky",
+    "cause": "Existing class-level Ignore(\"Flaky\") in test/Microsoft.TestPlatform.CommunicationUtilities.PlatformTests/SocketServerTests.cs, unchanged from the PR source. The platform project is now included in validation; the ignored methods are not claimed as passed.",
+    "classifiedOnRun": "local-20260917-corrected-unit-first",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.CuitTest.CuitRunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "Known flaky test requiring an unlocked interactive desktop.",
+    "cause": "Jakub explicitly requested Ignore in code on 2026-09-17 after the existing CUIT test failed because the desktop was locked or the remote session minimized. This test is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-final-local-validation",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.CodedWebTestRunAllTests",
+    "outcome": "NotExecuted",
+    "signature": "Legacy coded WebTest depends on obsolete external redirects.",
+    "cause": "Jakub explicitly selected Ignore for this legacy network-dependent test after CI showed its hardcoded Google request and 2017 redirect expectation failing. The legacy runner executed the test; the external request failed. This case is reported as skipped, not passed.",
+    "classifiedOnRun": "3079198",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DifferentTestFrameworkSimpleTests.WebTestRunAllTestsWithRunSettings",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. This works on server but not locally, because locally it grabs old dll from GAC, but has version 10.0.0 as the one in our package.",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/DifferentTestFrameworkSimpleTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DisableAppdomainTests.DisableAppdomainTest",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/DisableAppdomainTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DisableAppdomainTests.NewtonSoftDependencyWithDisableAppdomainTest",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. This test is not meant for .netcore.",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/DisableAppdomainTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DotnetArchitectureSwitchTests.DOTNET_ROOTS_EnvironmentVariables",
+    "outcome": "NotExecuted",
+    "signature": "Manual tests(for now). Tests in this class need some .NET SDK global installations",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/DotnetArchitectureSwitchTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DotnetArchitectureSwitchTests.GlobalInstallation",
+    "outcome": "NotExecuted",
+    "signature": "Manual tests(for now). Tests in this class need some .NET SDK global installations",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/DotnetArchitectureSwitchTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DotnetArchitectureSwitchTests.PrivateX64BuildToDOTNET_ROOTS_EnvironmentVariables",
+    "outcome": "NotExecuted",
+    "signature": "Manual tests(for now). Tests in this class need some .NET SDK global installations",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/DotnetArchitectureSwitchTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DotnetArchitectureSwitchTests.PrivateX64BuildToGlobalArmInstallation",
+    "outcome": "NotExecuted",
+    "signature": "Manual tests(for now). Tests in this class need some .NET SDK global installations",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/DotnetArchitectureSwitchTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.DotnetArchitectureSwitchTests.SilentlyForceX64",
+    "outcome": "NotExecuted",
+    "signature": "Manual tests(for now). Tests in this class need some .NET SDK global installations",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/DotnetArchitectureSwitchTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.EventLogCollectorTests.EventLogDataCollectorShoudCreateLogFileHavingEvents",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/EventLogCollectorTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionTests.StackOverflowExceptionShouldBeLoggedToConsoleAndDiagLogFile",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/ExecutionTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.ExecutionThreadApartmentStateTests.CancelTestExectionShouldWorkWhenApartmentStateIsSTA",
+    "outcome": "NotExecuted",
+    "signature": "Issue with TestSessionTimeout:  https://github.com/Microsoft/vstest/issues/980",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/ExecutionThreadApartmentStateTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.DiscoverTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/TelemetryTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TelemetryTests.RunTestsShouldPublishMetrics",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Telemetry API is not supported for .NetCore runner",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/TelemetryTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TestCaseFilterTests.DiscoverMstestV1TestsWithAndOperatorTrait",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Mstest v1 tests not supported with .NET Core runner.",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/TestCaseFilterTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TestCaseFilterTests.DiscoverTmiTestsWithOnlyPropertyValue",
+    "outcome": "NotExecuted",
+    "signature": "Temporary ignoring, because of incomplete interop work for legacy TP",
+    "cause": "Existing Ignore in test/Microsoft.TestPlatform.AcceptanceTests/TestCaseFilterTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTests.RunTestsShouldThrowOnStackOverflowException",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. On StackOverflowException testhost not exited in release configuration.",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/TranslationLayerTests/RunTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  },
+  {
+    "test": "Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests.RunTestsWithDifferentConfigurationTests.RunTestsWithTestSettings",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. VsTestConsoleWrapper does not support .Net Core Runner",
+    "cause": "Existing Assert.Inconclusive in test/Microsoft.TestPlatform.AcceptanceTests/TranslationLayerTests/RunTestsWithDifferentConfigurationTests.cs, verified in the original PR source. Normal acceptance is now executed; this case is reported as skipped, not passed.",
+    "classifiedOnRun": "local-20260917-normal-acceptance-2",
+    "classifiedOn": "2026-09-17"
+  }
+]

@@ -9,7 +9,24 @@
     <ProductSource Include="$(SourceRoot)**\*.csproj" Exclude="$(SourceRoot)package\**\*.csproj" />
   </ItemGroup>
 
+  <!--
+    Localize runs _CreateLocalizeXLF and then _CreateLocalizeResx. _CreateLocalizeXLF regenerates the
+    checked-in .xlf from the neutral .resx, which discards every translation before the converter reads
+    it. On a servicing branch the .xlf files are the shipped translations and must not be rewritten.
+
+    Use LocalizeResxOnly below. Localize is kept only so the pre-Arcade scripts\build.ps1 still resolves.
+  -->
   <Target Name="Localize">
     <MSBuild Projects="@(ProductSource)" Targets="Localize" BuildInParallel="True" />
+  </Target>
+
+  <!--
+    Reads the checked-in .xlf and writes the culture .resx that the build embeds as satellites.
+    Writes no .xlf. This is phase 1 of two: the generated .resx are picked up only by a build run with
+    LocalizedBuild=true, because TestPlatform.Settings.targets sets EnableDefaultEmbeddedResourceItems
+    to false, so nothing globs them in automatically.
+  -->
+  <Target Name="LocalizeResxOnly">
+    <MSBuild Projects="@(ProductSource)" Targets="_CreateLocalizeResx" BuildInParallel="True" />
   </Target>
 </Project>

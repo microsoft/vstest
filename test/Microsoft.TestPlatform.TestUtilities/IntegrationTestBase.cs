@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
+using System.Xml.Linq;
 
 using FluentAssertions;
 
@@ -18,6 +19,7 @@ using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
 using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -624,8 +626,7 @@ public class IntegrationTestBase
         }
         else if (IsNetCoreRunner())
         {
-            var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-            consoleRunnerPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
+            consoleRunnerPath = Path.Combine(IntegrationTestEnvironment.DotnetDirectory, IsWindows ? "dotnet.exe" : "dotnet");
         }
         else
         {
@@ -676,8 +677,7 @@ public class IntegrationTestBase
         var consoleRunnerPath = IsNetCoreRunner()
                 ? GetDotnetRunnerPath()
                 : GetConsoleRunnerPath();
-        var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
-        var dotnetPath = Path.Combine(_testEnvironment.ToolsDirectory, executablePath);
+        var dotnetPath = Path.Combine(IntegrationTestEnvironment.DotnetDirectory, IsWindows ? "dotnet.exe" : "dotnet");
 
         if (!File.Exists(dotnetPath))
         {
@@ -811,14 +811,7 @@ public class IntegrationTestBase
         {
             foreach (var variable in environmentVariables)
             {
-                if (process.StartInfo.EnvironmentVariables.ContainsKey(variable.Key))
-                {
-                    process.StartInfo.EnvironmentVariables[variable.Key] = variable.Value;
-                }
-                else
-                {
-                    process.StartInfo.EnvironmentVariables.Add(variable.Key, variable.Value);
-                }
+                process.StartInfo.AddEnvironmentVariable(variable.Key, variable.Value);
             }
         }
 
@@ -951,11 +944,9 @@ public class IntegrationTestBase
             throw new NotSupportedException(nameof(architecture));
         }
 
-        string path = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "tools",
-            architecture == "X86" ?
-            "dotnet_x86" :
-            $"dotnet",
-            $"dotnet{(IsWindows ? ".exe" : "")}");
+        string path = Path.Combine(IntegrationTestEnvironment.DotnetDirectory,
+            architecture == "X86" ? "x86" : "",
+            IsWindows ? "dotnet.exe" : "dotnet");
 
         Assert.IsTrue(File.Exists(path));
 
@@ -963,6 +954,51 @@ public class IntegrationTestBase
     }
 
     protected string GetDotnetRunnerPath() => _testEnvironment.VSTestConsoleInfo?.Path ?? Path.Combine(_testEnvironment.PublishDirectory, "vstest.console.dll");
+
+    protected static string CreateIsolatedTemplateEngineHome(string parentDirectory)
+    {
+        var home = Path.Combine(parentDirectory, "clihome");
+        Directory.CreateDirectory(home);
+        return home;
+    }
+
+    protected static void UseLocallyBuiltTestSdk(string projectDirectory)
+    {
+        var projectFile = Directory.GetFiles(projectDirectory, "*.csproj").Single();
+        var project = XDocument.Parse(File.ReadAllText(projectFile));
+        var root = project.Root ?? throw new InvalidOperationException($"Missing Project element in {projectFile}.");
+        var ns = root.Name.Namespace;
+        var references = root.Descendants(ns + "PackageReference").ToList();
+        var versions = new IntegrationTestEnvironment().DependencyVersions;
+        var group = new XElement(ns + "ItemGroup");
+        root.Add(group);
+
+        // New SDK templates use the MSTest metapackage, whose Test SDK floor is newer than this servicing line.
+        foreach (var reference in references.Where(item => (string?)item.Attribute("Include") == "MSTest"))
+        {
+            reference.Remove();
+            group.Add(new XElement(ns + "PackageReference",
+                new XAttribute("Include", "MSTest.TestAdapter"), new XAttribute("Version", versions["MSTestAdapterVersion"])));
+            group.Add(new XElement(ns + "PackageReference",
+                new XAttribute("Include", "MSTest.TestFramework"), new XAttribute("Version", versions["MSTestFrameworkVersion"])));
+        }
+
+        foreach (var reference in references.Where(item => (string?)item.Attribute("Include") == "Microsoft.NET.Test.Sdk"))
+        {
+            reference.Remove();
+        }
+
+        group.Add(new XElement(ns + "PackageReference",
+            new XAttribute("Include", "Microsoft.NET.Test.Sdk"), new XAttribute("Version", versions["NETTestSdkVersion"])));
+        project.Save(projectFile);
+
+        var config = XDocument.Load(Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "NuGet.config"));
+        var sources = config.Root?.Element("packageSources")
+            ?? throw new InvalidOperationException("NuGet.config has no packageSources element.");
+        sources.Add(new XElement("add", new XAttribute("key", "locally-built-testplatform-packages"),
+            new XAttribute("value", IntegrationTestEnvironment.LocalPackageSource)));
+        config.Save(Path.Combine(projectDirectory, "NuGet.config"));
+    }
 
     protected void StdOutHasNoWarnings()
     {

@@ -2,6 +2,9 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+#if !NETSTANDARD1_0
+using System.Collections.Concurrent;
+#endif
 using System.Collections.Generic;
 using System.Globalization;
 using System.Reflection;
@@ -19,7 +22,11 @@ public delegate bool ValidateValueCallback(object? value);
 public class TestProperty : IEquatable<TestProperty>
 {
     private Type _valueType;
+#if NETSTANDARD1_0
     private static readonly Dictionary<string, Type> TypeCache = new();
+#else
+    private static readonly ConcurrentDictionary<string, Type> TypeCache = new();
+#endif
 
 #if NETSTANDARD1_0
     private static bool DisableFastJson { get; set; } = true;
@@ -191,7 +198,11 @@ public class TestProperty : IEquatable<TestProperty>
             {
                 if (type != null)
                 {
+#if NETSTANDARD1_0
                     TypeCache[typeName] = type;
+#else
+                    TypeCache.TryAdd(typeName, type);
+#endif
                     return type;
                 }
             }
@@ -259,7 +270,11 @@ public class TestProperty : IEquatable<TestProperty>
 
         if (!DisableFastJson)
         {
+#if NETSTANDARD1_0
             TypeCache[typeName] = type;
+#else
+            TypeCache.TryAdd(typeName, type);
+#endif
         }
         return type;
     }

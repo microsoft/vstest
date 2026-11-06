@@ -4,7 +4,7 @@
         <PackagesPath Condition="'$(TP_PACKAGES_DIR)' != ''">$(TP_PACKAGES_DIR)\</PackagesPath>
         <PackagesPath Condition="'$(PackagesPath)' == ''">$(TestPlatformRoot)\packages\</PackagesPath>
     </PropertyGroup>
-    <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" />
+    <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Dependencies.props" Condition="'$(DependencyVersionsImported)' != 'true'" />
 
     <!-- Required by Microsoft.Common.targets -->
     <Target Name="CreateManifestResourceNames" Condition="'@(EmbeddedResource)' != ''" />
@@ -19,7 +19,7 @@
 
     <!-- Default to ILAsm shipped with buildtools -->
     <PropertyGroup Condition="'$(IlasmToolPath)' == ''">
-        <IlasmPath>$(PackagesPath)microsoft.netcore.ilasm\$(ILAsmPackageVersion)\runtimes\native</IlasmPath>
+        <IlasmPath>$(PackagesPath)microsoft.netcore.ilasm\$(ILAsmPackageVersion)\runtimes\native\</IlasmPath>
         <IlasmToolPath Condition="'$(RunningOnUnix)'!='true' And Exists('$(IlasmPath)ilasm.exe')">$(IlasmPath)ilasm.exe</IlasmToolPath>
         <IlasmToolPath Condition="'$(RunningOnUnix)'=='true' And Exists('$(IlasmPath)ilasm')">$(IlasmPath)ilasm</IlasmToolPath>
     </PropertyGroup>
@@ -27,12 +27,13 @@
     <!-- If buildtools wasn't restored with ILAsm, on Windows we can fallback to ILAsm from the framework -->
     <Target Name="GetIlasmPath" Condition="'$(RunningOnUnix)'!='true' And '$(IlasmToolPath)' == ''">
         <GetFrameworkPath>
-            <Output TaskParameter="Path" PropertyName="IlasmPath" />
+            <Output TaskParameter="FrameworkVersion40Path" PropertyName="FrameworkIlasmPath" />
         </GetFrameworkPath>
         <PropertyGroup>
-            <IlasmPath>$(IlasmPath)\</IlasmPath>
-            <IlasmToolPath>$(IlasmPath)ilasm</IlasmToolPath>
+            <IlasmToolPath>$(FrameworkIlasmPath)\ilasm.exe</IlasmToolPath>
+            <IlasmToolPath Condition="'$(FrameworkIlasmPath)' == ''">$(WINDIR)\Microsoft.NET\Framework\v4.0.30319\ilasm.exe</IlasmToolPath>
         </PropertyGroup>
+        <Error Condition="!Exists('$(IlasmToolPath)')" Text="The .NET Framework IL assembler was not found at '$(IlasmToolPath)'." />
     </Target>
 
     <ItemGroup>
@@ -58,7 +59,7 @@
             <_IlasmSwitches Condition="'$(IlasmResourceFile)' != ''">$(_IlasmSwitches) -RESOURCES=$(IlasmResourceFile)</_IlasmSwitches>
         </PropertyGroup>
 
-        <Exec Command="$(IlasmToolPath) $(_IlasmSwitches) $(_OutputTypeArgument) $(IlasmFlags) -OUTPUT=@(IntermediateAssembly) $(_KeyFileArgument) @(Compile, ' ')">
+        <Exec Command="&quot;$(IlasmToolPath)&quot; $(_IlasmSwitches) $(_OutputTypeArgument) $(IlasmFlags) -OUTPUT=&quot;@(IntermediateAssembly)&quot; $(_KeyFileArgument) @(Compile, ' ')">
             <Output TaskParameter="ExitCode" PropertyName="_ILAsmExitCode" />
         </Exec>
         <Error Text="ILAsm failed" Condition="'$(_ILAsmExitCode)' != '0'" />

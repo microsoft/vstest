@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -469,23 +469,53 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
         // i.e. I've got only private install and no global installation, in this case apphost needs to use env var to locate runtime.
         if (testHostExeFound)
         {
-            string prefix = "VSTEST_WINAPPHOST_";
-            string dotnetRootEnvName = $"{prefix}DOTNET_ROOT(x86)";
-            var dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
-            if (dotnetRoot is null)
-            {
-                dotnetRootEnvName = $"{prefix}DOTNET_ROOT";
-                dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
-            }
+            var targetArchitecture = _architecture is Architecture.Default or Architecture.AnyCPU ? Architecture.X64 : _architecture;
+            var architectureRootName = $"DOTNET_ROOT_{targetArchitecture.ToString().ToUpperInvariant()}";
+            var callerRootName = startInfo.EnvironmentVariables.Keys.FirstOrDefault(
+                name => string.Equals(name, architectureRootName, StringComparison.OrdinalIgnoreCase));
+            var architectureRoot = callerRootName is not null
+                ? startInfo.EnvironmentVariables[callerRootName]
+                : _environmentVariableHelper.GetEnvironmentVariable(architectureRootName);
 
-            if (dotnetRoot != null)
+            // The packaged 2.1 apphost only reads the legacy names. Preserve architecture-specific
+            // precedence without replacing the apphost or changing the muxer-resolution path.
+            if (!architectureRoot.IsNullOrWhiteSpace() && _fileHelper.DirectoryExists(architectureRoot))
             {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}', forwarding to '{dotnetRootEnvName.Replace(prefix, string.Empty)}'");
-                startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
+                var legacyRootName = targetArchitecture == Architecture.X86 ? "DOTNET_ROOT(x86)" : "DOTNET_ROOT";
+                foreach (var key in startInfo.EnvironmentVariables.Keys
+                    .Where(name => string.Equals(name, legacyRootName, StringComparison.OrdinalIgnoreCase)).ToArray())
+                {
+                    startInfo.EnvironmentVariables.Remove(key);
+                }
+
+                startInfo.EnvironmentVariables[legacyRootName] = architectureRoot;
+                EqtTrace.Verbose("DotnetTestHostmanager.GetTestHostProcessStartInfo: Forwarding {0} to {1} for the legacy apphost.", architectureRootName, legacyRootName);
             }
             else
             {
-                EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
+                if (!architectureRoot.IsNullOrWhiteSpace())
+                {
+                    EqtTrace.Verbose("DotnetTestHostmanager.GetTestHostProcessStartInfo: Ignoring {0} because directory '{1}' does not exist.", architectureRootName, architectureRoot);
+                }
+
+                string prefix = "VSTEST_WINAPPHOST_";
+                string dotnetRootEnvName = $"{prefix}DOTNET_ROOT(x86)";
+                var dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+                if (dotnetRoot is null)
+                {
+                    dotnetRootEnvName = $"{prefix}DOTNET_ROOT";
+                    dotnetRoot = _environmentVariableHelper.GetEnvironmentVariable(dotnetRootEnvName);
+                }
+
+                if (dotnetRoot != null)
+                {
+                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Found '{dotnetRootEnvName}' in env variables, value '{dotnetRoot}', forwarding to '{dotnetRootEnvName.Replace(prefix, string.Empty)}'");
+                    startInfo.EnvironmentVariables.Add(dotnetRootEnvName.Replace(prefix, string.Empty), dotnetRoot);
+                }
+                else
+                {
+                    EqtTrace.Verbose($"DotnetTestHostmanager.LaunchTestHostAsync: Prefix '{prefix}*' not found in env variables");
+                }
             }
         }
 

@@ -5,6 +5,31 @@
     <TestPlatformPackageDir>$(TestPlatformRoot)packages\</TestPlatformPackageDir>
   </PropertyGroup>
 
+  <!--
+    xlftool is the converter this branch shipped with. Its location is not fixed: NuGet.config asks for
+    a repo-relative 'packages' folder, but eng\common\tools.ps1 sets NUGET_PACKAGES, which wins, so under
+    Arcade the package lands wherever that points instead. Resolve it rather than hardcoding one of them.
+
+    Only the read direction gets this. _CreateLocalizeXLF below keeps the pre-Arcade path on purpose:
+    it rewrites the checked-in .xlf from the neutral .resx and destroys the shipped translations, and
+    teaching it to find the tool in a second location would hand it a working path it does not have today.
+  -->
+  <PropertyGroup>
+    <_XlfToolRelativePath>fmdev.xlftool\0.1.3\tools\xlftool.exe</_XlfToolRelativePath>
+    <XlfToolPath Condition="'$(XlfToolPath)' == '' and '$(NuGetPackageRoot)' != '' and Exists('$(NuGetPackageRoot)$(_XlfToolRelativePath)')">$(NuGetPackageRoot)$(_XlfToolRelativePath)</XlfToolPath>
+    <XlfToolPath Condition="'$(XlfToolPath)' == '' and Exists('$(TestPlatformPackageDir)$(_XlfToolRelativePath)')">$(TestPlatformPackageDir)$(_XlfToolRelativePath)</XlfToolPath>
+  </PropertyGroup>
+
+  <!--
+    Makes restore fetch the converter. external.csproj declares it too, but that project is not in
+    TestPlatform.sln, which is what the Arcade build restores, so on a clean agent nothing fetched it and
+    the localization step failed with 'The system cannot find the path specified' per project.
+    PackageDownload only downloads: it adds no compile-time reference to any product assembly.
+  -->
+  <ItemGroup Condition="'$(ProductProject)' == 'true'">
+    <PackageDownload Include="fmdev.xlftool" Version="[0.1.3]" />
+  </ItemGroup>
+
   <PropertyGroup>
     <ResourceDirectory>$(ProjectDir)Resources</ResourceDirectory>
     <ProductProject Condition="'$(TestProject)' == '' and '$(TestProject)' != 'true'">true</ProductProject>
@@ -45,14 +70,30 @@
     <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe update -Resx %(EmbeddedResource.Identity) -Xlf $(ResourceDirectory)\xlf\%(EmbeddedResource.Filename).xlf" Condition="%(EmbeddedResource.Filename) != 'DefaultCodeCoverageConfig' and %(EmbeddedResource.Filename) != 'html'"/>
   </Target>
 
-  <Target Name="_CreateLocalizeResx">
+  <!--
+    Reads the checked-in .xlf and writes the culture .resx. Writes no .xlf.
+
+    The condition is the one the Localize wrapper carries. It lives here as well because this target is
+    invoked directly, without the wrapper, and a project with no EmbeddedResource then reaches the Exec
+    below with empty batching metadata and asks xlftool for 'Resources\xlf\..xlf'.
+  -->
+  <Target Name="_CreateLocalizeResx" Condition="'$(ProductProject)' == 'true' and '@(EmbeddedResource)' != ''">
     <Message Importance="High" Text="Create localized resx for '$(AssemblyName)'" />
+
+    <!--
+      Fail here rather than letting each Exec below report 'The system cannot find the path specified'
+      once per locale. With the converter absent that produces hundreds of error lines and zero
+      generated .resx, which reads as a build that ran and had nothing to do.
+    -->
+    <Error Condition="'$(XlfToolPath)' == ''"
+           Text="xlftool was not found. Looked for '$(_XlfToolRelativePath)' under NuGetPackageRoot '$(NuGetPackageRoot)' and under '$(TestPlatformPackageDir)'. Restore has to run before localization so the fmdev.xlftool PackageDownload is present." />
+
     <CreateItem Include="@(EmbeddedResource)" AdditionalMetadata="Language=%(ResxLang.Identity)">
       <Output ItemName="LocResourceFile" TaskParameter="Include"/>
     </CreateItem>
 
     <!-- Convert language specific xlf files to resx -->
-    <Exec Command="$(TestPlatformPackageDir)fmdev.xlftool\0.1.3\tools\xlftool.exe  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" Condition="%(LocResourceFile.Filename) != 'DefaultCodeCoverageConfig' and %(LocResourceFile.Filename) != 'html'"/>
+    <Exec Command="&quot;$(XlfToolPath)&quot;  writeTarget -Xlf $(ResourceDirectory)\xlf\%(LocResourceFile.Filename).%(LocResourceFile.Language).xlf -Resx $(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx -verbose" Condition="%(LocResourceFile.Filename) != 'DefaultCodeCoverageConfig' and %(LocResourceFile.Filename) != 'html'"/>
     <ItemGroup>
       <EmbeddedResource Include="$(ResourceDirectory)\%(LocResourceFile.Filename).%(LocResourceFile.Language).resx" />
     </ItemGroup>

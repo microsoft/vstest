@@ -1,4 +1,45 @@
 <Project>
+
+  <!--
+    ARCADE 11 SIGNING DEFAULTS - the half that changes shipped bytes with no diagnostic.
+
+    Arcade 11 added extensions to its DEFAULT FileExtensionSignInfo that Arcade 7 did not have:
+
+      Arcade 7 (this line's original)        Arcade 11 (what this branch now builds with)
+      .dll;.exe;.mibc  -> Microsoft400       .dll;.exe;.mibc;.msi;.cab -> Microsoft400
+      .js;.ps1;...     -> Microsoft400       .ps1;...                  -> Microsoft400
+                                             .js      -> BreakingSignatureChange   REASSIGNED
+                                             .dylib   -> MacDeveloperHarden        NEW
+                                             .pkg     -> MacDeveloper              NEW
+                                             .app     -> MacDeveloper              NEW
+                                             .deb     -> LinuxSign                 NEW
+                                             .rpm     -> LinuxSign                 NEW
+                                             .tar.gz  -> None                      NEW
+
+    There are two halves and only one of them is loud:
+
+      declared by this repo + new Arcade 11 default  ->  hard build error, impossible to miss
+      NOT declared here     + new Arcade 11 default  ->  SILENT content change on a GREEN build
+
+    rel/17.3's original Signing.props declared neither .cab nor .dylib, so the silent half applied
+    to this line in full. On rel/17.14 the same gap caused Arcade 11 to overwrite an
+    "Developer ID Application: Microsoft Corporation (UBF8T346G9)" APPLE signature on two .dylib
+    files with MacDeveloperHarden - same file size, different bytes, no error, green build.
+
+    CertificateName="None" does not merely stop adding a second signature: the file passes through
+    unsigned from the package it was copied out of, so the producer's original bytes are preserved
+    exactly. Verified on 17.14 by hash before and after.
+
+    Fix the loud half with Remove then re-add, NEVER by deleting the line. Deleting hands the
+    extension back to Arcade's default and changes what ships, on a green build.
+  -->
+  <ItemGroup>
+    <FileExtensionSignInfo Remove=".cab" />
+    <FileExtensionSignInfo Include=".cab" CertificateName="None" />
+    <FileExtensionSignInfo Remove=".dylib" />
+    <FileExtensionSignInfo Include=".dylib" CertificateName="None" />
+  </ItemGroup>
+
   <!--
     These are third party libraries that we use in Arcade. We need to sign them even if they
     are already signed. However, they must be signed with a 3rd party certificate.
@@ -28,4 +69,146 @@
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.Package.dll" CertificateName="3PartySHA2" />
   </ItemGroup>
+
+  <!--
+    ==========================================================================================
+    WHERE THIS LINE'S ARTIFACTS ACTUALLY ARE
+
+    Arcade's default ItemsToSign globs are $(ArtifactsPackagesDir)**\*.nupkg and
+    $(VisualStudioSetupOutputPath)**\*.vsix, which resolve to
+
+        artifacts\packages\Release\{Shipping,NonShipping}\*.nupkg
+        artifacts\VSSetup\Release\**\*.vsix
+
+    On this line the packages are not produced by Arcade. They are produced by
+    scripts\build.ps1, which packs nuspec files with nuget.exe into
+
+        artifacts\Release\packages          $TPB_PackageOutDir,  scripts\build.ps1:103
+        artifacts\Release\VSIX              $vsixProjectDir,     scripts\build.ps1:954
+
+    The two sets of paths do not intersect, so without the entries below the signing step
+    resolves an empty ItemsToSign and Arcade fails with
+
+        Sign.proj(67,5): error : List of files to sign is empty. Make sure that ItemsToSign
+        is configured correctly.
+
+    MEASURED ON BUILD 3067129, and this is the entry that corrects a wrong inference rather
+    than merely recording a new one. Earlier ticks read that same error as "Package stopped
+    early, Sign is only downstream of it". On 3067129 Package SUCCEEDED - 10 nupkgs and
+    TestPlatform.vsix are listed by the 'Report what packaging produced' step - and Sign
+    still failed with the identical message. So the empty list is this file's gap, not a
+    packaging symptom. A downstream error that survives the upstream fix was never
+    downstream.
+
+    Ported from rel/16.11 (eng\Signing.props at c75ddb769d2d2ab897ac41449ddf1e0dcc3e157c),
+    where the same two globs are what makes signing resolve a non-empty set.
+
+    Adding globs here rather than moving the script's output is deliberate. $TPB_PackageOutDir
+    and the artifacts\Release layout are read by a dozen-plus copy sites in scripts\build.ps1;
+    changing the root re-opens every one of them. This file is Arcade's extension point and no
+    artifact comparison reads it.
+
+    The globs are recursive because Create-VsixPackage builds a project into that tree and the
+    .vsix lands under it rather than directly in it. Globbing wide and then ASSERTING THE SET
+    is the safe direction; globbing narrowly and hoping is not.
+    ==========================================================================================
+  -->
+  <PropertyGroup>
+    <_ServicingPackageOutDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', '$(Configuration)', 'packages'))</_ServicingPackageOutDir>
+    <_ServicingVsixOutDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', '$(Configuration)', 'VSIX'))</_ServicingVsixOutDir>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ItemsToSign Include="$(_ServicingPackageOutDir)**\*.nupkg" />
+    <ItemsToSign Include="$(_ServicingVsixOutDir)**\*.vsix" />
+  </ItemGroup>
+
+  <!--
+    A glob that matches NOTHING fails loudly, because Arcade already checks for it. A glob that
+    matches SOME of the packages signs some of the packages and exits 0, and nothing downstream
+    can tell that apart from success. That is the case this target exists for.
+
+    16.11 joins the resolved set against a produced-packages.txt that its Create-NugetPackages
+    writes. THIS LINE HAS NO SUCH FILE - scripts\build.ps1 on 17.3 ends Create-NugetPackages at
+    Verify-Nuget-Packages and writes no manifest - so the expected set is taken from the only
+    declaration of it that exists here: the twelve keys of $expectedNumOfFiles in
+    scripts\verify-nupkgs.ps1. Copying 16.11's ReadLinesFromFile verbatim would hard-error on a
+    file this line never creates, which is why this half is adapted rather than ported.
+
+    IT NOW FAILS ON A MISSING PACKAGE. The earlier revision of this file only REPORTED, for a
+    measured reason that has since expired: 3067129 and a local Release run both produced 10 of
+    these 12 (Microsoft.TestPlatform.CLI and Microsoft.TestPlatform.Build were absent because
+    Pack was a silent no-op), and erroring then would have stopped Sign before it had ever run
+    once on this line. That packaging defect is fixed - scripts\build.ps1 stages an empty
+    Directory.Build.props/.targets beside the packed projects so MSBuild's upward walk stops
+    before the Arcade SDK sets IsPackable=false - and all twelve are produced again. The note
+    that used to sit here said to tighten this the moment that happened, because a warning left
+    in place is how a partial signing set becomes permanent. This is that tightening.
+
+    THE MATCH IS ';<Id>\.[0-9]' AGAINST A DELIMITED LIST OF FILE NAMES, NOT A Contains OF
+    ';<Id>.', AND THE DIFFERENCE IS NOT COSMETIC. Every one of the eight Microsoft.TestPlatform.*
+    ids begins with the id Microsoft.TestPlatform, so a plain Contains check reports
+    Microsoft.TestPlatform as present whenever Microsoft.TestPlatform.ObjectModel is present -
+    the single most likely package to go missing is the one such a check can never see. The
+    trailing \.[0-9] anchors on the start of the version, which is what actually separates
+    'Microsoft.TestPlatform.17.3.3' from 'Microsoft.TestPlatform.ObjectModel.17.3.3'.
+
+    SELF-TESTED AGAINST THREE CONTROLS BEFORE BEING COMMITTED, because a check that has never
+    failed is not known to work:
+      twelve present                              -> MISSING = '' , count 12
+      CLI and Build absent                        -> MISSING = 'Microsoft.TestPlatform.Build,
+                                                     Microsoft.TestPlatform.CLI' , count 10
+      Microsoft.TestPlatform absent, the other
+      eleven including ObjectModel present        -> MISSING = 'Microsoft.TestPlatform' ,
+                                                     count 11   <- the case a Contains fails
+
+    The VSIX check below is deliberately left a Warning. The packages half is being tightened
+    because twelve produced packages have now been measured; the vsix glob resolving on an
+    agent has NOT been measured even once - 3067129 proved Package produces TestPlatform.vsix,
+    which is a different statement from this glob finding it. Do not promote a check to an
+    Error on something that has never been observed to pass.
+  -->
+  <!-- Standalone validation checks downloaded PackageBasePath, not the producer's ItemsToSign. -->
+  <Target Name="AssertServicingSigningSetIsResolved" BeforeTargets="Execute"
+          Condition="'$(OutDirName)' != 'toolset\SigningValidation'">
+    <ItemGroup>
+      <_ExpectedSignPackageId Include="Microsoft.CodeCoverage" />
+      <_ExpectedSignPackageId Include="Microsoft.NET.Test.Sdk" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.AdapterUtilities" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.Build" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.CLI" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.Extensions.TrxLogger" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.Internal.Uwp" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.ObjectModel" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.Portable" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.TestHost" />
+      <_ExpectedSignPackageId Include="Microsoft.TestPlatform.TranslationLayer" />
+
+      <_SignNupkg Include="@(ItemsToSign)" Condition="'%(Extension)' == '.nupkg'" />
+      <_SignNonPackage Include="@(ItemsToSign)" Exclude="@(_SignNupkg)" />
+    </ItemGroup>
+
+    <PropertyGroup>
+      <_SignNupkgNames>;@(_SignNupkg->'%(Filename)', ';');</_SignNupkgNames>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_MissingSignPackageId Include="@(_ExpectedSignPackageId)"
+                             Condition="!$([System.Text.RegularExpressions.Regex]::IsMatch('$(_SignNupkgNames)', ';%(Identity)\.[0-9]'))" />
+    </ItemGroup>
+
+    <Error Condition="'@(_SignNupkg)' == ''"
+           Text="No packages resolved into ItemsToSign. Searched $(_ServicingPackageOutDir)**\*.nupkg. Create-NugetPackages writes there; signing must not run before packaging." />
+
+    <Error Condition="'@(_MissingSignPackageId)' != ''"
+           Text="Expected packages did NOT reach the signing set: @(_MissingSignPackageId->'%(Identity)', ', '). Resolved @(_SignNupkg->Count()) of @(_ExpectedSignPackageId->Count()) from $(_ServicingPackageOutDir)**\*.nupkg: @(_SignNupkg->'%(Filename)%(Extension)', ', '). Signing a partial set produces a drop where some packages are signed and some are not, and nothing downstream can tell that apart from success." />
+
+    <Message Importance="high" Text="Signing set resolved, $(_ServicingPackageOutDir): @(_SignNupkg->Count()) packages: @(_SignNupkg->'%(Filename)%(Extension)', ', ')" />
+    <Message Importance="high" Condition="'@(_SignNonPackage)' != ''"
+             Text="Also to sign, and not packages: @(_SignNonPackage->'%(Filename)%(Extension)', ', ')" />
+    <Warning Condition="'@(_SignNonPackage)' == ''"
+             Text="Nothing to sign besides the packages. On a build agent that means TestPlatform.vsix was not produced into $(_ServicingVsixOutDir) and is a finding, not an expected absence." />
+  </Target>
+
 </Project>

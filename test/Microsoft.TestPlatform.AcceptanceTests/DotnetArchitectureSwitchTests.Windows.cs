@@ -11,6 +11,8 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 using Newtonsoft.Json.Linq;
 
+using NuGet.Versioning;
+
 namespace Microsoft.TestPlatform.AcceptanceTests;
 
 [TestClass]
@@ -39,10 +41,15 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         var environmentVariables = new Dictionary<string, string?>
         {
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
+            ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path),
             [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo)!,
-            ["ExpectedArchitecture"] = architectureTo
+            ["ExpectedArchitecture"] = architectureTo,
+            ["ExpectedDotnetRoot"] = Path.GetDirectoryName(dotnetPathTo)!
         };
-        ExecuteApplication(dotnetPath, "new mstest", out _, out string _, out _, environmentVariables, TempDirectory.Path);
+        ConfigureSdkEnvironment(environmentVariables, dotnetPath);
+        ExecuteApplication(dotnetPath, "new mstest --no-restore", out _, out string templateError, out int templateExitCode, environmentVariables, TempDirectory.Path);
+        Assert.AreEqual(0, templateExitCode, templateError);
+        UseLocallyBuiltTestSdk(TempDirectory.Path);
 
         // Patch test file
         File.WriteAllText(Path.Combine(TempDirectory.Path, "UnitTest1.cs"),
@@ -59,19 +66,30 @@ public class UnitTest1
     public void TestMethod1()
     {
         Assert.AreEqual(Environment.GetEnvironmentVariable(""ExpectedArchitecture""), System.Runtime.InteropServices.RuntimeInformation.ProcessArchitecture.ToString());
+        StringAssert.StartsWith(typeof(object).Assembly.Location, System.IO.Path.Combine(Environment.GetEnvironmentVariable(""ExpectedDotnetRoot"")!, ""shared"") + System.IO.Path.DirectorySeparatorChar);
     }
 }");
 
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
+        var testArguments = $"test --disable-build-servers -p:UseSharedCompilation=false -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt";
+        ExecuteApplication(dotnetPath, testArguments, out string stdOut, out _, out int exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
 
         environmentVariables = new Dictionary<string, string?>
         {
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             ["DOTNET_ROOT"] = Path.GetDirectoryName(dotnetPathTo),
-            ["ExpectedArchitecture"] = architectureTo
+            [$"DOTNET_ROOT_{architectureTo}"] = null,
+            ["ExpectedArchitecture"] = architectureTo,
+            ["ExpectedDotnetRoot"] = Path.GetDirectoryName(dotnetPathTo)!
         };
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
+        if (architectureTo == "X86")
+        {
+            // The legacy x86 apphost uses this name instead of DOTNET_ROOT on 64-bit Windows.
+            environmentVariables["DOTNET_ROOT(x86)"] = Path.GetDirectoryName(dotnetPathTo);
+        }
+        ConfigureSdkEnvironment(environmentVariables, dotnetPath);
+
+        ExecuteApplication(dotnetPath, testArguments, out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
 
         environmentVariables = new Dictionary<string, string?>
@@ -79,14 +97,32 @@ public class UnitTest1
             ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
             [$"DOTNET_ROOT_{architectureTo}"] = Path.GetDirectoryName(dotnetPathTo),
             ["DOTNET_ROOT"] = "WE SHOULD PICK THE ABOVE ONE BEFORE FALLBACK TO DOTNET_ROOT",
-            ["ExpectedArchitecture"] = architectureTo
+            ["ExpectedArchitecture"] = architectureTo,
+            ["ExpectedDotnetRoot"] = Path.GetDirectoryName(dotnetPathTo)!
         };
-        ExecuteApplication(dotnetPath, $"test -p:VsTestConsolePath=\"{Path.Combine(dotnetRunnerPath.FullName, Path.GetFileName(vstestConsolePath))}\" --arch {architectureTo.ToLower()} --diag:log.txt", out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
+        if (architectureTo == "X86")
+        {
+            environmentVariables["DOTNET_ROOT(x86)"] = "DOTNET_ROOT_X86_MUST_TAKE_PRECEDENCE";
+        }
+        ConfigureSdkEnvironment(environmentVariables, dotnetPath);
+
+        ExecuteApplication(dotnetPath, testArguments, out stdOut, out _, out exitCode, environmentVariables, TempDirectory.Path);
         Assert.AreEqual(0, exitCode, stdOut);
     }
 
+    private static void ConfigureSdkEnvironment(IDictionary<string, string?> environment, string dotnetPath)
+    {
+        // MSBuild exports these to child processes. An x86 SDK must not load the outer x64 SDK's tasks.
+        environment["MSBuildSDKsPath"] = null;
+        environment["MSBuildExtensionsPath"] = null;
+        environment["MSBUILD_EXE_PATH"] = null;
+        environment["DOTNET_MSBUILD_SDK_RESOLVER_CLI_DIR"] = Path.GetDirectoryName(dotnetPath);
+        environment["DOTNET_HOST_PATH"] = dotnetPath;
+    }
+
     private string GetLatestSdkVersion(string dotnetPath)
-        => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App")).OrderByDescending(x => x).First());
+        => Path.GetFileName(Directory.GetDirectories(Path.Combine(Path.GetDirectoryName(dotnetPath)!, @"shared/Microsoft.NETCore.App"))
+            .OrderByDescending(path => SemanticVersion.Parse(Path.GetFileName(path))).First());
 }
 
 #endif

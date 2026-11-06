@@ -52,6 +52,12 @@ internal partial class FeatureFlag : IFeatureFlag
     // multiple different tfms and architectures to run at the same time.
     public const string DISABLE_MULTI_TFM_RUN = VSTEST_ + nameof(DISABLE_MULTI_TFM_RUN);
 
+    // Disable the Unix handling of the directory holding the test session artifacts: narrowing a directory
+    // vstest creates to its owner, and verifying on Linux that a directory given by VSTEST_ARTIFACTS_DIRECTORY
+    // is owned by the current user and reachable by nobody else. Set it to 1 where that ownership or those
+    // permissions cannot be represented or changed, such as a mounted Windows or network volume.
+    public const string DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION = VSTEST_ + nameof(DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION);
+
     [Obsolete("Only use this in tests.")]
     internal static void Reset()
     {

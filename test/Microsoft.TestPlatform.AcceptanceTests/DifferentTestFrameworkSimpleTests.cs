@@ -120,6 +120,7 @@ public class DifferentTestFrameworkSimpleTests : AcceptanceTestBase
     [TestMethod]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
+    [Ignore("Legacy coded WebTest depends on obsolete external redirects.")]
     public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)
     {
         if (!IsCI)

@@ -413,7 +413,7 @@ public class DefaultTestHostManagerTests
     [TestCategory("Windows")]
     public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
     {
-        var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation())!, @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
+        var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation())!, @"TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
         IEnumerable<string> sources = _testHostManager.GetTestSources(new List<string> { sourcePath });
         Assert.IsTrue(sources.Any());
         Assert.IsTrue(sources.First().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
@@ -423,7 +423,7 @@ public class DefaultTestHostManagerTests
     [TestCategory("Windows")]
     public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
     {
-        var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation())!, @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
+        var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation())!, @"TestAssets\UWPTestAssets\AppxManifest.xml");
         string? source = AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
         Assert.AreEqual("UnitTestApp8.exe", source);
     }

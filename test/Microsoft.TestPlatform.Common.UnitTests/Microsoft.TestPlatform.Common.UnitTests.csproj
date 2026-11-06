@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
+    <ProjectReference Include="..\TestAssets\AttachmentProcessorDataCollector\AttachmentProcessorDataCollector.csproj" ReferenceOutputAssembly="false" />
   </ItemGroup>
   <!-- Workaround for https://github.com/dotnet/sdk/issues/364 -->
   <Target Name="WorkAroundPackageAndProjectReferenceConflict" BeforeTargets="ResolveLockFileReferences">

@@ -11,6 +11,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 public class CuitTest : AcceptanceTestBase
 {
     [TestMethod]
+    [Ignore("Known flaky test requiring an unlocked interactive desktop.")]
     [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void CuitRunAllTests(RunnerInfo runnerInfo)

@@ -46,6 +46,45 @@ VSTest can be built from within Visual Studio or from the CLI.
 - [Building with Visual Studio](https://github.com/Microsoft/vstest-docs/blob/main/docs/contribute.md#building-with-visual-studio)
 - [Building with CLI, CI, Editors](https://github.com/Microsoft/vstest-docs/blob/main/docs/contribute.md#building-with-cli-ci-editors)
 
+#### Servicing validation on Windows
+
+Use the SDK pinned in `global.json`. `eng\build.ps1 -restore -build` bootstraps the SDK when needed.
+Use a short worktree path to avoid .NET Framework adapter-loading failures at `MAX_PATH`.
+Do not use `-prepareMachine` on a shared development machine.
+Before localized packaging, run `eng\build.ps1 -restore -build -ci -warnAsError $false -nodeReuse $false`
+with the intended configuration. An ordinary inner-loop build is English-only and can replace the
+localized build outputs consumed by packaging.
+
+`eng\build.ps1 -test` runs unit tests, including the communication platform tests.
+`eng\build.ps1 -integrationTest` runs normal acceptance tests and excludes historical compatibility
+combinations. Before acceptance tests, run `scripts\build.ps1` with the same configuration and
+version suffix used for packaging, selecting `-Steps PrepareAcceptanceTests`. This builds normal
+assets against the local packages without changing NuGet sources or building the compatibility matrix.
+
+Both test commands require `VSTEST_CONSOLE_PATH` to point to
+`artifacts\<configuration>\netcoreapp2.1\vstest.console.dll` after packaging, not the console bundled
+in the SDK. The validation pipeline checks the staged console's version and starts the console before
+running tests. A successful validation requires nonempty unit and
+acceptance TRX files; known missing assets and empty AdapterUtilities suites are not allowed.
+
+For local Release validation, use the same prepared package cache and private runtimes as CI:
+
+```powershell
+$env:TP_ROOT_DIR = $PWD.Path
+$env:NUGET_PACKAGES = "$PWD\packages"
+$env:DOTNET_ROOT = "$PWD\.dotnet"
+$env:DOTNET_ROOT_X64 = $env:DOTNET_ROOT
+$env:DOTNET_ROOT_X86 = "$PWD\.dotnet\x86"
+${env:DOTNET_ROOT(x86)} = $env:DOTNET_ROOT_X86
+$env:VSTEST_CONSOLE_PATH = "$PWD\artifacts\Release\netcoreapp2.1\vstest.console.dll"
+.\eng\build.ps1 -configuration Release -test -warnAsError $false -nodeReuse $false
+.\eng\build.ps1 -configuration Release -integrationTest -warnAsError $false -nodeReuse $false
+```
+
+Historical combinations remain available separately through `-BuildCompatibilityTests` when preparing
+assets and `eng\build.ps1 -compatibilityTest` when running them. Performance tests are selected
+explicitly with `eng\build.ps1 -performanceTest` and may require administrator access for ETW.
+
 ### Microsoft Open Source Code of Conduct
 This project has adopted the [Microsoft Open Source Code of Conduct](https://opensource.microsoft.com/codeofconduct/). For more information see the [Code of Conduct FAQ](https://opensource.microsoft.com/codeofconduct/faq/) or contact [opencode@microsoft.com](mailto:opencode@microsoft.com) with any additional questions or comments.
 

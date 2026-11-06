@@ -47,7 +47,8 @@ public class IntegrationTestEnvironment
 
         // There is an assumption that integration tests will always run from a source enlistment.
         // Need to remove this assumption when we move to a CDP.
-        PackageDirectory = Path.Combine(TestPlatformRootDirectory, @"packages");
+        PackageDirectory = Environment.GetEnvironmentVariable("NUGET_PACKAGES")
+            ?? Path.Combine(TestPlatformRootDirectory, "packages");
         ToolsDirectory = Path.Combine(TestPlatformRootDirectory, @"tools");
         TestArtifactsDirectory = Path.Combine(TestPlatformRootDirectory, "artifacts", "testArtifacts");
         RunnerFramework = "net451";
@@ -154,6 +155,10 @@ public class IntegrationTestEnvironment
     /// Gets the tools directory for dependent tools
     /// </summary>
     public string ToolsDirectory { get; private set; }
+
+    public static string DotnetDirectory => Path.Combine(TestPlatformRootDirectory, ".dotnet");
+
+    public static string LocalPackageSource => Path.Combine(TestPlatformRootDirectory, "artifacts", BuildConfiguration, "packages");
 
     /// <summary>
     /// Gets the test artifacts directory.

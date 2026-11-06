@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">..\..\</TestPlatformRoot>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
@@ -35,8 +35,34 @@
     <Reference Include="Microsoft.CSharp" />
   </ItemGroup>
 
+  <!--
+    Copies a runnable vstest.console layout next to the playground exe so it can be F5'd.
+
+    THE PATHS ARE ARCADE'S, NOT THE PRE-ARCADE ONES. This is the Era A staging problem in its
+    smallest form. Every source below used to read
+      $(MSBuildProjectDirectory)\..\..\src\<project>\bin\$(Configuration)\<tfm>[\<rid>]
+    which is where this repo's own build script put output before Arcade. Under Arcade the build
+    writes to artifacts\bin\<project>\$(Configuration)\<tfm>[\<rid>] instead, so all twelve xcopy
+    sources resolved to directories that do not exist and the step failed with
+
+      error MSB3073: xcopy ... exited with code 4
+
+    xcopy's code 4 is "initialization error", which reads like a permissions or syntax fault rather
+    than a missing source, so the message points away from the cause.
+
+    ONE definition, referenced twelve times, rather than twelve edited literals. The failure mode
+    this avoids is a partial translation: eleven corrected paths and one missed would still build on
+    an incremental tree, because the stale pre-Arcade directory would still be sitting there from an
+    earlier build. Verify by deleting artifacts\bin and rebuilding, never by counting the diff.
+
+    $(ArtifactsBinDir) is Arcade's own property and already carries a trailing separator.
+  -->
+  <PropertyGroup>
+    <_PlaygroundConsoleDir>$(TargetDir)\vstest.console</_PlaygroundConsoleDir>
+  </PropertyGroup>
+
   <Target Name="PostBuild" AfterTargets="PostBuildEvent" Condition=" '$(OS)' == 'WINDOWS_NT' ">
-    <Exec Command="xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\vstest.console\bin\$(Configuration)\net451\ $(TargetDir)\vstest.console\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\Microsoft.TestPlatform.TestHostProvider\bin\$(Configuration)\net451\ $(TargetDir)\vstest.console\Extensions\&#xD;&#xA;REM copy net451, net47, net471, net472 and net48 testhosts&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost.x86\bin\$(Configuration)\net451\win7-x86 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost\bin\$(Configuration)\net451\win7-x64 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost.x86\bin\$(Configuration)\net47\win7-x86 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost\bin\$(Configuration)\net47\win7-x64 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost.x86\bin\$(Configuration)\net471\win7-x86 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost\bin\$(Configuration)\net471\win7-x64 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost.x86\bin\$(Configuration)\net472\win7-x86 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost\bin\$(Configuration)\net472\win7-x64 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost.x86\bin\$(Configuration)\net48\win7-x86 $(TargetDir)\vstest.console\TestHost\&#xD;&#xA;xcopy /i /y /f $(MSBuildProjectDirectory)\..\..\src\testhost\bin\$(Configuration)\net48\win7-x64 $(TargetDir)\vstest.console\TestHost\" />
+    <Exec Command="xcopy /i /y /f $(ArtifactsBinDir)vstest.console\$(Configuration)\net451\ $(_PlaygroundConsoleDir)\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)Microsoft.TestPlatform.TestHostProvider\$(Configuration)\net451\ $(_PlaygroundConsoleDir)\Extensions\&#xD;&#xA;REM copy net451, net47, net471, net472 and net48 testhosts&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost.x86\$(Configuration)\net451\win7-x86 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost\$(Configuration)\net451\win7-x64 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost.x86\$(Configuration)\net47\win7-x86 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost\$(Configuration)\net47\win7-x64 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost.x86\$(Configuration)\net471\win7-x86 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost\$(Configuration)\net471\win7-x64 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost.x86\$(Configuration)\net472\win7-x86 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost\$(Configuration)\net472\win7-x64 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost.x86\$(Configuration)\net48\win7-x86 $(_PlaygroundConsoleDir)\TestHost\&#xD;&#xA;xcopy /i /y /f $(ArtifactsBinDir)testhost\$(Configuration)\net48\win7-x64 $(_PlaygroundConsoleDir)\TestHost\" />
   </Target>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 </Project>

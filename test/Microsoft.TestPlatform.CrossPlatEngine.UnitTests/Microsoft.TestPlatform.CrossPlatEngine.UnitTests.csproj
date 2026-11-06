@@ -13,6 +13,7 @@
     <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\TestAssets\AttachmentProcessorDataCollector\AttachmentProcessorDataCollector.csproj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.TestHostProvider\Microsoft.TestPlatform.TestHostProvider.csproj" />
     <ProjectReference Include="..\coverlet.collector\coverlet.collector.csproj" />
     <ProjectReference Include="..\..\src\Microsoft.TestPlatform.CoreUtilities\Microsoft.TestPlatform.CoreUtilities.csproj">

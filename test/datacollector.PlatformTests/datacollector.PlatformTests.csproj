@@ -17,7 +17,22 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\datacollector\datacollector.csproj" />
 
-    <Content Include="$(TestPlatformRoot)src\datacollector\bin\$(Configuration)\$(TargetFramework)\datacollector*.json">
+    <!-- Arcade's output layout, not the pre-Arcade one.
+
+         This read $(TestPlatformRoot)src\datacollector\bin\$(Configuration)\$(TargetFramework)\ until
+         the Arcade 11 onboarding moved build output to artifacts\bin\<project>\<config>\<tfm>\.
+
+         It is the DANGEROUS half of that move. The playground project's xcopy of the same kind failed
+         loudly with MSB3073, so it was fixed the moment it appeared. A Content Include whose glob
+         matches nothing does not fail, does not warn, and does not appear in any diff: the build stays
+         green and the test assembly is simply missing datacollector.runtimeconfig.json and
+         datacollector.deps.json at run time, which surfaces later as a test failure that points at the
+         datacollector rather than at packaging.
+
+         Found by re-checking the whole repo for readers of the old layout AS A CLASS, after the
+         playground failure had already been fixed - not by a second failure. A path that is only read
+         by a glob has no error to search for. -->
+    <Content Include="$(ArtifactsBinDir)datacollector\$(Configuration)\$(TargetFramework)\datacollector*.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

@@ -3,9 +3,37 @@
   <PropertyGroup>
     <TestPlatformRoot>..\..\..\</TestPlatformRoot>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Dependencies.props" />
+  <PropertyGroup>
+    <!--
+      Point at the VSSDK build tools this repo pins, not at the ones belonging to whichever Visual
+      Studio happens to be installed. The import at the bottom of this file resolves
+      $(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets, and that targets file is what constructs the
+      VsixUtil command line - while Microsoft.VSSDK.BuildTools.targets supplies the VsixUtil.exe
+      that has to parse it. Letting those two come from different releases is a version diagonal:
+
+        VS 18's Microsoft.VsSDK.targets derives -targetSdkVersion "16.0" from the InstallationTarget
+        range [16.0,17.0) in source.extension.vsixmanifest and passes it, and VsixUtil.exe 17.1.4054
+        answers "'-targetSdkVersion' is an invalid argument" and exits -1, so CreateVsixContainer
+        fails with MSB6006 and no .vsix is produced. Measured on build 3067029.
+
+      The pinned package ships its own tools\VSSDK\Microsoft.VsSDK.targets, which references
+      is64BitBuild but not targetSdkVersion, and VsixUtil 17.1.4054 lists -is64BitBuild among its
+      valid arguments. So both halves now come from 17.1.4054 and agree with each other. This also
+      stops the produced .vsix depending on which Visual Studio the machine has, which for a
+      servicing branch is the property that matters. 16.11 carries the same fix.
+
+      This sits AFTER the Dependencies.props import on purpose: $(VSSdkBuildToolsVersion) is defined
+      there, and a default written above it expands to an empty version and resolves to a path that
+      does not exist.
+
+      The path is NORMALISED TO ABSOLUTE rather than left relative, and that is not tidiness.
+      Create-VsixPackage copies this project from src\package\VSIXProject to artifacts\<config>\VSIX
+      and builds the copy, so a relative path is interpreted from a directory the author never sees.
+    -->
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '$(TestPlatformRoot)', 'packages', 'microsoft.vssdk.buildtools', '$(VSSdkBuildToolsVersion)', 'tools'))</VSToolsPath>
+  </PropertyGroup>
   <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('($TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -18,7 +46,18 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestPlatform</RootNamespace>
     <AssemblyName>TestPlatform</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <!-- v4.6.2, not v4.6, and this is CONVERGENCE WITH 16.11 (build 3066931, green, VSIX published),
+         not a guess. MEASURED on build 3067010: once vswhere finally selected an instance,
+         Create-VsixPackage reached MSBuild and died at
+           Microsoft.Common.CurrentVersion.targets(1259,5): error MSB3644: The reference assemblies
+           for .NETFramework,Version=v4.6 were not found
+         on this very project. The agent image carries a v4.6 Reference Assemblies DIRECTORY that
+         holds 126 files and NO mscorlib.dll - a leftover shell, not a targeting pack - while
+         v4.6.2/4.7.2/4.8 hold 258-260 files WITH mscorlib. So v4.6 is genuinely absent.
+         This CANNOT change what the VSIX contains: the project has ZERO Compile items, ZERO
+         Reference items, and IncludeAssemblyInVSIXContainer=false, so it compiles nothing and ships
+         no assembly. TargetFrameworkVersion here only has to satisfy GetReferenceAssemblyPaths. -->
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>

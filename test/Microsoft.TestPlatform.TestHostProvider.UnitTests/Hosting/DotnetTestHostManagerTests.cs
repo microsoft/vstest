@@ -17,6 +17,7 @@ using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Helpers.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Hosting;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Host;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Logging;
@@ -904,6 +905,98 @@ public class DotnetTestHostManagerTests
         var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(new[] { sourcePath }, null, _defaultConnectionInfo);
 
         Assert.IsTrue(startInfo.Arguments!.Contains(testHostFullPath));
+    }
+
+    [TestMethod]
+    [DataRow("x64", "DOTNET_ROOT_X64", "DOTNET_ROOT", "testhost.exe")]
+    [DataRow("x86", "DOTNET_ROOT_X86", "DOTNET_ROOT(x86)", "testhost.x86.exe")]
+    public void GetTestHostProcessStartInfoShouldForwardArchitectureRootToLegacyAppHost(
+        string architecture, string architectureVariable, string legacyVariable, string apphost)
+    {
+        const string root = @"C:\private-dotnet";
+        _mockEnvironment.Setup(environment => environment.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(environment => environment.GetEnvironmentVariable(architectureVariable)).Returns(root);
+        _mockFileHelper.Setup(files => files.DirectoryExists(root)).Returns(true);
+        _mockFileHelper.Setup(files => files.Exists(apphost)).Returns(true);
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object,
+            $"<RunSettings><RunConfiguration><TargetPlatform>{architecture}</TargetPlatform></RunConfiguration></RunSettings>");
+        var variables = new Dictionary<string, string?>
+        {
+            [legacyVariable.ToLowerInvariant()] = "invalid-generic-root",
+            ["USER_VARIABLE"] = "unchanged",
+        };
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, variables, _defaultConnectionInfo);
+
+        Assert.AreEqual(root, startInfo.EnvironmentVariables![legacyVariable]);
+        Assert.AreEqual("unchanged", startInfo.EnvironmentVariables["USER_VARIABLE"]);
+        Assert.AreEqual(1, startInfo.EnvironmentVariables.Keys.Count(
+            name => string.Equals(name, legacyVariable, StringComparison.OrdinalIgnoreCase)));
+        StringAssert.Contains(startInfo.FileName, apphost);
+    }
+
+    [TestMethod]
+    [DataRow(@"C:\caller-dotnet", true)]
+    [DataRow(null, false)]
+    [DataRow("", false)]
+    [DataRow(@"C:\missing-dotnet", false)]
+    public void GetTestHostProcessStartInfoShouldRespectCallerArchitectureRoot(string? callerRoot, bool exists)
+    {
+        _mockEnvironment.Setup(environment => environment.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(environment => environment.GetEnvironmentVariable("DOTNET_ROOT_X64")).Returns(@"C:\parent-dotnet");
+        _mockFileHelper.Setup(files => files.DirectoryExists(@"C:\parent-dotnet")).Returns(true);
+        if (callerRoot is not null)
+        {
+            _mockFileHelper.Setup(files => files.DirectoryExists(callerRoot)).Returns(exists);
+        }
+
+        _mockFileHelper.Setup(files => files.Exists("testhost.exe")).Returns(true);
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object,
+            "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+        var variables = new Dictionary<string, string?>
+        {
+            ["dotnet_root_x64"] = callerRoot,
+            ["DOTNET_ROOT"] = @"C:\generic-dotnet",
+        };
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, variables, _defaultConnectionInfo);
+
+        Assert.AreEqual(exists ? callerRoot : @"C:\generic-dotnet", startInfo.EnvironmentVariables!["DOTNET_ROOT"]);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldNotForwardAnotherArchitectureRoot()
+    {
+        _mockEnvironment.Setup(environment => environment.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(environment => environment.GetEnvironmentVariable("DOTNET_ROOT_X86")).Returns(@"C:\x86-dotnet");
+        _mockFileHelper.Setup(files => files.DirectoryExists(@"C:\x86-dotnet")).Returns(true);
+        _mockFileHelper.Setup(files => files.Exists("testhost.exe")).Returns(true);
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object,
+            "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.AreEqual(0, startInfo.EnvironmentVariables!.Count);
+    }
+
+    [TestMethod]
+    public void GetTestHostProcessStartInfoShouldNotTranslateArchitectureRootForMuxer()
+    {
+        _mockEnvironment.Setup(environment => environment.OperatingSystem).Returns(PlatformOperatingSystem.Windows);
+        _mockEnvironmentVariable.Reset();
+        _mockEnvironmentVariable.Setup(environment => environment.GetEnvironmentVariable("DOTNET_ROOT_X64")).Returns(@"C:\private-dotnet");
+        _mockFileHelper.Setup(files => files.DirectoryExists(@"C:\private-dotnet")).Returns(true);
+        _mockFileHelper.Setup(files => files.Exists("testhost.dll")).Returns(true);
+        _dotnetHostManager.Initialize(_mockMessageLogger.Object,
+            "<RunSettings><RunConfiguration><TargetPlatform>x64</TargetPlatform></RunConfiguration></RunSettings>");
+
+        var startInfo = _dotnetHostManager.GetTestHostProcessStartInfo(_testSource, null, _defaultConnectionInfo);
+
+        Assert.AreEqual(DefaultDotnetPath, startInfo.FileName);
+        Assert.AreEqual(0, startInfo.EnvironmentVariables!.Count);
     }
 
     [TestMethod]

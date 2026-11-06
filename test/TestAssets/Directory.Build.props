@@ -1,0 +1,9 @@
+<Project>
+  <!-- Test assets represent consumer projects, not Arcade projects. Keep their original bin/obj layout. -->
+  <PropertyGroup>
+    <TestPlatformRoot>$(MSBuildThisFileDirectory)..\..\</TestPlatformRoot>
+    <LangVersion>latest</LangVersion>
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+  </PropertyGroup>
+  <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Dependencies.props" />
+</Project>

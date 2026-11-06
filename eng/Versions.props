@@ -1,12 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
   <PropertyGroup>
+    <!--
+      Sentinel for the duplicate-import guard in scripts\build\TestPlatform.Dependencies.props.
+      Arcade 11's tools\DefaultVersions.props(15) imports this same file as $(VersionsPropsPath),
+      and Dependencies.props imported it a second time, which raised MSB4011. Harmless as a warning,
+      fatal on the Package step, which restores external.csproj with -warnaserror. Read the comment
+      on that Import for the full reasoning.
+    -->
+    <TestPlatformEngVersionsImported>true</TestPlatformEngVersionsImported>
     <!-- This repo version -->
-    <VersionPrefix>17.3.3</VersionPrefix>
-    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
+    <VersionPrefix>17.3.4</VersionPrefix>
+    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies Condition="'$(DotNetBuildFromSource)' != 'true'">true</UsingToolNetFrameworkReferenceAssemblies>
+    <!--
+      Arcade resolves its test plumbing from TestRunnerName: RunTests lives in
+      tools\$(TestRunnerName)\$(TestRunnerName).targets. 17.3 declared this NOWHERE, so it took
+      Arcade's default rather than the MSTest path, and the consequence was measured on build
+      3066851 rather than reasoned about: the Test step ran ~20 unit-test projects on net6.0 and
+      net48, every one "Tests succeeded", "0 Error(s)" - and then the signing gate failed with
+      "No .trx files under D:\a\_work\1\s/artifacts/TestResults/Release". Tests RAN; their results
+      were simply never written where the gate reads.
+
+      MSTest is the name that works, and 16.11 is the control, not a guess: same pipeline step
+      byte-for-byte, same Arcade SDK 11.0.0-beta.26421.2, and the ONLY test-related property that
+      differs between the two branches is this one - 16.11 sets it and its gate passes, 17.3 did
+      not set it and its gate fails on missing .trx. There is no tools\VSTest\ directory;
+      VSTest.targets sits at the tools root and MSTest.targets imports it when EnableMSTestRunner
+      is false, which is already the default. rel/16.11 and rel/17.14 both set this.
+
+      NOTE FOR ANYONE READING THE OLD WORKLOG ENTRY: the claim that "only ONE test project ran"
+      was WRONG, and wrong twice for the same reason - a log filter of '\.trx' matches the PROJECT
+      NAME TrxLogger, not trx files, so it hid the other ~19 projects. The invocation is not the
+      defect and must not be "fixed"; do not port 15.9's Test.cmd shape here.
+    -->
+    <TestRunnerName>MSTest</TestRunnerName>
     <!-- Libs -->
     <CommandLineParserVersion>2.2.1</CommandLineParserVersion>
     <CredentialManagementVersion>1.0.2</CredentialManagementVersion>
@@ -62,8 +92,57 @@
     <XUnitVersion>2.4.1</XUnitVersion>
     <XUnitAbstractionsVersion>2.0.3</XUnitAbstractionsVersion>
     <XUnitVSRunnerVersion>2.4.1</XUnitVSRunnerVersion>
-    <MicrosoftDotNetBuildTasksFeedVersion>8.0.0-beta.22456.4</MicrosoftDotNetBuildTasksFeedVersion>
-    <MicrosoftDotNetSignToolVersion>8.0.0-beta.22456.4</MicrosoftDotNetSignToolVersion>
+    <!--
+      8.0.0-beta.22456.4 is GONE from dotnet-eng. Measured 2026-09-04: the feed lists 1817 versions
+      of this package and that is not one of them, so restore substituted 8.0.0-beta.22513.2 and
+      raised NU1603, which -warnaserror on the Package step's external.csproj restore turned into a
+      hard error. That was the FIRST action of the Package step, so 17.3 produced no packages and no
+      VSIX at all.
+
+      Pinned to the version restore actually resolves rather than suppressing the warning, because
+      this version is also used to BUILD A PATH - scripts\build\GenerateManifest.proj derives
+      $(NuGetPackageRoot)microsoft.dotnet.build.tasks.feed/$(MicrosoftDotNetBuildTasksFeedVersion)/
+      and loads Microsoft.DotNet.Build.Tasks.Feed.dll from it with UsingTask. Silencing NU1603 would
+      have left the declared version pointing at a directory restore never created, trading a loud
+      failure here for a missing-assembly failure later.
+
+      Content-neutral: PrivateAssets="All" and nothing from this package ships in any nupkg or VSIX.
+    -->
+    <!-- Arcade sets OutDirName before importing this file. Its standalone publishing tasks
+         need the matching SDK default; keep the legacy pin for external.csproj and GenerateManifest. -->
+    <MicrosoftDotNetBuildTasksFeedVersion Condition="'$(OutDirName)' != 'toolset\Publish' and '$(OutDirName)' != 'toolset\PublishBuildAssets'">8.0.0-beta.22513.2</MicrosoftDotNetBuildTasksFeedVersion>
+    <!--
+      NO MicrosoftDotNetSignToolVersion IS DECLARED HERE, DELIBERATELY. Arcade owns it.
+
+      rel/17.3 pinned 8.0.0-beta.22456.4, from the Arcade 7/8 era this line originally built on.
+      That pin survived the move to Arcade 11 and broke signing, measured on build 3067180:
+
+        Sign.proj(87,9): error MSB4064: The "DotNetPath" parameter is not supported by the
+        "Microsoft.DotNet.SignTool.SignToolTask" task loaded from assembly:
+        Microsoft.DotNet.SignTool, Version=8.0.6.46901 ... from
+        .packages\microsoft.dotnet.signtool\8.0.0-beta.22469.1\tools\net7.0\...dll
+        Sign.proj(74,5): error MSB4063: the task could not be initialized
+
+      artifacts\toolset\11.0.0-beta.26421.2\Sign.proj passes DotNetPath="$(_DotNetCorePath)" to
+      SignToolTask. The Arcade 8 task has no such property, so an Arcade 11 Sign.proj driving an
+      Arcade 8 task cannot initialize. The pin is what selected the old task: Sign.proj declares
+      <PackageReference Include="Microsoft.DotNet.SignTool" /> with NO version and takes it from
+      this file.
+
+      Removing rather than retargeting, because that is the mechanism the green line uses.
+      rel/16.11 at c75ddb769d2d2ab897ac41449ddf1e0dcc3e157c runs the IDENTICAL Arcade SDK
+      11.0.0-beta.26421.2 and the IDENTICAL .NET SDK 11.0.100-preview.6.26359.118, declares no
+      MicrosoftDotNetSignToolVersion at all, and its Sign step is green on build 3066931. The
+      two lines then differ only by this pin. Hard-coding 11.0.0-beta.26421.2 here would work
+      today and silently rot the next time the SDK moves, which is exactly how this defect was
+      created.
+
+      Checked before removing, because the sibling pin above is a counter-example: the whole
+      repository referenced MicrosoftDotNetSignToolVersion in exactly ONE place, this
+      declaration. Unlike MicrosoftDotNetBuildTasksFeedVersion it is not used to construct a
+      UsingTask path, so removing it cannot leave an assembly load pointing at a directory that
+      was never restored.
+    -->
     <MicrosoftAzureDocumentDBVersion>1.22.0</MicrosoftAzureDocumentDBVersion>
     <MicrosoftAzureCosmosDBTableVersion>1.1.2</MicrosoftAzureCosmosDBTableVersion>
     <MicrosoftAspNetCoreAllVersion>2.0.0</MicrosoftAspNetCoreAllVersion>

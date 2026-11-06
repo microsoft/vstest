@@ -1,0 +1,623 @@
+# Private producer for the 17.3 servicing line.
+# Preserve the existing build, test, signing and VS drop sequence.
+# Signed packages and manifests are staged with Arcade's standard Publish task;
+# BAR/Darc uses the branch's private default channel. No manual feed pushes.
+
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+# A merge into this line's servicing branch must build, and until now nothing made it.
+# The branch policy covers the pull request; this covers what lands after it. Azure DevOps
+# reads this file from the branch that was pushed, so internal/rel/* can only ever select
+# this branch's own servicing line.
+trigger:
+  branches:
+    include:
+    - internal/rel/*
+pr: none
+
+variables:
+  # Defines DncEngInternalBuildPool. Without this import the pool name stays the literal text
+  # "$(DncEngInternalBuildPool)" and the run fails before any job starts.
+  - template: /eng/common/templates-official/variables/pool-providers.yml@self
+
+  # DO NOT set DncEngInternalBuildPool to NetCore1ESPool-Svc-Internal here. Tried and measured
+  # 2026-09-05 01:3x UTC, build 3067156: the pipeline is NOT AUTHORIZED for that pool and the run
+  # dies in 8 seconds with
+  #   "Pipeline does not have permissions to use the referenced pool(s) NetCore1ESPool-Svc-Internal"
+  # on BOTH 'SDL Sources Analysis' and 'Windows Release'. That is a pool permission grant in dnceng,
+  # which needs an admin - it is not fixable from this repo.
+  #
+  # Why it was attempted, so nobody repeats the investigation. pool-providers.yml routes on the
+  # literal substring 'release' in the branch name; our servicing branches ('...rel173-delivery')
+  # do not contain it, so they land in the general pool. Measured at the same moment:
+  #   NetCore1ESPool-Internal      id 251   200 running / size 200   390 queued unassigned
+  #   NetCore1ESPool-Svc-Internal  id 249    34 running / size 200     0 queued
+  # Three builds sat over an hour behind that 390-deep queue. The -Svc pool is also the correct
+  # pool by the template's own stated motivation, since these branches have already shipped and
+  # their builds are COGS. So the routing idea is right and only the permission is missing.
+  #
+  # Note the two mechanisms are not equivalent: a root variable override does NOT win, because the
+  # pool is set through extends.parameters.pool.name, a 1ES template parameter. Only the branch
+  # name actually changes the routing.
+
+  - name: _TeamName
+    value: TestPlatformTeam
+
+  # REAL signing. Sign.proj rejects any DotNetSignType other than 'real', 'test' or empty, and the
+  # MicroBuild plugin only installs when _SignType is 'real' or 'test', so this value is
+  # load-bearing twice. It also forces microbuildUseESRP below: install-microbuild.yml validates
+  # the pair and FAILS when SignType is real while ESRP is disabled, rather than silently
+  # downgrading to a signature nobody would trust. The two settings are one decision.
+  - name: _SignType
+    value: real
+  # PULL REQUEST VALIDATION, the same override 18.12 uses. A pull request build has no ESRP
+  # credentials, so the MicroBuild plugin signs nothing and Arcade's own post-sign verification then
+  # fails the build - measured on 3076704:
+  #   Sign.proj(74,5): error : Nuget package Microsoft.CodeCoverage.16.11.1-hotfix-...nupkg is not
+  #                            signed properly.
+  #   Sign.proj(74,5): error : PE file ...\datacollector.exe is not signed properly.
+  # Not a flake and not fixable by a rerun: a pull request build must not sign at all.
+  #
+  # THIS CONDITIONAL IS COMPLETE, verified rather than assumed. _Sign is read only by _SignArgs, and
+  # $(_SignArgs) has exactly ONE consumer on this branch - the Sign step - which invokes
+  # eng\common\Build.ps1 with -sign and then appends $(_SignArgs). build.ps1 turns -sign into
+  # /p:Sign=True and appends @properties AFTER it, so /p:Sign from _SignArgs is last and wins, and
+  # the Sign target is skipped along with its verification. Same mechanism, same ordering dependency
+  # as 18.12.
+  #
+  # _SignType stays real. The gate above refuses to sign unless it reads real through both the macro
+  # and the environment; a pull request build satisfies that by not signing, not by claiming a
+  # different type. Non-pull-request keeps the former value exactly.
+  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+    - name: _Sign
+      value: false
+  - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    - name: _Sign
+      value: true
+  - name: _SignArgs
+    value: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:Sign=$(_Sign)
+
+  # Passed to the signing step. Arcade sets OfficialBuild=true whenever OfficialBuildId is
+  # non-empty, and Sign.proj dry-runs unless OfficialBuild is true - so without this, signing
+  # reports success and signs nothing.
+  #
+  # 🛑 THIS COMMENT USED TO SAY THE VALUE WAS KEPT OFF THE BUILD AND PACKAGE STEPS SO THAT
+  # NEITHER FileVersion NOR PACKAGE VERSION COULD MOVE AS A SIDE EFFECT OF MAKING SIGNING REAL.
+  # THAT ARRANGEMENT WAS MEASURED ON THIS LINE'S OWN SIGNED PACKAGES AND IT PRODUCED A DEFECT:
+  #   build 3067215, extracted from its own ServicingPackages_Release artifact
+  #     1832 of 2183 versioned binaries    FileVersion 42.42.42.42424   <- Arcade's placeholder
+  #     shipped 17.3.3 vstest.console.exe  FileVersion 15.0.0
+  # The old comment asked for exactly this measurement ("whether 17.3 splits the same way has to
+  # be measured on this line's own packages before it is claimed"). It does. The placeholder is
+  # never correct output: it is higher than any real vstest version, so a later genuine servicing
+  # build would look like a DOWNGRADE.
+  #
+  # So OfficialBuildId now reaches ALL THREE steps, and the two halves of the old worry are
+  # answered rather than avoided:
+  #   FileVersion    DOES move, to the modern Era B scheme, and that is the approved divergence
+  #                  from the shipped artifacts. Assembly loading binds on AssemblyVersion +
+  #                  strong name + culture, which are untouched.
+  #   PACKAGE VERSION does NOT move. scripts\build.ps1:847 passes -p:Version= on the dotnet
+  #                  publish COMMAND LINE, making Version a global property that no import can
+  #                  override. IncludeSourceRevisionInInformationalVersion is pinned false beside
+  #                  it because OfficialBuildId turns on SourceRevisionId appending, which would
+  #                  otherwise add +<sha> to InformationalVersion - a SECOND, unapproved
+  #                  divergence. 15.9 hit that on 3066572 and needed a whole extra build for it.
+  - name: _OfficialBuildIdArgs
+    value: /p:OfficialBuildId=$(Build.BuildNumber)
+
+  # The directory the signing gate reads AND the directory published as ServicingTestResults.
+  # One value used twice cannot disagree with itself. 17.14 shipped the two-literal shape in a
+  # .vsman drop path and had to fix it after the literals drifted apart.
+  - name: _TestResultsDirectory
+    value: $(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)
+
+  # DO-NOT-SHIP is in the NAME rather than in a comment because the name is the only part that
+  # travels with the artifacts. Deliberately not the historical
+  # Products/DevDiv/microsoft/vstest/<branch>/<id> path - these are not that build and must not
+  # land where consumers of that path look.
+  - name: VisualStudioDropName
+    value: Products/internal/microsoft-vstest/realsigned-DO-NOT-SHIP-$(Build.SourceBranchName)/$(Build.BuildNumber)
+
+  # The Build step's extra properties. OfficialBuildId is here so the assemblies the Build step
+  # produces AND KEEPS carry the Era B FileVersion. On 15.9 this alone was INERT for 8 of 9
+  # assemblies (commit 19a80734b, build 3066522) because the Package step republishes almost
+  # everything - but it was NOT inert for the one TFM that scripts\build.ps1 does not republish.
+  # Both producers need it, or the two disagree.
+  #
+  # IncludeSourceRevisionInInformationalVersion IS NOW HERE TOO, AND BUILD 3067248 IS WHY.
+  # It was set on the Package step only, and measured on that build's own 12 signed packages the
+  # 2,185 binaries split exactly along the two producers:
+  #     1478  17.3.3-release-20260904-49                      <- Package: suffix AND no +sha
+  #      354  17.3.3-release.26454.49+5119814b95...           <- Build:   Arcade's own suffix, +sha
+  # The 354 are precisely the assemblies the Build step produces and scripts\build.ps1 never
+  # republishes - the population the comment above already predicted would disagree. OfficialBuildId
+  # reached them (26454.49 is derived from Build.BuildNumber), which is what turns on
+  # SourceControlInformationFeatureSupported and makes GenerateAssemblyInfo append +<sha> to
+  # InformationalVersion. A property set on one producer cannot suppress it on the other.
+  #
+  # +sha on ProductVersion is a divergence from the shipped artifacts and it is NOT approved -
+  # only FileVersion may move. This closes the +sha half on the Build producer.
+  #
+  # THE SUFFIX SPLIT IS NOW CLOSED IN A SEPARATE PLACE, NOT HERE. The lever is
+  # /p:VersionSuffix=$(_ServicingVersionSuffix) on the Build step itself, which required moving
+  # ComputeVersionSuffix ahead of Build. It is deliberately NOT folded into this variable:
+  # _ServicingVersionSuffix is set at RUNTIME by a task, and nesting a runtime variable inside a
+  # queue-time variable's value is not a resolution path worth betting a 60-minute build on.
+  - name: _InternalBuildArgs
+    value: $(_OfficialBuildIdArgs) /p:IncludeSourceRevisionInInformationalVersion=false
+
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    sdl:
+      policheck:
+        enabled: true
+      # TSA upload is off. It requires .config/tsaoptions.json, which main carries and this 2022
+      # branch does not, and its purpose is to file security bugs into a tracking area. This is a
+      # validation build meant to have no external side effects, so filing bugs from
+      # it would be wrong even if the config were present. Guardian still runs and its results stay
+      # attached to the build record.
+      tsa:
+        enabled: false
+    pool:
+      # Internal pool image carries no .open suffix. The public pipeline in azure-pipelines.yml
+      # uses the same image family WITH .open; crossing the two fails pool resolution, which
+      # presents as a 0-second run with no timeline records.
+      name: $(DncEngInternalBuildPool)
+      image: windows.vs2026preview.scout.amd64
+      os: windows
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean
+    customBuildTags:
+    - servicing-validation
+    - private-channel-publishing
+    stages:
+    - stage: build
+      displayName: Build
+      jobs:
+
+      - template: /eng/common/templates-official/jobs/jobs.yml@self
+        parameters:
+          enableMicrobuild: true
+          # Which ESRP service connection resolves is established BEFORE the run rather than read
+          # out of a failure. install-microbuild.yml picks 6cc74545-... only when System.TeamProject
+          # is DevDiv; this pipeline is dnceng/internal, so the else branch applies and
+          # 248d384a-b39b-46e3-8ad5-c2c210d5e7ca is expected.
+          microbuildUseESRP: true
+          # Attaches files to the run so a private build can be inspected in place. This is not feed
+          # delivery and it is not asset registration.
+          enablePublishBuildArtifacts: true
+          enablePublishBuildAssets: ${{ and(eq(variables['System.TeamProjectId'], '7ea9116e-9fac-403d-b258-b31fcf1bb293'), eq(variables['Build.Repository.ID'], 'ef257391-4d76-4240-8649-3f21ac49c392'), eq(variables['Build.SourceBranch'], 'refs/heads/internal/rel/17.3'), ne(variables['Build.Reason'], 'PullRequest')) }}
+          enablePublishTestResults: true
+          testResultsFormat: 'vstest'
+          enableTelemetry: true
+          # 17.3 predates source build in this pipeline's sense; azure-pipelines.yml has a
+          # source-build job but this validation pipeline does not run one.
+          enableSourceBuild: false
+          # Source indexing uploads a complog containing source to a public source browser.
+          # Disable it explicitly rather than relying on the Arcade default.
+          enableSourceIndex: false
+          jobs:
+          - job: Windows
+            timeoutInMinutes: 120
+            pool:
+              name: $(DncEngInternalBuildPool)
+              image: windows.vs2026preview.scout.amd64
+              os: windows
+
+            # WINDOWS ONLY, DELIBERATELY, and this is a safety property rather than a convenience.
+            #
+            # With no non-Windows job in this file, "all signing happens on Windows" is STRUCTURAL
+            # here - there is nothing to revoke. On 17.14 the same sentence is only CONDITIONAL:
+            # a macOS job exists and merely skips the MicroBuild plugin because
+            # enableMicrobuildForMacAndLinux defaults false, so a one-line pipeline change would
+            # silently make it untrue. 16.11 has the structural shape and this line copies it.
+            #
+            # It also avoids band 17's standing macOS hazard outright: that job has a 60-minute cap
+            # and has been observed at 16, 28 and >60 minutes on near-identical inputs, so it fails
+            # intermittently for reasons unrelated to the change under test.
+            #
+            # Adding linux and macOS legs is a separate, later step for this line, and it would
+            # convert the signing guarantee above from structural back to conditional.
+            templateContext:
+              outputs:
+              # succeededOrFailed for the three build-record artifacts, deliberately: the packaging
+              # leg on this line is not finished, and the artifacts produced BEFORE it stops are
+              # exactly what has to be inspected to know how far it got. An artifact published only
+              # on green would be empty on every run that has something to teach.
+              - output: pipelineArtifact
+                displayName: Publish servicing packages to the build record
+                targetPath: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages
+                artifactName: ServicingPackages_$(_BuildConfig)
+                condition: succeededOrFailed()
+              - output: pipelineArtifact
+                displayName: Publish servicing VSIX to the build record
+                targetPath: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\VSIX
+                artifactName: ServicingVsix_$(_BuildConfig)
+                condition: succeededOrFailed()
+              # The test results the signing gate reads. Retained because the gate's INPUT was not,
+              # on the lines that came before: the gate decides in-job whether signing is
+              # authorised, then the agent is recycled and the .trx files are gone - making the one
+              # decision that authorises SIGNING the only one that could not be re-examined.
+              # The runs worth reading are precisely the ones where the gate BLOCKED.
+              - output: pipelineArtifact
+                displayName: Publish the test results the signing gate read
+                targetPath: $(_TestResultsDirectory)
+                artifactName: ServicingTestResults_$(_BuildConfig)
+                condition: succeededOrFailed()
+
+              # The VS drop retains its existing guard; packages use standard BAR/Darc publishing.
+              - output: microBuildVstsDrop
+                displayName: Publish servicing VSIX to an internal VS drop
+                dropFolder: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\VSIX
+                dropName: $(VisualStudioDropName)
+                dropRetentionDays: 30
+                accessToken: $(_DevDivDropAccessToken)
+                condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            strategy:
+              matrix:
+                Release:
+                  _BuildConfig: Release
+            steps:
+            # Explicit checkout with full history. A shallow default causes a run-time
+            # 'git fetch --unshallow' inside a later step, which reports no progress and reads as
+            # an unexplained stall until the job times out. persistCredentials because the implicit
+            # default strips them, and a credential prompt on a non-interactive agent is
+            # indistinguishable from a slow network.
+            - checkout: self
+              fetchDepth: 0
+              persistCredentials: true
+
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet --info'
+              inputs:
+                command: custom
+                custom: '--info'
+
+            # The version suffix, computed and VALIDATED rather than assumed. Every serviced line
+            # now ships <target version>-hotfix-<yyyyMMdd>-<rev>, so a consumer looking for a fix
+            # finds it as a prerelease of the version it will become. 17.3 last shipped
+            # 17.3.3-release-20230405-02, so this line produces 17.3.4-hotfix-<date>-<rev>. The
+            # prefix moves to 17.3.4 because a prerelease sorts below its stable counterpart, and
+            # 17.3.3 is published.
+            #
+            # A malformed suffix would otherwise ship silently.
+            #
+            # THIS STEP NOW RUNS BEFORE `Build`, AND THAT ORDERING IS THE FIX FOR THE SUFFIX SPLIT.
+            # It reads only $(Build.BuildNumber), so it never depended on Build having run; it was
+            # merely written after it. Build 3067281 measured the cost of that accident: its own
+            # 12 signed packages carry TWO different version strings for ONE build, split exactly
+            # along the two producers.
+            #     1478  17.3.3-release-20260904-52    <- Package: scripts\build.ps1 -p:Version=...
+            #      354  17.3.3-release.26454.52       <- Build:   Arcade's own computed suffix
+            # The shipped side was MEASURED rather than assumed, and it settles that this is OUR
+            # defect and not a property of the line: shipped 17.3.3 has the SAME 1,766-binary
+            # population on ONE uniform ProductVersion, with no split at all.
+            - pwsh: |
+                $buildNumber = "$(Build.BuildNumber)"
+                $parts = $buildNumber.Split('.')
+                if ($parts.Length -lt 2) {
+                  Write-Host "##vso[task.logissue type=error]Build.BuildNumber '$buildNumber' does not split into <date>.<revision>."
+                  exit 1
+                }
+                $date = $parts[0]
+                $rev = ([int]$parts[1]).ToString('00')
+                $suffix = "hotfix-$date-$rev"
+                if ($suffix -notmatch '^hotfix-\d{8}-\d{2,}$') {
+                  Write-Host "##vso[task.logissue type=error]Computed suffix '$suffix' does not match the shipped shape hotfix-<yyyyMMdd>-<rev>."
+                  exit 1
+                }
+                Write-Host "Build.BuildNumber : $buildNumber"
+                Write-Host "version suffix    : $suffix"
+                Write-Host "shipped 17.3 was  : 17.3.3-release-20230405-02, so this ships 17.3.4-hotfix-<date>-<rev>"
+                Write-Host "##vso[task.setvariable variable=_ServicingVersionSuffix]$suffix"
+              name: ComputeVersionSuffix
+              displayName: Compute the package version suffix
+
+            - pwsh: ./eng/Test-AssertKnownTestFailures.ps1
+              displayName: Verify missing and empty results block validation
+
+            - pwsh: ./eng/Test-BuildPreparation.ps1
+              displayName: Verify build initialization preserves dependency files
+
+            # BUILD. Arcade 11 + SDK 11.0.100-preview.6.26359.118, both pinned in global.json.
+            # -warnAsError 0 because this compiles 2022 source with a current Roslyn; the IDE
+            # analyzer set has moved considerably and those are style findings, not defects.
+            #
+            # /p:VersionSuffix CLOSES THE SUFFIX SPLIT, and it works for a mechanical reason that
+            # was read out of Arcade's own source rather than guessed. Arcade's
+            # Version.BeforeCommonTargets.targets assigns VersionSuffix UNCONDITIONALLY:
+            #     <VersionSuffix Condition="'$(DotNetFinalVersionKind)' == ''">
+            #       $(_PreReleaseLabel)$(_BuildNumberLabels)</VersionSuffix>
+            # which is what produced the 354 at `-release.26454.52`. That assignment loses to a
+            # COMMAND-LINE property, because MSBuild global properties cannot be overwritten from
+            # inside a project, and Arcade declares no TreatAsLocalProperty for it - checked, not
+            # assumed. It is also the same mechanism the Package producer already relies on:
+            # scripts\build.ps1 passes -p:Version=<full> and its 1,478 binaries prove a global
+            # property wins here.
+            #
+            # The two producers' prefixes were MEASURED to agree before relying on this, because
+            # they are read from two different files and nothing forces them to match:
+            #     scripts\build\TestPlatform.Settings.targets  TPVersionPrefix  17.3.3
+            #     eng\Versions.props                           VersionPrefix    17.3.3
+            # So Arcade computes Version = 17.3.3-$(_ServicingVersionSuffix), which is exactly the
+            # string the Package producer already stamps.
+            #
+            # DotNetFinalVersionKind is deliberately NOT used. It is the documented lever for
+            # dropping the suffix entirely, but doing that would change the PACKAGE VERSION from
+            # prerelease to stable, and that is a release decision (NEEDS JAKUB 5), not a build fix.
+            - powershell: eng\build.ps1
+                -configuration $(_BuildConfig)
+                -restore
+                -build
+                -ci
+                -prepareMachine
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\TestPlatform.sln
+                /p:VersionSuffix=$(_ServicingVersionSuffix)
+                $(_InternalBuildArgs)
+              name: Build
+              displayName: Build
+
+            # PACKAGE. Era A packaging, driven by the branch's own script and hand-written nuspecs.
+            #
+            # -Steps NAMES THE STEPS THAT MAY RUN, and the two omissions are the point:
+            #   Manifest            runs Generate-Manifest, which names a PUBLIC dotnet-tools feed
+            #                       as a publishing Location. Never add it.
+            #   UpdateLocalization  runs xlftool 'update', which REWRITES the checked-in .xlf from
+            #                       the neutral .resx and destroys the shipped translations. The
+            #                       read-only half runs from eng\build.ps1 instead, as
+            #                       LocalizeResxOnly.
+            #   InstallDotnet       Arcade already bootstrapped the SDK into .dotnet.
+            #
+            # Packaging failures must fail validation, not become partially successful builds.
+            - pwsh: |
+                ./scripts/build.ps1 `
+                  -Configuration $(_BuildConfig) `
+                  -VersionSuffix $(_ServicingVersionSuffix) `
+                  -Steps Restore,Publish,Pack
+              name: Package
+              displayName: Package
+              # THE STEP THAT ACTUALLY DETERMINES FileVersion, which is not obvious from its name.
+              # scripts\build.ps1:847 runs `dotnet publish` with NO --no-build, so it REBUILDS and
+              # stamps its own version metadata OVER whatever the Build step produced. Passing
+              # OfficialBuildId only to the Build step therefore fixes almost nothing - measured on
+              # 15.9, build 3066522, where 8 of 9 assemblies kept the placeholder.
+              #
+              # env: rather than -p: because scripts\build.ps1 has no property passthrough; MSBuild
+              # reads environment variables as properties, and nothing in this repo assigns either
+              # of these two names.
+              #
+              # IncludeSourceRevisionInInformationalVersion is quoted so it reaches MSBuild as the
+              # literal string false. Without it, setting OfficialBuildId turns on
+              # SourceControlInformationFeatureSupported and
+              # Microsoft.NET.GenerateAssemblyInfo.targets:64 appends +<sha> to
+              # InformationalVersion - i.e. to ProductVersion - on every assembly it rebuilds. That
+              # is a second divergence from the shipped artifacts and it is NOT approved. Only
+              # FileVersion may move.
+              env:
+                OfficialBuildId: $(Build.BuildNumber)
+                IncludeSourceRevisionInInformationalVersion: 'false'
+
+            - pwsh: |
+                ./scripts/build.ps1 `
+                  -Configuration $(_BuildConfig) `
+                  -VersionSuffix $(_ServicingVersionSuffix) `
+                  -Steps PrepareAcceptanceTests
+                exit $LASTEXITCODE
+              name: PrepareAcceptanceTests
+              displayName: Prepare normal acceptance assets without historical compatibility combinations
+              env:
+                OfficialBuildId: $(Build.BuildNumber)
+                IncludeSourceRevisionInInformationalVersion: 'false'
+
+            # Report what packaging actually produced, by name. "How far did the leg get" is
+            # answered by reading the set, never by the colour of the step above.
+            - pwsh: |
+                $root = "$(Build.SourcesDirectory)\artifacts\$(_BuildConfig)"
+                foreach ($sub in 'packages','VSIX') {
+                  $p = Join-Path $root $sub
+                  if (-not (Test-Path $p)) { Write-Host "$sub : DIRECTORY DOES NOT EXIST"; continue }
+                  $files = @(Get-ChildItem $p -File -Recurse)
+                  Write-Host "$sub : $($files.Count) files"
+                  $files | Sort-Object Name | Select-Object -First 40 | ForEach-Object { Write-Host "    $($_.Name)" }
+                }
+              name: ReportPackagingOutput
+              displayName: Report what packaging produced
+              condition: succeededOrFailed()
+              continueOnError: true
+
+            # TEST. Before signing, never after. 15.9 signs before it tests and build 3065539
+            # proved the consequence: Unit Test failed and every publish step still ran, staging the
+            # drop and pushing signed packages to the internal feed. Its fail-closed behaviour does
+            # not work. 16.11 runs Test -> Gate -> Sign on the same template and that is the
+            # ordering copied here.
+            # Run the repo's own suites against the vstest.console this build produced.
+            #
+            # Arcade's VSTest.targets does not use the VSTest MSBuild task. It shells out to
+            # `dotnet test <assembly>.dll`, so the VSTestConsolePath property that
+            # Microsoft.TestPlatform.targets reads is never evaluated and cannot be used here.
+            # Measured on 17.14: /p:VSTestConsolePath and an environment variable of that name
+            # both leave the SDK console in place. VSTEST_CONSOLE_PATH is the one that lands.
+            #
+            # Use this build's console for the test suites, rather than the SDK's version.
+            #
+            # This older branch stages a complete runnable layout before packing. Use that layout,
+            # including its Extensions, runtimes and framework TestHost, without mixing producers.
+            - powershell: |
+                $console = Join-Path "$(Build.SourcesDirectory)" "artifacts/$(_BuildConfig)/netcoreapp2.1/vstest.console.dll"
+                if (-not (Test-Path -LiteralPath $console)) { throw "Published console not found: $console" }
+                $prefix = ([xml](Get-Content "$(Build.SourcesDirectory)/eng/Versions.props")).Project.PropertyGroup.VersionPrefix
+                $expected = "$prefix-$(_ServicingVersionSuffix)"
+                $actual = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($console).ProductVersion
+                if ($actual -ne $expected) { throw "Console version '$actual' does not match '$expected'." }
+                $warmUp = & "$(Build.SourcesDirectory)/.dotnet/dotnet.exe" exec $console --help 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    throw "The console at $console did not start (exit $LASTEXITCODE): $($warmUp -join [Environment]::NewLine)"
+                }
+                Write-Host "warm-up : console started, $(@($warmUp).Count) lines of help"
+                Write-Host "console : $console ($actual)"
+                Write-Host "##vso[task.setvariable variable=_LocalVSTestConsolePath]$console"
+              displayName: Use the vstest.console this build produced
+              condition: succeeded()
+
+            - powershell: eng\build.ps1
+                -configuration $(_BuildConfig)
+                -test
+                -ci
+                -prepareMachine
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\TestPlatform.sln
+              name: Test
+              displayName: Test
+              env:
+                VSTEST_CONSOLE_PATH: $(_LocalVSTestConsolePath)
+                TP_ROOT_DIR: $(Build.SourcesDirectory)
+                NUGET_PACKAGES: $(Build.SourcesDirectory)\packages
+                DOTNET_ROOT: $(Build.SourcesDirectory)\.dotnet
+                DOTNET_ROOT_X64: $(Build.SourcesDirectory)\.dotnet
+                DOTNET_ROOT_X86: $(Build.SourcesDirectory)\.dotnet\x86
+                DOTNET_ROOT(x86): $(Build.SourcesDirectory)\.dotnet\x86
+              condition: succeeded()
+
+            - powershell: eng\build.ps1
+                -configuration $(_BuildConfig)
+                -integrationTest
+                -ci
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\test\Microsoft.TestPlatform.AcceptanceTests\Microsoft.TestPlatform.AcceptanceTests.csproj
+              name: AcceptanceTest
+              displayName: Normal acceptance tests
+              env:
+                VSTEST_CONSOLE_PATH: $(_LocalVSTestConsolePath)
+                TP_ROOT_DIR: $(Build.SourcesDirectory)
+                NUGET_PACKAGES: $(Build.SourcesDirectory)\packages
+                DOTNET_ROOT: $(Build.SourcesDirectory)\.dotnet
+                DOTNET_ROOT_X64: $(Build.SourcesDirectory)\.dotnet
+                DOTNET_ROOT_X86: $(Build.SourcesDirectory)\.dotnet\x86
+                DOTNET_ROOT(x86): $(Build.SourcesDirectory)\.dotnet\x86
+              condition: succeededOrFailed()
+
+            # THE GATE. Two independent refusals, both of which must pass before anything is signed.
+            #
+            # 1. _SignType must read 'real' through BOTH the macro and the environment. A dry run
+            #    signs nothing and fails nothing, and the drop is named realsigned - so a dry run
+            #    would produce a drop whose NAME asserts something its CONTENTS do not.
+            # 2. Every test result must be either a pass or a CLASSIFIED known failure.
+            #
+            # The baseline retains justified skipped tests, not broken discovery or missing assets.
+            # Both framework runs of the new socket tests and normal acceptance tests are required.
+            #
+            # ExpectedProductVersionPrefix is 17.3. - INHERITED CAVEAT, NOT MEASURED HERE: the
+            # script's own notes record that this check passed 17.14's result set when asked for
+            # "16.11.", because compatibility tests drive an older runner and the line's own product
+            # version may never appear in its results. Treat a pass as weak evidence on this line
+            # until a genuine retained set from this pipeline has been inspected for a
+            # "Tool Version 17.3." token.
+            - pwsh: |
+                $macro = '$(_SignType)'
+                $envv  = "$env:_SIGNTYPE"
+                Write-Host "sign type - macro: '$macro'  env: '$envv'"
+                if ($macro -ne 'real' -or $envv -ne 'real') {
+                  throw "REFUSING: _SignType must read 'real' through BOTH the macro and the environment before this run may sign. Got macro='$macro', env='$envv'. A dry-run signs nothing and fails nothing, and the drop is named realsigned."
+                }
+                ./eng/Assert-KnownTestFailures.ps1 `
+                  -ResultsDirectory "$(_TestResultsDirectory)" `
+                  -BaselinePath "$(Build.SourcesDirectory)/eng/servicing-known-test-failures.json" `
+                  -ExpectedProductVersionPrefix "17.3." `
+                  -RequiredResultFiles @(
+                    'Microsoft.TestPlatform.AdapterUtilities.UnitTests_net6.0_x64.trx',
+                    'Microsoft.TestPlatform.AdapterUtilities.UnitTests_net48_x64.trx',
+                    'Microsoft.TestPlatform.CommunicationUtilities.PlatformTests_net6.0_x64.trx',
+                    'Microsoft.TestPlatform.CommunicationUtilities.PlatformTests_net48_x64.trx',
+                    'Microsoft.TestPlatform.AcceptanceTests_net6.0_x64.trx',
+                    'Microsoft.TestPlatform.AcceptanceTests_net48_x64.trx')
+                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+              name: AssertKnownTestFailures
+              displayName: Gate on unclassified test results, and refuse to sign unless _SignType is real
+              condition: succeededOrFailed()
+
+            - powershell: eng\common\Build.ps1
+                -configuration $(_BuildConfig)
+                -restore
+                -sign
+                -ci
+                -prepareMachine
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\TestPlatform.sln
+                $(_SignArgs)
+                $(_OfficialBuildIdArgs)
+              name: Sign
+              displayName: Sign
+              condition: succeeded()
+
+            # THE SIGNING AUDIT AND THE TEST-RESULTS ASSERTION, as a SCRIPT rather than a habit.
+            #
+            # eng\Assert-DeliveryArtifacts.ps1 replaces the inline scan that used to live here.
+            # old-pipeline-rebuild-strategy.md section 6: "Put the check in the script, not in the
+            # analyst." Both checks below were previously disciplines somebody had to remember.
+            #
+            # It asserts two things and refuses to guess about either:
+            #
+            #  1. THE TEST STEP ACTUALLY PRODUCED RESULTS. On builds 3066271 and 3066280 the Test
+            #     step reported SUCCESS in 11.68 seconds having produced ZERO .trx. A step that runs
+            #     nothing cannot fail, so its green is not evidence. It also parses the .trx and
+            #     fails when they contain zero results, because a file can exist and be empty.
+            #
+            #  2. CARRIED PAYLOAD IS BYTE-IDENTICAL TO WHAT SHIPPED. It scans INSIDE the nupkgs,
+            #     because a clean build of this branch produces ZERO .cab under artifacts\ - the cab
+            #     exists only inside the produced package, so a filesystem sweep reports the line
+            #     clean while the cab is being re-signed.
+            #
+            # IT COMPARES SHA-256, NOT THE SIGNER NAME, AND THAT IS SPECIFIC TO THIS LINE. The
+            # prevailing advice is "check WHO signed it", which comes from 15.9 whose shipped cab is
+            # CN=VS Bld Lab. rel/17.3's shipped cab is CN=Microsoft Corporation, and Arcade 11
+            # re-signs .cab with Microsoft400 - also Microsoft. So the subject reads IDENTICAL
+            # before and after, and a name check returns clean on a modified file.
+            #
+            # Self-tested on three controls before being trusted:
+            #   no packages           -> exit 2, refuses to verify
+            #   genuine shipped cab   -> exit 0
+            #   re-signed cab, SAME SIZE, SAME SUBJECT, SAME THUMBPRINT -> exit 1, caught by hash
+            #
+            # Missing packages or empty test results fail validation.
+            - pwsh: |
+                ./eng/Assert-DeliveryArtifacts.ps1 `
+                  -PackagesDirectory "$(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages" `
+                  -TestResultsDirectory "$(_TestResultsDirectory)"
+                exit $LASTEXITCODE
+              name: AssertDeliveryArtifacts
+              displayName: Assert tests ran and carried payload was not re-signed
+              condition: succeededOrFailed()
+
+            - ${{ if and(eq(variables['System.TeamProjectId'], '7ea9116e-9fac-403d-b258-b31fcf1bb293'), eq(variables['Build.Repository.ID'], 'ef257391-4d76-4240-8649-3f21ac49c392'), eq(variables['Build.SourceBranch'], 'refs/heads/internal/rel/17.3'), ne(variables['Build.Reason'], 'PullRequest')) }}:
+              - powershell: eng\common\sdk-task.ps1 -task Publish -configuration $(_BuildConfig) -restore -msbuildEngine dotnet $(_OfficialBuildIdArgs)
+                displayName: Stage signed packages and manifests for BAR
+                condition: succeeded()
+
+            - task: AzureCLI@2
+              displayName: Mint DevDiv drop access token
+              inputs:
+                azureSubscription: 'dnceng-devdiv-drop-rw-code-rw-wif'
+                scriptType: pscore
+                scriptLocation: inlineScript
+                inlineScript: |
+                  $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
+                  Write-Host "##vso[task.setvariable variable=_DevDivDropAccessToken;issecret=true]$token"
+              condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+    - ${{ if and(eq(variables['System.TeamProjectId'], '7ea9116e-9fac-403d-b258-b31fcf1bb293'), eq(variables['Build.Repository.ID'], 'ef257391-4d76-4240-8649-3f21ac49c392'), eq(variables['Build.SourceBranch'], 'refs/heads/internal/rel/17.3'), ne(variables['Build.Reason'], 'PullRequest')) }}:
+      - template: /eng/common/templates-official/post-build/post-build.yml@self
+        parameters:
+          publishingInfraVersion: 3
+          requireDefaultChannels: true
+          enableSigningValidation: true
+          enableNugetValidation: true

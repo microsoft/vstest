@@ -156,6 +156,115 @@ function Restore-Package
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Restore-FakesPayload
+{
+    # Recovers the seven Fakes payload files that Microsoft.TestPlatform.nuspec references through
+    # $FakesPackageDir$, and that no feed can supply.
+    #
+    # WHAT IS ACTUALLY WRONG, because the symptom points somewhere else
+    #
+    # Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness 17.0.0-beta.21179.1 is not obtainable.
+    # Restore substitutes 17.4.0-beta.22405.1, which lands in a directory named after ITS version, so
+    # the path built from the PINNED version contains nothing. Restore SUCCEEDS - the NU1603 it raises
+    # is suppressed in external.csproj on purpose - and packing fails much later on a missing file.
+    # Nothing was wrong with the restore: the thing the build depends on was never something restore
+    # produced. Measured on build 3067050, where Create-NugetPackages packed three nupkgs and then
+    # died on the fourth with "Could not find a part of the path ...\17.0.0-beta.21179.1\contentFiles".
+    #
+    # WHERE THE FILES COME FROM
+    #
+    # All seven ship inside Microsoft.TestPlatform 17.3.0 - the previously released package for this
+    # line - under tools\net451\Common7\IDE\Extensions\TestPlatform. The mapping below is taken from
+    # the <file> elements of src\package\nuspec\Microsoft.TestPlatform.nuspec, so source and
+    # destination are the same seven the nuspec asks for, not a similar-looking set.
+    #
+    # THE HASHES ARE 17.3.0'S OWN AND WERE MEASURED, NOT COPIED FROM 16.11
+    #
+    # 16.11 carries the same function against ITS shipped package. Four of the seven files differ
+    # between the two releases (the DataCollector, both Instrumentation DLLs and the Fakes DLL), so
+    # copying 16.11's recorded hashes would have thrown on four of seven. Each value below was
+    # computed from the extracted Microsoft.TestPlatform 17.3.0 package.
+    #
+    # WHY THE HASH CHECK IS NOT OPTIONAL
+    #
+    # Today the failure is loud and names the package, the version and the path. An extraction that
+    # copied the wrong files, or none, would replace that with a package that is quietly short -
+    # trading a loud failure for a silent substitution, which is worse than doing nothing. So every
+    # file is verified by SHA-256 against the recorded manifest before it is used, and both
+    # "extracted the wrong thing" and "extracted nothing" fail by name.
+
+    $timer = Start-Timer
+    Write-Log "Restore-FakesPayload: Started."
+
+    $fakesVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
+    $destRoot = Join-Path $env:TP_PACKAGES_DIR "Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$fakesVersion\contentFiles"
+
+    # path under $destRoot -> path under the shipped package's TestPlatform extension folder
+    $map = [ordered]@{
+        "DataCollector\Microsoft.Cci.dll"                                              = "Extensions\Microsoft.Cci.dll"
+        "DataCollector\Microsoft.VisualStudio.Fakes.DataCollector.dll"                 = "Extensions\Microsoft.VisualStudio.Fakes.DataCollector.dll"
+        "Instrumentation\x64\FakesInstrumentationProfiler_x64.config"                  = "Extensions\Fakes\x64\FakesInstrumentationProfiler_x64.config"
+        "Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "Extensions\Fakes\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"
+        "Instrumentation\x86\FakesInstrumentationProfiler_x86.config"                  = "Extensions\Fakes\x86\FakesInstrumentationProfiler_x86.config"
+        "Instrumentation\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "Extensions\Fakes\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"
+        "TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll"                   = "Microsoft.VisualStudio.TestPlatform.Fakes.dll"
+    }
+
+    # SHA-256 prefix of each file as it exists in the shipped 17.3.0 package. Recorded here rather
+    # than read from a file beside the repo, so the check travels with the branch and a build agent
+    # needs nothing but the package.
+    $expected = @{
+        "DataCollector\Microsoft.Cci.dll"                                              = "7207CAE4EFAA"
+        "DataCollector\Microsoft.VisualStudio.Fakes.DataCollector.dll"                 = "A003AD100B14"
+        "Instrumentation\x64\FakesInstrumentationProfiler_x64.config"                  = "ECB5907F7C96"
+        "Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "96F2F54812BA"
+        "Instrumentation\x86\FakesInstrumentationProfiler_x86.config"                  = "9B178940E4E3"
+        "Instrumentation\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "E04EC7DAAE94"
+        "TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll"                   = "D1AAC5F3F011"
+    }
+
+    $sourceRoot = Join-Path $env:TP_PACKAGES_DIR "microsoft.testplatform\17.3.0\tools\net451\Common7\IDE\Extensions\TestPlatform"
+    if (-not (Test-Path $sourceRoot)) {
+        throw ("Restore-FakesPayload: the Fakes payload source is not at '$sourceRoot'. It comes from " +
+               "the PackageDownload of Microsoft.TestPlatform 17.3.0 in src\package\external\external.csproj, " +
+               "so Restore-Package has to run before this.")
+    }
+
+    $copied = 0
+    foreach ($rel in $map.Keys) {
+        $src = Join-Path $sourceRoot $map[$rel]
+        $dst = Join-Path $destRoot $rel
+
+        if (-not (Test-Path $src)) {
+            throw "Restore-FakesPayload: '$rel' expected at '$src' in Microsoft.TestPlatform 17.3.0 and it is not there."
+        }
+
+        $actual = (Get-FileHash $src -Algorithm SHA256).Hash.Substring(0, 12)
+        if ($actual -ne $expected[$rel]) {
+            throw ("Restore-FakesPayload: '$rel' in Microsoft.TestPlatform 17.3.0 hashes $actual, expected " +
+                   "$($expected[$rel]). The payload is not the one that shipped; refusing to stage it.")
+        }
+
+        New-Item (Split-Path $dst -Parent) -ItemType Directory -Force | Out-Null
+        Copy-Item $src $dst -Force
+        $copied++
+    }
+
+    # Assert the staged SET, not the number copied. The loop above could complete while an earlier
+    # run left something extra behind that nuget would then pack.
+    $staged = @(Get-ChildItem $destRoot -Recurse -File | ForEach-Object { $_.FullName.Substring($destRoot.Length + 1) } | Sort-Object)
+    $wanted = @($map.Keys | Sort-Object)
+    $missing = @($wanted | Where-Object { $staged -notcontains $_ })
+    $extra = @($staged | Where-Object { $wanted -notcontains $_ })
+    if ($missing.Count -gt 0 -or $extra.Count -gt 0) {
+        throw ("Restore-FakesPayload: staged set does not match. Missing: $($missing -join ', '). " +
+               "Unexpected: $($extra -join ', ').")
+    }
+
+    Write-Log "Restore-FakesPayload: $copied of $($map.Count) files staged into $destRoot, all hash-verified against the shipped 17.3.0 package."
+    Write-Log "Restore-FakesPayload: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
 function Copy-Bulk {
     param (
         [string]$root,

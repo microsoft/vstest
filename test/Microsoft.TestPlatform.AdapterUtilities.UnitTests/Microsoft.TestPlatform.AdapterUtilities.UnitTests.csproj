@@ -12,6 +12,8 @@
     <AssemblyName>Microsoft.TestPlatform.AdapterUtilities.UnitTests</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <NoWarn>$(NoWarn);RS1024</NoWarn>
+    <!-- CILProject is a fixture outside TestPlatform.sln; do not reset its configuration to Debug. -->
+    <ShouldUnsetParentConfigurationAndPlatform>false</ShouldUnsetParentConfigurationAndPlatform>
   </PropertyGroup>
 
   <ItemGroup>
@@ -21,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\TestAssets\CILProject\CILProject.proj" ReferenceOutputAssembly="false" />
     <ProjectReference Include="$(TestPlatformRoot)src\Microsoft.TestPlatform.AdapterUtilities\Microsoft.TestPlatform.AdapterUtilities.csproj" />
     <ProjectReference Include="..\Microsoft.TestPlatform.TestUtilities\Microsoft.TestPlatform.TestUtilities.csproj" />
   </ItemGroup>

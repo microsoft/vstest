@@ -48,9 +48,14 @@ public class PostProcessingTests : AcceptanceTestBase
         Parallel.For(0, 5, i =>
         {
             string projectFolder = Path.Combine(TempDirectory.Path, i.ToString());
-            ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode);
+            var environment = new Dictionary<string, string?>
+            {
+                ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(projectFolder),
+            };
+            ExecuteApplication(GetConsoleRunnerPath(), $"new mstest --no-restore -o {projectFolder}", out string stdOut, out string stdError, out int exitCode, environment);
             Assert.AreEqual(exitCode, 0);
-            ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);
+            UseLocallyBuiltTestSdk(projectFolder);
+            ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode, environment);
             Assert.AreEqual(exitCode, 0);
 
             string testContainer = Directory.GetFiles(Path.Combine(projectFolder, "bin"), $"{i}.dll", SearchOption.AllDirectories).Single();

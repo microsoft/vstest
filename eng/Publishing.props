@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <PublishingVersion>3</PublishingVersion>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <!-- The legacy pack step writes here rather than Arcade's default package directories. -->
+    <Artifact Include="$(_ServicingPackageOutDir)*.nupkg"
+              Exclude="$(_ServicingPackageOutDir)*.symbols.nupkg"
+              Kind="Package" />
+    <Artifact Update="$(_ServicingPackageOutDir)Microsoft.TestPlatform.Internal.Uwp.*.nupkg"
+              IsShipping="false" />
+  </ItemGroup>
+</Project>

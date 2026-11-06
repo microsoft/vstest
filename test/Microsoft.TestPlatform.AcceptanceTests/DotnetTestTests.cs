@@ -10,6 +10,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 [TestClass]
 public class DotnetTestTests : AcceptanceTestBase
 {
+    private string GetBuiltConsoleVersion()
+        => System.Diagnostics.FileVersionInfo.GetVersionInfo(GetDotnetRunnerPath()).ProductVersion!.Split('-')[0];
+
     [TestMethod]
     // patched dotnet is not published on non-windows systems
     [TestCategory("Windows-Review")]
@@ -19,10 +22,9 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("SimpleTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
+        InvokeDotnetTest($@"{projectPath} --framework {_testEnvironment.TargetFramework} /p:VSTestNoLogo=false --logger:""Console;Verbosity=normal""");
 
-        // ensure our dev version is used
-        StdOutputContains("-dev");
+        StdOutputContains("Test Execution Command Line Tool Version " + GetBuiltConsoleVersion());
         ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
     }
@@ -38,8 +40,7 @@ public class DotnetTestTests : AcceptanceTestBase
         var assemblyPath = BuildMultipleAssemblyPath("SimpleTestProject.dll");
         InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
 
-        // ensure our dev version is used
-        StdOutputContains("-dev");
+        StdOutputContains("Test Execution Command Line Tool Version " + GetBuiltConsoleVersion());
         ValidateSummaryStatus(1, 1, 1);
         ExitCodeEquals(1);
     }
@@ -53,7 +54,7 @@ public class DotnetTestTests : AcceptanceTestBase
         SetTestEnvironment(_testEnvironment, runnerInfo);
 
         var projectPath = GetIsolatedTestAsset("ParametrizedTestProject.csproj");
-        InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
+        InvokeDotnetTest($@"{projectPath} --framework {_testEnvironment.TargetFramework} /p:VSTestNoLogo=false --logger:""Console;Verbosity=normal"" -- TestRunParameters.Parameter(name =\""weburl\"", value=\""http://localhost//def\"")");
 
         ValidateSummaryStatus(1, 0, 0);
         ExitCodeEquals(0);

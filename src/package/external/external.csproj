@@ -2,7 +2,28 @@
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">../../../</TestPlatformRoot>
     <!-- TODO: Remove this before comitting, it ignores nuget signing issues. -->
-    <NoWarn>$(NoWarn);NU3018;NU3027</NoWarn>
+    <!--
+      NU1603 is added for ONE reason, and only the Fakes reference below justifies it.
+
+      Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness 17.0.0-beta.21179.1 is obtainable from
+      no feed, so restore substitutes 17.4.0-beta.22405.1 and raises NU1603. -warnaserror then made
+      that fatal on the very first action of the Package step.
+
+      The pin MUST NOT be bumped to the substitute. The seven payload files it carries are copied
+      into Microsoft.TestPlatform through $FakesPackageDir$ in the nuspec, so the version is SHIPPED
+      CONTENT, and changing it would break equivalence with the previously published 17.3.3.
+
+      Suppressing the warning is safe here precisely because the build never consumes the substitute:
+      scripts\build.ps1 builds the payload path from the PINNED $(MicrosoftFakesVersion), so the
+      substituted package sits in a directory nothing reads. The real check is not lost, only moved -
+      packing still fails loudly and names the missing path if the payload was not recovered first.
+      See the long comment on Restore-FakesPayload in 16.11's scripts\build.ps1 for the recovery,
+      which reads the files out of the PREVIOUSLY SHIPPED package for this line.
+
+      This does NOT silence NU1603 for Microsoft.DotNet.Build.Tasks.Feed - that pin was corrected in
+      eng\Versions.props instead, because its version is used to build a UsingTask path.
+    -->
+    <NoWarn>$(NoWarn);NU3018;NU3027;NU1603</NoWarn>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts/build/TestPlatform.Settings.targets" />
   <PropertyGroup>
@@ -60,6 +81,30 @@
     <PackageReference Include="Microsoft.NETCore.ILAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.NETCore.ILDAsm" Version="$(ILAsmPackageVersion)" />
     <PackageReference Include="Microsoft.DotNet.Build.Tasks.Feed" Version="$(MicrosoftDotNetBuildTasksFeedVersion)" PrivateAssets="All" />
+
+    <!--
+      The seven Fakes payload files that Microsoft.TestPlatform.nuspec copies through
+      $FakesPackageDir$ come from HERE, not from the PackageReference above.
+
+      Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness 17.0.0-beta.21179.1 is obtainable from
+      no feed, so restore substitutes 17.4.0-beta.22405.1, which lands in a directory named after
+      ITS version. The path scripts\build.ps1 builds from the PINNED version is therefore empty.
+      Restore succeeds; packing fails much later, naming a path. Build 3067050 measured exactly that.
+
+      The seven files ship INSIDE Microsoft.TestPlatform 17.3.0, so they are recovered from there by
+      Restore-FakesPayload in scripts\common.lib.ps1. Downloading is consuming, not publishing.
+
+      THE VERSION IS A LITERAL AND MUST STAY ONE. Not $(TPB_Version), not a range, not a floating
+      17.3.*. If this ever resolved to "the latest 17.3.x", servicing build N+1 would take its
+      payload from build N, every future build would inherit its predecessor's OUTPUT as its INPUT,
+      and the drift would compound with no point at which it becomes visible. Pinned to the original
+      17.3.0 release the chain always terminates there, so this recovers the original inputs rather
+      than rebuilding from our own output.
+
+      PackageDownload rather than PackageReference: nothing here is compiled against, only extracted,
+      so this must not become a dependency of the assembly.
+    -->
+    <PackageDownload Include="Microsoft.TestPlatform" Version="[17.3.0]" />
   </ItemGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.targets" />
 

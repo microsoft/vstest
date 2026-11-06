@@ -1,0 +1,114 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project>
+
+  <Import Project="Sdk.props" Sdk="Microsoft.DotNet.Arcade.Sdk" />
+
+  <!-- Deliberately infrastructure-only.
+
+       This file brings 17.3 onto Arcade's build/restore/CI plumbing and nothing else. It does not
+       import main's policy: no analyzers, no LangVersion bump, no EnforceCodeStyleInBuild, no
+       GenerateDocumentationFile, no TFM redefinitions. 17.3 keeps its own settings in
+       scripts/build/TestPlatform.Settings.targets and its own package versions in
+       scripts/build/TestPlatform.Dependencies.props. Old code, new infrastructure.
+
+       Shape taken from the 16.11 servicing pipeline rather than derived, so the Era A
+       servicing lines fail and pass in the same places. Every value below was re-measured on 17.3;
+       where 17.3 differs from 16.11 the difference is called out. -->
+
+  <PropertyGroup>
+    <!-- 2022-era framework packages carry known CVEs. A servicing line cannot be made CVE-free. -->
+    <NuGetAudit>false</NuGetAudit>
+
+    <!-- NETSDK1215 - targeting netstandard < 2.0 is no longer recommended. True, not fixable here.
+         NU1504     - a package declared twice with the same version. Pre-existing, harmless, and an
+                      error only under current NuGet.
+
+         NU1603 is deliberately NOT suppressed, and is promoted to an error explicitly rather than
+         relying on TreatWarningsAsErrors, because the build runs with -warnAsError $false which
+         would otherwise demote it back to a warning. A silent version substitution is exactly how
+         a 17.x package ends up shipping content from a later band. -->
+    <WarningsAsErrors>$(WarningsAsErrors);NU1603</WarningsAsErrors>
+    <NoWarn>$(NoWarn);NETSDK1215;NU1504;NU1605;NU1701;NU1702</NoWarn>
+    <!-- Servicing-age noise from building a 2021 line with a 2026 SDK. None of it is a product
+         problem: NETSDK1138/1215 say the target frameworks are old, NETSDK1023 flags the MSTest
+         reference this line pins on purpose, and CS1616/CS8105 are the signing key attribute
+         duplicating CryptoKeyFile. MSB3276 is .NET Framework facade skew only (System.Runtime.*,
+         System.Text.*, System.ValueTuple resolving from the SDK's net461 lib) - no vstest, MSTest
+         or third-party product assembly is involved, so no version substitution is being hidden. -->
+    <NoWarn>$(NoWarn);NETSDK1138;NETSDK1023;NETSDK1215;CS1616;CS8105</NoWarn>
+    <MSBuildWarningsAsMessages>$(MSBuildWarningsAsMessages);MSB3276</MSBuildWarningsAsMessages>
+  </PropertyGroup>
+
+  <!-- Arcade defaults DebugType to 'embedded'. This line shipped separate .pdb files, so embedding
+       is artifact-affecting rather than cosmetic: it removes every .pdb from the packages and
+       changes the assemblies that carry the debug data.
+
+       This MUST be set in Directory.Build.props, never in .targets. The compiler honours a late
+       override, but the decision to copy the .pdb to the output directory is made when the SDK
+       targets are imported, which happens first. A late setting yields a portable assembly whose
+       .pdb never leaves obj\ - indistinguishable from 'embedded' at the point where packaging
+       fails, and it is scripts\build.ps1 that fails, several steps away from the cause. -->
+  <PropertyGroup>
+    <DebugType>portable</DebugType>
+  </PropertyGroup>
+
+  <!-- OUTPUT LAYOUT: left as Arcade's, deliberately. Do not add BaseOutputPath here.
+
+       An earlier revision of this file set
+         BaseOutputPath        = $(MSBuildProjectDirectory)\bin\
+         BaseIntermediateOutputPath = $(MSBuildProjectDirectory)\obj\
+       to keep the pre-Arcade src\<project>\bin\<Config>\<TFM> layout that scripts\build.ps1 and the
+       hand-written nuspecs read from. MEASURED RESULT ON THIS BRANCH: it half-applied and produced a
+       SPLIT layout, which is worse than either consistent option.
+
+         compiled output  ->  artifacts\bin\<project>\<Config>\<TFM>\     (Arcade's, unchanged)
+         intermediates    ->  test\<project>\obj\                          (moved)
+
+       The reason is import order, not a typo. Arcade's Sdk.props is imported at the top of this
+       file, and RepoLayout.props computes OutputPath from BaseOutputPath at that moment. Assigning
+       BaseOutputPath afterwards changes a property whose consumer has already read it, so OutputPath
+       keeps Arcade's value. BaseIntermediateOutputPath has a later consumer and did move. One
+       assignment, two different outcomes, no diagnostic.
+
+       16.11 carries the same block with a comment saying it preserves the layout. Its own pipeline
+       shows the block is equally inert there: the version-split analysis in
+       azure-pipelines-official.yml states that "$env:TP_OUT_DIR is <root>\artifacts, so TP_OUT_DIR\bin\
+       is Arcade's output layout" and traces the copied files out of exactly that directory. So on
+       both lines the build writes to Arcade's layout regardless of this block.
+
+       The working answer is the one 16.11's Directory.Build.targets reached after reverting its OutDir
+       override: leave the build output where Arcade puts it, and STAGE from Arcade's layout into the
+       layout the nuspecs expect. Moving build output desynchronises every consumer that computes
+       paths from Arcade's layout - project-to-project references and GenerateDepsFile both do - and
+       it cannot fail on an incremental tree, so it survives local testing and breaks the first clean
+       CI build. -->
+
+  <!-- Self-contained publish of netcoreapp1.0 fails NETSDK1061 on a current SDK: restore resolves
+       Microsoft.NETCore.App 1.0.16 while the SDK's table would publish 1.0.5. Pin both to the
+       version restore already chooses, so nothing about the built output changes.
+       17.3 has 4 netcoreapp1.0 projects, so this applies here as it does on 16.11. -->  <PropertyGroup Condition="'$(TargetFramework)' == 'netcoreapp1.0'">
+    <RuntimeFrameworkVersion>1.0.16</RuntimeFrameworkVersion>
+  </PropertyGroup>
+
+  <!-- 17.3 ships 41 hand-written Properties\AssemblyInfo.cs files - twice 16.11's 20, measured on
+       this branch. Arcade generates the same attributes, which is CS0579 on every one of them.
+       TestPlatform.Settings.targets already turns off some; these are the ones Arcade adds on top. -->
+  <PropertyGroup>
+    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
+    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
+    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
+    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
+    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
+  </PropertyGroup>
+
+  <!-- Sign config. Arcade defaults StrongNameKeyId to its Open key. 17.3 signs with the Microsoft
+       key: scripts\build\TestPlatform.Settings.targets sets SignAssembly=true with
+       AssemblyOriginatorKeyFile=scripts\key.snk, and 156 InternalsVisibleTo declarations across
+       src\ hard-code that same public key. Letting Arcade substitute its own key is CS0281 on
+       every friend access, and would also produce a strong name that does not match the shipped
+       artifact. -->
+  <PropertyGroup>
+    <StrongNameKeyId>Microsoft</StrongNameKeyId>
+  </PropertyGroup>
+
+</Project>
