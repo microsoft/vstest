@@ -120,7 +120,7 @@
     <VSTestConsoleRecentStableVersion>[18.0.1]</VSTestConsoleRecentStableVersion>
     <VSTestConsoleMostDownloadedVersion>[17.12.0]</VSTestConsoleMostDownloadedVersion>
     <VSTestConsolePreviousStableVersion>[17.14.1]</VSTestConsolePreviousStableVersion>
-    <VSTestConsoleLegacyStableVersion>[15.9.2]</VSTestConsoleLegacyStableVersion>
+    <VSTestConsoleLegacyStableVersion>[17.8.0]</VSTestConsoleLegacyStableVersion>
     <ILAsmPackageVersion>5.0.0</ILAsmPackageVersion>
   </PropertyGroup>
 
