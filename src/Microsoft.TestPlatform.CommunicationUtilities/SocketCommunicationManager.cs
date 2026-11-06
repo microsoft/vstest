@@ -38,6 +38,9 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </summary>
     private TcpClient? _tcpClient;
 
+    private TcpClient? _acceptedTcpClient;
+    private readonly object _serverSyncObject = new();
+
     /// <summary>
     /// Binary Writer to write to channel stream
     /// </summary>
@@ -98,11 +101,14 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>Port of the listener</returns>
     public IPEndPoint HostServer(IPEndPoint endpoint)
     {
-        _tcpListener = new TcpListener(endpoint);
-        _tcpListener.Start();
-        EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)_tcpListener.LocalEndpoint);
+        lock (_serverSyncObject)
+        {
+            _tcpListener = new TcpListener(endpoint);
+            _tcpListener.Start();
+            EqtTrace.Info("Listening on Endpoint : {0}", (IPEndPoint)_tcpListener.LocalEndpoint);
 
-        return (IPEndPoint)_tcpListener.LocalEndpoint;
+            return (IPEndPoint)_tcpListener.LocalEndpoint;
+        }
     }
 
     /// <summary>
@@ -111,26 +117,51 @@ public class SocketCommunicationManager : ICommunicationManager
     /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
     public async Task AcceptClientAsync()
     {
-        if (_tcpListener == null)
+        var listener = _tcpListener;
+        if (listener is null)
         {
             return;
         }
 
         _clientConnectedEvent.Reset();
 
-        var client = await _tcpListener.AcceptTcpClientAsync();
-        _socket = client.Client;
-        _socket.NoDelay = true;
+        TcpClient client;
+        try
+        {
+            client = await listener.AcceptTcpClientAsync();
+        }
+        catch (ObjectDisposedException) when (!ReferenceEquals(listener, _tcpListener))
+        {
+            return;
+        }
+        catch (SocketException) when (!ReferenceEquals(listener, _tcpListener))
+        {
+            return;
+        }
 
-        // Using Buffered stream only in case of write, and Network stream in case of read.
-        var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
-        var networkStream = client.GetStream();
-        _binaryReader = new BinaryReader(networkStream);
-        _binaryWriter = new BinaryWriter(bufferedStream);
+        lock (_serverSyncObject)
+        {
+            if (!ReferenceEquals(listener, _tcpListener))
+            {
+                client.Close();
+                return;
+            }
 
-        _clientConnectedEvent.Set();
+            _acceptedTcpClient = client;
+            _socket = client.Client;
+            _socket.NoDelay = true;
+
+            // Using Buffered stream only in case of write, and Network stream in case of read.
+            var bufferedStream = new PlatformStream().CreateBufferedStream(client.GetStream(), SocketConstants.BufferSize);
+            var networkStream = client.GetStream();
+            _binaryReader = new BinaryReader(networkStream);
+            _binaryWriter = new BinaryWriter(bufferedStream);
+
+            _clientConnectedEvent.Set();
+        }
+
         EqtTrace.Info("Using the buffer size of {0} bytes", SocketConstants.BufferSize);
-        EqtTrace.Info("Accepted Client request and set the flag");
+        EqtTrace.Info("Accepted client connection");
     }
 
     /// <summary>
@@ -152,10 +183,16 @@ public class SocketCommunicationManager : ICommunicationManager
     /// </summary>
     public void StopServer()
     {
-        _tcpListener?.Stop();
-        _tcpListener = null;
-        _binaryReader?.Dispose();
-        _binaryWriter?.Dispose();
+        lock (_serverSyncObject)
+        {
+            var listener = _tcpListener;
+            _tcpListener = null;
+            listener?.Stop();
+            _acceptedTcpClient?.Close();
+            _acceptedTcpClient = null;
+            _binaryReader?.Dispose();
+            _binaryWriter?.Dispose();
+        }
     }
 
     #endregion

@@ -233,6 +233,7 @@ public class ProxyOperationManager
                 envVars,
                 connectionInfo));
         _testHostProcessFileName = testHostStartInfo.FileName;
+
         try
         {
             // Launch the test host.

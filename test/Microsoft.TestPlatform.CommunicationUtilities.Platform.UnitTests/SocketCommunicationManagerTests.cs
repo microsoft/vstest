@@ -124,6 +124,31 @@ public class SocketCommunicationManagerTests : IDisposable
         Assert.ThrowsExactly<AggregateException>(() => _tcpClient.ConnectAsync(IPAddress.Loopback, port).Wait());
     }
 
+    [TestMethod]
+    public async Task StopServerShouldCompletePendingAccept()
+    {
+        _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0));
+        var acceptClientTask = _communicationManager.AcceptClientAsync();
+
+        _communicationManager.StopServer();
+
+        await acceptClientTask;
+    }
+
+    [TestMethod]
+    public async Task StopServerShouldCloseAcceptedClient()
+    {
+        var port = _communicationManager.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+        var acceptClientTask = _communicationManager.AcceptClientAsync();
+        await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
+        await acceptClientTask;
+
+        _communicationManager.StopServer();
+
+        Assert.IsTrue(_tcpClient.Client.Poll(1000000, SelectMode.SelectRead));
+        Assert.AreEqual(0, _tcpClient.Client.Available);
+    }
+
     #endregion
 
     #region Client tests

@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -185,6 +185,19 @@ public class DataCollectionRequestHandlerTests
         // Negotiated version = Math.Min(4, HighestSupportedVersion=7) = 4; all responses must use it.
         _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.BeforeTestRunStartResult, It.IsAny<BeforeTestRunStartResult>(), 4), Times.Once);
         _mockCommunicationManager.Verify(x => x.SendMessage(MessageType.AfterTestRunEndResult, It.IsAny<AfterTestRunEndResult>(), 4), Times.Once);
+    }
+
+    [TestMethod]
+    public void HandleBeforeTestRunStartShouldNotArmTestCaseEventHandlerWhenTestCaseLevelEventsNotRequired()
+    {
+        _mockDataCollectionManager.Setup(x => x.SessionStarted(It.IsAny<SessionStartEventArgs>())).Returns(false);
+        var beforeTestRunStartPayload = new BeforeTestRunStartPayload { SettingsXml = "settingsxml", Sources = new List<string> { "test1.dll" } };
+        _mockDataSerializer.Setup(x => x.DeserializePayload<BeforeTestRunStartPayload>(It.Is<Message>(y => y.MessageType == MessageType.BeforeTestRunStart)))
+            .Returns(beforeTestRunStartPayload);
+
+        _requestHandler.ProcessRequests();
+
+        _mockDataCollectionTestCaseEventHandler.Verify(x => x.InitializeCommunication(), Times.Never);
     }
 
     [TestMethod]

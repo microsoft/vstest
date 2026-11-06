@@ -88,6 +88,12 @@ internal partial class FeatureFlag : IFeatureFlag
     // This defaults to true. Set it to 0 to opt in to the feature.
     public const string VSTEST_DISABLE_MTP_TESTHOST = nameof(VSTEST_DISABLE_MTP_TESTHOST);
 
+    // Disable the Unix handling of the directory holding the test session artifacts: narrowing a directory
+    // vstest creates to its owner, and verifying on Linux that a directory given by VSTEST_ARTIFACTS_DIRECTORY
+    // is owned by the current user and reachable by nobody else. Set it to 1 where that ownership or those
+    // permissions cannot be represented or changed, such as a mounted Windows or network volume.
+    public const string VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION = nameof(VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION);
+
     private static bool GetValue(string featureFlag)
     {
         var environmentValue = Environment.GetEnvironmentVariable(featureFlag)?.Trim();
