@@ -103,8 +103,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 Task.Run(() =>
                 {
-                    this.communicationManager.WaitForClientConnection(Timeout.Infinite);
-                    this.handShakeSuccessful = this.HandShakeWithVsTestConsole();
+                    this.handShakeSuccessful = this.communicationManager.WaitForClientConnection(Timeout.Infinite)
+                        && this.HandShakeWithVsTestConsole();
                     this.handShakeComplete.Set();
                 });
             }

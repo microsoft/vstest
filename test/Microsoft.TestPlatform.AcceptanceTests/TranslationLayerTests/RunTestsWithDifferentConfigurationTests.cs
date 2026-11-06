@@ -28,7 +28,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
         private void Setup()
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(observeProcess: true);
             this.runEventHandler = new RunEventHandler();
         }
 
@@ -83,14 +83,21 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testHostNames);
+                testHostNames,
+                this.ConsoleProcessInvocation,
+                includeRoot: false);
 
-            this.vstestConsoleWrapper.RunTests(
-                this.GetTestAssemblies(),
-                runSettingsXml,
-                this.runEventHandler);
-
-            cts.Cancel();
+            try
+            {
+                this.vstestConsoleWrapper.RunTests(
+                    this.GetTestAssemblies(),
+                    runSettingsXml,
+                    this.runEventHandler);
+            }
+            finally
+            {
+                cts.Cancel();
+            }
 
             // Assert
             this.runEventHandler.EnsureSuccess();
@@ -156,15 +163,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
-                cts, testhostProcessNames);
+                cts, testhostProcessNames, this.ConsoleProcessInvocation, includeRoot: false);
 
-            this.vstestConsoleWrapper.RunTests(
-                sources,
-                this.GetDefaultRunSettings(),
-                new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
-                this.runEventHandler);
-
-            cts.Cancel();
+            try
+            {
+                this.vstestConsoleWrapper.RunTests(
+                    sources,
+                    this.GetDefaultRunSettings(),
+                    new TestPlatformOptions() { TestCaseFilter = "FullyQualifiedName = SampleUnitTestProject3.UnitTest1.WorkingDirectoryTest" },
+                    this.runEventHandler);
+            }
+            finally
+            {
+                cts.Cancel();
+            }
 
             // Assert
             Assert.AreEqual(1, this.runEventHandler.TestResults.Count);

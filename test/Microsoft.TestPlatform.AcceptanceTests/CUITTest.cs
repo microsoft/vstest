@@ -10,6 +10,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     public class CUITTest : AcceptanceTestBase
     {
         [TestMethod]
+        [Ignore("Legacy Coded UI test. Ignored by user request.")]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void CUITRunAllTests(RunnerInfo runnerInfo)

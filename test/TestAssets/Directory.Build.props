@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Deliberately does NOT import the repository root Directory.Build.props.
+
+       MSBuild stops searching upward at the first Directory.Build.props it finds, so this file
+       isolates the test assets from Arcade. That is what main does, and 15.9 does the same, for the
+       reason stated there: these projects are meant to look like real-life projects, and most people
+       do not build with Arcade. The root file applies StyleCop, analyzers, TreatWarningsAsErrors,
+       assembly signing and an InternalsVisibleTo key to everything beneath it, and none of that
+       belongs on a sample project whose purpose is to be an ordinary consumer of the test platform.
+
+       An earlier version of this file on this line did the OPPOSITE - it imported the root
+       explicitly, on the reasoning that a scoped props file must not detach these projects from
+       repo-wide settings. That reasoning was backwards: detaching them is the point.
+
+       OUTPUT PATH CONSEQUENCE, checked rather than inherited. Leaving the SDK default means assets
+       land in test\TestAssets\<project>\bin\<configuration>\<tfm>\ instead of Arcade's
+       artifacts\bin\<project>\<configuration>\<tfm>\. IntegrationTestEnvironment.GetTestAsset on
+       this line resolves BOTH layouts - it tries the Arcade path, falls back to the historic one and
+       names both when it fails - so this move is safe here. It was verified before this file was
+       written, not assumed: CILProject already produced the historic layout because it sets its own
+       relative OutputPath, which is why the two-layout resolver exists. -->
+
+  <PropertyGroup>
+    <RepoRoot>$(MSBuildThisFileDirectory)..\..\</RepoRoot>
+  </PropertyGroup>
+
+  <!-- The isolation above also cuts these projects off from any net4x reference-assembly handling in
+       the root file, and on this agent image that is fatal:
+
+         MSB3644: The reference assemblies for .NETFramework,Version=v4.5.1 were not found.
+
+       x80 across the asset solution on build 3063958, with CS0518 x592 downstream - no reference
+       assemblies means no System.Object.
+
+       THE CAUSE, which cost this line four hypotheses to not find and was written down in 15.9's
+       copy of this file: the installed targeting pack directory EXISTS BUT CONTAINS NO mscorlib.dll.
+       Every hypothesis about the package being unavailable was measuring the wrong thing, because
+       the pack is present - it is simply empty. The reference has to come from the per-TFM package.
+
+       REFERENCE THE PER-TFM SUB-PACKAGE, NOT THE META-PACKAGE. An earlier attempt on this line
+       referenced Microsoft.NETFramework.ReferenceAssemblies and it changed nothing on the agent in
+       either configuration. The measurement that explained it was already in hand and was not read
+       as the answer: with IncludeAssets="build" the restore graph carried the meta-package AND its
+       per-framework children; without it, the meta-package ONLY. The meta-package does not reliably
+       bring its children's build assets, so the child is referenced directly.
+
+       Conditioned per framework version because a single condition would apply the wrong package.
+       MSB3644 was observed for v4.5.1, v4.5.2 and v4.6.1; the remaining versions are covered because
+       the assets target them and an empty targeting pack is a property of the image rather than of
+       any one version. -->
+
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.5.1'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net451" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.5.2'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net452" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.6'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net46" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.6.1'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net461" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.6.2'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net462" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.7'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net47" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.7.1'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net471" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.7.2'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net472" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFrameworkIdentifier)' == '.NETFramework' AND '$(TargetFrameworkVersion)' == 'v4.8'">
+    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies.net48" Version="1.0.3" PrivateAssets="All" IsImplicitlyDefined="true" />
+  </ItemGroup>
+</Project>

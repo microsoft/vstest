@@ -1,5 +1,48 @@
 <Project>
   <!--
+    .cab MUST NOT BE SIGNED, AND THIS IS A TWO-LINE FIX RATHER THAN ONE.
+
+    Arcade 11 added .cab to its DEFAULT FileExtensionSignInfo:
+
+        Sign.props:86   <FileExtensionSignInfo Include=".dll;.exe;.mibc;.msi;.cab"
+                                               CertificateName="Microsoft400" />
+
+    Arcade 9 defined no .cab at all. This branch carries one - the 2.8 MB
+    IntelliTraceCollection.cab that Microsoft.TestPlatform ships under
+    tools\net451\Common7\IDE\CommonExtensions\Microsoft\IntelliTrace - and it arrives
+    ALREADY SIGNED from the pinned Microsoft.Internal.Intellitrace package. Under the new
+    default it was signed AGAIN, and that is a change to shipped content on a branch whose
+    mandate is to reproduce what 16.11 originally shipped.
+
+    MEASURED on build 3065144, which delivered before this fix:
+
+        pinned package / shipped 2021   2827942 bytes   cert serial 33000001DF...01DF
+                                                        notBefore 2020-12-15
+        3065144 delivered               2828878 bytes   cert serial 330000021D...021D
+                                                        notBefore 2026-04-16
+
+    A 2026 certificate cannot be the 2021 signature. The +936 bytes are the new one.
+
+    WHY THE Remove IS REQUIRED. Arcade 11 rejects a duplicate definition, so simply adding
+    .cab -> None is a hard build error. Remove first, then re-add.
+
+    AND DO NOT "FIX" A COLLISION BY DELETING THE COLLIDING LINE. That builds green and
+    silently starts signing the cab again, which is the defect this exists to prevent. The
+    17.14 line hit the same error and preserved its entry this way; their delivered cab is
+    byte-identical to their pinned package under Arcade 11.
+
+    THIS IS THE ONLY AFFECTED EXTENSION HERE, measured rather than assumed: of the eight
+    Arcade 11 added (.cab .msi .deb .rpm .pkg .app .dylib .tar.gz), a scan INSIDE the
+    produced packages finds 4 .cab entries and zero of the rest. Note "inside" - a
+    filesystem search for *.cab across the build output returns 0, because the file only
+    exists within the nupkgs.
+  -->
+  <ItemGroup>
+    <FileExtensionSignInfo Remove=".cab" />
+    <FileExtensionSignInfo Include=".cab" CertificateName="None" />
+  </ItemGroup>
+
+  <!--
     These are third party libraries that we use in Arcade. We need to sign them even if they
     are already signed. However, they must be signed with a 3rd party certificate.
   -->
@@ -28,4 +71,94 @@
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.dll" CertificateName="3PartySHA2" />
     <FileSignInfo Include="Microsoft.Deployment.WindowsInstaller.Package.dll" CertificateName="3PartySHA2" />
   </ItemGroup>
+
+  <!--
+    ==========================================================================================
+    WHERE THIS LINE'S ARTIFACTS ACTUALLY ARE
+
+    Arcade's default ItemsToSign globs are $(ArtifactsPackagesDir)**\*.nupkg and
+    $(VisualStudioSetupOutputPath)**\*.vsix, which resolve to
+
+        artifacts\packages\Release\{Shipping,NonShipping}\*.nupkg
+        artifacts\VSSetup\Release\**\*.vsix
+
+    On this line the packages are not produced by Arcade. They are produced by
+    scripts\build.ps1, which packs nuspec files with nuget.exe into
+
+        artifacts\Release\packages          $TPB_PackageOutDir,  scripts\build.ps1:153
+        artifacts\Release\VSIX              $vsixProjectDir,     Create-VsixPackage
+
+    The two sets of paths do not intersect, so without the entries below the signing step
+    resolves an empty ItemsToSign. Arcade's AllowEmptySignList is false for in-build signing,
+    so that is an error rather than a silent no-op - but it is still a failure, and this is
+    what avoids it.
+
+    Adding globs here rather than moving the script's output is deliberate. $TPB_PackageOutDir
+    and the artifacts\Release layout are read by a dozen-plus copy sites in scripts\build.ps1;
+    changing the root re-opens every one of them. This file is Arcade's extension point and no
+    artifact comparison reads it. Copying the packages into Arcade's layout was also considered
+    and rejected: it would leave two copies of every package on disk and two answers to "which
+    one is the artifact".
+
+    The globs are recursive because Create-VsixPackage builds a project into that tree and the
+    .vsix lands under it rather than directly in it. Globbing wide and then ASSERTING THE SET is
+    the safe direction; globbing narrowly and hoping is not.
+    ==========================================================================================
+  -->
+  <PropertyGroup>
+    <_ServicingPackageOutDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', '$(Configuration)', 'packages'))</_ServicingPackageOutDir>
+    <_ServicingVsixOutDir>$([MSBuild]::NormalizeDirectory('$(ArtifactsDir)', '$(Configuration)', 'VSIX'))</_ServicingVsixOutDir>
+    <_ServicingProducedPackagesFile>$(ArtifactsDir)$(Configuration)\produced-packages.txt</_ServicingProducedPackagesFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ItemsToSign Include="$(_ServicingPackageOutDir)**\*.nupkg" />
+    <ItemsToSign Include="$(_ServicingVsixOutDir)**\*.vsix" />
+  </ItemGroup>
+
+  <!--
+    A glob that matches NOTHING fails loudly, because Arcade already checks for it. A glob that
+    matches SOME of the packages signs some of the packages and exits 0, and nothing downstream
+    can tell that apart from success. That is the case this target exists for.
+
+    Create-NugetPackages writes produced-packages.txt AFTER Assert-PackagesProduced has
+    established that the output directory holds exactly the set of packages the nuspec files
+    asked for, so the file is the produced SET and not merely a listing of whatever is on disk.
+    This target joins that set against the resolved ItemsToSign BY NAME and reports the two
+    directions separately. They are never netted: one missing and one unexpected is two findings,
+    not zero.
+
+    A file that does not exist is an error, not a skip. "I could not look" must not be reportable
+    as "I found nothing".
+  -->
+  <Target Name="AssertServicingSigningSetMatchesProducedPackages" BeforeTargets="Execute">
+    <Error Condition="!Exists('$(_ServicingProducedPackagesFile)')"
+           Text="Cannot verify the signing set: '$(_ServicingProducedPackagesFile)' does not exist. Create-NugetPackages writes it. Signing must not run before packaging." />
+
+    <ReadLinesFromFile File="$(_ServicingProducedPackagesFile)">
+      <Output TaskParameter="Lines" ItemName="_ExpectedSignPackage" />
+    </ReadLinesFromFile>
+
+    <ItemGroup>
+      <_SignNupkg Include="@(ItemsToSign)" Condition="'%(Extension)' == '.nupkg'" />
+      <_SignNonPackage Include="@(ItemsToSign)" Exclude="@(_SignNupkg)" />
+      <_ActualSignPackage Include="@(_SignNupkg->'%(Filename)%(Extension)')" />
+      <_SignPackageMissing Include="@(_ExpectedSignPackage)" Exclude="@(_ActualSignPackage)" />
+      <_SignPackageUnexpected Include="@(_ActualSignPackage)" Exclude="@(_ExpectedSignPackage)" />
+    </ItemGroup>
+
+    <Error Condition="'@(_ExpectedSignPackage)' == ''"
+           Text="'$(_ServicingProducedPackagesFile)' is empty. An empty expected set would make any signing set pass." />
+    <Error Condition="'@(_SignPackageMissing)' != ''"
+           Text="Packages were produced but will NOT be signed: @(_SignPackageMissing, ', '). Searched $(_ServicingPackageOutDir)**\*.nupkg." />
+    <Error Condition="'@(_SignPackageUnexpected)' != ''"
+           Text="ItemsToSign contains packages that Create-NugetPackages did not produce: @(_SignPackageUnexpected, ', '). A stale package from an earlier run would be signed and shipped." />
+
+    <Message Importance="high" Text="Signing set verified against the produced set, by name: @(_ActualSignPackage, ', ')" />
+    <Message Importance="high" Condition="'@(_SignNonPackage)' != ''"
+             Text="Also to sign, and not packages: @(_SignNonPackage->'%(Filename)%(Extension)', ', ')" />
+    <Message Importance="high" Condition="'@(_SignNonPackage)' == ''"
+             Text="Nothing to sign besides the packages. On a machine with no Visual Studio that is the expected absence: Create-VsixPackage stops before building the VSIX, so '$(_ServicingVsixOutDir)' holds no .vsix. On a build agent this line means the VSIX was not produced and is a finding." />
+  </Target>
+
 </Project>

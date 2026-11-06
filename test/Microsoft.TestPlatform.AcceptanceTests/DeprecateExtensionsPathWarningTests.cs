@@ -1,5 +1,6 @@
 ﻿namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -45,6 +46,8 @@
         [TestInitialize]
         public void CopyAdapterToExtensions()
         {
+            this.testEnvironment.RunnerFramework = DesktopRunnerFramework;
+            this.testEnvironment.TargetFramework = DesktopTargetFramework;
             this.copiedFiles = new List<string>();
             var extensionsDir = Path.Combine(Path.GetDirectoryName(this.GetConsoleRunnerPath()), "Extensions");
             this.adapterDependencies = Directory.GetFiles(this.GetTestAdapterPath(), "*.dll", SearchOption.TopDirectoryOnly);
@@ -78,9 +81,15 @@
 
         public override string GetConsoleRunnerPath()
         {
-            DirectoryInfo currentDirectory = new DirectoryInfo(typeof(DeprecateExtensionsPathWarningTests).GetTypeInfo().Assembly.GetAssemblyLocation()).Parent.Parent.Parent.Parent.Parent.Parent;
+            // The repo root BY NAME. This read six .Parent calls from the test assembly's own
+            // location, which is the same unnamed layout assumption as TelemetryPerfTestBase's three
+            // - a different count in a different file encoding the same thing. Arcade inserts a
+            // <ProjectName> segment into the output path, so any hard-coded level count is wrong by
+            // one under it. This site has not fired yet only because the acceptance suite has not
+            // run; it is the same defect waiting on a suite that has not executed.
+            string root = IntegrationTestEnvironment.TestPlatformRootDirectory;
 
-            return Path.Combine(currentDirectory.FullName, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
+            return Path.Combine(root, "artifacts", BuildConfiguration, "net451", "win7-x64", "vstest.console.exe");
         }
     }
 }

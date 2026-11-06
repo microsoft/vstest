@@ -13,6 +13,25 @@ namespace Microsoft.TestPlatform.AdapterUtilities.ManagedNameUtilities.UnitTests
     using System.Reflection;
 
     [TestClass]
+    // PRODUCES A DEPLOYMENT WARNING ON EVERY RUN, AND IT IS A SELF-COPY. Left in place deliberately.
+    //
+    // TestClasses.cs is already placed in the output directory by the project file
+    // (<Compile Update="TestClasses.cs"> with CopyToOutputDirectory=PreserveNewest), and this
+    // attribute asks MSTest to deploy it into the directory it is already in. Source and
+    // destination are the same path, so the copy fails against the file it is reading:
+    //
+    //   Test Run deployment issue: Failed to copy file '...\netcoreapp2.1\TestClasses.cs' to
+    //   '...\netcoreapp2.1\TestClasses.cs': System.IO.IOException: The process cannot access the
+    //   file ... because it is being used by another process.
+    //
+    // The tests pass - the file is where they need it, which is why nobody noticed. The warning
+    // became visible only when eng\Assert-KnownTestFailures.ps1 started surfacing RunInfos, and it
+    // is recorded here so the next person to read that line does not re-derive it.
+    //
+    // NOT REMOVED. Deleting the attribute would be right if nothing ever runs these tests with
+    // deployment enabled, and this branch has no evidence either way - a runsettings that enables
+    // deployment would then have no copy at all. Changing test behaviour on a servicing branch to
+    // silence a warning that costs nothing is the wrong trade.
     [DeploymentItem("TestClasses.cs")]
     public partial class ManagedNameRoundTripTests
     {

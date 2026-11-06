@@ -11,6 +11,14 @@
     <!-- this version also needs to be "statically" readable because the test fixture will inspect this file for the version 
     and because during the test `dotnet test` will run and re-build some of the test projects and at that time the version 
     from a build parameter would not be available, so I am writing this version from the build.ps1 script to keep it in sync --> 
+    <!-- DO NOT COMMIT A REWRITTEN VALUE HERE. scripts\build.ps1:167 overwrites this element on every
+    build with the version it computed, and this file is git-tracked, so a local build leaves the tree
+    dirty. That was harmless while the suffix was the constant "dev" and the rewrite was usually a
+    no-op; it is not harmless now that the suffix varies per build, because the value differs every
+    time. Committing one would pin a SPECIFIC build's version into source - and where 16.11.0-dev
+    announces itself as a placeholder, 16.11.0-release-20260902-30 looks authoritative and would be
+    stale from the moment it landed. If git reports this file modified after a build, that is build
+    output, not a change. -->
     <NETTestSdkVersion>16.11.0-dev</NETTestSdkVersion>
 
     <MSTestFrameworkVersion>2.1.0</MSTestFrameworkVersion>

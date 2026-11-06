@@ -3,6 +3,8 @@
 
 namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
 {
+    using Microsoft.VisualStudio.TestPlatform.Common.Utilities;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
 
@@ -27,7 +29,11 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// <returns> The <see cref="string"/>. </returns>
         public override string ToString()
         {
-            return "(" + this.MessageType + ") -> " + (this.Payload == null ? "null" : this.Payload.ToString(Formatting.Indented));
+            // Redact by scanning for property names that look like they hold a secret, rather than by
+            // listing the message types that carry one. A list has to be updated whenever a message or a
+            // variable is added or renamed, and the one time it is not, the value lands in a log. This
+            // covers the environment blocks messages carry to a child process.
+            return "(" + this.MessageType + ") -> " + (this.Payload == null ? "null" : SecretRedaction.RedactSecretsInJson(this.Payload.ToString(Formatting.Indented)));
         }
     }
 }

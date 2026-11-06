@@ -401,7 +401,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         [TestCategory("Windows")]
         public void GetTestSourcesShouldReturnAppropriateSourceIfAppxRecipeIsProvided()
         {
-            var sourcePath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe");
+            var sourcePath = this.GetUwpTestAssetPath("UnitTestApp8.build.appxrecipe");
             IEnumerable<string> sources = this.testHostManager.GetTestSources(new List<string> { sourcePath });
             Assert.IsTrue(sources.Any());
             Assert.IsTrue(sources.FirstOrDefault().EndsWith(".exe", StringComparison.OrdinalIgnoreCase));
@@ -411,7 +411,7 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
         [TestCategory("Windows")]
         public void AppxManifestFileShouldReturnAppropriateSourceIfAppxManifestIsProvided()
         {
-            var appxManifestPath = Path.Combine(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()), @"..\..\..\..\TestAssets\UWPTestAssets\AppxManifest.xml");
+            var appxManifestPath = this.GetUwpTestAssetPath("AppxManifest.xml");
             string source = AppxManifestFile.GetApplicationExecutableName(appxManifestPath);
             Assert.AreEqual("UnitTestApp8.exe", source);
         }
@@ -573,6 +573,48 @@ namespace TestPlatform.TestHostProvider.Hosting.UnitTests
                     }).Returns(Process.GetCurrentProcess());
 
             this.mockProcessHelper.Setup(ph => ph.TryGetExitCode(It.IsAny<object>(), out exitCode)).Returns(true);
+        }
+
+        /// <summary>
+        /// Resolves a UWP test asset by walking up from the test assembly until the repository is
+        /// found, rather than assuming a fixed number of parent directories.
+        /// </summary>
+        /// <remarks>
+        /// These tests previously used a hard-coded "..\..\..\..\TestAssets\UWPTestAssets\" path
+        /// relative to the assembly location. That depth is correct only for the historical output
+        /// layout, test\project\bin\config\tfm, where four levels up lands on test\. Under Arcade the
+        /// layout is artifacts\bin\project\config\tfm, so the same four levels land on artifacts\ and
+        /// the asset is not found:
+        ///   DirectoryNotFoundException: ...\artifacts\TestAssets\UWPTestAssets\UnitTestApp8.build.appxrecipe
+        /// Searching for the directory removes the dependency on either layout.
+        ///
+        /// The assets are NOT build output. AppxManifest.xml and UnitTestApp8.build.appxrecipe are
+        /// checked into test\TestAssets\UWPTestAssets\ and nothing produces them. An earlier note on
+        /// this line recorded them as "a UWP asset that is not produced", which was wrong - they were
+        /// always present and the counted walk simply never reached them.
+        ///
+        /// The count is not the same across the servicing lines: 16.11 used four levels with no
+        /// "test" segment, 17.14 uses five levels with one. Three lines, three different correct
+        /// numbers for one lookup, which is why counting is the wrong mechanism rather than the wrong
+        /// number. Approach taken from 15.9's 505527183.
+        /// </remarks>
+        private string GetUwpTestAssetPath(string fileName)
+        {
+            var directory = new DirectoryInfo(Path.GetDirectoryName(typeof(TestableTestHostManager).GetTypeInfo().Assembly.GetAssemblyLocation()));
+
+            while (directory != null)
+            {
+                var candidate = Path.Combine(directory.FullName, "test", "TestAssets", "UWPTestAssets", fileName);
+                if (File.Exists(candidate))
+                {
+                    return candidate;
+                }
+
+                directory = directory.Parent;
+            }
+
+            throw new FileNotFoundException(
+                $"Could not locate test\\TestAssets\\UWPTestAssets\\{fileName} in any parent of the test assembly location.");
         }
 
         private TestProcessStartInfo GetDefaultStartInfo()

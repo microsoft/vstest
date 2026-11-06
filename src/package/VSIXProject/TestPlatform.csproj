@@ -3,9 +3,85 @@
   <PropertyGroup>
     <TestPlatformRoot>..\..\..\</TestPlatformRoot>
     <MinimumVisualStudioVersion>15.0</MinimumVisualStudioVersion>
-    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v$(VisualStudioVersion)</VSToolsPath>
   </PropertyGroup>
   <Import Project="$(TestPlatformRoot)scripts\build\TestPlatform.Dependencies.props" />
+  <PropertyGroup>
+    <!--
+      Point at the VSSDK build tools this repo pins, not at the ones belonging to whichever Visual
+      Studio happens to be installed. The import at the bottom of this file resolves
+      $(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets, and that targets file is what constructs the
+      VsixUtil command line - while Microsoft.VSSDK.BuildTools.targets supplies the VsixUtil.exe
+      that has to parse it. Letting those two come from different releases is a version diagonal:
+
+        VS 18's Microsoft.VsSDK.targets passes Is64BitBuild="true", hardcoded and with no property
+        to turn it off, and VsixUtil.exe 15.8.3247 answers "'-is64BitBuild' is an invalid argument"
+        and exits -1.
+
+      The pinned package ships its own tools\VSSDK\Microsoft.VsSDK.targets, so both halves now come
+      from 15.8.3247 and agree with each other. This also stops the produced .vsix depending on
+      which Visual Studio the machine has, which for a servicing branch is the property that matters.
+
+      This sits AFTER the Dependencies.props import on purpose: $(VSSdkBuildToolsVersion) is defined
+      there, and a default written above it expands to an empty version and resolves to a path that
+      does not exist.
+
+      The path is NORMALISED TO ABSOLUTE rather than left relative, and that is not tidiness.
+      Create-VsixPackage copies this project from src\package\VSIXProject to artifacts\<config>\VSIX
+      and builds the copy, so a relative path is interpreted from a directory the author never sees.
+      The pinned package's own Microsoft.VSSDK.BuildTools.props sets VSToolsPath to an absolute
+      $(ThisPackageDirectory)\tools for the same reason - but that props file is never imported here,
+      see the finding recorded below, so this project has to do it itself.
+
+      WHAT ELSE THAT PROPS FILE WOULD HAVE SET, AND WHY NOT SETTING IT IS SAFE. Raised by the 15.9
+      line, which runs the other arrangement and asked the question of the line actually running this
+      one. Measured here against the pinned package on disk rather than reasoned:
+
+        Microsoft.VSSDK.BuildTools.props sets 5 properties
+          ThisPackageDirectory, VSToolsPath, VsSDKInstall, VsSDKIncludes, VsSDKToolsPath
+
+        references in tools\VSSDK\Microsoft.VsSDK.targets
+          VSToolsPath      0        VsSDKIncludes    0     <- dead
+          VsSDKInstall     3        VsSDKToolsPath   0     <- dead
+          OutputPath       2        positive control, so the zeros are measurements
+
+      All three VsSDKInstall references are inside Target RunRegRiched, which registers RichEdit for
+      VS integration scenarios. That target IS on the build chain - PrepareForBuildDependsOn appends
+      it - but it carries Condition="'$(RunRegRiched)' == 'true'", and that property is set nowhere:
+      not in the targets, not in the props, not in this project. So the target never executes and
+      VsSDKInstall being empty is UNREACHABLE here, not merely latent.
+
+      Were it ever reached, the consequence is a WARNING and not an execution: the Warning carries
+      !Exists(...) and fires, while the Exec carries the NON-negated Exists(...) and is skipped. An
+      empty path cannot be executed by this target. Worth stating because the opposite reading - that
+      it would Exec an empty path - is the natural one and is what the two lines first assumed.
+
+      Its FindSDKInstallation dependency resolves inside the same pinned package,
+      tools\vssdk\Microsoft.VisualStudio.Sdk.Common.targets, so nothing dangles.
+
+      EMPIRICAL, which outranks all of the above: this arrangement has produced a VSIX in CI three
+      times since it landed in 3965b7a14 on 2026-09-01 - builds 3064282, 3064344 and 3064417.
+
+      DO NOT "FIX" THIS BY SETTING THE THREE PROPERTIES. Two are referenced nowhere and the third is
+      unreachable, so it would change no behaviour while adding divergence from the shipped project.
+    -->
+    <VSToolsPath Condition="'$(VSToolsPath)' == ''">$([MSBuild]::NormalizeDirectory('$(MSBuildThisFileDirectory)', '$(TestPlatformRoot)', 'packages', 'microsoft.vssdk.buildtools', '$(VSSdkBuildToolsVersion)', 'tools'))</VSToolsPath>
+  </PropertyGroup>
+  <!--
+    FINDING, RECORDED AND DELIBERATELY NOT FIXED. The condition below reads
+    '($TestPlatformRoot)packages\...' - parenthesis and dollar transposed - which is literal text that
+    never exists, so these props have never been imported by this project: not now, and not in 2021.
+    The .targets import near the bottom of the file spells the same condition correctly, so the two
+    halves of one package are imported inconsistently.
+
+    Correcting it would not restore 2021 behaviour, it would depart from it. The malformed condition
+    never matched, so the shipped .vsix was produced WITHOUT these props, and a build that imports
+    them does something this project has never done. On a servicing branch whose whole purpose is to
+    reproduce what shipped, the typo is load-bearing.
+
+    It is left in place on purpose, and the VSIX builds without it. If some later change genuinely
+    needs these props, that is a deliberate departure and it has to be paid for with a comparison of
+    the produced .vsix against the shipped one.
+  -->
   <Import Project="$(TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props" Condition="Exists('($TestPlatformRoot)packages\microsoft.vssdk.buildtools\$(VSSdkBuildToolsVersion)\build\Microsoft.VSSDK.BuildTools.props')" />
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -18,7 +94,16 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>TestPlatform</RootNamespace>
     <AssemblyName>TestPlatform</AssemblyName>
-    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <!--
+      v4.6 targeting is no longer installable: on a current machine
+      Reference Assemblies\...\.NETFramework\v4.6 exists but holds 126 files and no mscorlib.dll,
+      where v4.6.2 holds 258 with one, and MSBuild answers MSB3644. Nothing in the produced VSIX
+      depends on this value: the project has no source files, IncludeAssemblyInVSIXContainer and
+      CopyBuildOutputToOutputDirectory are both false, so it compiles nothing and contributes no
+      assembly to the container. The framework version is here only so reference resolution can
+      complete, and 4.6.2 is the nearest version that still ships a targeting pack.
+    -->
+    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
     <GeneratePkgDefFile>false</GeneratePkgDefFile>
     <IncludeAssemblyInVSIXContainer>false</IncludeAssemblyInVSIXContainer>
     <IncludeDebugSymbolsInVSIXContainer>false</IncludeDebugSymbolsInVSIXContainer>

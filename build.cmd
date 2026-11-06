@@ -2,5 +2,9 @@
 
 REM Copyright (c) Microsoft. All rights reserved.
 
-powershell -ExecutionPolicy Bypass -NoProfile -NoLogo -Command "%~dp0scripts\build.ps1 %*; exit $LastExitCode;" 
-if %errorlevel% neq 0 exit /b %errorlevel% 
+REM Uses -Command rather than main's -File: with -File every argument reaches PowerShell as a
+REM string, so any [bool] parameter of eng\build.ps1 fails to bind. See test.cmd for the detail.
+
+if not defined MSBUILDTERMINALLOGGER set MSBUILDTERMINALLOGGER=off
+powershell -ExecutionPolicy ByPass -NoProfile -NoLogo -Command "& '%~dp0eng\build.ps1' %*; exit $LastExitCode;"
+exit /b %ErrorLevel%

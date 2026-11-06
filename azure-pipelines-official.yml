@@ -1,0 +1,2067 @@
+# Internal validation pipeline for the 16.11 servicing line.
+#
+# The servicing validation pipeline reads this file. This is NOT main's official pipeline or
+# a release pipeline. It builds, real-signs, and delivers to two internal destinations - see below.
+# Shape copied from the 15.9 servicing pipeline rather than derived, so the three servicing
+# lines fail and pass in the same places.
+#
+# ---------------------------------------------------------------------------------------------
+# WHY THIS EXTENDS THE OFFICIAL TEMPLATE, AND WHY THAT IS STILL SAFE
+#
+# Extending Official does not by itself add a delivery route. The template SUPPLIES tasks; it does
+# not INVOKE them. Every publishing route in main's pipeline comes from tasks written explicitly in
+# main's own YAML inside a "- job: Publish" that this file does not contain, and that remains true.
+#
+# What this file DOES invoke is two 1ES templateContext outputs - a microBuildVstsDrop and a nuget
+# push - declared explicitly below with literal internal destinations. So the safety property is no
+# longer "nothing delivers"; it is that every delivery is named in this file, is internal, and is
+# gated on succeeded(). Anything not named here still does not happen.
+# ---------------------------------------------------------------------------------------------
+# WHAT THIS PIPELINE DELIVERS, AND WHERE
+#
+# It builds, packages, REAL-SIGNS, and then delivers to exactly two internal destinations. This
+# section previously read "no delivery of any kind" and listed the drop and feed push among the
+# things deliberately left out. That was true until the real-signing work and is now false, so it
+# is rewritten rather than amended: a delivery-surface description that is partly stale is more
+# dangerous than none, because the stale half still reads as a guarantee.
+#
+# The two destinations, both internal, both literal:
+#
+#   1. VS drop  Products/internal/microsoft-vstest/realsigned-DO-NOT-SHIP-<branch>/<buildNumber>
+#              carries the VSIX. Not the historical Products/DevDiv/microsoft/vstest path.
+#   2. Feed     dnceng/internal general-testing-internal, visibility Organization, ZERO upstream
+#              sources - so nothing pushed can be transitively re-served publicly.
+#
+# Both are gated on succeeded(), so a partial set never reaches either.
+#
+# STILL absent, and these are the routes that would make delivery public or authoritative:
+#
+#   - any package push to public/dotnet-tools, public/test-tools, nuget.org or the public dotnet
+#     feeds. test-tools and dotnet-public are CONSUMED by this build and never written to.
+#   - Generate-Manifest, which names a public dotnet-tools feed as a publishing Location. The
+#     packaging step names its actions individually so this one cannot be reached.
+#   - the post-build stage, which is what registers build assets against a Maestro channel.
+#   - asset registration: the publish-build-assets job is gated by an or() with FOUR disjuncts, and
+#     all four are false here. Naming only the flag is a weaker guarantee than it reads as, so the
+#     whole condition is written out - eng/common/core-templates/jobs/jobs.yml:104:
+#
+#       or( eq(enablePublishBuildAssets, true),          <- false, explicit at the jobs.yml call
+#           eq(artifacts.publish.manifests, 'true'),     <- no artifacts: is passed at all
+#           ne(artifacts.publish.manifests, ''),         <- SAME field, ANY non-empty value includes it
+#           eq(isAssetlessBuild, true) )                 <- jobs.yml:31 default false, never set here
+#
+#     The third disjunct is the one to watch: it fires on any non-empty manifests value, so setting
+#     the flag false does NOT settle it by itself. enablePublishUsingPipelines is also set false at
+#     line ~335, and it is INERT: measured, it has ZERO references in the entire eng/common template
+#     set, while enablePublishBuildAssets has 2, enablePublishTestResults 3, publishAssetsImmediately
+#     8 and enablePublishBuildArtifacts 11 - and a deliberately invented name scores 0 too, so the
+#     query discriminates. Nothing in Arcade reads it, so setting it false guards nothing. It is a
+#     leftover from an older Arcade, harmless to leave and misleading to cite.
+#
+#     TWO earlier versions of this comment were wrong about it in opposite directions: the first named
+#     it as one of the conditions gating the publish job, the second corrected that to "not part of
+#     this condition". Both implied it does something. It does not do anything.
+#
+#     Left in place rather than removed: deleting it is behaviour-neutral by the same measurement that
+#     shows it inert, but it is still an edit to a pipeline that has never run on an agent, and the
+#     measurement is worth more here than the tidier file.
+#
+#     Everything publish-named in eng/common hangs off this one job: publish-logs.yml is included
+#     only by publish-build-assets.yml:214 and post-build.yml:233, and publish-using-darc.ps1 is
+#     called only from publish-build-assets.yml:201 and post-build.yml:312. This pipeline references
+#     post-build.yml zero times, so the whole chain is unreachable from one gate plus one absent
+#     stage. source-index-stage1-publish.yml is separate and gated on enableSourceIndex, default
+#     false, never set here.
+#
+# Localization runs here, unlike main, because satellites on this line are generated during the
+# build rather than checked in. There is no isRTM parameter, because there is nothing for it to
+# gate.
+#
+# trigger: none is deliberate. This runs only when queued by hand. main's official pipeline
+# excludes rel/15.* and rel/16.* from its trigger, so 16.11 has never been built by it, and
+# nothing here changes that for any other branch.
+# ---------------------------------------------------------------------------------------------
+# SCOPE: build, package, real-sign, and deliver to the two internal destinations named above.
+#
+# The test leg is IN, as of a9c263f04: Build -> Package -> Test -> Sign.
+#
+# This block previously read "The test leg is still out... Arcade's own -test path does not work on
+# this line yet... MSB4057 x20... wiring it means porting main's eng/build.ps1 together with
+# test.cmd, which is a separate change." Every clause of that was true when written and none of it
+# was true by the time it was read: 8a0a4f1e9 had already set TestRunnerName=MSTest in
+# eng/Versions.props and ported the wrapper with full -test support, so the runner targets resolve.
+# Only this pipeline's invocation was missing.
+#
+# A LEAD THAT IS NEVER RE-MEASURED EVENTUALLY BECOMES FALSE WITHOUT ANYONE EDITING IT. The reason
+# was carried forward for three sessions with the qualifier "inherited, not re-measured", which is
+# what kept it from being a plain false claim - but a qualifier buys time, it does not fix an entry.
+#
+# The existing -test pass runs unit tests. NormalAcceptanceTests separately runs both supported
+# acceptance frameworks with the patched runner; Smoke, Performance and *PlatformTests are unchanged.
+#
+# Verified locally on this branch before queueing:
+#   eng\build.ps1 -restore -build -ci -warnAsError 0 -configuration Release
+#     restore 0 errors, build 0 errors, with NU1603 promoted to an explicit error so package
+#     substitution cannot hide behind -warnAsError 0. The WRAPPER, not eng\common\Build.ps1: the
+#     localization phase lives there and packaging fails without it.
+#   scripts\build.ps1 -Steps Publish -Actions Publish-Package | Create-VsixPackage | Create-NugetPackages
+#     Publish-Package 0, 16 staged directories. Create-VsixPackage 0, producing TestPlatform.vsix,
+#     16,040,410 bytes, 450 entries, 13 locales. Create-NugetPackages 0, 11 of 11.
+#     The VSIX builds on a developer machine now. It never needed a Visual Studio that was missing;
+#     it needed .NET Framework 4.6 targeting, which no longer exists anywhere, and a VSSDK whose
+#     targets and VsixUtil.exe come from the same release.
+#   eng\common\build.ps1 -restore -sign
+#     11 of 11 produced packages resolved into ItemsToSign, 0 either way, all carrying
+#     Certificate='NuGet', plus TestPlatform.vsix. Dry run locally, because there is no
+#     OfficialBuildId there.
+# ---------------------------------------------------------------------------------------------
+
+# yyyymmdd.r, which is the shape Arcade's OfficialBuildId expects. The build's OWN date is used
+# rather than a reconstruction of 2021: nothing recoverable was ever stamped by Arcade on this
+# line, a 2021 date would be a false claim about when these bytes were produced, it would sort
+# before every other build in any build-id ordering, and - the strongest reason - a package whose
+# version string is indistinguishable from the real shipped one is a non-shipping artifact
+# impersonating a shipped artifact.
+name: $(Date:yyyyMMdd)$(Rev:.r)
+
+# A merge into this line's servicing branch must build, and until now nothing made it.
+# The branch policy covers the pull request; this covers what lands after it. Azure DevOps
+# reads this file from the branch that was pushed, so internal/rel/* can only ever select
+# this branch's own servicing line.
+trigger:
+  branches:
+    include:
+    - internal/rel/*
+pr: none
+
+variables:
+  # Defines DncEngInternalBuildPool. Without this import the pool name stays the literal
+  # text "$(DncEngInternalBuildPool)" and the run fails before any job starts.
+  - template: /eng/common/templates-official/variables/pool-providers.yml@self
+  - name: _TeamName
+    value: TestPlatformTeam
+
+  # _RunAsInternal and _RunAsPublic used to be declared here. They were read by nothing - measured
+  # as zero references across eng/common and the whole repo - and _RunAsPublic: True sat next to
+  # the signing configuration saying the opposite of what the build does. The real control is the
+  # runAsPublic TEMPLATE PARAMETER, which core-templates/jobs/jobs.yml defaults to false and this
+  # file does not override. A dead variable that reads as a decision is worse than no variable.
+
+  # REAL signing. Certificates are real and the signatures are trusted for shipping.
+  #
+  # Sign.proj rejects any DotNetSignType other than 'real', 'test' or empty, and the MicroBuild
+  # plugin only installs when _SignType is 'real' or 'test', so this value is load-bearing twice.
+  #
+  # It also forces microbuildUseESRP below. install-microbuild.yml validates the pair and FAILS the
+  # build when SignType is real while ESRP is disabled, rather than silently downgrading to a
+  # signature nobody would trust - so the two settings are one decision, not two.
+  - name: _SignType
+    value: real
+  # PULL REQUEST VALIDATION, the same override 18.12 uses. A pull request build has no ESRP
+  # credentials, so the MicroBuild plugin signs nothing and Arcade's own post-sign verification then
+  # fails the build - measured on 3076704:
+  #   Sign.proj(74,5): error : Nuget package Microsoft.CodeCoverage.16.11.1-hotfix-...nupkg is not
+  #                            signed properly.
+  #   Sign.proj(74,5): error : PE file ...\datacollector.exe is not signed properly.
+  # Not a flake and not fixable by a rerun: a pull request build must not sign at all.
+  #
+  # THIS CONDITIONAL IS COMPLETE, verified rather than assumed. _Sign is read only by _SignArgs, and
+  # $(_SignArgs) has exactly ONE consumer on this branch - the Sign step - which invokes
+  # eng\common\Build.ps1 with -sign and then appends $(_SignArgs). build.ps1 turns -sign into
+  # /p:Sign=True and appends @properties AFTER it, so /p:Sign from _SignArgs is last and wins, and
+  # the Sign target is skipped along with its verification. Same mechanism, same ordering dependency
+  # as 18.12.
+  #
+  # _SignType stays real. The gate above refuses to sign unless it reads real through both the macro
+  # and the environment; a pull request build satisfies that by not signing, not by claiming a
+  # different type. Non-pull-request keeps the former value exactly.
+  - ${{ if eq(variables['Build.Reason'], 'PullRequest') }}:
+    - name: _Sign
+      value: false
+  - ${{ if ne(variables['Build.Reason'], 'PullRequest') }}:
+    - name: _Sign
+      value: true
+  - name: _SignArgs
+    value: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:Sign=$(_Sign)
+
+  # Passed ONLY to the signing step, deliberately. Arcade sets OfficialBuild=true whenever
+  # OfficialBuildId is non-empty, and Sign.proj dry-runs unless OfficialBuild is true - so without
+  # this, signing reports success and signs nothing. It is kept off the build step because on this
+  # line the build step is what determines assembly FileVersion, and off the packaging step because
+  # the packaging step is what determines package version; neither may change as a side effect of
+  # making signing real. Passing it to the signing invocation alone cannot affect either, because
+  # that invocation produces no assembly and no package.
+  #
+  # SECOND-ORDER CONSEQUENCE, discovered afterwards and recorded here because THIS is where anyone
+  # would change it:
+  #
+  # Because the build never receives OfficialBuildId, Arcade stamps its placeholder version
+  # 42.42.42.42424 into every assembly, and that stamp is therefore IDENTICAL across builds. The
+  # assembly version is a compilation INPUT, so two runs of this pipeline compile identical inputs
+  # even at different build numbers - which is the only reason a determinism experiment is possible
+  # on this line at all. Measured on 3063024 (20260901.7) vs 3063087 (20260901.12): same
+  # FileVersion, 1,404 of 1,404 satellites MVID-stable, 226 IL-bearing assemblies MVID-unstable.
+  #
+  # MOVING OfficialBuildId ONTO THE BUILD STEP WOULD SILENTLY DESTROY THAT. Every assembly would
+  # carry a build-derived version, every MVID would differ between runs for that reason alone, and
+  # non-determinism would become indistinguishable from a version bump. The 17.14 line has exactly
+  # that configuration and its 262 MVID differences are fully explained by it.
+  #
+  # There may be a good reason to move it later. Read this first, and if you do move it, record that
+  # the determinism measurement is void rather than letting it stand as though it still held.
+  #
+  # A MEASURED CONSEQUENCE OF NOT MOVING IT, so the trade is stated rather than implied. Because
+  # OfficialBuildId reaches Sign and not Build, this pipeline stamps TWO version suffixes into one
+  # artifact. Measured on the VSIX delivered by 3064235: 186 files at 16.11.0-dev and 44 at
+  # 16.11.0-ci, and all 230 carrying FileVersion 42.42.42.42424, so every one was compiled by that
+  # build - none is a carried or restored component.
+  #
+  # THE -dev HALF NOW TRACKS THE COMPUTED VERSION. Since 57007ce7d the compiled group is stamped
+  # 16.11.0-release-<yyyyMMdd>-<rev> instead of 16.11.0-dev; the copied group is unaffected, because
+  # its version was baked in by whatever compiled it. Measured across the packages of 3064456:
+  # 138 binaries at 16.11.0-release-20260902-42 and 87 at 16.11.0-ci, still 2 distinct values, still
+  # not uniform. The SPLIT is the finding; the particular suffix on the left of it is not.
+  #
+  #   files scripts\build.ps1 COMPILES        -> -dev   from $VersionSuffix, scripts\build.ps1:23
+  #   files it COPIES from Arcade's output    -> -ci    from ContinuousIntegrationBuild, eng\common\tools.ps1:814
+  #
+  # TRACED TO THE COPY SITES, so this is a cause rather than an inference from the version strings.
+  # $env:TP_OUT_DIR is <root>\artifacts (scripts\build.ps1:98), so TP_OUT_DIR\bin\ is Arcade's
+  # output layout, and every -ci file is Copy-Item'd out of it:
+  #
+  #   :594-598   the 8 testhost.<tfm>.exe      from artifacts\bin\testhost\
+  #   :601-605   the 8 testhost.<tfm>.x86.exe  from artifacts\bin\testhost.x86\
+  #   :768-789   BlameDataCollector + 13 locales, via Copy-Loc-Files
+  #   :793-803   EventLogCollector  + 13 locales, via Copy-Loc-Files
+  #
+  # 2 collectors + 16 launchers = the 44 files in the VSIX. The negative half matters as much:
+  # scripts\build.ps1 never compiles any of them - no dotnet build, no dotnet publish. Everything
+  # else goes through Publish-PackageInternal / Publish-PackageWithRuntimeInternal with
+  # -p:Version=$TPB_Version. So the -p:CIBuild value passed at :410 and :928 does not explain the
+  # mixture, because neither invocation ever touches these files; Arcade compiled them during the
+  # Build step and this script only relocates the bytes. ProductVersion is
+  # AssemblyInformationalVersionAttribute, baked at compile time, so a copy cannot change it.
+  #
+  # THIS SITE LIST IS NOT COMPLETE, AND MUST NOT BE USED AS THE SCOPE OF A FIX. It was written from
+  # the VSIX, where 44 files are -ci and all 44 are explained above. Across the PACKAGES the -ci
+  # population is 87, and these five sites explain 75 of them. The residue is CoreUtilities,
+  # PlatformAbstractions and Microsoft.VisualStudio.TestPlatform.ObjectModel in the net45,
+  # netstandard1.0 and uap10.0 legs - and CoreUtilities is -ci in 4 legs while being -dev in 15
+  # others, so the unit is the (PROJECT, TFM LEG) pair rather than the project or the leg.
+  #
+  # Two packages are entirely -ci and neither appears in the VSIX at all: Microsoft.TestPlatform.Build,
+  # which supplies the MSBuild targets every `dotnet test` consumer executes, and
+  # Microsoft.TestPlatform.AdapterUtilities. A census of the VSIX alone cannot see either.
+  #
+  # So the acceptance criterion for any fix is a POPULATION check - count distinct ProductVersion
+  # values across first-party managed binaries and require exactly one - and NOT "the files at these
+  # five sites now agree". A fix scoped to an enumeration inherits that enumeration's
+  # incompleteness, and its verification would pass for the same reason the fix was wrong.
+  #
+  # The 44 are BlameDataCollector and EventLogCollector with 13 locales each, plus the 16 generated
+  # testhost.net4XX[.x86].exe. The SHIPPED 16.11 VSIX carries the identical 230 files at ONE version,
+  # 16.11.0-release-20210730-02, so this is a composition difference from shipped and not normal
+  # variation - 17.14's shipped artifact is itself split across 22 versions, and a split there would
+  # mean nothing.
+  #
+  # THREE FIXES EXIST, not one, and the cheap two do not touch OfficialBuildId:
+  #
+  #   A  OfficialBuildId -> the Build step         restamps EVERYTHING; the warning above applies
+  #   B  scripts\build.ps1 -VersionSuffix ci       only the 186 change, to match the 44
+  #   C  ContinuousIntegrationBuild=false on the   only the 44 change, to match the 186
+  #      Arcade Build step
+  #
+  # B and C reconcile the two SUFFIX SOURCES, which is the actual disagreement, rather than
+  # restamping against a shipped version. All three are deferred deliberately: even B and C alter
+  # version strings on binaries whose alignment against the shipped 2021 packages has been measured,
+  # which is a servicing-policy decision for whoever inserts servicing code. The cheapest useful
+  # change is neither - it is that nothing in this pipeline currently REPORTS the split.
+  - name: _OfficialBuildIdArgs
+    value: /p:OfficialBuildId=$(Build.BuildNumber)
+
+  # The directory the signing gate reads AND the directory published as ServicingTestResults. One
+  # value used twice cannot disagree with itself.
+  #
+  # These were briefly two literals - the gate rooted at $(System.DefaultWorkingDirectory) and the
+  # publish at $(Build.SourcesDirectory). Those two are equal on this pipeline today, which is
+  # exactly what makes the divergence dangerous: it would not fail, it would silently publish a
+  # different directory than the one the gate asserted on, and the artifact would still be present
+  # and still look like evidence. 17.14 shipped the same shape in a .vsman drop path and had to fix
+  # it after the two literals drifted apart.
+  - name: _TestResultsDirectory
+    value: $(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)
+
+  # This pipeline DOES upload a drop, as of the real-signing work: see the microBuildVstsDrop output
+  # below. The name is a literal internal path and it states what the artifacts ARE.
+  #
+  # A drop labelled "testsigned" while holding real Microsoft-signed binaries would mislead
+  # consumers. The name must describe the actual signed payload.
+  #
+  # DO-NOT-SHIP is in the name rather than in a comment because the name is the only part that
+  # travels with the artifacts.
+  - name: VisualStudioDropName
+    value: Products/internal/microsoft-vstest/realsigned-DO-NOT-SHIP-$(Build.SourceBranchName)/$(Build.BuildNumber)
+
+  - name: _InternalBuildArgs
+    # WAS ' ' - a single space, i.e. EMPTY - and that emptiness was the whole defect. The Build
+    # step below expands $(_InternalBuildArgs) and therefore passed NOTHING to Arcade, so Arcade
+    # built as a non-official build and stamped its non-official placeholder.
+    #
+    # MEASURED ON THIS LINE'S OWN BUILD 3066837, not carried over from 15.9:
+    #   1,971 versioned binaries in ServicingPackages_Release
+    #     308 on FileVersion 42.42.42.42424    <- Arcade's non-official placeholder
+    #   1,324 on FileVersion 16.1100.26.45420  <- the group the Package step restamps
+    # The 308 are exactly the binaries Copy-Item'd out of Arcade's Build output; a copy cannot
+    # restamp what it copies, so they can only be fixed at the step that produced them.
+    #
+    # AND MEASURED AGAINST SHIPPED 16.11.0 rather than assumed: the shipped packages contain the
+    # SAME 1,971-binary population, carry the placeholder on ZERO of them, and hold 1,632 on one
+    # uniform ProductVersion 16.11.0 - which is exactly our 1,324 + 308. So the split is a real
+    # divergence from shipped and not normal variation.
+    #
+    # 15.9 is the control, not a guess: its Build step is the same shape and expands the same
+    # variable, but there the variable is NON-EMPTY and carries this exact argument - and 15.9's
+    # placeholder count is 0 on build 3066816.
+    value: /p:OfficialBuildId=$(Build.BuildNumber)
+
+resources:
+  repositories:
+  - repository: 1ESPipelineTemplates
+    type: git
+    name: 1ESPipelineTemplates/1ESPipelineTemplates
+    ref: refs/tags/release
+
+extends:
+  template: v1/1ES.Official.PipelineTemplate.yml@1ESPipelineTemplates
+  parameters:
+    sdl:
+      policheck:
+        enabled: true
+      # TSA upload is off. It requires .config/tsaoptions.json, which main carries and this 2021
+      # branch does not, and its purpose is to file security bugs into a tracking area. This is a
+      # validation build that is meant to have no external side effects, so filing
+      # bugs from it would be wrong even if the config were present. Guardian itself still runs
+      # and its results stay attached to the build record.
+      # When this line gets a real production pipeline, take main's .config/tsaoptions.json rather
+      # than leaving this disabled.
+      tsa:
+        enabled: false
+    pool:
+      # Internal pool image carries no .open suffix. The public pipeline in azure-pipelines.yml
+      # uses the same image family WITH .open; crossing the two fails pool resolution, which
+      # presents as a 0-second run with no timeline records.
+      name: $(DncEngInternalBuildPool)
+      image: windows.vs2026preview.scout.amd64
+      os: windows
+    settings:
+      networkIsolationPolicy: Permissive,CFSClean
+    customBuildTags:
+    - servicing-validation
+    - do-not-publish
+    stages:
+    - stage: build
+      displayName: Build
+      jobs:
+
+      - template: /eng/common/templates-official/jobs/jobs.yml@self
+        parameters:
+          enableMicrobuild: true
+          # Real signing needs the ESRP service connection, and install-microbuild.yml enforces that:
+          # microbuildUseESRP false with _SignType real is a hard build failure, by design, so this
+          # is forced by _SignType rather than chosen independently.
+          #
+          # Which service connection resolves is established BEFORE the run rather than read out of a
+          # failure. The template picks 6cc74545-... only when System.TeamProject is DevDiv; this
+          # pipeline is dnceng/internal, so the else branch applies and
+          # 248d384a-b39b-46e3-8ad5-c2c210d5e7ca is expected. Corroborated off a resolved job, not
+          # off this file: NuGetAuthenticate@1 appears in build 3062199's timeline and its
+          # compile-time condition requires System.TeamProject to be internal.
+          microbuildUseESRP: true
+          # Attaches files to the run so a private build can be inspected in place.
+          # This is not feed delivery and it is not asset registration.
+          enablePublishBuildArtifacts: true
+          enablePublishBuildAssets: false
+          enablePublishUsingPipelines: false
+          # RESTORED, together, now that a test leg exists. Both values must move together: the
+          # gate is an OR -
+          #   ${{ if or( and(eq(enablePublishTestResults,'true'), eq(testResultsFormat,'')),
+          #              eq(testResultsFormat,'vstest') ) }}
+          # so setting the flag alone does nothing (measured: byte-identical expansion), and
+          # clearing the format alone removes the step whatever the flag says.
+          #
+          # These were set to false/'' in 8fcd7199b because the pipeline ran no tests, and a
+          # test-results publisher with condition: always() and continueOnError: true showed
+          # GREEN on build 3063087 while publishing nothing - it cannot not-run and it cannot
+          # fail, so there was no state of the world it distinguished.
+          #
+          # THAT REMAINS TRUE OF THE STEP ITSELF. It is safe to restore only because the verdict
+          # is now taken from the ATTACHED TEST-RUN COUNT rather than from the step's colour:
+          #   GET /_apis/test/runs?buildUri=vstfs:///Build/Build/<id>   -> count must be NON-ZERO
+          # A green publish with zero attached runs means no test executed, whatever it looks
+          # like on the build summary. Capture-DeliveryEvidence.ps1 asserts exactly that.
+          enablePublishTestResults: true
+          testResultsFormat: 'vstest'
+          enableTelemetry: true
+          # 16.11 predates source build.
+          enableSourceBuild: false
+          jobs:
+          - job: Windows
+            timeoutInMinutes: 120
+            pool:
+              name: $(DncEngInternalBuildPool)
+              image: windows.vs2026preview.scout.amd64
+              os: windows
+            # Attach what this pipeline PRODUCES to the build record, so that "the pipeline produces
+            # the artifacts" stops being a claim read out of a log and becomes a set that can be
+            # downloaded and compared against the shipped baseline. Without this the run signs eleven
+            # packages and a VSIX and then discards them.
+            #
+            # This is the ONLY thing on any of the three servicing lines that leaves a build agent,
+            # and it is deliberately the least dangerous shape available: a pipeline artifact on the
+            # build record. Not a feed, not a drop, not asset registration, no manifest - and
+            # Generate-Manifest remains unreachable because the packaging step names its actions.
+            #
+            # The packages carry -dev, which is not cosmetic. Package version comes from $TPB_Version
+            # in scripts\build\TestPlatform.Settings.targets and is independent of Arcade's
+            # OfficialBuildId, so a downloaded artifact is self-labelling as a non-shipping build.
+            #
+            # The signatures are REAL Microsoft production signatures, not test signatures. That
+            # sentence used to read "the signatures are test signatures for the same reason" and it
+            # expired when _SignType became real. Measured on build 3063024: all 1,973 PE files carry
+            # the same Authenticode signer subject as the corresponding shipped 2021 file, against
+            # 333 of 1,973 under test signing. So -dev in the version string is now the ONLY thing
+            # distinguishing these artifacts from shippable ones, which is precisely why the drop
+            # name below says DO-NOT-SHIP and why the feed is a testing feed.
+            #
+            # succeededOrFailed, not succeeded, and that is the point rather than a convenience: the
+            # packaging leg currently stops at a payload that no feed can supply, and the artifacts
+            # produced BEFORE it stops are exactly what has to be inspected to know how far the leg
+            # got. An artifact published only on green would be empty on every run that has something
+            # to teach. Whether a set is complete is answered by reading the set, which is reported
+            # by name after every run, never by the presence of the artifact.
+            templateContext:
+              outputs:
+              - output: pipelineArtifact
+                displayName: Publish servicing packages to the build record
+                targetPath: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages
+                artifactName: ServicingPackages_$(_BuildConfig)
+                condition: succeededOrFailed()
+              - output: pipelineArtifact
+                displayName: Publish servicing VSIX to the build record
+                targetPath: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\VSIX
+                artifactName: ServicingVsix_$(_BuildConfig)
+                condition: succeededOrFailed()
+
+              # 🛑 THE ARTIFACT NAME IS LOAD-BEARING AND MUST BE EXACTLY "VSSetup" - NO SUFFIX.
+              # RoslynTools GetInsertableComponentBuildsAsync compares against the literal:
+              #     var arcadeArtifactName = ArcadeInsertionArtifacts.ArtifactName;   // "VSSetup"
+              #     if (artifacts.Any(a => a.Name == arcadeArtifactName || a.Name == legacyArtifactName))
+              # and DISCARDS the build otherwise. Earlier insertion attempts did not reach a
+              # manifest when the artifact name differed from VSSetup.
+              # Publishing VSTest1714VSSetup instead of VSSetup is what already cost a week, so the
+              # $(_BuildConfig) suffix every artifact above carries must NOT be added to this one.
+              # succeeded() rather than succeededOrFailed(): the others are retained for diagnosis,
+              # this one is a DELIVERY artifact and a failed run must not offer the insertion tool a
+              # half-built component.
+              # PULL REQUEST: not produced. The assemble step below is skipped in a pull request
+              # build because there is nothing signed to stage, so there is no artifact to publish
+              # and an empty one would look to the insertion tool exactly like a half-built
+              # component. Non-pull-request behaviour is unchanged.
+              - output: pipelineArtifact
+                displayName: Publish Artifact VSSetup
+                targetPath: $(Build.SourcesDirectory)\artifacts\VSSetup\$(_BuildConfig)
+                artifactName: VSSetup
+                condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+              # THE TEST RESULTS THE SIGNING GATE READS. Retained because the gate's INPUT was not.
+              #
+              # Assert-KnownTestFailures reads artifacts\TestResults\<config> in-job, decides whether
+              # signing is authorised, and then the agent is recycled and the .trx files are gone.
+              # Every other control on this line publishes what it asserted on; this one did not, so
+              # the single decision that authorises SIGNING was the only one that could not be
+              # re-examined afterwards.
+              #
+              # This was found by needing it: validating a change to the gate required a retained
+              # result set, none existed for this line, and the only set on the machine turned out to
+              # belong to 15.9 - which the gate cheerfully classified, because the tests share names
+              # across the two lines. 15.9 publishes ServicingTestResults_<config>; this is the same
+              # artifact under the same name so the two lines can be compared directly.
+              #
+              # succeededOrFailed for the same reason as the two above, and more sharply here: the
+              # runs worth reading are precisely the ones where the gate BLOCKED.
+              - output: pipelineArtifact
+                displayName: Publish the test results the signing gate read
+                targetPath: $(_TestResultsDirectory)
+                artifactName: ServicingTestResults_$(_BuildConfig)
+                condition: succeededOrFailed()
+
+              - output: pipelineArtifact
+                displayName: Publish normal acceptance results
+                targetPath: $(Build.SourcesDirectory)\artifacts\AcceptanceTestResults\$(_BuildConfig)
+                artifactName: NormalAcceptanceTestResults_$(_BuildConfig)
+                condition: succeededOrFailed()
+
+              # The binlog from "Build test assets", which is the only artefact that can settle why
+              # CI reports MSB3644 x16 and 838 netstandard2.0 errors while an identical local run on
+              # the pinned SDK reports zero of both. succeededOrFailed for the same reason as above:
+              # the interesting run is the FAILING one, and that step carries continueOnError.
+              - output: pipelineArtifact
+                displayName: Publish the test-asset build binlog
+                targetPath: $(Build.SourcesDirectory)/artifacts/log/$(_BuildConfig)
+                artifactName: ServicingBuildLogs_$(_BuildConfig)
+                condition: succeededOrFailed()
+
+              # The VSIX drop and the package feed push. These are the first things on any of the
+              # three servicing lines to leave the build record, so the reasoning is spelled out.
+              #
+              # condition: succeeded(), NOT succeededOrFailed(). The two pipeline artifacts above are
+              # deliberately succeededOrFailed because a partial set is exactly what has to be read
+              # when the packaging leg stops early. The opposite is true here: a drop or a feed is a
+              # place other people look, and half a set published there is indistinguishable from a
+              # complete one at the destination. Publishing a partial set to the build record is
+              # evidence; publishing it to a feed is a lie with a URL.
+              #
+              # DESTINATION HONESTY. The drop name is a literal internal path containing
+              # DO-NOT-SHIP - no variable that could expand somewhere else, no DevDiv segment. The
+              # historical 2021 drop for this repo was Products/DevDiv/microsoft/vstest/<branch>/<id>
+              # (still visible in scripts\write-release-notes.ps1); this deliberately does not reuse
+              # it, because these artifacts are not that build and must not land where consumers of
+              # that path look.
+              #
+              # THE FEED IS general-testing-internal, and the choice is measured rather than
+              # conventional:
+              #   - project dnceng/internal, visibility Organization. Not public. Read from the
+              #     packaging API, not assumed from the name.
+              #   - ZERO upstream sources. Nothing pushed here can be transitively re-served to a
+              #     public feed. That is the property that matters for the never-publish-publicly
+              #     rule, and it is a fact about the feed rather than about our intent.
+              #   - it is named for testing, so its consumers expect experimental content.
+              # dotnet-tools-internal and the dotnetN-internal transport feeds were rejected: real
+              # product builds consume them, and an experimental servicing package appearing there
+              # could be picked up by something that did not ask for an experiment.
+              #
+              # ⚠️ THE CLAIM BELOW WAS TRUE UNTIL 2026-09-07 AND IS NOW SUPERSEDED. It is kept
+              # rather than deleted, because a reader who finds only the new text cannot tell that
+              # the protection was deliberately given up rather than overlooked.
+              #
+              # WHAT IT SAID: every version this line produced carried a PRERELEASE SUFFIX -
+              # 16.11.0-dev historically, 16.11.0-release-<yyyyMMdd>-<rev> since 57007ce7d - while
+              # the shipped packages are plain 16.11.0. A prerelease sorts BELOW the release it
+              # qualifies, so no push here could replace or outrank a real 16.11.0 on any feed
+              # carrying both. The property was the SUFFIX, not any particular value of it.
+              #
+              # WHY IT NO LONGER HOLDS: the prefix moved 16.11.0 -> 16.11.1, so this line now
+              # produces 16.11.1-release-<yyyyMMdd>-<rev>. That still sorts below a future real
+              # 16.11.1, but it sorts ABOVE the shipped 16.11.0. The guarantee "cannot outrank what
+              # shipped" is GONE, and it was load-bearing on a feed product builds consume.
+              #
+              # WHY IT WAS GIVEN UP, on purpose: 16.11.1 is the servicing target, and a package
+              # that cannot outrank 16.11.0 also cannot SERVICE it. The protection and the goal
+              # were mutually exclusive.
+              #   Precedent: 15.9 has carried 15.9.3 against shipped 15.9.2 since 2026-09-04.
+              #
+              # WHAT STILL CONSTRAINS THIS: the `-release-<date>-<rev>` suffix remains, so these are
+              # still PRERELEASE builds and a real 16.11.1 will outrank them. The drop stays in the
+              # realsigned-DO-NOT-SHIP- namespace. Neither is a substitute for the property above.
+              # 🛑 THE DROP MUST CARRY WHAT THE MANIFEST POINTS AT, so it is the Insertion folder
+              # and not the raw VSIX folder. The generated .vsman gives every payload an absolute
+              # url of the form
+              #     https://vsdrop.corp.microsoft.com/file/v1/<dropName>;/<fileName>
+              # so each payload has to sit at the ROOT of this drop. Pointing the drop at
+              # artifacts\<cfg>\VSIX would resolve TestPlatform.vsix and then 404 on
+              # ...V2.CLI_sbom.json, which the vsmanproj writes next to the manifest - and a missing
+              # SBOM breaks drop GENERATION, not transmission, so it surfaces late and badly.
+              # This is the shape 18.10 already uses and that RoslynTools already accepts:
+              #     dropFolder: 'artifacts\VSSetup\Release\Insertion'
+              # 17.14's pin defect was this same field pointing where the content was not, proven by
+              # a control URL that stayed 404 across three consecutive builds.
+              - output: microBuildVstsDrop
+                displayName: Publish servicing VSIX to an internal VS drop
+                dropFolder: $(Build.SourcesDirectory)\artifacts\VSSetup\$(_BuildConfig)\Insertion
+                dropName: $(VisualStudioDropName)
+                dropRetentionDays: 30
+                accessToken: $(_DevDivDropAccessToken)
+                condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+              - output: nuget
+                displayName: Publish servicing packages to general-testing-internal
+                packageParentPath: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages
+                # Symbols packages are excluded, matching main's push pattern.
+                #
+                # Found by diffing this pipeline's MECHANISM surface against main rather than by a
+                # failure: main pushes '**/*.nupkg;!**/*.symbols.nupkg' and this pushed '*.nupkg'.
+                #
+                # It is a NO-OP TODAY and that is measured, not assumed: build 3063087 produced 11
+                # .nupkg and 0 .symbols.nupkg, so the two patterns select the same 11 files. It is
+                # committed anyway because the divergence is latent - the day this line starts
+                # producing symbols packages, the unqualified pattern would publish debugging
+                # symbols to a feed as an ordinary package, and nothing would report it as a change.
+                packagesToPush: $(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages\*.nupkg;!$(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages\*.symbols.nupkg
+                nuGetFeedType: internal
+                # allowPackageConflicts: false, DELIBERATELY, and it used to be true.
+                #
+                # WHAT IT WAS FOR. This line used to push a FIXED version, 16.11.0-dev, on every
+                # run, because the build is deliberately not an official build. A second delivering
+                # run offered the same version with different bytes, the feed kept the first upload
+                # and answered 409, and build 3064130 failed exactly that way with all 11 packages
+                # already present and verified correct by a paged read-back. allowPackageConflicts
+                # was set to true to keep that from failing the build.
+                #
+                # WHAT CHANGED. 57007ce7d computes 16.11.0-release-<yyyyMMdd>-<rev> from
+                # Build.BuildNumber, matching the shape 16.11 actually shipped
+                # (16.11.0-release-20210730-02). MEASURED on 3064456, the first run after that
+                # change: 11 produced, 11 TRANSFERRED, 0 already present, 0 conflicts. The 409 case
+                # did not arise at all, and cannot: no two builds share a build number.
+                #
+                # SO A CONFLICT NOW MEANS A FAULT. Either the suffix computation regressed to a
+                # constant, or two builds share a build number. Both are faults, and true would
+                # convert both into a silent success - the feed would hold ANOTHER build's packages
+                # and the push would report that it had delivered THIS build's. false makes the
+                # push itself refuse, which is the behaviour that was previously obtained by a
+                # separate report step running beforehand.
+                allowPackageConflicts: false
+                publishVstsFeed: internal/general-testing-internal
+                publishPackageMetadata: true
+                condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+            strategy:
+              matrix:
+                Release:
+                  _BuildConfig: Release
+            steps:
+            # EXPLICIT CHECKOUT WITH FULL HISTORY. This job previously declared no checkout, so it
+            # inherited the shallow default. Build 3065069 then spent 13.4 minutes inside a run-time
+            # `git fetch --unshallow` and was cancelled; the entire task log was one line.
+            #
+            # fetchDepth: 0 does not make the fetch cheaper. It moves it into the step designed to do
+            # it, which reports progress, so the same cost stops presenting as an unexplained stall.
+            # The delivering build 3065083 ran with this setting.
+            - checkout: self
+              fetchDepth: 0
+              # persistCredentials, because the implicit default strips them and that half of the
+              # default is not fixed by fetchDepth. 15.9's build 3065068 hung 31 MINUTES with zero
+              # output when a `git fetch` ran without credentials and prompted; a prompt on a
+              # non-interactive agent is indistinguishable from a slow network until the job times
+              # out. Nothing in this file fetches today, so this is latent rather than live, and it
+              # costs nothing to make a future fetch work instead of hang.
+              persistCredentials: true
+
+            - task: DotNetCoreCLI@2
+              displayName: 'dotnet --info'
+              inputs:
+                command: custom
+                custom: '--info'
+
+            # THE PACKAGE VERSION SUFFIX MUST VARY PER BUILD, and it is computed here rather than
+            # defaulted.
+            #
+            # scripts\build.ps1:23 defaults $VersionSuffix to the constant "dev", and a constant
+            # version is the mechanical cause of the feed being frozen: every run after the first
+            # offered 16.11.0-dev again, the feed kept the first upload and answered 409, and with
+            # allowPackageConflicts set the push reported success having transferred nothing.
+            # Eleven packages on the feed differ by SHA-256 from what the latest build produced.
+            #
+            # The SHAPE is taken from what this line actually shipped, not invented:
+            #
+            #   16.11.0-release-20210730-02      the shipped 16.11 packages and VSIX
+            #   16.11.0-release-<yyyyMMdd>-<rev> this, from Build.BuildNumber's <date>.<rev>
+            #
+            # DO NOT HARMONISE THIS WITH THE OTHER SERVICING LINES. They deliberately differ:
+            #
+            #   16.11   release-<yyyyMMdd>-<rev>   matches 16.11's shipped release-20210730-02
+            #   15.9    release-<yyMMdd>-<rev>     15.9 shipped bare, with no suffix at all
+            #   17.14   release-26452-26           Arcade's own date encoding, matching 17.14's shipped shape
+            #
+            # Three different encodings, each matched to ITS OWN baseline. The requirement is that a
+            # rebuilt artifact carries the same shape as what that line shipped - not that the three
+            # lines agree with each other. Anyone comparing the three side by side will want to
+            # unify them; unifying them would move at least two lines AWAY from their own shipped
+            # form, which is the thing being validated.
+            #
+            # Computed in PowerShell rather than as a YAML expression on purpose: the revision needs
+            # zero-padding to two digits to match the shipped form, which YAML expressions cannot do,
+            # and a malformed suffix would be silent. It ASSERTS its own output instead - a build
+            # number that does not split into date and revision fails the step rather than producing
+            # a version nobody notices is wrong.
+            #
+            # OfficialBuildId is NOT moved. It stays on the Sign invocation only, so the determinism
+            # measurement recorded in the variables block is unaffected: the package version is
+            # composed by scripts\build.ps1:149 from this suffix and never passes through Arcade's
+            # version generator, so no build-id component and no +commit metadata can appear.
+            #
+            # scripts\build.ps1:167 rewrites <NETTestSdkVersion> in
+            # scripts\build\TestPlatform.Dependencies.props from the computed version on every run,
+            # so the test assets follow this automatically. The value checked in there is the last
+            # one written, not a pin.
+            - pwsh: |
+                $buildNumber = "$(Build.BuildNumber)"
+                $parts = $buildNumber.Split('.')
+                if ($parts.Length -lt 2) {
+                  Write-Host "##vso[task.logissue type=error]Build.BuildNumber '$buildNumber' does not split into <date>.<revision>."
+                  Write-Host 'Blocking. A malformed version suffix would ship silently.'
+                  exit 1
+                }
+                $date = $parts[0]
+                $rev = ([int]$parts[1]).ToString('00')
+                $suffix = "hotfix-$date-$rev"
+                if ($suffix -notmatch '^hotfix-\d{8}-\d{2,}$') {
+                  Write-Host "##vso[task.logissue type=error]Computed suffix '$suffix' does not match the shipped shape hotfix-<yyyyMMdd>-<rev>."
+                  exit 1
+                }
+                Write-Host "Build.BuildNumber : $buildNumber"
+                Write-Host "version suffix    : $suffix"
+                Write-Host "shipped 16.11 was : release-20210730-02"
+                Write-Host "##vso[task.setvariable variable=_ServicingVersionSuffix]$suffix"
+                # THE FULL VERSION, for the Build step. The Package step composes its own version
+                # from the SUFFIX above, so the two steps would otherwise label the same product
+                # differently - and they measurably did:
+                #
+                #   1324 compiled by Package   ProductVersion 16.11.0-release-<yyyyMMdd>-<rev>
+                #    308 copied from Build     ProductVersion 16.11.0-ci
+                #
+                # Those 1,632 are EXACTLY the 1,632 that shipped 16.11.0 carries on ONE uniform
+                # ProductVersion, so the split is the divergence and uniformity is the target.
+                # Giving Build the same version the Package step will use is what closes it.
+                #
+                # The prefix is READ from the file that defines it rather than repeated here, so
+                # this cannot drift from TPVersionPrefix. An empty prefix would silently produce
+                # "-release-<date>-<rev>", which packs and signs happily and is wrong everywhere
+                # downstream, so it stops the build instead.
+                $prefix = ([xml](Get-Content scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | Where-Object { $_ }
+                if (-not $prefix) {
+                  Write-Host "##vso[task.logissue type=error]TPVersionPrefix is empty in scripts\build\TestPlatform.Settings.targets, so the full version cannot be composed."
+                  exit 1
+                }
+                $full = "$prefix-$suffix"
+                Write-Host "version prefix    : $prefix"
+                Write-Host "full version      : $full"
+                Write-Host "##vso[task.setvariable variable=_ServicingVersion]$full"
+              name: ComputeVersionSuffix
+              displayName: Compute the package version suffix
+
+            # eng\build.ps1, NOT eng\common\Build.ps1. The repo wrapper is where the localization
+            # phase lives, and it is not optional here.
+            #
+            # Satellites on this branch are not compiled from anything checked in: fmdev.xlftool
+            # writes culture .resx out of the checked-in .xlf, and only a build that has both those
+            # .resx and /p:LocalizedBuild=true embeds them. eng\build.ps1 does the generation and
+            # sets the property together, splitting Arcade's single call into restore, generate,
+            # build - because the .resx must exist before the build that embeds them is evaluated.
+            #
+            # Calling eng\common\Build.ps1 directly skips both. Measured on build 3062169: the build
+            # succeeded with 0 errors and 133 assemblies, and packaging then failed at the first
+            # Move-Loc-Files call because no satellite existed anywhere. A build leg that is green
+            # and a packaging leg that is not is exactly what that looks like from the outside.
+            #
+            # -prepareMachine is correct here and only here: the CI agent is exclusive. Never pass
+            # it on a shared developer machine, where Arcade's Stop-Processes kills every dotnet,
+            # msbuild and vbcscompiler process on the box.
+            #
+            # warnAsError is passed as 0, not $false: through cmd and the PowerShell task the token
+            # arrives as the string "False" and the [bool] parameter rejects it. The switch is off
+            # because this is 2021 source compiled by a current Roslyn, and the
+            # diagnostics are pre-existing style and XML-doc rules. NU1603 is promoted back to an
+            # error in Directory.Build.props so package substitution is still caught.
+            # -projects pins the build to TestPlatform.sln. Arcade builds every *.sln at the repo
+            # root by default, and this repo has two: TestPlatform.sln and
+            # TestPlatform_BuildFromSource.sln. Both contain the same shared projects, so Arcade
+            # builds those projects twice concurrently and the two builds overwrite each other's
+            # intermediate output:
+            #
+            #   MSB3554: Cannot write to the output file ...Resources.resources
+            #            because it is being used by another process
+            #
+            # That is why the failures landed on projects with no duplicate .csproj, why they were
+            # intermittent, and why they looked like machine contention. TestPlatform_BuildFromSource
+            # .sln is 2018-era source-build infrastructure and source build is disabled on this
+            # line, so excluding it costs nothing. The 15.9 line measured the same change at 10:07
+            # serialised against 1:00 in parallel, same assembly count.
+            # COVERAGE NOTE, AND THE QUESTION IT RAISED IS NOW ANSWERED.
+            #
+            # This step, Test (line ~1110) and Sign (line ~1210) are written in the SINGLE-LINE
+            # `- powershell: <script> <args>` form, not the `pwsh: |` block form. An audit of "every
+            # step that invokes a repo script and what follows it" was run against this pipeline and
+            # reported 8 steps with 0 defects. That audit's matcher required the block form, so it
+            # reached 13 of the 18 pwsh/powershell steps and NEVER EXAMINED THESE THREE - the build,
+            # the tests and the signing. The partition was checked afterwards and is exhaustive and
+            # disjoint: 13 block + 5 single-line = 18.
+            #
+            # THE PROPAGATION MECHANISM, MEASURED IN ALL SIX SHAPES. Three different mechanisms were
+            # recorded here before this one, each replacing a wrong reason for a line that was
+            # correct every time - which is precisely why nothing forced a re-measurement:
+            #
+            #   body raises the failure itself (throw or exit)   exit 1   propagates
+            #   body CALLS a script that THROWS                  exit 1   propagates (terminating)
+            #   body CALLS a script that EXITS non-zero          exit 0   LOST, last statement or not
+            #   body CALLS, then exit $LASTEXITCODE              exit 1   forwarded
+            #
+            # It is not "inline versus file" and not "a trailing statement". A CALLED script's exit
+            # code is not the calling file's; a called script's THROW is a terminating error and is.
+            #
+            # SO WHY THESE THREE ARE NOT EXPOSED, AND IT IS NOT THE EXIT CODE. eng\build.ps1 signals
+            # build failure by EXIT, not throw - its only two throws are argument validation. Under
+            # the rule above that code would be discarded. The build still goes red, by an INDEPENDENT
+            # route: eng\common\tools.ps1 dot-sources pipeline-logging-functions.ps1 (tools.ps1:928)
+            # and calls Write-PipelineTelemetryError 13 times; eng\common\build.ps1:201 calls it
+            # immediately before ExitWithExitCode 1. That emits ##vso[task.logissue type=error], which
+            # fails an Azure DevOps task regardless of the process exit code. Build 3063938 going red
+            # from 292 NU1301 errors is explained without exit-code propagation.
+            #
+            # THE RESIDUE, STATED RATHER THAN ROUNDED OFF: this holds for failures routed through
+            # Arcade's error helpers. A failure that exits non-zero WITHOUT calling them would still
+            # be discarded here. That is narrower than "these steps are fine" and it is what was
+            # measured.
+            #
+            # A literal grep for 'task.logissue' across eng/common returns ZERO for the very file
+            # that emits it - Format-LoggingCommand builds the string from '##vso[' plus parts. That
+            # zero was believed for several minutes. A narrow pattern's zero is not a measured zero.
+            #
+            # /p:Version BELOW - and note it is passed as an ARGUMENT, not written as a YAML comment
+            # inside the argument list. This is a multi-line plain scalar, so a '#' line here would
+            # be part of the STRING and would reach PowerShell literally, not be stripped as a
+            # comment. Every explanation therefore lives above the step.
+            #
+            # WHY IT IS HERE: 308 binaries reach the packages by Copy-Item straight out of this
+            # step's output and are never republished, so whatever THIS step stamps is what ships
+            # for them. Measured on 3066837: they carried ProductVersion 16.11.0-ci while the 1,324
+            # the Package step compiles carried 16.11.0-release-<yyyyMMdd>-<rev>. Shipped 16.11.0
+            # carries ONE uniform ProductVersion across exactly those same 1,632 binaries, so the
+            # split is the divergence.
+            #
+            # A command-line /p: is a GLOBAL property and beats every <Version> assignment in every
+            # targets file, so this is not a race with Arcade's version generator. The repo's own
+            # scripts\build\TestPlatform.Settings.targets:13 already declares
+            # <Version Condition="'$(Version)' == ''"> - i.e. it explicitly yields to an
+            # externally supplied Version - so this is the supported entry point, not a hack.
+            #
+            # This is 15.9's VERIFIED shape, ported as a MECHANISM and not as code: on that line the
+            # same hoist-then-/p:Version took first-party ProductVersion values from 2 to 1. The
+            # SUFFIX ENCODING is deliberately NOT ported - 15.9 uses release-<yyMMdd>-<rev> and this
+            # line uses release-<yyyyMMdd>-<rev>, each matching its OWN shipped shape.
+            - powershell: eng\build.ps1
+                -configuration $(_BuildConfig)
+                -restore
+                -build
+                -ci
+                -prepareMachine
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\TestPlatform.sln
+                /p:Version=$(_ServicingVersion)
+                $(_InternalBuildArgs)
+              name: Build
+              displayName: Build
+              env:
+                # PAIRED WITH _InternalBuildArgs ABOVE - these two must move together or the second
+                # silently undoes the first. Setting OfficialBuildId turns on
+                # SourceControlInformationFeatureSupported, and
+                # Microsoft.NET.GenerateAssemblyInfo.targets then appends SourceRevisionId to
+                # InformationalVersion, which IS ProductVersion. On 15.9 that same enabling hit
+                # 1,205 assemblies and was a SECOND divergence from completion bar (f), where
+                # FileVersion is the ONE approved divergence.
+                #
+                # THE NUMBER THIS PROTECTS, measured on both sides rather than assumed:
+                #   shipped 16.11.0        105 binaries carry a +<sha> ProductVersion
+                #   our build 3066837      105 binaries carry a +<sha> ProductVersion
+                # They already MATCH, and all 105 are third-party. So +sha is NOT a divergence on
+                # this line and this variable exists to keep it that way. If a later build shows
+                # +sha above 105, this env var did not reach the step.
+                #
+                # Quoted so it reaches MSBuild as a literal string.
+                IncludeSourceRevisionInInformationalVersion: 'false'
+
+            # pwsh, NOT powershell. An Azure DevOps "- powershell:" step runs Windows PowerShell,
+            # and Assert-UapCoreUtilities - the check that proves the staged uap10.0 CoreUtilities
+            # is really the uap10.0 build - needs System.Reflection.Metadata, which PowerShell 7 has
+            # and Windows PowerShell 5.1 on .NET Framework does not. Measured: as a "- powershell:"
+            # step this dies with "Cannot find type PEReader" inside a correctness control.
+            #
+            # The actions are named individually rather than running -Steps Restore,Publish as
+            # groups, and that is required work rather than tidiness: the Publish group also
+            # contains Generate-Manifest, which passes a public dotnet-tools feed URL as a
+            # publishing Location, and Copy-PackageIntoStaticDirectory. Neither may ever run here.
+            # Naming actions cannot reorder them - the dispatcher owns the order - so this is a
+            # subset of the shipped sequence and nothing else.
+            #
+            # Restore-Package is in the list because the agent needs it and this machine did not.
+            # It restores src\package\external\external.csproj into the repo-local packages\ folder,
+            # which about thirty payload copy sites read by versioned path: TraceDataCollector, the
+            # Coverage.* trees, QualityTools, CUIT, Intellitrace, the Dia COM components, vswhere
+            # and nuget.exe itself. A developer machine has that folder populated from earlier work;
+            # a clean agent does not, and the packages would come out quietly short.
+            #
+            # Install-DotNetCli is NOT in the list and must not be. It downloads dotnet-install.ps1
+            # from raw.githubusercontent.com/dotnet/cli/master, archived years ago, and asks it for
+            # channel release/6.0.1xx-preview1. Get-DotNetPath falls back to the .dotnet that the
+            # Arcade restore above installs from global.json.
+            #
+            # Create-VsixPackage is expected to SUCCEED here, and that is the difference between
+            # this agent and the developer machine. Locally it stops at Locate-VsInstallPath for
+            # want of Microsoft.VisualStudio.Component.VSSDK. Its first ~80 lines are pure payload
+            # copying into the full-CLR package directory, proven by deleting the first and the last
+            # of those copies and watching both return, so skipping the function is not an option:
+            # it would silently drop hundreds of shipped payload files.
+            - pwsh: |
+                # THE VSIX VERSION IS A THIRD SENTINEL, AND IT IS THE SAME DEFECT AS
+                # FileVersion 42.42.42.42424 ONE LEVEL OVER. Ported from 15.9, where it was
+                # found first on 2026-09-07.
+                #
+                # scripts/build.ps1 declares  [System.String] $BuildNumber = "20991231-99"
+                # and Update-VsixVersion composes the VSIX manifest version as
+                #   <Version>.<yyyyMMdd><rev>   from  $BuildNumber.Split("-")
+                # This step never passed -BuildNumber, so the default won and EVERY VSIX this
+                # line has produced carries 16.11.0.2099123199 - including the one on the
+                # internal VS drop from build 3066931. Shipped 16.11 for comparison is
+                # 16.11.0.2021073002, a real 2021-07-30 date.
+                #
+                # 2099-12-31 sorts ABOVE every real build and VS's VSIX upgrade rules compare
+                # exactly this field, so a VSIX stamped 2099 is never superseded by a genuine
+                # later servicing VSIX.
+                #
+                # The separator and the padding both matter, and both fail SILENTLY:
+                #   ADO gives "20260904.26" with a DOT, and Split("-") returns one element, so
+                #     the Length -ige 2 test fails and NO suffix is appended at all.
+                #   ADO's first build of a day is "20260907.1", so an unconverted revision is a
+                #     single digit and gives nine, where every shipped VSIX carries ten.
+                $parts = "$(Build.BuildNumber)" -split '\.'
+                if ($parts.Count -lt 2) { throw "BuildNumber '$(Build.BuildNumber)' has no revision part. Update-VsixVersion would fall back to the 20991231-99 sentinel and stamp a VSIX that no later build can supersede." }
+                $bn = "{0}-{1}" -f $parts[0], ([int]$parts[1]).ToString('00')
+                if ($bn -notmatch '^\d{8}-\d{2,}$') { throw "BuildNumber '$bn' is not <yyyyMMdd>-<rev>. Update-VsixVersion would fall back to the 20991231-99 sentinel." }
+                Write-Host "VSIX-VERSION build number       : $bn"
+
+                ./scripts/build.ps1 `
+                  -Configuration $(_BuildConfig) `
+                  -VersionSuffix $(_ServicingVersionSuffix) `
+                  -BuildNumber $bn `
+                  -Steps Restore,Publish `
+                  -Actions Restore-Package,Restore-FakesPayload,Publish-Package,Create-VsixPackage,Create-NugetPackages,Copy-PackageIntoStaticDirectory
+              name: Package
+              displayName: Package
+              # PORTED FROM 15.9, WHERE IT IS ALREADY VERIFIED. On that line the same two variables
+              # on this same step took FileVersion placeholders 89 -> 0 (build 3066572) and then the
+              # +sha suffix 1207 -> 2 (build 3066724). This is not a speculative port.
+              #
+              # An env var rather than /p:, because scripts\build.ps1 has no property passthrough.
+              # MSBuild reads environment variables as properties, and nothing in this repo assigns
+              # OfficialBuildId, so there is nothing for it to collide with.
+              #
+              # WHY IT IS NEEDED HERE, measured on THIS line's own build 3066640 rather than carried
+              # over from 15.9 or from the older 3064235 that an earlier note used:
+              #
+              #   1,973 versioned binaries in ServicingPackages_Release
+              #   1,632 on FileVersion 42.42.42.42424      <- Arcade's non-official placeholder
+              #     105 ProductVersion +sha                <- ALL third-party, none first-party
+              #
+              # The placeholder population is EXACTLY the two first-party ProductVersion groups,
+              # with no overlap either way:
+              #
+              #     16.11.0-release-20260904-15   1324 total   1324 placeholder   compiled HERE
+              #     16.11.0-ci                     308 total    308 placeholder   COPIED from Arcade
+              #
+              # 🛑 PREDICTION, STATED BEFORE THE BUILD SO IT CAN FALSIFY THIS CHANGE. Verify by the
+              # number, never by the build colour:
+              #
+              #     placeholder   1632 -> 308      the 1,324 compiled group moves, the copied 308 CANNOT
+              #     first-party +sha   0 ->   0      suppressed by the variable below, as on 15.9
+              #     ProductVersion split          unchanged: still 1324 -release / 308 -ci
+              #
+              # If the placeholder stays at 1632 this never reached the compile and is INERT - do not
+              # record it as fixed on the strength of a green build. If it goes to 0, that is ALSO
+              # wrong and must be explained, because the 308 are Copy-Item'd out of Arcade's Build
+              # output (traced to the five copy sites listed on _OfficialBuildIdArgs above) and a copy
+              # cannot restamp what it copies.
+              #
+              # THE 308 ARE A KNOWN, STATED REMAINDER, not an oversight. Clearing them needs
+              # OfficialBuildId on the ARCADE BUILD step, which is a SEPARATE change with its own
+              # consequences - it also moves those binaries off the 16.11.0-ci suffix, and that suffix
+              # alignment against the shipped 2021 packages has been measured. One change, one
+              # countable population, one build.
+              #
+              # ⚠️ THE DETERMINISM MEASUREMENT ON _OfficialBuildIdArgs IS NOW VOID FOR THE COMPILED
+              # GROUP, and that comment asks explicitly to be told rather than left standing. It read
+              # 1,404 of 1,404 satellites MVID-stable across 3063024 vs 3063087, and it held only
+              # because the constant placeholder made the compilation inputs identical between runs.
+              # These 1,324 now carry a build-derived FileVersion, so their MVIDs will differ between
+              # builds for that reason alone. The 308 copied binaries are unaffected and remain
+              # comparable. Any future determinism run must exclude the compiled group or re-baseline.
+              env:
+                # ProductVersion must NOT gain a +<sha> suffix. Setting OfficialBuildId turns on
+                # SourceControlInformationFeatureSupported, and
+                # Microsoft.NET.GenerateAssemblyInfo.targets:64 then appends SourceRevisionId to
+                # InformationalVersion - which is ProductVersion. On 15.9 that hit 1,205 assemblies
+                # and was a SECOND divergence from completion bar (f), where FileVersion is the ONE
+                # approved one. Quoted so it reaches MSBuild as a literal string.
+                IncludeSourceRevisionInInformationalVersion: 'false'
+                OfficialBuildId: $(Build.BuildNumber)
+
+            # PLACEHOLDER GATE FOR THE VSIX MANIFEST VERSION. Ported from 15.9.
+            #
+            # eng\Verify-LineAF.ps1 already fails a build on FileVersion 42.42.42.42424 and did
+            # NOT catch 16.11.0.2099123199, because it scans ASSEMBLY versions and a VSIX manifest
+            # version is not one. The guard existed and the sentinel walked past it, which is why
+            # this check sits where the artifact is produced rather than in that scanner.
+            #
+            # Placed before Sign deliberately. Signing a VSIX that can never be superseded yields
+            # a correctly signed artifact that must not be published - worse than a failed build.
+            - pwsh: |
+                $vsixDir = "$(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\VSIX"
+                $vsixes = @(Get-ChildItem -LiteralPath $vsixDir -File -Filter '*.vsix' -ErrorAction SilentlyContinue)
+                if ($vsixes.Count -eq 0) { throw "No .vsix in '$vsixDir'. Create-VsixPackage produced nothing and there is no version to check - that is the failure to report, not something to skip past." }
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                $bad = @()
+                foreach ($v in $vsixes) {
+                  $zip = [IO.Compression.ZipFile]::OpenRead($v.FullName)
+                  try {
+                    $entry = $zip.Entries | Where-Object { $_.FullName -match 'extension\.vsixmanifest$' } | Select-Object -First 1
+                    if (-not $entry) { throw "$($v.Name) has no extension.vsixmanifest" }
+                    $reader = New-Object IO.StreamReader($entry.Open())
+                    $xml = [xml]$reader.ReadToEnd(); $reader.Close()
+                    $ver = $xml.PackageManifest.Metadata.Identity.Version
+                    Write-Host "VSIX-VERSION $($v.Name) : $ver"
+                    $rev = ($ver -split '\.')[-1]
+                    if ($ver -match '2099123199' -or $ver -match '42\.42\.42') { $bad += "$($v.Name) = $ver (sentinel)" }
+                    elseif ($rev -notmatch '^\d{10,}$')                        { $bad += "$($v.Name) = $ver (revision '$rev' is not <yyyyMMdd><2-digit rev>; an unpadded revision breaks upgrade ordering)" }
+                    elseif ([int]$rev.Substring(0,4) -gt ([int](Get-Date -Format yyyy) + 1)) { $bad += "$($v.Name) = $ver (dated in the future)" }
+                  } finally { $zip.Dispose() }
+                }
+                if ($bad.Count -gt 0) { throw "VSIX manifest version is a placeholder or implausible: $($bad -join '; '). A VSIX version sorts above every real build and VS's upgrade rules compare it, so this artifact could never be superseded. Fix -BuildNumber on the Package step; do not publish this." }
+                Write-Host "VSIX-VERSION all $($vsixes.Count) vsix carry a plausible dated version"
+              displayName: Assert VSIX version is not a placeholder
+
+            # Copy-PackageIntoStaticDirectory populates the local NuGet feed the test assets
+            # restore from. test\TestAssets\NuGet.config:8 declares
+            #
+            #   <add key="locally-built-testplatform-packages" value="..\..\artifacts\testArtifacts\packages"/>
+            #
+            # and nothing else in the build creates that directory. Its absence is what failed
+            # build 3063938: 292 occurrences of
+            #
+            #   NU1301: The local source '...\artifacts\testArtifacts\packages' doesn't exist.
+            #
+            # The action was excluded by the -Actions selector above, correctly, for as long as
+            # there was no test leg to consume the feed. Adding the test leg made it required.
+            # Its source, artifacts\<config>\packages, is the same literal this pipeline already
+            # reads at the artifact publish and the feed push, both of which succeeded on the
+            # delivering build 3063087 - so the path survived the move to Arcade, measured rather
+            # than assumed. Its Copy-Item produces the packages\ subdirectory the config names,
+            # verified against the trailing-separator semantics rather than reasoned about.
+            #
+            # ASSERTED HERE, at the step responsible, because a feed that is missing or empty is
+            # not an error at the point it is created - it surfaces hundreds of restore failures
+            # in a later step and looks like a test-asset problem. Assert the product, not the
+            # exit code: the action's product is nupkgs on disk at the path the config names.
+            - pwsh: |
+                $feed = "$(Build.SourcesDirectory)\artifacts\testArtifacts\packages"
+                if (-not (Test-Path $feed)) {
+                  Write-Host "##vso[task.logissue type=error]Local test feed was not created: $feed"
+                  Write-Host "Copy-PackageIntoStaticDirectory did not produce its output. The test assets cannot restore."
+                  exit 1
+                }
+                $nupkgs = @(Get-ChildItem $feed -Filter *.nupkg -File)
+                Write-Host "Local test feed: $feed"
+                Write-Host "  nupkgs: $($nupkgs.Count)"
+                $nupkgs | Sort-Object Name | ForEach-Object { Write-Host "    $($_.Name)" }
+                if ($nupkgs.Count -eq 0) {
+                  Write-Host "##vso[task.logissue type=error]Local test feed exists but is empty: $feed"
+                  exit 1
+                }
+              name: AssertLocalTestFeed
+              displayName: Assert local test feed is populated
+
+            # Signing is a separate Arcade invocation because it has to happen after packaging, and
+            # packaging is not part of the Arcade build graph on this line.
+            #
+            # -restore is required and is not redundant with the restore above. Arcade's Tools.proj
+            # carries "<ProjectReference Include="Sign.proj" Condition="'$(Sign)' == 'true'" />", so
+            # Sign.proj is only restored by an invocation that already knows it is signing. Dropping
+            # -restore here fails to resolve Microsoft.DotNet.SignTool.
+            #
+            # -build is absent on purpose. This invocation must not compile anything: see the note
+            # on _OfficialBuildIdArgs above for why the build and the signing run carry different
+            # properties.
+            #
+            # What proves this step did something is not its exit code. eng\Signing.props joins the
+            # resolved ItemsToSign against the set Create-NugetPackages recorded, by name, and fails
+            # on a difference in either direction; the log line "Signing set verified against the
+            # produced set, by name: ..." is the evidence, and it names every package.
+            # THE TEST ASSETS. Two invocations, not one, and nothing else builds them.
+            #
+            # Ported from 15.9's step (their azure-pipelines-official.yml:187) together with their
+            # reasoning, which is the part worth having: the assets are a separate solution, the
+            # Arcade port dropped the step that scripts\build.ps1 performed, and every test calling
+            # IntegrationTestEnvironment.GetTestAsset then fails in CI with
+            #
+            #   Assert.IsTrue failed. GetTestAsset: Path not found:
+            #   test\TestAssets\SimpleTestProject\bin\Release\net451\SimpleTestProject.dll
+            #
+            # Only 4 asset projects are members of TestPlatform.sln, so the Build step above cannot
+            # cover the rest. Measured here on build 3063908: 6 failures of exactly that shape.
+            #
+            # Built with dotnet build rather than through Arcade, matching the original script.
+            # test\TestAssets carries its own Directory.Build.props and .targets which deliberately
+            # stop MSBuild searching upward, so these are NOT Arcade projects and must not be handed
+            # to eng\common\build.ps1. -projects therefore does not apply: dotnet build is given an
+            # explicit solution and cannot glob the repo root, which is the hazard -projects exists
+            # to prevent in the Arcade invocations.
+            #
+            # TWO invocations because CILProject is NOT a member of TestAssets.sln - scripts\build.ps1
+            # builds it separately at L415 and the solution at L431. 15.9's single step would leave it
+            # unbuilt; on this line that is a real failure rather than a hypothetical one:
+            #
+            #   VerifyThatInvalidIdentifierNamesAreParsed
+            #     GetTestAsset: Path not found: ...test\TestAssets\CILProject\bin\Release\net451\CILProject.dll
+            #
+            # which is 1 of the 6 and sits in a DIFFERENT assembly from the other 5, so splitting the
+            # failures by test project would have hidden that they share a cause.
+            #
+            # THE CILProject INVOCATION IS DISABLED, and the reason is measured rather than assumed.
+            # Enabled once, on build 3063930, it failed with
+            #
+            #   MSB3644: The reference assemblies for .NETFramework,Version=v4.5.1 were not found
+            #
+            # CILProject targets net451 and the agent image has no v4.5.1 targeting pack. This
+            # developer box does (v4.0 through v4.8.1 are all present), which is why the project
+            # builds here and not there - the same local-versus-agent divergence this line already
+            # met with .NETFramework v4.6 in the VSIX work.
+            #
+            # It is DISABLED rather than worked around because the failure took the whole test leg
+            # with it: the step failed, and Build test assets, Test and Sign were all SKIPPED. One
+            # unbuildable asset cost 4,802 executed tests. The remaining 5 asset failures are fixed
+            # by the solution build below; VerifyThatInvalidIdentifierNamesAreParsed stays failing
+            # and is a known, named single failure rather than a blocked run.
+            #
+            # To re-enable: install a v4.5.1 targeting pack on the image, or retarget CILProject,
+            # which is a change to a 2021 test asset and needs its own justification.
+            #
+            # CORRECTED by build 3063958: the diagnosis above is right about CILProject and too
+            # narrow about the cause. The same MSB3644 then appeared 80 times across the solution
+            # for net451, net452 and net461. CILProject was not special, it was simply the first
+            # net451 project the pipeline reached. Installing one targeting pack would not be
+            # enough; see the note on the solution build below.
+            #
+            # RE-ENABLED. This step was disabled three commits into the test work because it failed
+            # with MSB3644 for .NETFramework v4.5.1, and the cause is now measurably gone rather than
+            # argued away. The v4.5.1 targeting pack on this image exists but is EMPTY - no
+            # mscorlib.dll - and test\TestAssets\Directory.Build.props now supplies the reference
+            # assemblies from the per-TFM package instead. Build 3064120 measured MSB3644 falling
+            # from 80 to 16 on the asset solution with zero remaining in the test assets themselves,
+            # and CILProject builds clean locally under the same props file.
+            #
+            # It needs its own invocation because CILProject is NOT a member of TestAssets.sln, which
+            # is why there are two asset build steps rather than one. The original 2021 script builds
+            # it separately for the same reason.
+            #
+            # It carries continueOnError for the same reason the solution build does: an asset that
+            # cannot build must not take the acceptance suite with it. When this step was previously
+            # enabled and failing it skipped Build test assets, Test and Sign - one unbuildable asset
+            # cost 4,802 executed tests.
+            - powershell: .dotnet\dotnet.exe build
+                $(Build.SourcesDirectory)\test\TestAssets\CILProject\CILProject.proj
+                --configuration $(_BuildConfig)
+                -v:minimal
+              name: BuildTestAssetsCIL
+              displayName: Build test assets (CILProject)
+              continueOnError: true
+
+            # NON-BLOCKING ON PURPOSE, and this is the second time the same measurement has
+            # forced the same conclusion. Build 3063958 failed here with MSB3644 x80:
+            #
+            #   MSB3644: The reference assemblies for .NETFramework,Version=v4.5.1 were not found
+            #
+            # plus net452 and net461, with CS0518 x592 and CS0246 x240 downstream of them - no
+            # reference assemblies means no System.Object. The CILProject failure above was not a
+            # special case, it was the FIRST INSTANCE of a general condition: the test assets carry
+            # 53 net4x projects across 9 target frameworks and this agent image has reference
+            # assemblies for none of the old ones.
+            #
+            # The standard remedy is a Microsoft.NETFramework.ReferenceAssemblies PackageReference,
+            # and it is NOT AVAILABLE HERE. It has to be scoped to the test assets, and the only
+            # Directory.Build.props that applies to test\TestAssets is the REPO ROOT one - this
+            # line has no assets-local props file. Editing the root props to fix a test asset would
+            # change the file that governs the product build, whose artifact alignment is closed and
+            # proven against the shipped 2021 packages. That trade is not worth making for assets
+            # that are never shipped.
+            #
+            # So the step builds what the agent can build and does not block. The reasoning is the
+            # one this line already applied to CILProject: a fix whose failure mode is worse than
+            # the defect it addresses is not a fix.
+            #
+            #   without this step   4,802 tests EXECUTED, 6 asset failures, the gate fires
+            #   blocking            0 tests executed, the whole leg skipped - twice, 3063930 and 3063958
+            #
+            # continueOnError renders the step as "succeeded with issues", which on this project is
+            # exactly the shape that has to be distrusted - a failure wearing a success colour. It
+            # is tolerable here only because the step is FOLLOWED BY A MEASUREMENT of what was
+            # actually produced, and because the control that matters is unaffected: the TEST result
+            # still gates Sign. A test asset failing to build must not block signing the product;
+            # a test failing must, and still does.
+
+            # DIAGNOSTIC, added 2026-09-04 because CI and a local repro DISAGREE.
+            #
+            # Locally, on the pinned SDK from global.json, with the exact same command line:
+            #   MSB3644                                   0   (CI: 16)
+            #   PlatformAbstractions netstandard2.0 errors 0   (CI: 838)
+            # and the gated PackageReference demonstrably reaches the src projects - the generated
+            # src\Microsoft.TestPlatform.CoreUtilities\obj\*.nuget.g.targets imports the net45,
+            # net451 and net461 reference-assembly targets. The local v4.5.1 targeting pack is NOT
+            # masking it either: that directory exists but contains ZERO mscorlib.dll.
+            #
+            # So the props change is correct and something about the AGENT differs. Candidates worth
+            # separating, all of which fail SILENTLY because the generated imports are guarded by
+            # Exists(): the package is absent from the agent's NuGet cache under network isolation,
+            # or restore no-ops against an obj\ left by the earlier Arcade Build step, or the two
+            # steps use different NUGET_PACKAGES roots (the Arcade step runs -ci and this one does
+            # not).
+            #
+            # A binlog answers all of them at once and costs one build. -v:normal alone does not:
+            # the question is which imports were evaluated, not which tasks ran.
+            #
+            # CUITTestProject is back in TestAssets.sln for normal acceptance coverage. Its pinned
+            # dependencies now resolve from the additive local packages source below, populated by
+            # Package. This preserves the isolated build cache and does not add a feed.
+            #
+            # This pipeline runs UNIT tests only - the Test step's own comment records that
+            # Acceptance, Smoke, Performance and the *PlatformTests are deliberately not in it - so
+            # CUITTest cannot be affected by this here. Restoring the project to the solution is a
+            # one-line revert once the Coded UI packages exist on a configured feed.
+            #
+            # ---------------------------------------------------------------------------------
+            # 🛑 THAT PREDICTION FAILED, AND THE GAP IS THE FINDING. MEASURED on 3066739: 32 -> 16,
+            # not 32 -> 0. Recorded as WRONG rather than restated, because the shortfall located the
+            # rest of the defect. Decomposed BOTH builds the same way, by project:
+            #
+            #                                   3066640   3066739
+            #   CUITTestProject                     16         0    <- the solution-membership change
+            #   LegacySettingsUnitTestProject        8         8    } untouched, and never CUIT's
+            #   MstestV1UnitTestProject              8         8    } to remove
+            #                                       --        --
+            #                                       32        16
+            #
+            # So dropping CUITTestProject removed EXACTLY its own 16 and nothing else. The change did
+            # what it mechanically could; the error was in the ATTRIBUTION - all 32 were booked to one
+            # project when only half of them were its.
+            #
+            # The remaining 16 are ONE package, Microsoft.VisualStudio.QualityTools, in TWO projects
+            # that are not Coded UI at all and must NOT be dropped: they are real MSTest v1 / legacy
+            # runsettings assets.
+            #
+            # WHY RESTORE CANNOT SEE IT, measured in two files rather than inferred:
+            #   test\TestAssets\NuGet.config   <clear /> then THREE sources:
+            #                                    locally-built-testplatform-packages, test-tools,
+            #                                    dotnet-public
+            #   NuGet.config (repo root)       ELEVEN sources, including vs-impl / vs-impl-archived /
+            #                                    vssdk / vssdk-archived
+            # The pinned 16.11.31528.385 is on none of the three, which is exactly what NU1102 prints.
+            # It is not on "no feed" as the note above guessed - src\package\external\external.csproj
+            # takes the SAME package at the SAME $(TestPlatformExternalsVersion) and restores it fine,
+            # because the product path reads the eleven-source root config.
+            #
+            # So the package IS on the agent, in the no-dot packages\ folder, before this step runs.
+            # Two independent proofs, neither of which needs a new build:
+            #   1. these projects compiled in every earlier build, and their <Reference> HintPath is
+            #      literally ..\..\..\packages\microsoft.visualstudio.qualitytools\$(TestPlatform-
+            #      ExternalsVersion)\tools\net451\ - the no-dot folder, so it must be populated
+            #   2. before the NUGET_PACKAGES change this step's global folder WAS that folder, and it
+            #      reported zero NuGet errors while seeing the same three feeds
+            #
+            # THE FIX IS THEREFORE NOT A FEED AND NOT A DROP. The folder is added back as a local
+            # restore SOURCE, so the already-present package is found, while compilation keeps using
+            # .packages and the 822 errors that root removed stay removed. RestoreAdditionalProject-
+            # Sources is ADDITIVE, so it survives the <clear /> that the three-source config applies;
+            # a fallbackPackageFolders edit would not, and would also hard-error if the folder were
+            # ever absent. Nothing public is involved: this is a directory on the agent, read-only, at
+            # a path this same step already probes.
+            #
+            # 🛑 VERIFY BY THE NUMBER on the next build: NU1102 16 -> 0, and the per-project split
+            # above must go 8 -> 0 for BOTH projects. If it stays at 16 the source was not honoured
+            # and the change is inert - do not re-explain it, measure where restore looked.
+            - powershell: .dotnet\dotnet.exe build
+                $(Build.SourcesDirectory)\test\TestAssets\TestAssets.sln
+                --configuration $(_BuildConfig)
+                -v:minimal
+                /p:VsTestTestAssetsBuild=true
+                /p:RestoreAdditionalProjectSources=$(Build.SourcesDirectory)\packages
+                -bl:$(Build.SourcesDirectory)\artifacts\log\$(_BuildConfig)\TestAssets.binlog
+              name: BuildTestAssets
+              displayName: Build test assets
+              continueOnError: true
+              env:
+                # THE TWO STEPS DISAGREED ABOUT WHERE PACKAGES LIVE. Measured on 3066591's binlog:
+                #
+                #   TargetFrameworkRootPath  D:\a\_work\1\s\packages\microsoft.netframework.referenceassemblies.net451\1.0.3\build\
+                #   package found by probe   D:\a\_work\1\s\.packages\microsoft.netframework.referenceassemblies.net451\1.0.3\build
+                #                                         ^ one leading dot
+                #
+                # Cause, in two files:
+                #   NuGet.config             globalPackagesFolder = "packages"   RELATIVE -> <repo>\packages
+                #   eng\common\tools.ps1:645 NUGET_PACKAGES = <RepoRoot>\.packages\
+                #
+                # The Build step runs eng\common\build.ps1, which runs tools.ps1, so it restores into
+                # .packages. THIS step invokes .dotnet\dotnet.exe directly, so tools.ps1 never runs -
+                # the probe on 3066591 printed NUGET_PACKAGES = '' - and NuGet falls back to
+                # NuGet.config's relative globalPackagesFolder, the no-dot folder.
+                #
+                # Everything downstream then fails SILENTLY: the generated imports are guarded by
+                # Exists(), and a missing targeting-pack root is MSB3644, not a NuGet error. That is
+                # how four builds running three different props changes produced byte-identical
+                # counts.
+                #
+                # Setting it here aligns this step with the Build step instead of editing
+                # NuGet.config, which restore, the Arcade build and the packaging step all read.
+                NUGET_PACKAGES: $(Build.SourcesDirectory)\.packages\
+
+            # Reports only. Never gates - it runs after a step that is allowed to fail, and its
+            # whole purpose is to explain that failure, so it must not become a second failure.
+            # The 15.9 line already had a "diagnostic" that returned exit 1 and coloured every
+            # build; do not repeat that here.
+            - powershell: |
+                $ErrorActionPreference = 'Continue'
+                Write-Host "NUGET_PACKAGES = '$env:NUGET_PACKAGES'"
+                foreach ($root in @($env:NUGET_PACKAGES, "$env:USERPROFILE\.nuget\packages", "$(Build.SourcesDirectory)\.packages", "$(Build.SourcesDirectory)\packages")) {
+                    if (-not $root) { continue }
+                    $p = Join-Path $root 'microsoft.netframework.referenceassemblies.net451\1.0.3\build'
+                    Write-Host ("{0,-5} {1}" -f (Test-Path $p), $p)
+                    # The .NETFramework payload is the thing MSB3644 is actually looking for. A
+                    # present package folder with no v4.5.1 payload looks identical to a working one
+                    # unless this is checked.
+                    $fw = Join-Path $p '.NETFramework\v4.5.1\mscorlib.dll'
+                    Write-Host ("      mscorlib v4.5.1 present: {0}" -f (Test-Path $fw))
+                }
+                $g = "$(Build.SourcesDirectory)\src\Microsoft.TestPlatform.CoreUtilities\obj"
+                Get-ChildItem $g -Filter '*.nuget.g.targets' -ErrorAction SilentlyContinue | ForEach-Object {
+                    Write-Host "--- $($_.FullName) ---"
+                    $hits = Select-String -Path $_.FullName -Pattern 'ReferenceAssemblies'
+                    if ($hits) { $hits.Line } else { Write-Host 'NO ReferenceAssemblies import - the gated PackageReference did not reach this project' }
+                }
+                exit 0
+              displayName: Diagnose reference-assembly restore
+              condition: succeededOrFailed()
+              # WHAT TODAY'S ORANGE CONSISTS OF, so a future worse orange is distinguishable from it.
+              # As of build 3064130 this step is succeededWithIssues for exactly one reason: MSB3644
+              # for .NETFramework v4.5.1 on PRODUCT projects reached as ProjectReferences from
+              # TestAssets.sln, which does not go through Arcade's entry point. The count was 80
+              # before the test assets were given the per-TFM reference-assembly package and 16 after,
+              # and all 16 were product projects. Nothing else is expected here.
+              #
+              # This step's failure is NOT covered by any downstream control - the gate reads test
+              # results, not asset build output - so if the count moves, nothing will say so on its
+              # own. Compare against 16 before concluding that an orange here is the same orange.
+
+            # What the previous step actually produced, reported rather than assumed. This exists
+            # because "succeeded with issues" carries no information about WHICH assets built, and
+            # the asset-attributed test failures are tied to specific projects.
+            #
+            # IT REPORTS BOTH LAYOUTS ON PURPOSE. The first version of this step searched only
+            # test\TestAssets\*\bin, the historic convention, and printed "Test asset outputs
+            # produced: 0" on build 3063977 while the build had in fact produced 48 outputs under
+            # artifacts\bin. It named SimpleTestProject and MSTestAdapterPerfTestProject as NONE
+            # when both had built. A query that matched nothing returned a confident, plausible,
+            # wrong answer, in the one step added specifically to replace assumption with
+            # measurement - and it was written against the historic layout one commit after a commit
+            # message about that exact layout change.
+            #
+            # So it now searches BOTH, prints the path it searched next to every count, and says so
+            # when a population is empty. outputs=0 must never again be indistinguishable from "I
+            # looked in the wrong place". The gap between the two layouts is not noise here: it is
+            # the cause of the remaining asset-path test failures, because the build writes to
+            # artifacts\bin and IntegrationTestEnvironment.GetTestAsset composes the historic path.
+            #
+            # continueOnError because a step whose only job is to describe what happened must never
+            # be able to stop it. Without it this step gates Test and Sign through succeeded().
+            - pwsh: |
+                $layouts = [ordered]@{
+                  'arcade   artifacts\bin'      = "$(Build.SourcesDirectory)\artifacts\bin"
+                  'historic test\TestAssets'    = "$(Build.SourcesDirectory)\test\TestAssets"
+                }
+                $found = @{}
+                foreach ($name in $layouts.Keys) {
+                  $root = $layouts[$name]
+                  if (-not (Test-Path $root)) {
+                    Write-Host "$name -> $root : ROOT DOES NOT EXIST"
+                    $found[$name] = @()
+                    continue
+                  }
+                  $items = @(Get-ChildItem $root -Recurse -Include *.dll,*.exe -File -ErrorAction SilentlyContinue)
+                  if ($name -like 'historic*') { $items = @($items | Where-Object { $_.FullName -match '\\bin\\' }) }
+                  $found[$name] = $items
+                  Write-Host "$name -> $root : $($items.Count) outputs"
+                  if ($items.Count -eq 0) { Write-Host "  EMPTY - this is a statement about this path only, not about the build" }
+                }
+                Write-Host ""
+                Write-Host "Projects tied to the asset-attributed test failures:"
+                foreach ($p in 'SimpleTestProject','MSTestAdapterPerfTestProject','CILProject') {
+                  foreach ($name in $layouts.Keys) {
+                    $hits = @($found[$name] | Where-Object { $_.FullName -match [regex]::Escape("\$p\") })
+                    Write-Host ("  {0,-30} {1,-28} outputs={2}" -f $p, $name, $hits.Count)
+                  }
+                }
+              name: ReportTestAssets
+              displayName: Report which test assets were produced
+              condition: succeededOrFailed()
+              continueOnError: true
+
+            # WHY THE net451 ASSETS DO NOT BUILD - an ISOLATED probe, not a probe of this repo.
+            #
+            # Three hypotheses are already dead by measurement on this agent: the package being
+            # unavailable (it is in the restore graph), the IncludeAssets="build" restriction
+            # (removing it changed nothing and resolved FEWER sub-packages), and
+            # scripts\build\TestAssets.props (it sets one unrelated boolean).
+            #
+            # The remaining question is not about a property value - that has answered "empty" three
+            # times without saying why - it is about an IMPORT: does the reference-assemblies
+            # package's build\*.targets get imported at all? So this builds a self-contained project
+            # in a temp directory that references the package and nothing else, and reports the
+            # import closure via -preprocess. Isolated on purpose: no repo props, no Arcade, no
+            # solution, so an answer here is about the PACKAGE and the AGENT rather than about this
+            # repository's configuration.
+            #
+            # This cannot be measured on a developer box. The condition under investigation is the
+            # ABSENCE of the reference assemblies, and every developer machine here has targeting
+            # packs from v4.0 to v4.8.1 installed, so MSB3644 never fires there in the first place.
+            # A remedy cannot be tested against a failure that will not reproduce.
+            #
+            # Reports only, and never gates the build it is diagnosing.
+            - pwsh: |
+                $probe = Join-Path $env:AGENT_TEMPDIRECTORY 'net451probe'
+                Remove-Item $probe -Recurse -Force -ErrorAction SilentlyContinue
+                New-Item -ItemType Directory -Force $probe | Out-Null
+                $csproj = @(
+                  '<Project Sdk="Microsoft.NET.Sdk">',
+                  '  <PropertyGroup>',
+                  '    <TargetFramework>net451</TargetFramework>',
+                  '    <AssemblyName>Net451Probe</AssemblyName>',
+                  '  </PropertyGroup>',
+                  '  <ItemGroup>',
+                  '    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.3" PrivateAssets="all" />',
+                  '  </ItemGroup>',
+                  '</Project>') -join [Environment]::NewLine
+                Set-Content -Path (Join-Path $probe 'Net451Probe.csproj') -Value $csproj -Encoding UTF8
+                'namespace P { public class C { } }' | Set-Content (Join-Path $probe 'C.cs') -Encoding UTF8
+                $dotnet = "$(Build.SourcesDirectory)\.dotnet\dotnet.exe"
+                Push-Location $probe
+                Write-Host "--- restore ---"
+                & $dotnet restore 2>&1 | Select-Object -Last 6 | ForEach-Object { Write-Host "  $_" }
+                Write-Host "--- TargetFrameworkRootPath in the ISOLATED probe ---"
+                $v = & $dotnet msbuild Net451Probe.csproj -getProperty:TargetFrameworkRootPath -v:quiet --nologo 2>&1
+                Write-Host "  '$(($v | Where-Object { $_ -and "$_".Trim() } | Select-Object -Last 1))'"
+                Write-Host "--- IMPORT CLOSURE: is the package's targets file imported? ---"
+                & $dotnet msbuild Net451Probe.csproj -preprocess:pp.xml -v:quiet --nologo 2>&1 | Out-Null
+                if (Test-Path pp.xml) {
+                  $hits = @(Select-String -Path pp.xml -Pattern 'ReferenceAssemblies' | Select-Object -First 8)
+                  Write-Host "  lines mentioning ReferenceAssemblies: $((Select-String -Path pp.xml -Pattern 'ReferenceAssemblies').Count)"
+                  $hits | ForEach-Object { Write-Host "    $($_.Line.Trim())" }
+                  Write-Host "  nuget.g.props/targets imported: $((Select-String -Path pp.xml -Pattern 'nuget\.g\.(props|targets)').Count)"
+                } else { Write-Host "  PREPROCESS PRODUCED NO FILE - the probe itself failed, treat that as the finding" }
+                Write-Host "--- does the probe COMPILE? that is the real question ---"
+                $o = & $dotnet build -v:minimal --nologo 2>&1
+                Write-Host "  exit=$LASTEXITCODE  MSB3644=$(@($o | Select-String 'MSB3644').Count)"
+                $o | Select-String -Pattern 'error|-> ' | Select-Object -First 4 | ForEach-Object { Write-Host "  $_" }
+                Pop-Location
+                # EXIT 0 DELIBERATELY. This step's own header says it "reports only, and never gates
+                # the build it is diagnosing" - and until now that was false. The probe restores from
+                # api.nuget.org, which network isolation BLOCKS on this agent, so it exits 1 on every
+                # run with NU1301 and renders the step succeededWithIssues. Measured on 3065423: the
+                # probe contributed one of the three orange steps while answering nothing, because a
+                # probe that cannot restore cannot report on reference assemblies either.
+                #
+                # The diagnostic output above is still printed and still worth reading. What is
+                # removed is its effect on the build result, which it was never supposed to have.
+                # DO NOT "fix" this by pointing the probe at the repo NuGet.config: the probe is
+                # deliberately isolated from repo configuration, and giving it the repo's feeds would
+                # change what it measures.
+                exit 0
+              name: DiagnoseNet451
+              displayName: Diagnose net451 reference assemblies on the agent
+              condition: succeededOrFailed()
+              continueOnError: true
+            # THE TEST LEG. Placed AFTER Package and BEFORE Sign, and the ordering is the whole
+            # point rather than a preference.
+            #
+            # WHY PACKAGING MUST COME FIRST. IntegrationTestEnvironment.PublishDirectory resolves
+            # artifacts\<config>\<framework>\<runtime> and THROWS if it does not exist. That
+            # directory is produced by Publish-Package, not by the build:
+            #
+            #   retained null-build reference set (restore+build only)  artifacts\Release\net451\win7-x64  ABSENT
+            #   after packaging                                          same path                          228 files
+            #
+            # On this line the property is UNCONDITIONAL - one path, no runningInCli branch - so
+            # every acceptance, smoke, platform and performance test touches it. And the failure
+            # would not present as "console missing": vstest.console.exe IS in the build-output
+            # tree, while Extensions\ (168 files, the adapter payload GetTestAdapterPath resolves)
+            # is absent from it entirely. The message would be adapter-not-found, and the message
+            # the harness actually prints - "did you build the solution via build.cmd?" - names the
+            # build when the missing thing is packaging.
+            #
+            # 15.9 hit the same deadlock and fixed it by REORDERING rather than by excluding tests.
+            # They first tried a namespace filter; it silently collapsed 32 attached test runs to 2
+            # and was reverted. Do not re-buy that lesson: REORDER, NEVER EXCLUDE.
+            #
+            # THE COST OF THIS ORDER: none of the signing-gate kind. Sign runs AFTER Test with an
+            # implicit succeeded(), so a test failure PREVENTS SIGNING. Proven empirically on the
+            # first run, 3063908: Package succeeded, Test failed, Sign SKIPPED.
+            #
+            # An earlier version of this comment said "the tests no longer gate SIGNING... the
+            # artifact is signed before the verdict exists". THAT IS 15.9's COST, NOT THIS LINE'S,
+            # and it is recorded here with its owner named so nobody reintroduces it:
+            #
+            #   15.9    Build -> Package -> SIGN -> Test    signed before the verdict. Cost REAL.
+            #   16.11   Build -> Package -> TEST -> Sign    signed after the verdict. NO SUCH COST.
+            #
+            # 15.9 could not reach this order and correctly states the cost of theirs; ours does
+            # not have it. The sentence was imported along with their precedent without rechecking
+            # whether it survived the change of order - taking a precedent means taking its
+            # REASONING, not its conclusions.
+            #
+            # The unit invocation stays unchanged. NormalAcceptanceTests below separately selects
+            # the acceptance assembly, which Arcade's unit-test naming convention does not select.
+            # Acceptance runs after packaging and requires nonempty results from both frameworks.
+            # Smoke, Performance and *PlatformTests are not added to this unit invocation.
+            #
+            # eng\build.ps1, not eng\common\Build.ps1: the wrapper owns -test, its filters and its
+            # --test-parameter plumbing, and TestRunnerName=MSTest in eng/Versions.props is what
+            # makes Arcade's RunTests target resolve at all.
+            # STAGE THE CONSOLE THIS BUILD PRODUCED, for eng/Tests.targets to run the netcore suites
+            # against. It overrides Arcade's RunTests for netcore only; .NET Framework stays on the
+            # `dotnet test` path untouched, so the suites that work today are not disturbed.
+            #
+            # Neither console layout alone is runnable, both measured on 17.8. The package tree has
+            # Extensions and TestHostNetFramework but its deps.json names a runtimes/ asset the
+            # package does not carry, so it does not start. The build output starts but has neither
+            # folder, so no trx logger is found. Overlaying the build output onto the package tree
+            # gives both halves.
+            #
+            # This sets a PROPERTY rather than VSTEST_CONSOLE_PATH. That environment variable makes
+            # the modern dotnet test CLI use this console, which is the arrangement that was
+            # REVERTED on this branch: the CLI then appends an artifactsProcessingMode-collect
+            # switch that a 16.11 console rejects, on every invocation, and the branch produced no
+            # result files at all. Here the CLI is not in the path.
+            - powershell: |
+                $package = Get-ChildItem -Path "$(Build.SourcesDirectory)/artifacts" -Recurse -Filter 'Microsoft.TestPlatform.CLI.*.nupkg' -File |
+                    Where-Object { $_.Name -notlike '*symbols*' } |
+                    Select-Object -First 1
+                if (-not $package) { throw 'Microsoft.TestPlatform.CLI package not found - cannot run the netcore suites against the console this build produced.' }
+                $destination = Join-Path "$(Build.SourcesDirectory)" 'artifacts/tmp/$(_BuildConfig)/localConsole'
+                if (Test-Path $destination) { Remove-Item -Recurse -Force $destination }
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                [System.IO.Compression.ZipFile]::ExtractToDirectory($package.FullName, $destination)
+                $console = Get-ChildItem -Path (Join-Path $destination 'contentFiles/any') -Recurse -Filter 'vstest.console.dll' -File |
+                    Select-Object -First 1
+                if (-not $console) { throw "no vstest.console.dll under $destination/contentFiles/any" }
+                $binLayout = Join-Path "$(Build.SourcesDirectory)" "artifacts/bin/vstest.console/$(_BuildConfig)/$($console.Directory.Name)"
+                if (-not (Test-Path $binLayout)) { throw "no build output for $($console.Directory.Name) at $binLayout - cannot complete the console layout." }
+                Copy-Item -Recurse -Force (Join-Path $binLayout '*') $console.Directory.FullName
+
+                # Start it once here. A console that cannot start is a failure of THIS step, which
+                # names the layout, rather than empty trx files three steps later that read as test
+                # failures. It also pages in a directory written moments earlier, which on the 17.x
+                # lines took sixteen previously-failing suite runs to passing.
+                $warmUp = & dotnet exec $console.FullName --help 2>&1
+                if ($LASTEXITCODE -ne 0) {
+                    throw "the console at $($console.FullName) did not start (exit $LASTEXITCODE): $($warmUp -join [Environment]::NewLine)"
+                }
+                Write-Host "package : $($package.Name)"
+                Write-Host "console : $($console.FullName)"
+                Write-Host "warm-up : console started, $(@($warmUp).Count) lines of help"
+                Write-Host "##vso[task.setvariable variable=_LocalVSTestConsolePath]$($console.FullName)"
+              displayName: Stage the vstest.console this build produced
+              condition: succeeded()
+
+            - powershell: eng\build.ps1
+                -configuration $(_BuildConfig)
+                -test
+                -ci
+                -prepareMachine
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\TestPlatform.sln
+                /p:LocalVSTestConsolePath=$(_LocalVSTestConsolePath)
+              name: Test
+              displayName: Test
+              condition: succeeded()
+              # The test step no longer decides whether signing happens; the gate below does.
+              # continueOnError lets the job reach that gate. It does NOT weaken the control: a
+              # test result that is not in the baseline, or that is in the baseline under a
+              # different failure signature, still blocks signing - see Assert-KnownTestFailures.
+              #
+              # DO NOT REMOVE THIS LINE TO MAKE THE PIPELINE STRICTER. It does the opposite.
+              # This branch has 22 declared known-failing tests - 15 Failed, 7 NotExecuted, mostly
+              # environmental on a shared hosted agent - and they fail on EVERY run. Sign carries
+              # condition: succeeded(), so a failing Test step means Sign is SKIPPED and the line
+              # never signs at all. Measured before the gate existed, on build 3063908: Package
+              # succeeded, Test failed, Sign SKIPPED. The strict outcome of removing this is not
+              # "signing blocked on bad tests", it is "signing blocked on all tests, forever".
+              #
+              # It is COUPLED to Assert-KnownTestFailures and the two move together. If that gate
+              # is ever removed, this line must come off in the SAME change - otherwise a red test
+              # run reaches signing with nothing in between.
+              continueOnError: true
+
+            # AcceptanceTests is not selected by Arcade's unit-test naming convention on 16.11.
+            # Run both supported frameworks explicitly, with the patched console and separate TRX files.
+            # Acceptance has a strict result gate; do not mix its historical skips into the unit baseline.
+            - pwsh: eng\Test-NormalAcceptanceTests.ps1
+              displayName: Verify normal acceptance selection and result guards
+
+            - pwsh: eng\Run-NormalAcceptanceTests.ps1
+                -Configuration $(_BuildConfig)
+                -LocalVSTestConsolePath "$(_LocalVSTestConsolePath)"
+              name: NormalAcceptanceTests
+              displayName: Normal acceptance tests (net451 and netcoreapp2.1)
+              condition: succeeded()
+              env:
+                NUGET_PACKAGES: $(Build.SourcesDirectory)\.packages\
+
+            - task: PublishTestResults@2
+              displayName: Publish normal acceptance TRX results
+              inputs:
+                testResultsFormat: VSTest
+                testResultsFiles: '*.normal.trx'
+                searchFolder: $(Build.SourcesDirectory)\artifacts\AcceptanceTestResults\$(_BuildConfig)
+                testRunTitle: Normal acceptance
+                failTaskOnMissingResultsFile: true
+                failTaskOnFailedTests: true
+              condition: succeededOrFailed()
+
+            # THE SIGNING GATE. It gates on UNCLASSIFIED results, not on zero failures.
+            #
+            # Build -> Package -> Test -> Sign is the shipping order and this line keeps it: nothing
+            # is signed that failed its tests. But measured across four runs, every non-passing
+            # result on this branch is environmental or a harness defect and NONE is product-shaped.
+            # Ten of them match the set 15.9 measured independently on its own line. Gating on zero
+            # failures therefore gates delivery on properties of the hosted agent, and the line
+            # produces nothing at all - a gate that cannot open is not a gate, it is a stop.
+            #
+            # So eng\servicing-known-test-failures.json names every known non-passing test WITH the
+            # failure signature it was classified on, and the gate blocks unless every non-passing
+            # result matches one by NAME AND SIGNATURE. Matching on the name alone would make the
+            # name a proxy for the cause: the same test failing later for a different reason would
+            # be absorbed silently, and absorbed in the false-clean direction.
+            #
+            # It fails closed. No results directory, no .trx files, or zero parsed results all
+            # BLOCK - an absence must not read as a pass, which is the failure mode that has cost
+            # this project the most.
+            #
+            # It also reports baseline entries that did NOT fire, so an entry whose justification
+            # has expired is visible rather than silently permanent.
+            # pwsh, NOT powershell. Windows PowerShell 5.1's ConvertFrom-Json returns a JSON array as
+            # a SINGLE object instead of enumerating it, which made this gate read its 24-entry
+            # baseline as "1 entries" on build 3064083. Every comparison of the form $_.test -eq $name
+            # then ran against an ARRAY of names and returned the matching elements rather than a
+            # boolean; a non-empty array is truthy, so all 25 results appeared to match a baseline
+            # entry by name, failed the signature check, and were reported as "known test, NEW failure
+            # mode" with 0 known. Under PowerShell 7 the same file and the same script loaded 24
+            # entries and passed. The script now enumerates defensively so it is correct under both,
+            # and this pins the shell as well - two independent fixes, because the defect was silent
+            # and produced a confident, plausible, wrong classification.
+            - pwsh: |
+                # _SignType IS ASSERTED HERE, IN THE STEP THAT ALREADY DECIDES WHETHER SIGNING HAPPENS.
+                #
+                # It is a static 'real' in a variables block and nothing verified it. Change that one
+                # word to 'test' and Arcade dry-runs the signing: this gate still passes, Sign still
+                # succeeds, the job still succeeds, both destinations still run, and the drop is still
+                # named realsigned-DO-NOT-SHIP. Nothing on this line would fail, and the drop name
+                # would be a claim the pipeline does not check. 15.9 found the same value unguarded on
+                # their line, where it is worse - their variable is NAMED ArtifactsSigned while gating
+                # only on "no step failed".
+                #
+                # BOTH the macro and the environment variable must read 'real'. Which one carries the
+                # value to Arcade is not something this line could settle locally, so either mechanism
+                # failing is a refusal rather than a guess.
+                #
+                # It THROWS rather than exiting, and the line below forwards the gate's own exit code
+                # because the gate has no throw paths at all. Both are needed, and the reason is now
+                # measured rather than assumed:
+                #
+                #   inline -Command string : process code = result of the LAST command in the string,
+                #                            so a failing call propagates ONLY if nothing follows it
+                #   script FILE            : process code = 0 unless the FILE ITSELF calls exit,
+                #                            so a failing call is discarded even as the last statement
+                #
+                # A `pwsh: |` body is materialised as a file, which is the row that governs here: the
+                # forwarding line is required whether or not anything follows the call. An earlier
+                # comment justified it with "the wrapper runs on" - that is the INLINE mechanism and is
+                # not why the file case loses it. Right conclusion, wrong reason, which is worse than a
+                # wrong conclusion because nobody re-checks it.
+                #
+                # What is still not observable from a developer machine is what the ADO task itself
+                # appends. It does not matter: the forwarding line produced exit 1 in every measured
+                # row - inline and file, with and without a trailing statement - and a throw does not
+                # depend on the answer at all.
+                #
+                # NOTHING IS ADDED TO THE SIGNING PATH: no new step, no certificate, no task. This is
+                # four lines inside a step that already runs immediately before Sign.
+                $macro = '$(_SignType)'
+                $envv  = "$env:_SIGNTYPE"
+                Write-Host "sign type - macro: '$macro'  env: '$envv'"
+                if ($macro -ne 'real' -or $envv -ne 'real') {
+                  throw "REFUSING: _SignType must read 'real' through BOTH the macro and the environment before this run may sign. Got macro='$macro', env='$envv'. A dry-run signs nothing and fails nothing, and the drop is named realsigned."
+                }
+
+                ./eng/Assert-KnownTestFailures.ps1 `
+                  -ResultsDirectory "$(_TestResultsDirectory)" `
+                  -BaselinePath "$(Build.SourcesDirectory)/eng/servicing-known-test-failures.json" `
+                  -ExpectedProductVersionPrefix "16.11."
+                if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+              name: AssertKnownTestFailures
+              displayName: Gate on unclassified test results, and refuse to sign unless _SignType is real
+              condition: succeededOrFailed()
+
+            - powershell: eng\common\Build.ps1
+                -configuration $(_BuildConfig)
+                -restore
+                -sign
+                -ci
+                -prepareMachine
+                -warnAsError 0
+                -projects $(Build.SourcesDirectory)\TestPlatform.sln
+                $(_SignArgs)
+                $(_OfficialBuildIdArgs)
+              name: Sign
+              displayName: Sign
+              # EXPLICIT, THOUGH THE DEFAULT IS THE SAME. This step declared no condition and relied
+              # on the Azure DevOps default of succeeded(), which is correct and is the whole reason
+              # signing stops when the gate above finds an unclassified test result: the gate is not
+              # continueOnError, so a finding fails the job, and a failed job makes succeeded() false.
+              # Observed on build 3063908 - Package succeeded, Test failed, Sign SKIPPED.
+              #
+              # It is written down because this is the single most consequential step on the line and
+              # it was the only load-bearing one whose protection was INHERITED rather than declared.
+              # The steps immediately around it declare conditions, and two of them use
+              # succeededOrFailed() so they can run after a failure - which is exactly the value
+              # somebody would copy onto this step while tidying, turning "signing stops when the gate
+              # fires" into "signing proceeds past a failed gate" with no other visible change.
+              #
+              # Behaviourally identical to the bare form. It changes what a reader can rely on.
+              condition: succeeded()
+
+            # ============================================================================
+            # THE VSSetup ARTIFACT. Without it this line CANNOT be inserted into VS.
+            #
+            # PORTED FROM 15.9. The insertion tool downloads the VSSetup artifact and opens
+            # VSSetup\Insertion\<ComponentName>.vsman; TestsDrop.json is optional. This step
+            # produces exactly that path.
+            #
+            # TWO EARLIER APPROACHES FAILED AND ARE RECORDED SO THEY ARE NOT RETRIED:
+            #   1. Restore MicroBuild.Core and build the repo's own .vsmanproj. DEAD:
+            #      MicroBuild.Core.targets is 451 bytes and only imports plugin targets from a
+            #      MicroBuildPluginDirectory we never populate. enableMicrobuild installs the
+            #      SIGNING plugin, not this one.
+            #   2. Set UsingToolVSSDK/IsVsixProject and let Arcade build the VSIX project. DEAD,
+            #      measured on 15.9's build 3068550:
+            #        VisualStudio.VsixBuild.targets(153,5): error MSB4036: The
+            #        "Microsoft.DotNet.Build.Tasks.VisualStudio.FinalizeInsertionVsixFile" task was not found
+            #      scripts/build.ps1 drives raw msbuild, so Arcade's targets import through
+            #      Directory.Build.props but their task assembly never loads.
+            # Both failed the same way: ENABLING A TARGET IS NOT HAVING ITS IMPLEMENTATION.
+            #
+            # So Arcade's generator is called DIRECTLY. VisualStudio.SetupPackage.vsmanproj is
+            # self-contained by construction - ImportDirectoryBuildProps=false,
+            # ImportDirectoryBuildTargets=false, ResolveNuGetPackages=false - so it does not care
+            # how the VSIX was built. Its whole input contract is:
+            #     ComponentIntermediateOutputPath\*.stub   one line: VsixId/VsixFileName/VsixVersion
+            #     SetupOutputPath\<VsixId>.json            the component manifest
+            #     SetupOutputPath\<VsixFileName>           the VSIX
+            #
+            # 🛑 THE MANIFEST IS GENERATED, NEVER WRITTEN HERE. New-ServicingDrop.ps1 recorded what
+            # a hand-built one cost on the 17.14 pilot: it "carried one info field where the real
+            # manifest carries eight, including buildVersion, which is the value VS records as the
+            # component version in .corext/Configs/testtools-components.json. That alone made this
+            # drop unusable for insertion."
+            #
+            # NOTHING HERE SIGNS and the VSIX build is UNCHANGED - which is the point. The VSIX is
+            # already signed by the Sign step above, and leaving packaging alone preserves the
+            # equivalence measured against shipped 16.11.0: 495/495 package files with ZERO
+            # AssemblyVersion changes.
+            # ============================================================================
+            - powershell: |
+                $ErrorActionPreference = 'Stop'
+                $root = $env:BUILD_SOURCESDIRECTORY
+                $cfg  = $env:_BUILDCONFIG
+                $component = 'Microsoft.VisualStudio.TestTools.TestPlatform.V2.CLI'
+
+                $vsixDir = Join-Path $root ('artifacts\' + $cfg + '\VSIX')
+                $vsixes = @(Get-ChildItem -LiteralPath $vsixDir -File -Filter '*.vsix' -ErrorAction SilentlyContinue)
+                if ($vsixes.Count -ne 1) { throw ('Expected exactly one .vsix in ' + $vsixDir + ', found ' + $vsixes.Count + '. The component describes one VSIX and must not guess which.') }
+                $vsix = $vsixes[0]
+                $componentJson = Join-Path $vsixDir ($component + '.json')
+                if (-not (Test-Path -LiteralPath $componentJson)) { throw ('Component manifest ' + $componentJson + ' is absent. The generator reads it as MergeManifest input.') }
+
+                # ASSERT THE VSIX IS SIGNED. Publishing unsigned bits under the official artifact
+                # name is worse than publishing nothing: the tool takes a hash that fails HashCheck.
+                # Measured precedent - official 3052044 had OPC signature 1/1, VSTest1714VSSetup 0/0.
+                # READ THE OPC SIGNATURE DIRECTLY. System.IO.Packaging is not usable here:
+                # measured on 15.9's build 3068589, [Reflection.Assembly]::Load('WindowsBase')
+                # fails with "Could not load file or assembly 'WindowsBase'" in this task's
+                # Windows PowerShell host. Reading the signature part out of the package needs no
+                # such assembly, and it lets the certificate be DECODED rather than counted.
+                Add-Type -AssemblyName System.IO.Compression.FileSystem
+                $zip = [IO.Compression.ZipFile]::OpenRead($vsix.FullName)
+                try {
+                  $sigEntry = $zip.Entries | Where-Object { $_.FullName -match '\.psdsxs$' } | Select-Object -First 1
+                  if (-not $sigEntry) { throw ($vsix.Name + ' carries no OPC signature part. Refusing to stage unsigned bits into an artifact named VSSetup - the insertion tool would take a hash that then fails HashCheck.') }
+                  $sr = New-Object IO.StreamReader($sigEntry.Open())
+                  $sigXml = [xml]$sr.ReadToEnd()
+                  $sr.Close()
+                  $certNodes = $sigXml.GetElementsByTagName('X509Certificate')
+                  if ($certNodes.Count -eq 0) { throw ($vsix.Name + ' has a signature part but no X509Certificate in it.') }
+                  $certBytes = [Convert]::FromBase64String(($certNodes[0].InnerText -replace '\s',''))
+                  $cert = New-Object Security.Cryptography.X509Certificates.X509Certificate2(,$certBytes)
+                  Write-Host ('VSSETUP signer  : ' + $cert.Subject)
+                  Write-Host ('VSSETUP issuer  : ' + $cert.Issuer)
+
+                  # READ THE VERSION OUT OF THE VSIX, because the component .json does not carry one
+                  # on this line and an absent version fails three steps later as a wrong diagnosis.
+                  # Arcade builds its component from .stub files of the form Id/FileName/Version, and
+                  # errors when the count of DISTINCT versions is not exactly one - a condition that
+                  # is also true of ZERO. Measured on 3075806: the stub ended in a bare slash, the
+                  # version printed empty, and the error read "contains multiple VSIX files with
+                  # different versions:" with an EMPTY list. Nothing was duplicated; nothing was
+                  # there. The vsix manifest is the authoritative statement of what was built.
+                  $manifestEntry = $zip.Entries | Where-Object { $_.FullName -eq 'extension.vsixmanifest' } | Select-Object -First 1
+                  if (-not $manifestEntry) { throw ($vsix.Name + ' carries no extension.vsixmanifest, so its version cannot be established.') }
+                  $mr = New-Object IO.StreamReader($manifestEntry.Open())
+                  $vsixManifestXml = [xml]$mr.ReadToEnd()
+                  $mr.Close()
+                  $identity = $vsixManifestXml.GetElementsByTagName('Identity')
+                  if ($identity.Count -eq 0) { throw ($vsix.Name + ' has an extension.vsixmanifest with no Identity element.') }
+                  $vsixVersionFromPackage = $identity[0].GetAttribute('Version')
+                } finally { $zip.Dispose() }
+
+                $cj = Get-Content -LiteralPath $componentJson -Raw | ConvertFrom-Json
+                $vsixVersion = $cj.packages[0].version
+                $payloadName = $cj.packages[0].payloads[0].fileName
+                Write-Host ('VSSETUP component : ' + $component)
+                Write-Host ('VSSETUP version from component json : ' + $vsixVersion)
+                Write-Host ('VSSETUP version from vsix manifest   : ' + $vsixVersionFromPackage)
+
+                # Prefer what the component manifest says, because that is what the generator merges.
+                # Fall back to the package when it says nothing, and make the substitution visible
+                # rather than silent - a version that appeared from somewhere else is exactly the
+                # kind of thing the next reader needs to see.
+                if (-not $vsixVersion) {
+                  if (-not $vsixVersionFromPackage) { throw ('Neither ' + $componentJson + ' nor the vsix manifest carries a version. The component would be generated with no version at all, and Arcade reports that as "multiple VSIX files with different versions", which is the opposite of what is wrong.') }
+                  Write-Host ('VSSETUP version   : component json carried none, taking the vsix manifest version ' + $vsixVersionFromPackage)
+                  $vsixVersion = $vsixVersionFromPackage
+                  $cj.packages[0].version = $vsixVersion
+                }
+                elseif ($vsixVersionFromPackage -and $vsixVersion -ne $vsixVersionFromPackage) {
+                  throw ('The component manifest says version ' + $vsixVersion + ' but the built VSIX says ' + $vsixVersionFromPackage + '. The manifest and the drop would describe different builds.')
+                }
+
+                Write-Host ('VSSETUP version   : ' + $vsixVersion)
+                if ($vsixVersion -match '2099123199') { throw ('The component manifest still carries the 20991231-99 sentinel (' + $vsixVersion + '). A version sorting above every real build can never be superseded.') }
+                if ($payloadName -ne $vsix.Name) { throw ('The component manifest names payload ' + $payloadName + ' but the built VSIX is ' + $vsix.Name + '. The manifest and the drop would describe different files.') }
+
+                # Arcade's layout, from RepoLayout.props.
+                $setupRoot = Join-Path $root ('artifacts\VSSetup\' + $cfg)
+                $insertion = Join-Path $setupRoot 'Insertion'
+                $componentObj = Join-Path $root ('artifacts\VSSetup.obj\' + $cfg + '\' + $component)
+                Remove-Item -LiteralPath $setupRoot -Recurse -Force -ErrorAction SilentlyContinue
+                Remove-Item -LiteralPath $componentObj -Recurse -Force -ErrorAction SilentlyContinue
+                New-Item -ItemType Directory -Force -Path $insertion, $componentObj | Out-Null
+                # 🛑 REFRESH THE PAYLOAD SIZE FROM THE SIGNED VSIX BEFORE GENERATING.
+                # The component .json is written during the VSIX build, which happens BEFORE
+                # signing, so its declared payload size is the UNSIGNED size. The generator merges
+                # that value straight through - it computes sha256 itself but trusts size - and the
+                # manifest then describes a file that does not exist at that length. Measured on
+                # 15.9's 3068664: manifest said 17,884,142, the signed vsix is 19,329,225, a
+                # difference of 1,445,083 bytes of signature. HashCheck compares the drop against
+                # the manifest, so this ships a drop rejected at insertion time.
+                $cj.packages[0].payloads[0].size = $vsix.Length
+                $refreshedJson = $cj | ConvertTo-Json -Depth 10 -Compress
+                Set-Content -LiteralPath (Join-Path $insertion ($component + '.json')) -Value $refreshedJson -Encoding utf8
+                Set-Content -LiteralPath (Join-Path $setupRoot ($component + '.json')) -Value $refreshedJson -Encoding utf8
+                Write-Host ('VSSETUP payload size refreshed to signed length : ' + $vsix.Length)
+                Copy-Item $vsix.FullName  (Join-Path $insertion $vsix.Name) -Force
+                Copy-Item $vsix.FullName  (Join-Path $setupRoot $vsix.Name) -Force
+
+                # Stub format is fixed by _GetVsixFileInfo: VsixId/VsixFileName/VsixVersion
+                $stubLine = $component + '/' + $vsix.Name + '/' + $vsixVersion
+                $stubPath = Join-Path $componentObj ([IO.Path]::GetFileNameWithoutExtension($vsix.Name) + '.stub')
+                Set-Content -LiteralPath $stubPath -Value $stubLine -Encoding ascii -NoNewline
+                Write-Host ('VSSETUP stub      : ' + $stubLine)
+
+                # Both tools are ORDINARY NuGet packages - this is why the route needs no plugin
+                # onboarding and no new permissions. SwixBuild 1.1.286 verified restoring from this
+                # repo's own NuGet.config on 2026-09-07.
+                $pkgRoot = $env:NUGET_PACKAGES
+                if (-not $pkgRoot) { $pkgRoot = Join-Path $root '.packages' }
+                if (-not $pkgRoot.EndsWith('\')) { $pkgRoot = $pkgRoot + '\' }
+                $swixVersion = '1.1.286'
+                $probe = Join-Path $root 'artifacts\vsman-tools'
+                New-Item -ItemType Directory -Force -Path $probe | Out-Null
+                Copy-Item (Join-Path $root 'NuGet.config') (Join-Path $probe 'NuGet.config') -Force
+                $proj = @(
+                  '<Project Sdk="Microsoft.NET.Sdk">'
+                  '  <PropertyGroup><TargetFramework>net472</TargetFramework></PropertyGroup>'
+                  '  <ItemGroup>'
+                  ('    <PackageReference Include="Microsoft.VisualStudioEng.MicroBuild.Plugins.SwixBuild" Version="' + $swixVersion + '" />')
+                  '  </ItemGroup>'
+                  '</Project>')
+                Set-Content -LiteralPath (Join-Path $probe 'swix.csproj') -Value $proj -Encoding UTF8
+                & dotnet restore (Join-Path $probe 'swix.csproj') --packages $pkgRoot --nologo
+                if ($LASTEXITCODE -ne 0) { throw ('SwixBuild ' + $swixVersion + ' restore failed with exit ' + $LASTEXITCODE + '.') }
+                $swixPath = $pkgRoot + 'microsoft.visualstudioeng.microbuild.plugins.swixbuild\' + $swixVersion + '\'
+                if (-not (Test-Path -LiteralPath $swixPath)) { throw ('SwixBuild restored but ' + $swixPath + ' is absent.') }
+
+                & dotnet restore (Join-Path $root 'eng\common\internal\Tools.csproj') --packages $pkgRoot --nologo
+                if ($LASTEXITCODE -ne 0) { Write-Host 'MANIFESTTOOL restore failed; SBOM generation is disabled below rather than failing the build.' }
+                $manifestTool = ''
+                $mtDir = Join-Path $pkgRoot 'microsoft.manifesttool.crossplatform'
+                if (Test-Path -LiteralPath $mtDir) {
+                  $mt = Get-ChildItem -LiteralPath $mtDir -Directory | Sort-Object Name -Descending | Select-Object -First 1
+                  if ($mt) { $candidate = Join-Path $mt.FullName 'Content\Microsoft.ManifestTool.dll'; if (Test-Path -LiteralPath $candidate) { $manifestTool = $candidate } }
+                }
+                $generateSbom = 'true'
+                if (-not $manifestTool) { $generateSbom = 'false'; Write-Host 'MANIFESTTOOL absent - generating WITHOUT an SBOM. Reported, not hidden: the _sbom.json belongs in the drop with its hash in the .vsman.' }
+
+                # THE URL MUST EQUAL THE DROP THIS BUILD UPLOADS. On this line the drop name is a
+                # VARIABLE shared with the upload output, so it is read from the variable rather
+                # than recomposed here - recomposing is how 17.14 ended up with a manifest pointing
+                # where the content was not.
+                $dropName = $env:VS_DROP_NAME
+                if (-not $dropName) { throw 'VS_DROP_NAME is empty. The manifest url must equal the drop this build uploads.' }
+                Write-Host ('VSSETUP dropName  : ' + $dropName)
+
+                $arcadeVersion = (Get-Content -LiteralPath (Join-Path $root 'global.json') -Raw | ConvertFrom-Json).'msbuild-sdks'.'Microsoft.DotNet.Arcade.Sdk'
+                $vsmanproj = $pkgRoot + 'microsoft.dotnet.arcade.sdk\' + $arcadeVersion + '\toolset\VisualStudio.SetupPackage.vsmanproj'
+                if (-not (Test-Path -LiteralPath $vsmanproj)) { throw ('Arcade generator not found at ' + $vsmanproj) }
+
+                $msbuildExe = $null
+                $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+                if (Test-Path -LiteralPath $vswhere) {
+                  $vsPath = & $vswhere -latest -prerelease -products * -requires Microsoft.Component.MSBuild -property installationPath | Select-Object -First 1
+                  if ($vsPath) {
+                    foreach ($rel in @('MSBuild\Current\Bin\amd64\MSBuild.exe','MSBuild\Current\Bin\MSBuild.exe')) {
+                      $c = Join-Path $vsPath $rel
+                      if (Test-Path -LiteralPath $c) { $msbuildExe = $c; break }
+                    }
+                  }
+                }
+                if (-not $msbuildExe) { throw 'Desktop MSBuild was not found. The generator imports MicroBuild SwixBuild targets and must not run under dotnet msbuild.' }
+
+                $dotnetTool = Join-Path $root '.dotnet\dotnet.exe'
+                if (-not (Test-Path -LiteralPath $dotnetTool)) { $dotnetTool = (Get-Command dotnet -ErrorAction Stop).Source }
+
+                $msbuildArgs = @(
+                  $vsmanproj, '/nologo', '/v:minimal', '/t:_BuildManifest'
+                  '/p:OfficialBuild=true'
+                  ('/p:ComponentName=' + $component)
+                  ('/p:SetupOutputPath=' + $insertion + '\')
+                  ('/p:ComponentIntermediateOutputPath=' + $componentObj + '\')
+                  ('/p:SwixBuildPath=' + $swixPath)
+                  ('/p:VisualStudioDropName=' + $dropName)
+                  ('/p:DotNetTool=' + $dotnetTool)
+                  ('/p:ManifestTool=' + $manifestTool)
+                  ('/p:GenerateSbom=' + $generateSbom))
+                & $msbuildExe @msbuildArgs
+                if ($LASTEXITCODE -ne 0) { throw ('Arcade VisualStudio.SetupPackage.vsmanproj exited ' + $LASTEXITCODE + '.') }
+
+                # ASSERT THE ARTIFACT, not the exit code.
+                $vsman = @(Get-ChildItem -LiteralPath $setupRoot -Recurse -File -Filter '*.vsman')
+                if ($vsman.Count -ne 1) { throw ('Found ' + $vsman.Count + ' .vsman under ' + $setupRoot + '. The tool takes the FIRST payload whose url contains a semicolon, so there must be exactly one.') }
+                $manifestText = Get-Content -LiteralPath $vsman[0].FullName -Raw
+                if ($manifestText -notmatch [regex]::Escape($dropName)) { throw ('The generated .vsman does not carry the drop path ' + $dropName + '.') }
+                Write-Host 'VSSETUP layout:'
+                Get-ChildItem -LiteralPath $setupRoot -Recurse -File | ForEach-Object { Write-Host ('  {0,12:N0}  {1}' -f $_.Length, $_.FullName.Substring($setupRoot.Length).TrimStart('\')) }
+              displayName: Assemble the VSSetup artifact
+              # PULL REQUEST: skipped, because a pull request build does not sign. The OPC signature
+              # check inside this step is doing its job when it refuses an unsigned VSIX - measured
+              # on 3077574, 'TestPlatform.vsix carries no OPC signature part' - so the step is not
+              # run rather than the check being weakened. The check, the signature requirement and
+              # every non-pull-request path are untouched, and no unsigned VSSetup is ever staged or
+              # published.
+              condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+              env:
+                VS_DROP_NAME: $(VisualStudioDropName)
+
+            # VALIDATE THE MANIFEST FIELD BY FIELD, against the shape 18.10 already produces and
+            # RoslynTools already accepts. A manifest missing fields has bitten this work before and
+            # it fails at INSERTION time, not build time - one info field where the real manifest
+            # carries eight is what made the 17.14 pilot drop unusable.
+            - powershell: |
+                $ErrorActionPreference = 'Stop'
+                $setupRoot = Join-Path $env:BUILD_SOURCESDIRECTORY ('artifacts\VSSetup\' + $env:_BUILDCONFIG)
+                $vsmanFile = @(Get-ChildItem -LiteralPath $setupRoot -Recurse -File -Filter '*.vsman')[0]
+                $m = Get-Content -LiteralPath $vsmanFile.FullName -Raw | ConvertFrom-Json
+                $fail = New-Object System.Collections.Generic.List[string]
+
+                foreach ($k in @('manifestVersion','info','signers','packages')) {
+                  if (-not $m.PSObject.Properties.Name.Contains($k)) { $fail.Add('top-level key missing: ' + $k) }
+                }
+                $expectedInfo = @('id','buildVersion','localBuild','manifestName','productDisplayVersion','productPatchVersion','productPreReleaseMilestoneSuffix','productSemanticVersion')
+                foreach ($k in $expectedInfo) {
+                  if (-not $m.info.PSObject.Properties.Name.Contains($k)) { $fail.Add('info field missing: ' + $k) }
+                  elseif ([string]::IsNullOrWhiteSpace([string]$m.info.$k)) { $fail.Add('info field empty: ' + $k) }
+                }
+                Write-Host ('MANIFEST info fields : ' + $m.info.PSObject.Properties.Name.Count + ' (expect ' + $expectedInfo.Count + ')')
+                $m.info.PSObject.Properties | ForEach-Object { Write-Host ('  info.' + $_.Name + ' = ' + $_.Value) }
+
+                if ($m.packages.Count -ne 1) { $fail.Add('expected exactly 1 package, found ' + $m.packages.Count) }
+                $p = $m.packages[0]
+                foreach ($k in @('id','version','type','payloads','vsixId','extensionDir','installSizes')) {
+                  if (-not $p.PSObject.Properties.Name.Contains($k)) { $fail.Add('package field missing: ' + $k) }
+                }
+                if ($p.type -ne 'Vsix') { $fail.Add('package type is ' + $p.type + ', expected Vsix') }
+                if ($m.info.buildVersion -ne $p.version) { $fail.Add('info.buildVersion ' + $m.info.buildVersion + ' != package version ' + $p.version) }
+                if ($m.info.buildVersion -match '2099123199' -or $m.info.buildVersion -match '42\.42\.42') { $fail.Add('info.buildVersion is a placeholder: ' + $m.info.buildVersion) }
+
+                $signedPayloads = 0
+                foreach ($pl in $p.payloads) {
+                  $n = $pl.fileName
+                  foreach ($k in @('fileName','sha256','size','url','_buildInfo')) {
+                    if (-not $pl.PSObject.Properties.Name.Contains($k)) { $fail.Add($n + ': payload field missing: ' + $k) }
+                  }
+                  if ($pl.url -notmatch ';') { $fail.Add($n + ": payload url has no ';' - GetComponentFromManifestFile splits on it and would find no payload") }
+                  if (-not $pl._buildInfo.crc) { $fail.Add($n + ': _buildInfo.crc missing') }
+                  if ($pl.PSObject.Properties.Name.Contains('signer')) { $signedPayloads++ }
+                  $onDisk = Join-Path $vsmanFile.Directory.FullName $n
+                  if (-not (Test-Path -LiteralPath $onDisk)) { $fail.Add($n + ': listed in the manifest but ABSENT from the insertion folder, so the drop and the manifest describe different files') }
+                  else {
+                    $actualSize = (Get-Item -LiteralPath $onDisk).Length
+                    $actualHash = (Get-FileHash -LiteralPath $onDisk -Algorithm SHA256).Hash.ToLowerInvariant()
+                    if ($pl.size -ne $actualSize) { $fail.Add($n + ': manifest size ' + $pl.size + ' != actual ' + $actualSize) }
+                    if ($pl.sha256.ToLowerInvariant() -ne $actualHash) { $fail.Add($n + ': manifest sha256 does not match the file on disk - this is what HashCheck rejects') }
+                    Write-Host ('MANIFEST payload OK  : ' + $n + '  ' + $actualSize + ' B')
+                  }
+                }
+                if ($signedPayloads -lt 1) { $fail.Add('no payload carries a signer record, so the manifest does not describe the VSIX as signed') }
+                if (-not $m.signers -or $m.signers.Count -lt 1) { $fail.Add('signers array is missing or empty') }
+
+                if ($fail.Count -gt 0) {
+                  Write-Host ('MANIFEST VALIDATION FAILED with ' + $fail.Count + ' problem(s):')
+                  $fail | ForEach-Object { Write-Host ('  - ' + $_) }
+                  throw 'The generated .vsman does not match the shape RoslynTools accepts. A manifest missing fields fails at insertion time, not here, so it is rejected now.'
+                }
+                Write-Host ('MANIFEST VALIDATION PASSED - ' + $expectedInfo.Count + ' info fields, ' + $p.payloads.Count + ' payloads, all hashes and sizes match the drop')
+              displayName: Validate the insertion manifest
+              # PULL REQUEST: skipped. It validates the manifest the assemble step above produces,
+              # and that step does not run in a pull request build.
+              condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+            # Mints the token the VS drop needs, using the SAME service connection main uses for the
+            # same purpose. This runs in steps: and the drop runs in templateContext.outputs:, which
+            # the 1ES template appends after every step - so the variable is set before it is read.
+            #
+            # WHY THIS EXISTS, measured on build 3063057 rather than anticipated:
+            #
+            # Without an accessToken the task still runs, and drop.exe falls back to
+            #   drop.exe Create --DropService "https://devdiv.artifacts.visualstudio.com/" --AadAuth
+            # authenticating as the AGENT. This pipeline is dnceng/internal and the drop service is
+            # DevDiv's, so that identity has no token for it:
+            #   AadAcquireTokenException ... StatusInternal::InteractionRequired
+            #   Operation ended with exit code: 100
+            #
+            # The DevDiv drop service is CORRECT and is not the mistake - vstest's drops have always
+            # gone there, and main targets the same service. The mistake was omitting the credential
+            # and assuming a task with no auth input would use the ambient one.
+            #
+            # The token is scoped by the service connection, not by this file. It is marked issecret
+            # so it is masked in logs; the drop it can write to is still constrained by the
+            # DO-NOT-SHIP name below, which is the part this branch controls.
+            - task: AzureCLI@2
+              displayName: Mint DevDiv drop access token
+              inputs:
+                azureSubscription: 'dnceng-devdiv-drop-rw-code-rw-wif'
+                scriptType: pscore
+                scriptLocation: inlineScript
+                inlineScript: |
+                  $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
+                  Write-Host "##vso[task.setvariable variable=_DevDivDropAccessToken;issecret=true]$token"
+              condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))

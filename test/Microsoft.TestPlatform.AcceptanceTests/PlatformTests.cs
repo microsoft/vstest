@@ -62,11 +62,11 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var cts = new CancellationTokenSource();
             var numOfProcessCreatedTask = NumberOfProcessLaunchedUtility.NumberOfProcessCreated(
                 cts,
-                testhostProcessName);
+                testhostProcessName,
+                this.ObserveNextProcess());
 
-            this.InvokeVsTest(arguments);
-
-            cts.Cancel();
+            try { this.InvokeVsTest(arguments); }
+            finally { cts.Cancel(); }
 
             Assert.AreEqual(
                 expectedNumOfProcessCreated,

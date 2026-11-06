@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+  <!-- Present so MSBuild does not continue searching upward and pick up the repository root
+       Directory.Build.targets, which carries the Arcade and product build rules. See the reasoning
+       in Directory.Build.props beside this file.
+
+       This file is not optional once that props file exists. Isolating only the props leaves the
+       root targets still applying, which imports Arcade's Sdk.targets with ArcadeSdkDir never having
+       been set by Arcade's Sdk.props - measured, and it fails every asset project with:
+
+         MSB4019: The imported project "...\Sdk\BeforeCommonTargets.targets" was not found.
+                  ... "$(ArcadeSdkDir)BeforeCommonTargets.targets", which evaluated to
+                  "BeforeCommonTargets.targets"
+
+       An empty-valued property in an Import path is the diagnostic there: the import ran without the
+       props file that defines the directory. -->
+
+  <!-- Arcade defines Test, IntegrationTest and PerformanceTest as empty targets for every project it
+       owns. These assets are isolated from Arcade but are still members of TestPlatform.sln, and the
+       test leg runs with -projects TestPlatform.sln, so MSBuild asks every project in the solution
+       for the Test target. Without these declarations the assets fail the whole test leg with:
+
+         error MSB4057: The target "Test" does not exist in the project.
+
+       That error is recorded in this line's own history as the reason the test leg could not be
+       wired at all. It was resolved by other means before the assets were isolated; isolating them
+       brings it back, so the declarations are restored here rather than by importing the root and
+       undoing the isolation.
+
+       Publish is deliberately NOT declared. Arcade lists it in its own Empty.targets because Arcade
+       owns publishing for its projects; for these assets Publish is the real SDK target and
+       overriding it would break them. Only the three Arcade-specific verbs belong here. -->
+  <Target Name="Test" />
+  <Target Name="IntegrationTest" />
+  <Target Name="PerformanceTest" />
+</Project>

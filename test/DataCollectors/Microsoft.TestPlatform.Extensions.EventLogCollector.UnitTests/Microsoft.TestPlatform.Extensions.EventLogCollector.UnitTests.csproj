@@ -10,11 +10,41 @@
     <RootNamespace>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</RootNamespace>
   </PropertyGroup>
   <PropertyGroup>
-    <TargetFramework>net451</TargetFramework>
-  </PropertyGroup>
-  <PropertyGroup>
+    <!-- This project used to set BOTH <TargetFramework>net451</TargetFramework> here and
+         <TargetFrameworks>net451</TargetFrameworks> below, and it did so from the day it was
+         created: 468d4b232, 2017-09-07, "Added Event Log Data Collector for Windows OS", which
+         added this file with both properties already present. Four commits in the file's entire
+         history and the defect was in the first.
+
+         It was the only one of 72 test projects in this repository that set both, and it was the
+         only one whose tests did not run: its .trx carried zero results and a RunInfo warning
+         saying no test was available because no discoverer was registered. The MSTest adapter was
+         missing from its output directory while present for the other 13 net451 test projects, and
+         NuGet delivers that adapter through build assets which are imported per inner build.
+         Setting both properties makes the inner/outer distinction ambiguous.
+
+         So these 36 tests had NEVER run, on any build, since 2017 - not "stopped running", never.
+         15.9 traced the identical commit on their line independently.
+
+         HOW TO VERIFY THE SINGULAR PROPERTY IS ACTUALLY GONE, because this comment defeats the
+         obvious check. Searching this file for the literal "<TargetFramework>" returns hits - in
+         THIS COMMENT - while zero such elements exist:
+
+           grep for the literal                             hits, all of them prose, all in here
+           [xml] parse, SelectNodes('//TargetFramework')     0 elements
+           [xml] parse, SelectNodes('//TargetFrameworks')    1 element
+
+         Parse the XML, or anchor to a line that is not a comment. A text search cannot distinguish
+         a defect from the note explaining that it was removed - and here the text that defeats the
+         search is the documentation of the fix itself.
+
+         No hit COUNT is stated above, deliberately. The first draft of this comment said "1 hit",
+         and adding these two paragraphs made it 3 - the comment falsified its own number before it
+         was ever committed. A count of occurrences in the same text that contains the count cannot
+         stay true. The element counts are safe to state because they are properties of the XML,
+         which prose cannot change. -->
     <TargetFrameworks>net451</TargetFrameworks>
-    <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>    
+    <AssemblyName>Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests</AssemblyName>
     <WarningsAsErrors>true</WarningsAsErrors>
   </PropertyGroup>
   <ItemGroup>

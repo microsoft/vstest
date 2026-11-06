@@ -1,0 +1,58 @@
+[
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputErrorForSimpleMessageShouldSetConsoleColorToRed",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "By design, and not a skip. OutputExtensionsTests.cs:149 calls Assert.Inconclusive when the console foreground colour cannot be set, and MSTest maps Inconclusive to NotExecuted. The tests RUN - durations of 3, 4, 33 and 84 ms prove it - and then declare themselves inconclusive on a redirected-output agent. Signature taken from the TRX; the ADO results API reports errorMessage as null for these rows, which is why an earlier version of this entry expected no message at all.",
+    "classifiedOnRun": "3064056",
+    "classifiedOn": "2026-09-02"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputWarningForSimpleMessageShouldSetConsoleColorToYellow",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "By design, and not a skip. OutputExtensionsTests.cs:149 calls Assert.Inconclusive when the console foreground colour cannot be set, and MSTest maps Inconclusive to NotExecuted. The tests RUN - durations of 3, 4, 33 and 84 ms prove it - and then declare themselves inconclusive on a redirected-output agent. Signature taken from the TRX; the ADO results API reports errorMessage as null for these rows, which is why an earlier version of this entry expected no message at all.",
+    "classifiedOnRun": "3064056",
+    "classifiedOn": "2026-09-02"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputInformationForSimpleMessageShouldSetConsoleColorToGivenColor",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "By design, and not a skip. OutputExtensionsTests.cs:149 calls Assert.Inconclusive when the console foreground colour cannot be set, and MSTest maps Inconclusive to NotExecuted. The tests RUN - durations of 3, 4, 33 and 84 ms prove it - and then declare themselves inconclusive on a redirected-output agent. Signature taken from the TRX; the ADO results API reports errorMessage as null for these rows, which is why an earlier version of this entry expected no message at all.",
+    "classifiedOnRun": "3064056",
+    "classifiedOn": "2026-09-02"
+  },
+  {
+    "test": "Microsoft.TestPlatform.CoreUtilities.UnitTests.Output.OutputExtensionsTests.OutputInformationShouldNotChangeConsoleOutputColor",
+    "outcome": "NotExecuted",
+    "signature": "Assert.Inconclusive failed. Can't set Console foreground color",
+    "cause": "By design, and not a skip. OutputExtensionsTests.cs:149 calls Assert.Inconclusive when the console foreground colour cannot be set, and MSTest maps Inconclusive to NotExecuted. The tests RUN - durations of 3, 4, 33 and 84 ms prove it - and then declare themselves inconclusive on a redirected-output agent. Signature taken from the TRX; the ADO results API reports errorMessage as null for these rows, which is why an earlier version of this entry expected no message at all.",
+    "classifiedOnRun": "3064056",
+    "classifiedOn": "2026-09-02"
+  },
+  {
+    "test": "TestPlatform.Common.UnitTests.ExtensionFramework.TestPluginCacheTests.GetTestExtensionsShouldShouldThrowIfDiscovererThrows",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Disabled in the source since 2021. TestPluginCacheTests.cs:331 carries [Ignore] and the body holds a TODO saying the test needs an ITestDiscoverer interface to mock. Not an environmental condition and not a regression.",
+    "classifiedOnRun": "3064056",
+    "classifiedOn": "2026-09-02"
+  },
+  {
+    "test": "TestPlatform.Common.UnitTests.ExtensionFramework.TestPluginCacheTests.UpdateAdditionalExtensionsShouldResetExtensionsDiscoveredFlag",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Disabled in the source since 2021. TestPluginCacheTests.cs:121 carries [Ignore] and the method body is EMPTY. Not an environmental condition and not a regression.",
+    "classifiedOnRun": "3064056",
+    "classifiedOn": "2026-09-02"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShouldAddLogs",
+    "outcome": "NotExecuted",
+    "signature": "",
+    "cause": "Carries [Ignore] at EventLogContainerTests.cs:62. It becomes visible for the first time now that this project's tests are discovered at all - before the csproj fix the whole assembly produced zero results, so this [Ignore] had nothing to report against. Declared here because an undeclared NotExecuted blocks signing, which is the designed behaviour.",
+    "classifiedOnRun": "local",
+    "classifiedOn": "2026-09-02"
+  }
+]

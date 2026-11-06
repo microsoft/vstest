@@ -22,7 +22,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
             var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.*.nupkg").OrderBy(a => a).FirstOrDefault();
-            nugetPackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage));
+            nugetPackageFolder = GetResultsDirectory();
             ZipFile.ExtractToDirectory(nugetPackage, nugetPackageFolder);
 
             TryMoveDirectory(

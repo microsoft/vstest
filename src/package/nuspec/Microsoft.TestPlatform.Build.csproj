@@ -5,6 +5,14 @@
     <NuspecFile>TestPlatform.Build.nuspec</NuspecFile>
     <NuspecProperties>version=$(Version)</NuspecProperties>
 
+    <!-- This project shares its file name with src\Microsoft.TestPlatform.Build. Arcade derives the
+         intermediate directory from the project name, so both would write to
+         artifacts\obj\Microsoft.TestPlatform.Build\ and race, which surfaces as intermittent CS2012
+         "being used by another process" locks that read as machine contention rather than as a
+         name collision. Inert today because this project is not in TestPlatform.sln and sets
+         NoBuild, but it activates the moment packing runs through Arcade. -->
+    <OutDirName>Microsoft.TestPlatform.Build.Nuspec</OutDirName>
+
     <!-- Don't include the output.dll and output.runtimeconfig.json files in nuget package -->
     <IncludeBuildOutput>false</IncludeBuildOutput>
     <GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>

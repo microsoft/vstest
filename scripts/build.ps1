@@ -51,7 +51,15 @@ Param(
     [Switch] $Force, 
 
     [Alias("s")]
-    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests")
+    [String[]] $Steps = @("InstallDotnet", "Restore", "UpdateLocalization", "Build", "Publish", "PrepareAcceptanceTests"),
+
+    # Run only these actions out of the selected steps. The default, an empty list, means "no filter":
+    # every action of every selected step runs, in the order its step defines. This exists so a single
+    # packaging action can be invoked on its own - Generate-Manifest names a public feed and must not
+    # run, and Create-VsixPackage needs a Visual Studio install that build agents have and dev boxes
+    # may not. Naming actions never reorders them; the order lives in $StepActions below.
+    [Alias("a")]
+    [String[]] $Actions = @()
 )
 
 $ErrorActionPreference = "Stop"
@@ -157,7 +165,21 @@ Import-Module -Name "$($CurrentScriptDir.FullName)\verify-nupkgs.ps1" -Scope Loc
 $dependenciesPath = "$env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props"
 $dependencies = Get-Content -Raw -Encoding UTF8 $dependenciesPath
 $updatedDependencies = $dependencies -replace "<NETTestSdkVersion>.*?</NETTestSdkVersion>", "<NETTestSdkVersion>$TPB_Version</NETTestSdkVersion>"
-$updatedDependencies | Set-Content -Encoding UTF8 $dependenciesPath -NoNewline
+# Write only when the version actually changed, and write the BOM back explicitly.
+#
+# -Encoding UTF8 means WITH a BOM on Windows PowerShell 5.1 and WITHOUT one on PowerShell 7. This
+# script was written for 5.1, where reading and rewriting an unchanged file was a no-op. Run under 7
+# the same two lines stripped the BOM, so every build left this tracked file modified with a diff that
+# no diff viewer shows. Guarding the write turns "every run dirties tracked source" into "the file
+# changes exactly when the version changes", and WriteAllText with an explicit encoding makes the
+# result the same on both PowerShell versions instead of depending on which one is running.
+#
+# It still rewrites tracked source when the version differs, which it will in CI. That is unchanged
+# behaviour and is deliberate: moving the stamp somewhere generated would redefine where this build
+# keeps its version, which is a bigger change than this line should make.
+if ($updatedDependencies -cne $dependencies) {
+    [System.IO.File]::WriteAllText($dependenciesPath, $updatedDependencies, (New-Object System.Text.UTF8Encoding $true))
+}
 
 function Write-Log ([string] $message)
 {
@@ -267,6 +289,116 @@ function Restore-Package
     Write-Log "Restore-Package: Complete. {$(Get-ElapsedTime($timer))}"
 }
 
+function Restore-FakesPayload
+{
+    # Recovers the seven Fakes payload files that Microsoft.TestPlatform.nuspec references through
+    # $FakesPackageDir$, and that no feed can supply.
+    #
+    # WHAT IS ACTUALLY WRONG, because the symptom points somewhere else
+    #
+    # Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness 16.11.230815 is not obtainable. Restore
+    # substitutes a newer version, which lands in a directory named after ITS version, so the path
+    # built from the pinned version contains nothing. Restore SUCCEEDS - no NU1102, no NU1603 - and
+    # packing fails much later on a missing file. Nothing was wrong with the restore: the thing the
+    # build depends on was never something restore produced.
+    #
+    # The folder that made this work on developer machines was hand-placed by an earlier session and
+    # carried no .nupkg, no .nuspec, no .nupkg.metadata and no .sha512. A restored package carries
+    # all four. That absence is the discriminator, and it is worth reusing: a packages\<id>\<version>\
+    # folder with no .nupkg.metadata is not something a restore can reproduce, and packages\ is
+    # gitignored, so nothing in the branch reveals it.
+    #
+    # WHERE THE FILES COME FROM
+    #
+    # All seven ship inside Microsoft.TestPlatform 16.11.0 - the previously released package - under
+    # tools\net451\Common7\IDE\Extensions\TestPlatform. Located by CONTENT HASH rather than by name:
+    # a name would have matched the x86 and x64 instrumentation DLLs against each other, which are
+    # different files with the same name in different directories.
+    #
+    # The version is pinned to the ORIGINAL 16.11.0 in external.csproj and must never float. See the
+    # comment there for why a floating version makes each servicing build inherit the previous one's
+    # output as its input.
+    #
+    # WHY THE HASH CHECK IS NOT OPTIONAL
+    #
+    # Today the failure is loud and names the package, the version and the path. An extraction that
+    # copied the wrong files, or none, would replace that with a package that is quietly short -
+    # trading a loud failure for a silent substitution, which is worse than doing nothing. So every
+    # file is verified by SHA-256 against the recorded manifest before it is used, and both
+    # "extracted the wrong thing" and "extracted nothing" fail by name.
+
+    $timer = Start-Timer
+    Write-Log "Restore-FakesPayload: Started."
+
+    $fakesVersion = ([xml](Get-Content $env:TP_ROOT_DIR\scripts\build\TestPlatform.Dependencies.props)).Project.PropertyGroup.MicrosoftFakesVersion
+    $destRoot = Join-Path $env:TP_PACKAGES_DIR "Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness\$fakesVersion\contentFiles"
+
+    # path under $destRoot -> path under the shipped package's TestPlatform extension folder
+    $map = [ordered]@{
+        "DataCollector\Microsoft.Cci.dll"                                              = "Extensions\Microsoft.Cci.dll"
+        "DataCollector\Microsoft.VisualStudio.Fakes.DataCollector.dll"                 = "Extensions\Microsoft.VisualStudio.Fakes.DataCollector.dll"
+        "Instrumentation\x64\FakesInstrumentationProfiler_x64.config"                  = "Extensions\Fakes\x64\FakesInstrumentationProfiler_x64.config"
+        "Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "Extensions\Fakes\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"
+        "Instrumentation\x86\FakesInstrumentationProfiler_x86.config"                  = "Extensions\Fakes\x86\FakesInstrumentationProfiler_x86.config"
+        "Instrumentation\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "Extensions\Fakes\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll"
+        "TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll"                   = "Microsoft.VisualStudio.TestPlatform.Fakes.dll"
+    }
+
+    # SHA-256 of each file as it exists in the shipped 16.11.0 package. Recorded here rather than
+    # read from a file beside the repo, so the check travels with the branch and a build agent needs
+    # nothing but the package.
+    $expected = @{
+        "DataCollector\Microsoft.Cci.dll"                                              = "7207CAE4EFAA"
+        "DataCollector\Microsoft.VisualStudio.Fakes.DataCollector.dll"                 = "D15C5AD37B0F"
+        "Instrumentation\x64\FakesInstrumentationProfiler_x64.config"                  = "ECB5907F7C96"
+        "Instrumentation\x64\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "FB687A05BC25"
+        "Instrumentation\x86\FakesInstrumentationProfiler_x86.config"                  = "9B178940E4E3"
+        "Instrumentation\x86\Microsoft.QualityTools.Testing.Fakes.Instrumentation.dll" = "E811F8440EBD"
+        "TestPlatform\Microsoft.VisualStudio.TestPlatform.Fakes.dll"                   = "C3C53DABC455"
+    }
+
+    $sourceRoot = Join-Path $env:TP_PACKAGES_DIR "microsoft.testplatform\16.11.0\tools\net451\Common7\IDE\Extensions\TestPlatform"
+    if (-not (Test-Path $sourceRoot)) {
+        throw ("Restore-FakesPayload: the Fakes payload source is not at '$sourceRoot'. It comes from " +
+               "the PackageDownload of Microsoft.TestPlatform 16.11.0 in src\package\external\external.csproj, " +
+               "so Restore-Package has to run before this.")
+    }
+
+    $copied = 0
+    foreach ($rel in $map.Keys) {
+        $src = Join-Path $sourceRoot $map[$rel]
+        $dst = Join-Path $destRoot $rel
+
+        if (-not (Test-Path $src)) {
+            throw "Restore-FakesPayload: '$rel' expected at '$src' in Microsoft.TestPlatform 16.11.0 and it is not there."
+        }
+
+        $actual = (Get-FileHash $src -Algorithm SHA256).Hash.Substring(0, 12)
+        if ($actual -ne $expected[$rel]) {
+            throw ("Restore-FakesPayload: '$rel' in Microsoft.TestPlatform 16.11.0 hashes $actual, expected " +
+                   "$($expected[$rel]). The payload is not the one that shipped; refusing to stage it.")
+        }
+
+        New-Item (Split-Path $dst -Parent) -ItemType Directory -Force | Out-Null
+        Copy-Item $src $dst -Force
+        $copied++
+    }
+
+    # Assert the staged SET, not the number copied. The loop above could complete while an earlier
+    # run left something extra behind that nuget would then pack.
+    $staged = @(Get-ChildItem $destRoot -Recurse -File | ForEach-Object { $_.FullName.Substring($destRoot.Length + 1) } | Sort-Object)
+    $wanted = @($map.Keys | Sort-Object)
+    $missing = @($wanted | Where-Object { $staged -notcontains $_ })
+    $extra = @($staged | Where-Object { $wanted -notcontains $_ })
+    if ($missing.Count -gt 0 -or $extra.Count -gt 0) {
+        throw ("Restore-FakesPayload: staged set does not match. Missing: $($missing -join ', '). " +
+               "Unexpected: $($extra -join ', ').")
+    }
+
+    Write-Log "Restore-FakesPayload: $copied of $($map.Count) files staged into $destRoot, all hash-verified against the shipped 16.11.0 package."
+    Write-Log "Restore-FakesPayload: Complete. {$(Get-ElapsedTime($timer))}"
+}
+
 function Invoke-Build
 {
     $timer = Start-Timer
@@ -329,8 +461,63 @@ function Publish-PatchedDotnet {
     Copy-Item $dotnetPath $dotnetTestArtifactsPath -Force -Recurse
 
     Write-Log "Publish-PatchedDotnet: Copy VSTest task artifacts to local dotnet installation to allow `dotnet test` to run with it"
-    $buildArtifactsPath = "$env:TP_ROOT_DIR\src\Microsoft.TestPlatform.Build\bin\$TPB_Configuration\$TPB_TargetFrameworkNS20\*"
+    $buildArtifactsPath = "$env:TP_OUT_DIR\bin\Microsoft.TestPlatform.Build\$TPB_Configuration\$TPB_TargetFrameworkNS20\*"
     Copy-Item $buildArtifactsPath $dotnetTestArtifactsSdkPath -Force
+}
+
+function Assert-UapCoreUtilities($path)
+{
+    # Confirms that the CoreUtilities assembly staged for uap10.0 really is the uap10.0 build.
+    #
+    # CoreUtilities defines WINDOWS_UWP only when TargetFramework is uap10.0, and ConsoleOutput.cs and
+    # OutputExtensions.cs are both guarded by "#if !NETSTANDARD1_0 && !WINDOWS_UWP". So the uap10.0
+    # build has neither type and does not reference System.Console; the netstandard1.3 build, which is
+    # a legal UAP-compatible asset and is what the reference resolution now picks, has both.
+    if (-not (Test-Path $path)) {
+        throw "Assert-UapCoreUtilities: expected a CoreUtilities assembly at '$path' and found none."
+    }
+
+    # PEReader lives in System.Reflection.Metadata, which is part of the runtime PowerShell 7 loads
+    # and is not available to Windows PowerShell 5.1 on .NET Framework. Without this check the run
+    # dies with "Cannot find type [System.Reflection.PortableExecutable.PEReader]", which names the
+    # type and not the reason.
+    #
+    # This matters beyond a developer prompt: an Azure DevOps "- powershell:" step is Windows
+    # PowerShell, so the packaging steps have to be "- pwsh:" steps or they stop here.
+    if (-not ('System.Reflection.PortableExecutable.PEReader' -as [type])) {
+        throw ("Assert-UapCoreUtilities: this check needs System.Reflection.Metadata, which " +
+               "PowerShell 7 has and Windows PowerShell $($PSVersionTable.PSVersion) does not. " +
+               "Run the packaging actions with pwsh - in Azure DevOps that is a '- pwsh:' step, " +
+               "because '- powershell:' runs Windows PowerShell.")
+    }
+
+    $full = (Resolve-Path -LiteralPath $path).ProviderPath
+    $fs = [IO.File]::OpenRead($full)
+    try {
+        $pe = New-Object System.Reflection.PortableExecutable.PEReader($fs)
+        try {
+            # A static extension on PEReaderExtensions; instance syntax throws.
+            $md = [System.Reflection.Metadata.PEReaderExtensions]::GetMetadataReader($pe)
+
+            $forbiddenTypes = @("ConsoleOutput", "OutputExtensions")
+            $found = @()
+            foreach ($h in $md.TypeDefinitions) {
+                $name = $md.GetString($md.GetTypeDefinition($h).Name)
+                if ($forbiddenTypes -contains $name) { $found += $name }
+            }
+
+            $refs = @()
+            foreach ($rh in $md.AssemblyReferences) { $refs += $md.GetString($md.GetAssemblyReference($rh).Name) }
+            $consoleRef = @($refs | Where-Object { $_ -eq "System.Console" })
+
+            if ($found.Count -gt 0 -or $consoleRef.Count -gt 0) {
+                throw ("Assert-UapCoreUtilities: '$path' is not the uap10.0 build. " +
+                       "Types that WINDOWS_UWP should exclude: $($found -join ', '). " +
+                       "System.Console references: $($consoleRef.Count). " +
+                       "The uap10.0 build has neither.")
+            }
+        } finally { $pe.Dispose() }
+    } finally { $fs.Dispose() }
 }
 
 function Publish-Package
@@ -405,16 +592,16 @@ function Publish-Package
     
     # Copy the .NET multitarget testhost exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
-        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force 
-        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.pdb" $testhostFullPackageDir\testhost.$tfm.pdb -Force 
-        Copy-Item "$(Split-Path $testHostProject)\bin\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe.config" $testhostFullPackageDir\testhost.$tfm.exe.config -Force 
+        Copy-Item "$env:TP_OUT_DIR\bin\testhost\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe" $testhostFullPackageDir\testhost.$tfm.exe -Force 
+        Copy-Item "$env:TP_OUT_DIR\bin\testhost\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.pdb" $testhostFullPackageDir\testhost.$tfm.pdb -Force 
+        Copy-Item "$env:TP_OUT_DIR\bin\testhost\$TPB_Configuration\$tfm\$TPB_X64_Runtime\testhost.$tfm.exe.config" $testhostFullPackageDir\testhost.$tfm.exe.config -Force 
     }
 
     # Copy the .NET multitarget testhost.x86 exes to destination folder (except for net451 which is the default)
     foreach ($tfm in "net452;net46;net461;net462;net47;net471;net472;net48" -split ";") {
-        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe" $testhostFullPackageDir\testhost.$tfm.x86.exe -Force 
-        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.pdb" $testhostFullPackageDir\testhost.$tfm.x86.pdb -Force 
-        Copy-Item "$(Split-Path $testHostx86Project)\bin\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force 
+        Copy-Item "$env:TP_OUT_DIR\bin\testhost.x86\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe" $testhostFullPackageDir\testhost.$tfm.x86.exe -Force 
+        Copy-Item "$env:TP_OUT_DIR\bin\testhost.x86\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.pdb" $testhostFullPackageDir\testhost.$tfm.x86.pdb -Force 
+        Copy-Item "$env:TP_OUT_DIR\bin\testhost.x86\$TPB_Configuration\$tfm\$TPB_X86_Runtime\testhost.$tfm.x86.exe.config" $testhostFullPackageDir\testhost.$tfm.x86.exe.config -Force 
     }
 
     # Copy the .NET core x86 and x64 testhost exes from tempPublish to required folder
@@ -452,7 +639,7 @@ function Publish-Package
 
     ################################################################################
     # Publish Microsoft.TestPlatform.PlatformAbstractions
-    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.PlatformAbstractions\bin\$TPB_Configuration") `
+    Copy-Bulk -root (Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.PlatformAbstractions\$TPB_Configuration") `
               -files @{
                 $TPB_TargetFramework45     = $fullCLRPackage45Dir          # net45
                 $TPB_TargetFramework451    = $fullCLRPackage451Dir         # net451
@@ -465,7 +652,7 @@ function Publish-Package
 
     ################################################################################
     # Publish Microsoft.TestPlatform.CoreUtilities
-    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.CoreUtilities\bin\$TPB_Configuration") `
+    Copy-Bulk -root (Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.CoreUtilities\$TPB_Configuration") `
               -files @{
                 $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
                 $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
@@ -477,7 +664,7 @@ function Publish-Package
 
     ################################################################################
     # Publish Microsoft.TestPlatform.ObjectModel
-    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.ObjectModel\bin\$TPB_Configuration") `
+    Copy-Bulk -root (Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.ObjectModel\$TPB_Configuration") `
               -files @{
                 $TPB_TargetFramework45      = $fullCLRPackage45Dir           # net45
                 $TPB_TargetFramework451     = $fullCLRPackage451Dir          # net451
@@ -490,8 +677,39 @@ function Publish-Package
               }
 
     ################################################################################
+    # Restore the uap10.0 CoreUtilities that the ObjectModel copy above overwrote.
+    #
+    # ObjectModel's uap10.0 build carries a NETSTANDARD1.3 copy of CoreUtilities, not the uap10.0 one,
+    # and the Copy-Bulk above therefore lands that copy on top of the correct file published a few
+    # lines earlier. netstandard1.3 is legitimately compatible with UAP,Version=v10.0, so NuGet is
+    # selecting a compatible asset rather than misbehaving; it simply chose differently than the SDK
+    # that shipped 16.11 did. All three uap10.0 projects already carry identical uap10.0 property
+    # groups, so there is no missing property to add, and making the graph prefer the uap10.0 asset
+    # would change how this build selects assets rather than how it copies them.
+    #
+    # The two builds are not interchangeable: CoreUtilities defines WINDOWS_UWP only for uap10.0, and
+    # ConsoleOutput.cs and OutputExtensions.cs are both guarded by "#if !NETSTANDARD1_0 && !WINDOWS_UWP".
+    # Shipping the netstandard1.3 build adds 14 public members and a System.Console reference that the
+    # shipped 16.11 package does not have.
+    #
+    # This is an explicit re-copy rather than a reordering of the two blocks on purpose. A reordering
+    # looks arbitrary and the next person to tidy this function undoes it silently.
+    Copy-Bulk -root (Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.CoreUtilities\$TPB_Configuration") `
+              -files @{
+                $TPB_TargetFrameworkUap100  = $testhostUapPackageDir         # uap10.0
+              }
+
+    # Assert the PRODUCT, not that the copy ran. A copy that silently landed the wrong file exits 0,
+    # which is how this defect reached a shipped-looking package in the first place.
+    #
+    # The two builds are told apart by what WINDOWS_UWP excludes: the uap10.0 build has no
+    # ConsoleOutput or OutputExtensions type and no System.Console reference. The netstandard1.3 build
+    # has both. Asserting a member count instead would break on any legitimate source change.
+    Assert-UapCoreUtilities (Join-Path $testhostUapPackageDir "Microsoft.TestPlatform.CoreUtilities.dll")
+
+    ################################################################################
     # Publish Microsoft.TestPlatform.AdapterUtilities
-    Copy-Bulk -root (Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.AdapterUtilities\bin\$TPB_Configuration") `
+    Copy-Bulk -root (Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.AdapterUtilities\$TPB_Configuration") `
             -files @{
               # "net20"                     = $net20PackageDir               # net20
                 "net45/any"                 = $net45PackageDir               # $net4
@@ -547,7 +765,7 @@ function Publish-Package
 
     # Copy Blame Datacollector to Extensions folder.
     $TPB_TargetFrameworkStandard = "netstandard2.0"
-    $blameDataCollector = Join-Path $env:TP_ROOT_DIR "src\Microsoft.TestPlatform.Extensions.BlameDataCollector\bin\$TPB_Configuration"
+    $blameDataCollector = Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.Extensions.BlameDataCollector\$TPB_Configuration"
     $blameDataCollectorNetFull = Join-Path $blameDataCollector $TPB_TargetFramework472
     $blameDataCollectorNetStandard = Join-Path $blameDataCollector $TPB_TargetFrameworkStandard
     Copy-Item $blameDataCollectorNetFull\Microsoft.TestPlatform.Extensions.BlameDataCollector.dll $fullCLRExtensionsDir -Force
@@ -572,7 +790,7 @@ function Publish-Package
     }
 
     # Copy Event Log Datacollector to Extensions folder.
-    $eventLogDataCollector = Join-Path $env:TP_ROOT_DIR "src\DataCollectors\Microsoft.TestPlatform.Extensions.EventLogCollector\bin\$TPB_Configuration"
+    $eventLogDataCollector = Join-Path $env:TP_OUT_DIR "bin\Microsoft.TestPlatform.Extensions.EventLogCollector\$TPB_Configuration"
     $eventLogDataCollectorNetFull = Join-Path $eventLogDataCollector $TPB_TargetFramework451
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.dll $fullCLRExtensionsDir -Force
     Copy-Item $eventLogDataCollectorNetFull\Microsoft.TestPlatform.Extensions.EventLogCollector.pdb $fullCLRExtensionsDir -Force
@@ -684,7 +902,6 @@ function Publish-Tests
         Write-Log "Publish-Tests: Started."
 
         # Adding only Perf project for now
-        $fullCLRTestDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework451"
         $fullCLRPerfTestAssetDir = Join-Path $env:TP_TESTARTIFACTS "$TPB_Configuration\$TPB_TargetFramework451\TestAssets\PerfAssets"
     
         $mstest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "MSTestAdapterPerfTestProject"
@@ -698,9 +915,6 @@ function Publish-Tests
         $xunittest10kPerfProjectDir = Join-Path $fullCLRPerfTestAssetDir "XUnitAdapterPerfTestProject"
         $xunittest10kPerfProject = Join-Path $env:TP_ROOT_DIR "test\TestAssets\PerfAssets\XUnitAdapterPerfTestProject"
         Publish-PackageInternal $xunittest10kPerfProject $TPB_TargetFramework451 $xunittest10kPerfProjectDir
-
-        $testPerfProject = Join-Path $env:TP_ROOT_DIR "test\Microsoft.TestPlatform.PerformanceTests"
-        Publish-PackageInternal $testPerfProject $TPB_TargetFramework451 $fullCLRTestDir
     }
 }
 
@@ -720,11 +934,47 @@ function Publish-PackageWithRuntimeInternal($packagename, $framework, $runtime, 
     Set-ScriptFailedOnError
 }
 
+function Assert-LocFilePresent($dllToCopy, $lang, $dllName)
+{
+    # Every one of the fourteen loc call sites reaches here.
+    #
+    # A CLAIM MADE HERE EARLIER WAS WRONG AND IS RETRACTED. This comment previously said that
+    # Copy-Item is non-terminating, so a missing satellite would leave the payload short with the
+    # build still green, while Move-Item stops the run - and therefore that the defect was caught by
+    # luck, because the first loc site happens to be a Move. That is false on this file, and it was
+    # measured rather than argued:
+    #
+    #   $ErrorActionPreference = "Stop" at scripts\build.ps1:65
+    #   all 14 call sites pass a NAMED FILE, not a wildcard
+    #   named file, missing, under Stop -> Copy-Item AND Move-Item both throw ItemNotFoundException,
+    #   on PowerShell 7 and on Windows PowerShell 5.1 alike
+    #
+    # So a missing satellite could not have shipped quietly, and CI could not have gone green with
+    # satellites missing. The real discriminator is EMPTY versus MISSING source, not Copy versus
+    # Move: a wildcard over an empty directory is silent for both cmdlets. These call sites use
+    # neither a wildcard nor an empty directory.
+    #
+    # The assertion stays, for the reason it is actually worth having: a bare ItemNotFoundException
+    # names a file, and the cause is almost never one missing file. Satellites on this branch are not
+    # compiled from anything checked in - they come from culture .resx that fmdev.xlftool writes out
+    # of the .xlf, and that generation plus /p:LocalizedBuild=true live together in eng\build.ps1. A
+    # build that goes straight to eng\common\Build.ps1 skips both and produces no satellites at all,
+    # which is exactly how this was found, on a build agent, at the first Move-Loc-Files call. The
+    # throw below says that instead of sending the next reader to look for one file.
+    if (-not (Test-Path $dllToCopy)) {
+        throw ("Localized file '$dllName' for language '$lang' is not at '$dllToCopy'. " +
+               "Satellite assemblies come from the localization phase in eng\build.ps1, which " +
+               "generates the culture .resx and sets LocalizedBuild=true together. A build invoked " +
+               "through eng\common\Build.ps1 directly does neither and produces no satellites.")
+    }
+}
+
 function Copy-Loc-Files($sourceDir, $destinationDir, $dllName)
 {
     foreach($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
+        Assert-LocFilePresent $dllToCopy $lang $dllName
         if (-not (Test-Path $destinationFolder)) {
             New-Item $destinationFolder -Type Directory -Force | Out-Null
         }
@@ -737,6 +987,7 @@ function Move-Loc-Files($sourceDir, $destinationDir, $dllName)
     foreach($lang in $language) {
         $dllToCopy = Join-Path $sourceDir\$lang $dllName
         $destinationFolder = Join-Path $destinationDir $lang
+        Assert-LocFilePresent $dllToCopy $lang $dllName
         if (-not (Test-Path $destinationFolder)) {
             New-Item $destinationFolder -Type Directory -Force | Out-Null
         }
@@ -850,6 +1101,22 @@ function Create-VsixPackage
         # Build vsix project to get TestPlatform.vsix
         Write-Verbose "$msbuildPath $vsixProjectDir\TestPlatform.csproj -p:Configuration=$Configuration"
         & $msbuildPath "$vsixProjectDir\TestPlatform.csproj" -p:Configuration=$Configuration
+        $vsixBuildExitCode = $LASTEXITCODE
+
+        # Assert the VSIX, not the step. Nothing here used to look at the exit code or at the file:
+        # a failing msbuild left the function logging "Complete" and returning 0 with no .vsix
+        # anywhere, and a caller could not tell that from success. This is the step whose whole
+        # purpose is to produce one file.
+        if ($vsixBuildExitCode -ne 0) {
+            throw ".. Create-VsixPackage: msbuild exited $vsixBuildExitCode building '$vsixProjectDir\TestPlatform.csproj' with '$msbuildPath'."
+        }
+
+        $producedVsix = @(Get-ChildItem $vsixProjectDir -Recurse -Filter "*.vsix" -ErrorAction SilentlyContinue)
+        if ($producedVsix.Count -eq 0) {
+            throw (".. Create-VsixPackage: msbuild exited 0 but produced no .vsix under '$vsixProjectDir'. " +
+                   "The VSIX is the entire output of this step, so a green msbuild with no file is a failure.")
+        }
+        Write-Log ".. Create-VsixPackage: produced $($producedVsix.Count) vsix: $(($producedVsix | ForEach-Object { $_.Name }) -join ', ')"
     }
     else
     { 
@@ -858,6 +1125,44 @@ function Create-VsixPackage
 
     Write-Log "Create-VsixPackage: Complete. {$(Get-ElapsedTime($timer))}"
 }
+
+# TEST-EXTRACT-PACKAGESET-BEGIN  scripts\Test-PackageSetAssertion.ps1 extracts this function and
+# exercises it directly. Keep it self-contained: it must not read anything but its parameters.
+function Assert-PackagesProduced($nuspecFiles, $stagingDir, $packageOutputDir, $version)
+{
+    # Assert the SET of packages produced against the SET of nuspecs handed to nuget, joined by name.
+    #
+    # Verify-Nuget-Packages checks the file count inside each package it FINDS, so a package that was
+    # never produced is outside its search space entirely and it cannot report one. Nothing else
+    # compares produced artifacts against requested ones.
+    #
+    # The exit code is not a contract for a tool of this vintage. nuget 5.8.1 returns 1 after refusing
+    # invalid arguments, but nuget 3.4.3 returns 0 for the same refusal, and on another servicing
+    # branch that turned eight packages that were never built into a green build with no error text.
+    # Assert the product, not the exit code.
+    #
+    # The id is read from the nuspec, never derived from its file name: six of the eleven differ, for
+    # example TestPlatform.Build.nuspec declares Microsoft.TestPlatform.Build.
+    $expected = @($nuspecFiles | ForEach-Object {
+        $id = ([xml](Get-Content (Join-Path $stagingDir $_))).package.metadata.id
+        "$id.$version.nupkg"
+    })
+    $produced = @(Get-ChildItem $packageOutputDir -Filter "*.nupkg" -ErrorAction SilentlyContinue | ForEach-Object { $_.Name })
+
+    $notProduced = @($expected | Where-Object { $produced -notcontains $_ } | Sort-Object)
+    $unexpected = @($produced | Where-Object { $expected -notcontains $_ } | Sort-Object)
+
+    # Reported separately and never netted. One package missing and one stale package left behind
+    # would otherwise cancel out to a correct-looking count.
+    if ($notProduced.Count -gt 0 -or $unexpected.Count -gt 0) {
+        throw ("Create-NugetPackages produced the wrong set of packages. " +
+               "Not produced ($($notProduced.Count)): $($notProduced -join ', '). " +
+               "Unexpected ($($unexpected.Count)): $($unexpected -join ', ').")
+    }
+
+    return $expected.Count
+}
+# TEST-EXTRACT-PACKAGESET-END
 
 function Create-NugetPackages
 {
@@ -932,16 +1237,42 @@ function Create-NugetPackages
 
     # package them from stagingDir
     foreach ($file in $nuspecFiles) {
-        $additionalArgs = ""
+        # An array, splatted below, rather than a string appended to the command line. Windows
+        # PowerShell 5.1 dropped an empty string argument to a native command; PowerShell 7 passes it
+        # through as a real, empty argument. nuget.exe answers that with "pack: invalid arguments" and
+        # prints its help, so under 7 this loop failed on the first nuspec that needed no extra
+        # argument, which is ten of the eleven. Splatting an empty array passes nothing on both.
+        $additionalArgs = @()
         if ($skipAnalysis -contains $file) {
-            $additionalArgs = "-NoPackageAnalysis"
+            $additionalArgs = @("-NoPackageAnalysis")
         }
 
         Write-Verbose "$nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version $additionalArgs"
-        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir`;BranchName=$TPB_BRANCH`;CommitId=$TPB_COMMIT $additionalArgs
+        & $nugetExe pack $stagingDir\$file -OutputDirectory $packageOutputDir -Version $TPB_Version -Properties Version=$TPB_Version`;JsonNetVersion=$JsonNetVersion`;Runtime=$TPB_TargetRuntime`;NetCoreTargetFramework=$TPB_TargetFrameworkCore20`;FakesPackageDir=$FakesPackageDir`;NetStandard10Framework=$TPB_TargetFrameworkNS10`;NetStandard13Framework=$TPB_TargetFrameworkNS13`;NetStandard20Framework=$TPB_TargetFrameworkNS20`;Uap10Framework=$testhostUapPackageDir`;BranchName=$TPB_BRANCH`;CommitId=$TPB_COMMIT @additionalArgs
 
         Set-ScriptFailedOnError
     }
+
+    # Assert that every requested package exists before checking what is inside them.
+    $producedCount = Assert-PackagesProduced $nuspecFiles $stagingDir $packageOutputDir $TPB_Version
+    Write-Log "Create-NugetPackages: all $producedCount requested packages were produced."
+
+    # Hand the produced SET to the signing step, which runs in a separate process and otherwise has
+    # only a glob to go on. A glob that matches nothing fails loudly because Arcade checks for it; a
+    # glob that matches SOME of the packages signs some of them and exits 0. eng\Signing.props joins
+    # this file against the resolved ItemsToSign by name and fails on a difference in either
+    # direction.
+    #
+    # Written only after Assert-PackagesProduced has established that the directory holds exactly the
+    # set the nuspec files asked for, so this is the produced set rather than a listing of whatever
+    # happens to be on disk. ASCII, because MSBuild's ReadLinesFromFile reads it and a BOM would
+    # become part of the first package name.
+    $producedManifest = Join-Path $env:TP_OUT_DIR "$TPB_Configuration\produced-packages.txt"
+    Get-ChildItem $packageOutputDir -Filter "*.nupkg" |
+        Select-Object -ExpandProperty Name |
+        Sort-Object |
+        Set-Content -Path $producedManifest -Encoding ascii
+    Write-Log "Create-NugetPackages: produced set recorded in $producedManifest."
 
     # Verifies that expected number of files gets shipped in nuget packages.
     # Few nuspec uses wildcard characters.
@@ -991,9 +1322,13 @@ function Copy-CodeCoverage-Package-Artifacts
 function Copy-PackageItems($packageName)
 {
     # Packages published separately are copied into their own artifacts directory
-    # E.g. src\Microsoft.TestPlatform.ObjectModel\bin\Debug\net451\* is copied
+    # E.g. artifacts\bin\Microsoft.TestPlatform.ObjectModel\Debug\net451\* is copied
     # to artifacts\Debug\Microsoft.TestPlatform.ObjectModel\net451
-    $binariesDirectory = [System.IO.Path]::Combine("src", "$packageName", "bin", "$TPB_Configuration")
+    #
+    # This path is assembled from fragments rather than written out, which is why the check that
+    # reported "0 remaining pre-Arcade build-output reads" missed it: the only literal src\<p>\bin\
+    # left in this file is the comment above.
+    $binariesDirectory = [System.IO.Path]::Combine($env:TP_OUT_DIR, "bin", "$packageName", "$TPB_Configuration")
     $binariesDirectory = $(Join-Path $binariesDirectory "*")
     $publishDirectory = $(Join-Path $env:TP_OUT_DIR "$TPB_Configuration\$packageName")
     Write-Log "Copy-PackageItems: Package: $packageName"
@@ -1029,12 +1364,34 @@ function Update-LocalizedResources
 #
 function Get-DotNetPath
 {
-    $dotnetPath = Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"
-    if (-not (Test-Path $dotnetPath)) {
-        Write-Error "Dotnet.exe not found at $dotnetPath. Did the dotnet cli installation succeed?"
+    # Two locations, tried in this order, because a build agent only ever has the second one.
+    #
+    # tools\dotnet is what Install-DotNetCli produces, and that action can no longer run anywhere.
+    # It downloads dotnet-install.ps1 from raw.githubusercontent.com/dotnet/cli/master - a repository
+    # archived years ago - and then asks it for channel release/6.0.1xx-preview1. Neither the script
+    # nor the channel is still served. On this developer machine tools\dotnet happens to exist as a
+    # reparse point onto .dotnet, so both entries below resolve to the same dotnet.exe byte for byte,
+    # which is why packaging works here and would not work on a clean agent.
+    #
+    # .dotnet is what Arcade installs from global.json, including the 1.0.16, 1.1.13, 2.1.30 and
+    # 3.1.32 runtimes that publishing this line needs. Falling back to it changes which file is
+    # executed on an agent and changes nothing at all on a machine that has both.
+    #
+    # The failure is a throw rather than Write-Error. Write-Error is non-terminating, so the function
+    # went on to return the path it had just reported as missing, the caller invoked it, and the
+    # message a reader actually saw came from "& <nonexistent path>" several lines further down.
+    $candidates = @(
+        (Join-Path $env:TP_TOOLS_DIR "dotnet\dotnet.exe"),
+        (Join-Path $env:TP_ROOT_DIR ".dotnet\dotnet.exe")
+    )
+
+    foreach ($candidate in $candidates) {
+        if (Test-Path $candidate) {
+            return $candidate
+        }
     }
 
-    return $dotnetPath
+    throw "dotnet.exe not found. Looked in: $($candidates -join ' and '). Run the Arcade restore first; it installs the SDK named in global.json into .dotnet."
 }
 
 function Get-FullCLRPackageDirectory
@@ -1118,20 +1475,44 @@ function Locate-VsInstallPath
 
    Write-Verbose "Using '$vswhere' to locate VS installation path."
 
-   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.Net.Component.4.6.TargetingPack", "Microsoft.VisualStudio.Component.VSSDK")
+   # Two lists, and the split is deliberate.
+   #
+   # Microsoft.Net.Component.4.6.TargetingPack used to be required here, and it selected ZERO
+   # instances on a machine with four Visual Studio installations and on the build agent. It is worth
+   # recording what that measurement does and does not mean, because the first reading of it was
+   # wrong:
+   #
+   #   Reference Assemblies\...\.NETFramework\v4.6 EXISTS   -> looks like the pack is installed
+   #   it holds 126 files and NO mscorlib.dll               -> it is a leftover shell, not a pack
+   #   v4.6.2, v4.7.2 and v4.8 hold 258-260 files WITH mscorlib.dll
+   #
+   # So the component id was telling the truth: 4.6 targeting really is unavailable on a current
+   # machine. Testing a DIRECTORY for existence rather than for contents is what made it look like a
+   # false positive.
+   #
+   # It is still dropped from the SELECTOR, for a different and narrower reason: a selector should
+   # select. Requiring it makes vswhere return nothing and the run stops with "Failed to find VS
+   # installation with requirements: <three component ids>", which does not say which of the three
+   # is missing or what to do. Letting the selector find the instance moves the failure to reference
+   # resolution, where MSBuild says exactly what is wrong and how to fix it:
+   #
+   #   error MSB3644: The reference assemblies for .NETFramework,Version=v4.6 were not found.
+   #                  ... install the Developer Pack (SDK/Targeting Pack) for this framework version
+   #                  or retarget your application.
+   #
+   # Both stop the build at the same point - Locate-MSBuildPath runs after all the payload copying
+   # either way - so nothing is lost by preferring the message that names the missing thing.
+   $requiredPackageIds = @("Microsoft.Component.MSBuild", "Microsoft.VisualStudio.Component.VSSDK")
    Write-Verbose "VSInstallation requirements : $requiredPackageIds"
 
    Try
    {
-       if ($TPB_CIBuild) {
-           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath"
-           $vsInstallPath = & $vswhere -version '(15.0' -products * -requires $requiredPackageIds -property installationPath
-       }
-       else {
-           # Allow using pre release versions of VS for dev builds
-           Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath"
-           $vsInstallPath = & $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath
-       }
+       # -prerelease on both branches now. Without it, vswhere finds NOTHING on a machine whose only
+       # installations are preview or internal channels - measured as 0 of 4 here - and the CI image
+       # this line builds on is windows.vs2026preview. The flag was omitted under CIBuild on the
+       # assumption that a build agent carries a released VS, and that assumption no longer holds.
+       Write-Verbose "VSWhere command line: $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath"
+       $vsInstallPath = & $vswhere -version '(15.0' -prerelease -products * -requires $requiredPackageIds -property installationPath
    }
    Catch [System.Management.Automation.MethodInvocationException]
    {
@@ -1222,9 +1603,13 @@ function Build-SpecificProjects
         }
 
         # Copy artifacts
-        $ProjectDir = [System.IO.Path]::GetDirectoryName($ProjectToBuild)
+        # Same constructed-path defect as Copy-PackageItems: Arcade emits to
+        # artifacts\bin\<ProjectName>\<Config>\<tfm>, keyed on the project file name.
+        # Reached only through -ProjectNamePatterns, so neither the pipeline nor the publish step
+        # exercises this line, and it is translated but UNTESTED.
+        $projectName = [System.IO.Path]::GetFileNameWithoutExtension($ProjectToBuild)
         foreach($FrameworkAndOutDir in $FrameworksAndOutDirs) {
-            $fromDir = $([System.IO.Path]::Combine($ProjectDir, "bin", $TPB_Configuration, $FrameworkAndOutDir[0]))
+            $fromDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, "bin", $projectName, $TPB_Configuration, $FrameworkAndOutDir[0]))
             $toDir = $([System.IO.Path]::Combine($env:TP_OUT_DIR, $TPB_Configuration, $FrameworkAndOutDir[1]))
             if ( Test-Path $fromDir){
                 Write-Log "Copying artifacts from $fromDir to $toDir"
@@ -1253,36 +1638,43 @@ Get-ChildItem env: | Where-Object -FilterScript { $_.Name.StartsWith("TP_") } | 
 Write-Log "Test platform build variables: "
 Get-Variable | Where-Object -FilterScript { $_.Name.StartsWith("TPB_") } | Format-Table
 
-if ($Force -or $Steps -contains "InstallDotnet") {
-    Install-DotNetCli
+# TEST-EXTRACT-BEGIN  scripts\Test-BuildDispatch.ps1 extracts the region between these two markers
+# and runs it against stub functions, so keep the region free of anything that is not dispatch.
+#
+# The step groups, and the actions each one runs IN THIS ORDER. The order lives here and is never
+# taken from -Actions, so naming actions picks a subset without reordering it. This table is the
+# same composition, in the same order, that this dispatcher ran as six literal if-blocks.
+$StepActions = [ordered]@{
+    "InstallDotnet"          = @("Install-DotNetCli")
+    "Restore"                = @("Clear-Package", "Restore-Package", "Restore-FakesPayload")
+    "UpdateLocalization"     = @("Update-LocalizedResources")
+    "Build"                  = @("Invoke-Build")
+    "Publish"                = @("Publish-Package", "Create-VsixPackage", "Create-NugetPackages", "Generate-Manifest", "Copy-PackageIntoStaticDirectory")
+    "PrepareAcceptanceTests" = @("Publish-PatchedDotnet", "Invoke-TestAssetsBuild", "Publish-Tests")
 }
 
-if ($Force -or $Steps -contains "Restore") {
-    Clear-Package
-    Restore-Package    
+$KnownActions = @($StepActions.Keys | ForEach-Object { $StepActions[$_] })
+$UnknownActions = @($Actions | Where-Object { $KnownActions -notcontains $_ })
+if ($UnknownActions.Count -gt 0) {
+    throw "Unknown -Actions: $($UnknownActions -join ', '). Known actions are: $($KnownActions -join ', ')."
 }
 
-if ($Force -or $Steps -contains "UpdateLocalization") {
-    Update-LocalizedResources
+$ActionPlan = @()
+foreach ($stepName in $StepActions.Keys) {
+    if (-not ($Force -or $Steps -contains $stepName)) { continue }
+    foreach ($actionName in $StepActions[$stepName]) {
+        if ($Actions.Count -eq 0 -or $Actions -contains $actionName) { $ActionPlan += $actionName }
+    }
 }
 
-if ($Force -or $Steps -contains "Build") {
-    Invoke-Build
+# Naming actions that match nothing would otherwise run nothing and exit 0, which is indistinguishable
+# from a successful build. Selecting no steps at all is different: it is a deliberate no-op, not an error.
+if ($Actions.Count -gt 0 -and $ActionPlan.Count -eq 0) {
+    throw "-Actions ($($Actions -join ', ')) selected no action from -Steps ($($Steps -join ', ')). Nothing would run."
 }
 
-if ($Force -or $Steps -contains "Publish") {
-    Publish-Package
-    Create-VsixPackage
-    Create-NugetPackages
-    Generate-Manifest
-    Copy-PackageIntoStaticDirectory
-}
-
-if ($Force -or $Steps -contains "PrepareAcceptanceTests") {
-    Publish-PatchedDotnet
-    Invoke-TestAssetsBuild
-    Publish-Tests
-}
+foreach ($actionName in $ActionPlan) { & $actionName }
+# TEST-EXTRACT-END
  
 Write-Log "Build complete. {$(Get-ElapsedTime($timer))}"
 if ($Script:ScriptFailed) { Exit 1 } else { Exit 0 }

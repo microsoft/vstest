@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
@@ -553,9 +553,8 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
             this.testPlatformEventSource.TranslationLayerInitializeStart();
 
-            var timeout = EnvironmentHelper.GetConnectionTimeout();
             // Start communication
-            var port = await this.requestSender.InitializeCommunicationAsync(timeout * 1000);
+            var port = this.requestSender.InitializeCommunication();
 
             if (port > 0)
             {
@@ -565,6 +564,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
 
                 // Start vstest.console.exe process
                 this.vstestConsoleProcessManager.StartProcess(this.consoleParameters);
+                this.sessionStarted = await Task.Run(this.WaitForConnection).ConfigureAwait(false);
             }
             else
             {

@@ -1,4 +1,4 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29319.158
@@ -103,8 +103,6 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.AcceptanceTests", "test\Microsoft.TestPlatform.AcceptanceTests\Microsoft.TestPlatform.AcceptanceTests.csproj", "{DD9382B5-5EC4-4B3D-BEB7-95423731AE29}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.SmokeTests", "test\Microsoft.TestPlatform.SmokeTests\Microsoft.TestPlatform.SmokeTests.csproj", "{156F8811-28BB-4EC7-87D9-434F10FB7DBE}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.PerformanceTests", "test\Microsoft.TestPlatform.PerformanceTests\Microsoft.TestPlatform.PerformanceTests.csproj", "{A5B167ED-873A-4762-9326-5F43B8D3AFF6}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Microsoft.TestPlatform.ObjectModel.PlatformTests", "test\Microsoft.TestPlatform.ObjectModel.PlatformTests\Microsoft.TestPlatform.ObjectModel.PlatformTests.csproj", "{107F28E1-6E91-4A06-8943-E5E5A7E4CA66}"
 EndProject
@@ -496,18 +494,6 @@ Global
 		{156F8811-28BB-4EC7-87D9-434F10FB7DBE}.Release|x64.Build.0 = Release|Any CPU
 		{156F8811-28BB-4EC7-87D9-434F10FB7DBE}.Release|x86.ActiveCfg = Release|Any CPU
 		{156F8811-28BB-4EC7-87D9-434F10FB7DBE}.Release|x86.Build.0 = Release|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Debug|x64.Build.0 = Debug|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Debug|x86.Build.0 = Debug|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Release|x64.ActiveCfg = Release|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Release|x64.Build.0 = Release|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Release|x86.ActiveCfg = Release|Any CPU
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6}.Release|x86.Build.0 = Release|Any CPU
 		{107F28E1-6E91-4A06-8943-E5E5A7E4CA66}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{107F28E1-6E91-4A06-8943-E5E5A7E4CA66}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{107F28E1-6E91-4A06-8943-E5E5A7E4CA66}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -823,7 +809,6 @@ Global
 		{E344E0A2-7715-4C7F-BAF7-D64EA94CB19B} = {EE49F5DC-5835-4AE3-B3BA-8BDE0AD56330}
 		{DD9382B5-5EC4-4B3D-BEB7-95423731AE29} = {46250E12-4CF1-4051-B4A7-80C8C06E0068}
 		{156F8811-28BB-4EC7-87D9-434F10FB7DBE} = {46250E12-4CF1-4051-B4A7-80C8C06E0068}
-		{A5B167ED-873A-4762-9326-5F43B8D3AFF6} = {595BE9C1-E10F-4E50-938A-E6C248D3F950}
 		{107F28E1-6E91-4A06-8943-E5E5A7E4CA66} = {376C19DE-31E2-4FF6-88FC-0D0D6233C999}
 		{D27E1CB4-C641-4C6C-A140-EF5F6215AE29} = {ED0C35EB-7F31-4841-A24F-8EB708FFA959}
 		{EFA38DEF-C2BB-42AE-8B68-B31D79F3107E} = {B27FAFDF-2DBA-4AB0-BA85-FD5F21D359D6}

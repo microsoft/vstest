@@ -6,6 +6,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using System;
+    using System.Collections.Generic;
+    using System.IO;
 
     using static AcceptanceTestBase;
 
@@ -14,21 +16,59 @@ namespace Microsoft.TestPlatform.AcceptanceTests
     {
         [TestMethod]
         [TestCategory("Windows-Review")]
-        // the underlying test is using xUnit to avoid AppDomain enhancements in MSTest that make this pass even without multitargetting
-        // xUnit supports net452 onwards, so that is why this starts at net452, I also don't test all framework versions
         [NetCoreRunner(NETFX452_48)]
         [NetFrameworkRunner(NETFX452_48)]
-        public void RunningTestWithAFailingDebugAssertDoesNotCrashTheHostingProcess(RunnerInfo runnerInfo)
+        public void TestRunInATesthostThatTargetsTheirChosenNETFramework(RunnerInfo runnerInfo)
         {
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
             var resultsDir = GetResultsDirectory();
 
             var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
             var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
-            this.InvokeVsTest(arguments);
+            arguments += this.FrameworkDiagnosticArgument();
+            this.InvokeVsTest(arguments, new Dictionary<string, string>
+            {
+                ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework
+            });
 
             this.ValidateSummaryStatus(passedTestsCount: 1, failedTestsCount: 0, 0);
             TryRemoveDirectory(resultsDir);
+        }
+
+        [TestMethod]
+        [TestCategory("Windows-Review")]
+        [NetCoreRunner(NETFX452_48)]
+        [NetFrameworkRunner(NETFX452_48)]
+        public void FrameworkOracleShouldRejectAnIncorrectExpectedFramework(RunnerInfo runnerInfo)
+        {
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
+            var resultsDir = GetResultsDirectory();
+            try
+            {
+                var assemblyPath = this.BuildMultipleAssemblyPath("MultitargetedNetFrameworkProject.dll").Trim('\"');
+                var arguments = PrepareArguments(assemblyPath, null, null, this.FrameworkArgValue, runnerInfo.InIsolationValue, resultsDirectory: resultsDir);
+                arguments += this.FrameworkDiagnosticArgument();
+                this.InvokeVsTest(arguments, new Dictionary<string, string>
+                {
+                    ["EXPECTED_TARGET_FRAMEWORK"] = runnerInfo.TargetFramework == Net452TargetFramework ? Net48TargetFramework : Net452TargetFramework
+                });
+
+                this.ValidateSummaryStatus(passedTestsCount: 0, failedTestsCount: 1, skippedTestsCount: 0);
+                this.StdOutputContains("Assert.Equal() Failure");
+                this.ExitCodeEquals(1);
+            }
+            finally
+            {
+                TryRemoveDirectory(resultsDir);
+            }
+        }
+
+        private string FrameworkDiagnosticArgument()
+        {
+            var directory = Environment.GetEnvironmentVariable("VSTEST_ACCEPTANCE_DIAGNOSTICS_DIRECTORY")
+                ?? Path.Combine(this.testEnvironment.TestArtifactsDirectory, "framework-diagnostics");
+            Directory.CreateDirectory(directory);
+            return " /Diag:\"" + Path.Combine(directory, "framework-" + Guid.NewGuid().ToString("N") + ".log") + "\"";
         }
     }
 }

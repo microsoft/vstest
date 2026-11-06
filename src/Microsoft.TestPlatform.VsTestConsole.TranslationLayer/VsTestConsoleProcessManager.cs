@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
@@ -99,33 +99,14 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
         }
 
         /// <summary>
-        /// Call vstest.console with the parameters previously specified
+        /// Starts vstest.console with the parameters previously specified.
         /// </summary>
         public void StartProcess(ConsoleParameters consoleParameters)
         {
-            var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
-            {
-                UseShellExecute = false,
-                CreateNoWindow = true,
-                RedirectStandardOutput = true,
-                RedirectStandardError = true
-            };
+            var info = this.CreateProcessStartInfo(consoleParameters);
 
             EqtTrace.Verbose("VsTestCommandLineWrapper: Process Start Info {0} {1}", info.FileName, info.Arguments);
 
-#if NETFRAMEWORK
-            if (consoleParameters.EnvironmentVariables != null)
-            {
-                info.EnvironmentVariables.Clear();
-                foreach (var envVariable in consoleParameters.EnvironmentVariables)
-                {
-                    if (envVariable.Key != null)
-                    {
-                        info.EnvironmentVariables.Add(envVariable.Key.ToString(), envVariable.Value?.ToString());
-                    }
-                }
-            }
-#endif
             this.process = Process.Start(info);
 
             lock (syncObject)
@@ -142,6 +123,39 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer
             this.process.BeginOutputReadLine();
             this.process.BeginErrorReadLine();
             processExitedEvent.Reset();
+        }
+
+        internal ProcessStartInfo CreateProcessStartInfo(ConsoleParameters consoleParameters)
+        {
+            var info = new ProcessStartInfo(GetConsoleRunner(), string.Join(" ", BuildArguments(consoleParameters)))
+            {
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+
+#if NETFRAMEWORK
+            if (consoleParameters.EnvironmentVariables != null)
+            {
+                info.EnvironmentVariables.Clear();
+                foreach (var envVariable in consoleParameters.EnvironmentVariables)
+                {
+                    if (envVariable.Key != null)
+                    {
+                        if (envVariable.Value == null)
+                        {
+                            info.EnvironmentVariables.Remove(envVariable.Key.ToString());
+                        }
+                        else
+                        {
+                            info.EnvironmentVariables[envVariable.Key.ToString()] = envVariable.Value.ToString();
+                        }
+                    }
+                }
+            }
+#endif
+            return info;
         }
 
         /// <summary>

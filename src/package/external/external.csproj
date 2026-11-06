@@ -117,6 +117,29 @@
       <Version>$(MicrosoftFakesVersion)</Version>
       <PrivateAssets>All</PrivateAssets>
     </PackageReference>
+    <!--
+      The Fakes payload recovery. Read the long comment on Restore-FakesPayload in scripts\build.ps1
+      before changing anything here.
+
+      Microsoft.QualityTools.Testing.Fakes.TestRunnerHarness 16.11.230815 is obtainable from no feed.
+      The PackageReference above therefore resolves to a NEWER version, which lands in a different
+      directory, and the seven payload files the nuspec needs are simply absent. Restore succeeds;
+      packing fails much later, naming a path.
+
+      The seven files ship INSIDE Microsoft.TestPlatform 16.11.0, so they are recovered from there.
+      Downloading is consuming, not publishing.
+
+      THE VERSION IS A LITERAL AND MUST STAY ONE. Not $(TPB_Version), not a range, not a floating
+      16.11.*. If this ever resolved to "the latest 16.11.x", servicing build N+1 would take its
+      payload from build N, every future build would inherit its predecessor's OUTPUT as its INPUT,
+      and the drift would compound with no point at which it becomes visible. Pinned to the original
+      2021 release the chain always terminates there, so this recovers the original inputs rather
+      than rebuilding from our own output.
+
+      PackageDownload rather than PackageReference: nothing here is compiled against, only extracted,
+      so this must not become a dependency of the assembly.
+    -->
+    <PackageDownload Include="Microsoft.TestPlatform" Version="[16.11.0]" />
     <PackageReference Include="VsWebSite.Interop">
       <Version>$(VsWebSiteInteropVersion)</Version>
       <PrivateAssets>All</PrivateAssets>

@@ -300,6 +300,30 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         }
 
         [TestMethod]
+        public void CheckVersionWithTestHostShouldSucceedWhenTestHostSendsOnlyVersion()
+        {
+            this.SetupRaiseOnlyVersionOnSend();
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.CheckVersionWithTestHost();
+
+            this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
+        public void CheckVersionWithTestHostShouldTolerateTestMessageBeforeVersion()
+        {
+            // A test (log) message arriving before the version response is ignored, and the exchange
+            // completes on the version message.
+            this.SetupRaiseTestMessageThenVersionOnSend();
+            this.SetupFakeCommunicationChannel();
+
+            this.testRequestSender.CheckVersionWithTestHost();
+
+            this.mockChannel.Verify(mc => mc.Send(It.IsAny<string>()), Times.Once);
+        }
+
+        [TestMethod]
         public void InitializeDiscoveryShouldSendCommunicationMessageWithCorrectParametersWithVersion()
         {
             this.SetupFakeChannelWithVersionNegotiation(DUMMYNEGOTIATEDPROTOCOLVERSION);
@@ -862,6 +886,37 @@ namespace Microsoft.TestPlatform.CommunicationUtilities.UnitTests
         private void SetupRaiseMessageReceivedOnCheckVersion()
         {
             this.mockChannel.Setup(mc => mc.Send(It.IsAny<string>())).Callback(this.RaiseMessageReceivedEvent);
+        }
+
+        private void SetupRaiseOnlyVersionOnSend(int negotiatedVersion = DUMMYNEGOTIATEDPROTOCOLVERSION)
+        {
+            // Emulate a testhost that sends a plain version response.
+            const string versionData = "versionData";
+
+            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(versionData)).Returns(new Message { MessageType = MessageType.VersionCheck });
+            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.Is<Message>(m => m.MessageType == MessageType.VersionCheck))).Returns(negotiatedVersion);
+
+            this.mockChannel.Setup(mc => mc.Send(It.IsAny<string>())).Callback(() =>
+            {
+                this.mockChannel.Raise(c => c.MessageReceived += null, this.mockChannel.Object, new MessageReceivedEventArgs { Data = versionData });
+            });
+        }
+
+        private void SetupRaiseTestMessageThenVersionOnSend(int negotiatedVersion = DUMMYNEGOTIATEDPROTOCOLVERSION)
+        {
+            // Emulate a testhost that sends a test (log) message before its version response.
+            const string testMessageData = "testMessageData";
+            const string versionData = "versionData";
+
+            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(testMessageData)).Returns(new Message { MessageType = MessageType.TestMessage });
+            this.mockDataSerializer.Setup(ds => ds.DeserializeMessage(versionData)).Returns(new Message { MessageType = MessageType.VersionCheck });
+            this.mockDataSerializer.Setup(ds => ds.DeserializePayload<int>(It.Is<Message>(m => m.MessageType == MessageType.VersionCheck))).Returns(negotiatedVersion);
+
+            this.mockChannel.Setup(mc => mc.Send(It.IsAny<string>())).Callback(() =>
+            {
+                this.mockChannel.Raise(c => c.MessageReceived += null, this.mockChannel.Object, new MessageReceivedEventArgs { Data = testMessageData });
+                this.mockChannel.Raise(c => c.MessageReceived += null, this.mockChannel.Object, new MessageReceivedEventArgs { Data = versionData });
+            });
         }
 
         private void ResetRaiseMessageReceivedOnCheckVersion()

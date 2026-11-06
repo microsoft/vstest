@@ -6,6 +6,8 @@ namespace Microsoft.TestPlatform.TestUtilities
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer;
     using Microsoft.TestPlatform.VsTestConsole.TranslationLayer.Interfaces;
     using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Extensions;
+    using Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing;
+    using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions;
     using Microsoft.VisualStudio.TestPlatform.ObjectModel;
     using Microsoft.VisualStudio.TestPlatform.Utilities.Helpers;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -18,6 +20,7 @@ namespace Microsoft.TestPlatform.TestUtilities
     using System.Text;
     using System.Text.RegularExpressions;
     using System.Xml;
+    using global::TestPlatform.TestUtilities;
 
     /// <summary>
     /// Base class for integration tests.
@@ -39,6 +42,22 @@ namespace Microsoft.TestPlatform.TestUtilities
         private int runnerExitCode = -1;
 
         private string arguments = string.Empty;
+        private ProcessInvocation nextProcessInvocation;
+        private readonly List<ProcessInvocation> processInvocations = new List<ProcessInvocation>();
+        protected ProcessInvocation ConsoleProcessInvocation { get; private set; }
+
+        protected ProcessInvocation ObserveNextProcess()
+        {
+            this.nextProcessInvocation = new ProcessInvocation();
+            this.processInvocations.Add(this.nextProcessInvocation);
+            return this.nextProcessInvocation;
+        }
+
+        [TestCleanup]
+        public void DisposeProcessInvocations()
+        {
+            foreach (var invocation in this.processInvocations) { invocation.Dispose(); }
+        }
 
         protected readonly IntegrationTestEnvironment testEnvironment;
 
@@ -118,8 +137,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// </summary>
         /// <param name="arguments">Arguments provided to <c>vstest.console</c>.exe</param>
         public void InvokeVsTest(string arguments)
+            => this.InvokeVsTest(arguments, null);
+
+        public void InvokeVsTest(string arguments, Dictionary<string, string> environmentVariables)
         {
-            this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode);
+            this.ExecuteVsTestConsole(arguments, out this.standardTestOutput, out this.standardTestError, out this.runnerExitCode, environmentVariables);
             this.FormatStandardOutCome();
         }
 
@@ -487,10 +509,11 @@ namespace Microsoft.TestPlatform.TestUtilities
         /// Returns the VsTestConsole Wrapper.
         /// </summary>
         /// <returns></returns>
-        public IVsTestConsoleWrapper GetVsTestConsoleWrapper()
+        public IVsTestConsoleWrapper GetVsTestConsoleWrapper(bool observeProcess = false)
         {
             var logFileName = Path.GetFileName(Path.GetTempFileName());
-            var logFileDir = Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
+            var logFileDir = Environment.GetEnvironmentVariable("VSTEST_ACCEPTANCE_DIAGNOSTICS_DIRECTORY")
+                ?? Path.Combine(Path.GetTempPath(), "VSTestConsoleWrapperLogs");
 
             if (!Directory.Exists(logFileDir))
             {
@@ -519,7 +542,22 @@ namespace Microsoft.TestPlatform.TestUtilities
                 throw new FileNotFoundException($"File '{dotnetPath}' was not found.");
             }
 
-            var vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+            VsTestConsoleWrapper vstestConsoleWrapper;
+            if (observeProcess)
+            {
+                this.ConsoleProcessInvocation = new ProcessInvocation();
+                this.processInvocations.Add(this.ConsoleProcessInvocation);
+                vstestConsoleWrapper = new VsTestConsoleWrapper(
+                    new VsTestConsoleRequestSender(),
+                    new ObservedProcessManager(consoleRunnerPath, dotnetPath, this.ConsoleProcessInvocation),
+                    new ConsoleParameters() { LogFilePath = logFilePath },
+                    TestPlatformEventSource.Instance,
+                    new ProcessHelper());
+            }
+            else
+            {
+                vstestConsoleWrapper = new VsTestConsoleWrapper(consoleRunnerPath, dotnetPath, new ConsoleParameters() { LogFilePath = logFilePath });
+            }
             vstestConsoleWrapper.StartSession();
 
             return vstestConsoleWrapper;
@@ -543,7 +581,7 @@ namespace Microsoft.TestPlatform.TestUtilities
             return testMethodName;
         }
 
-        private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode)
+        private void ExecuteVsTestConsole(string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
         {
             if (this.IsNetCoreRunner())
             {
@@ -552,7 +590,7 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             this.arguments = args;
 
-            this.ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode);
+            this.ExecuteApplication(this.GetConsoleRunnerPath(), args, out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
         /// <summary>
@@ -573,7 +611,20 @@ namespace Microsoft.TestPlatform.TestUtilities
 
             var executablePath = IsWindows ? @"dotnet\dotnet.exe" : @"dotnet-linux/dotnet";
             var patchedDotnetPath = Path.Combine(this.testEnvironment.TestArtifactsDirectory, executablePath);
-            this.ExecuteApplication(patchedDotnetPath, string.Join(" ", command, args), out stdOut, out stdError, out exitCode, environmentVariables);
+            var commandLine = string.Join(" ", command, args);
+            var sdkEntryPoint = Environment.GetEnvironmentVariable("VSTEST_ACCEPTANCE_DOTNET_SDK");
+            if (!string.IsNullOrEmpty(sdkEntryPoint))
+            {
+                if (!File.Exists(sdkEntryPoint))
+                {
+                    throw new FileNotFoundException("The prepared acceptance SDK entry point was not found.", sdkEntryPoint);
+                }
+
+                // global.json searches .dotnet before the host's SDK, bypassing the patched copy.
+                commandLine = string.Join(" ", "exec", sdkEntryPoint.AddDoubleQuote(), commandLine);
+            }
+
+            this.ExecuteApplication(patchedDotnetPath, commandLine, out stdOut, out stdError, out exitCode, environmentVariables);
         }
 
         private void ExecuteApplication(string path, string args, out string stdOut, out string stdError, out int exitCode, Dictionary<string, string> environmentVariables = null)
@@ -628,6 +679,11 @@ namespace Microsoft.TestPlatform.TestUtilities
                 stopwatch.Start();
 
                 process.Start();
+                if (this.nextProcessInvocation != null)
+                {
+                    this.nextProcessInvocation.SetRoot(process);
+                    this.nextProcessInvocation = null;
+                }
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
                 if (!process.WaitForExit(5 * 60 * 1000)) // 5 minutes

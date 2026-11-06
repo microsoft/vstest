@@ -43,6 +43,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
         public VsTestConsoleRequestSenderTests()
         {
             this.mockCommunicationManager = new Mock<ICommunicationManager>();
+            this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite)).Returns(true);
             this.requestSender = new VsTestConsoleRequestSender(
                 this.mockCommunicationManager.Object,
                 JsonDataSerializer.Instance,
@@ -61,6 +62,20 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Verify(cm => cm.WaitForClientConnection(Timeout.Infinite), Times.Once);
             this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Exactly(2));
             this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, this.protocolVersion), Times.Once);
+        }
+
+        [TestMethod]
+        public void InitializeCommunicationShouldNotNegotiateVersionAfterFailedAccept()
+        {
+            this.mockCommunicationManager.Setup(cm => cm.HostServer(It.IsAny<IPEndPoint>()))
+                .Returns(new IPEndPoint(IPAddress.Loopback, 123));
+            this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
+                .Returns(false);
+
+            Assert.AreEqual(123, this.requestSender.InitializeCommunication());
+            Assert.IsFalse(this.requestSender.WaitForRequestHandlerConnection(this.WaitTimeout));
+            this.mockCommunicationManager.Verify(cm => cm.ReceiveMessage(), Times.Never);
+            this.mockCommunicationManager.Verify(cm => cm.SendMessage(MessageType.VersionCheck, It.IsAny<int>()), Times.Never);
         }
 
         [TestMethod]
@@ -113,7 +128,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
-                .Callback((int timeout) => Task.Delay(200).Wait());
+                .Callback((int timeout) => Task.Delay(200).Wait()).Returns(true);
             this.mockCommunicationManager.Setup(cm => cm.ReceiveMessage()).Throws(new Exception("Fail"));
 
             var portOutput = this.requestSender.InitializeCommunication();
@@ -152,7 +167,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
-                .Callback((int timeout) => Task.Delay(200).Wait());
+                .Callback((int timeout) => Task.Delay(200).Wait()).Returns(true);
 
             var discoveryMessage = new Message() { MessageType = MessageType.StartDiscovery };
 
@@ -200,7 +215,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.HostServer(new IPEndPoint(IPAddress.Loopback, 0))).Returns(new IPEndPoint(IPAddress.Loopback, dummyPortInput));
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
-                .Callback((int timeout) => Task.Delay(200).Wait());
+                .Callback((int timeout) => Task.Delay(200).Wait()).Returns(true);
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
@@ -251,7 +266,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
-                .Callback((int timeout) => Task.Delay(200).Wait());
+                .Callback((int timeout) => Task.Delay(200).Wait()).Returns(true);
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
 
@@ -2132,7 +2147,7 @@ namespace Microsoft.TestPlatform.VsTestConsole.TranslationLayer.UnitTests
             this.mockCommunicationManager.Setup(cm => cm.AcceptClientAsync()).Returns(Task.FromResult(false)).Callback(() => { });
 
             this.mockCommunicationManager.Setup(cm => cm.WaitForClientConnection(Timeout.Infinite))
-                .Callback((int timeout) => Task.Delay(200).Wait());
+                .Callback((int timeout) => Task.Delay(200).Wait()).Returns(true);
 
             var sessionConnected = new Message() { MessageType = MessageType.SessionConnected };
             var versionCheck = new Message() { MessageType = MessageType.VersionCheck, Payload = this.protocolVersion };

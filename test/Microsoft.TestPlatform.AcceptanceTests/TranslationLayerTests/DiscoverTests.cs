@@ -178,6 +178,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         public void CancelTestDiscovery(RunnerInfo runnerInfo)
         {
             // Setup
+            SetTestEnvironment(this.testEnvironment, runnerInfo);
             var testAssemblies = new List<string>
                                      {
                                          this.GetAssetFullPath("DiscoveryTestProject.dll"),
@@ -185,7 +186,6 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
                                          this.GetAssetFullPath("SimpleTestProject2.dll")
                                      };
 
-            SetTestEnvironment(this.testEnvironment, runnerInfo);
             this.Setup();
 
             var discoveredTests = new List<TestCase>();

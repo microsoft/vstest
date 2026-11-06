@@ -70,6 +70,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         }
 
         [TestMethod]
+        [Ignore("Legacy coded WebTest. Ignored by user request.")]
         [TestCategory("Windows-Review")]
         [NetFullTargetFrameworkDataSource]
         public void CodedWebTestRunAllTests(RunnerInfo runnerInfo)

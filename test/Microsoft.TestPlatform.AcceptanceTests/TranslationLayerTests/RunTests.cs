@@ -24,9 +24,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private IVsTestConsoleWrapper vstestConsoleWrapper;
         private RunEventHandler runEventHandler;
 
-        private void Setup()
+        private void Setup(bool observeProcess = false)
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(observeProcess);
             this.runEventHandler = new RunEventHandler();
         }
 
@@ -58,18 +58,15 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public void EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
         {
-            var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
-
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            this.Setup(observeProcess: true);
 
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies(), this.GetDefaultRunSettings(), this.runEventHandler);
             this.vstestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper = null;
 
             // Assert
-            Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
-
-            this.vstestConsoleWrapper = null;
+            Assert.IsTrue(this.ConsoleProcessInvocation.HasExited, "EndSession must terminate this invocation's runner.");
         }
 
         [TestMethod]

@@ -3,6 +3,9 @@
 
 namespace Microsoft.TestPlatform.AcceptanceTests
 {
+    using System.Diagnostics;
+    using System.IO;
+    using Microsoft.TestPlatform.TestUtilities;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     [TestClass]
@@ -19,12 +22,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             var projectName = "SimpleTestProject.csproj";
             var projectPath = this.GetProjectFullPath(projectName);
 
-            this.InvokeDotnetTest($@"{projectPath} --logger:""Console;Verbosity=normal""");
-            
-            // ensure our dev version is used
-            this.StdOutputContains("-dev");
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ExitCodeEquals(1);
+            var diagnosticDirectory = GetResultsDirectory();
+            try
+            {
+                var diagnosticPath = Path.Combine(diagnosticDirectory, "dotnet-test.log");
+                this.InvokeDotnetTest($@"{projectPath} -p:VSTestNoLogo= --diag:""{diagnosticPath}"" --logger:""Console;Verbosity=normal""");
+
+                this.StdOutputContains(GetPatchedConsoleVersion());
+                this.ValidateSummaryStatus(1, 1, 1);
+                this.ExitCodeEquals(1);
+            }
+            finally
+            {
+                TryRemoveDirectory(diagnosticDirectory);
+            }
         }
 
 
@@ -37,12 +48,20 @@ namespace Microsoft.TestPlatform.AcceptanceTests
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
 
             var assemblyPath = this.BuildMultipleAssemblyPath("SimpleTestProject.dll").Trim('\"');
-            this.InvokeDotnetTest($@"{assemblyPath} --logger:""Console;Verbosity=normal""");
+            var diagnosticDirectory = GetResultsDirectory();
+            try
+            {
+                var diagnosticPath = Path.Combine(diagnosticDirectory, "dotnet-test.log");
+                this.InvokeDotnetTest($@"{assemblyPath} --diag:""{diagnosticPath}"" --logger:""Console;Verbosity=normal""");
 
-            // ensure our dev version is used
-            this.StdOutputContains("-dev");
-            this.ValidateSummaryStatus(1, 1, 1);
-            this.ExitCodeEquals(1);
+                this.StdOutputContains(GetPatchedConsoleVersion());
+                this.ValidateSummaryStatus(1, 1, 1);
+                this.ExitCodeEquals(1);
+            }
+            finally
+            {
+                TryRemoveDirectory(diagnosticDirectory);
+            }
         }
 
         [TestMethod]
@@ -74,6 +93,19 @@ namespace Microsoft.TestPlatform.AcceptanceTests
 
             this.ValidateSummaryStatus(1, 0, 0);
             this.ExitCodeEquals(0);
+        }
+
+        private static string GetPatchedConsoleVersion()
+        {
+            var console = Path.Combine(
+                IntegrationTestEnvironment.TestPlatformRootDirectory,
+                "artifacts",
+                IntegrationTestEnvironment.BuildConfiguration,
+                CoreRunnerFramework,
+                "vstest.console.dll");
+            var version = FileVersionInfo.GetVersionInfo(console).ProductVersion;
+            Assert.IsFalse(string.IsNullOrEmpty(version), "The locally built console has no product version.");
+            return version;
         }
     }
 }

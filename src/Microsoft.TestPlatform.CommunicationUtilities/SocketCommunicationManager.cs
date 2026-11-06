@@ -35,6 +35,8 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         private TcpClient tcpClient;
 
+        private TcpClient acceptedTcpClient;
+
         /// <summary>
         /// Binary Writer to write to channel stream
         /// </summary>
@@ -113,6 +115,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
                 this.clientConnectedEvent.Reset();
 
                 var client = await this.tcpListener.AcceptTcpClientAsync();
+                this.acceptedTcpClient = client;
                 this.socket = client.Client;
                 this.socket.NoDelay = true;
 
@@ -146,6 +149,14 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities
         /// </summary>
         public void StopServer()
         {
+#if NETFRAMEWORK
+            // tcpClient.Close() calls tcpClient.Dispose().
+            this.acceptedTcpClient?.Close();
+#else
+            // tcpClient.Close() not available for netstandard1.5.
+            this.acceptedTcpClient?.Dispose();
+#endif
+            this.acceptedTcpClient = null;
             this.tcpListener?.Stop();
             this.tcpListener = null;
             this.binaryReader?.Dispose();

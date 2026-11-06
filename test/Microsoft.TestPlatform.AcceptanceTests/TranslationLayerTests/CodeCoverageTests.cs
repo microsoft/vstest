@@ -29,9 +29,9 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         private RunEventHandler runEventHandler;
         private TestRunAttachmentsProcessingEventHandler testRunAttachmentsProcessingEventHandler;
 
-        private void Setup()
+        private void Setup(bool observeProcess = false)
         {
-            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper();
+            this.vstestConsoleWrapper = this.GetVsTestConsoleWrapper(observeProcess);
             this.runEventHandler = new RunEventHandler();
             this.testRunAttachmentsProcessingEventHandler = new TestRunAttachmentsProcessingEventHandler();
         }
@@ -262,10 +262,8 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
         [NetCoreTargetFrameworkDataSource]
         public async Task EndSessionShouldEnsureVstestConsoleProcessDies(RunnerInfo runnerInfo)
         {
-            var numOfProcesses = Process.GetProcessesByName("vstest.console").Length;
-
             AcceptanceTestBase.SetTestEnvironment(this.testEnvironment, runnerInfo);
-            this.Setup();
+            this.Setup(observeProcess: true);
 
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Take(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
             this.vstestConsoleWrapper.RunTests(this.GetTestAssemblies().Skip(1), this.GetCodeCoverageRunSettings(1), this.runEventHandler);
@@ -277,11 +275,10 @@ namespace Microsoft.TestPlatform.AcceptanceTests.TranslationLayerTests
 
             // act
             this.vstestConsoleWrapper?.EndSession();
+            this.vstestConsoleWrapper = null;
 
             // Assert
-            Assert.AreEqual(numOfProcesses, Process.GetProcessesByName("vstest.console").Length);
-
-            this.vstestConsoleWrapper = null;
+            Assert.IsTrue(this.ConsoleProcessInvocation.HasExited, "EndSession must terminate this invocation's runner.");
         }
 
         private IList<string> GetTestAssemblies()

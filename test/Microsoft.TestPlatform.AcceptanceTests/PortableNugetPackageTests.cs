@@ -21,11 +21,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests
         {
             var packageLocation = Path.Combine(IntegrationTestEnvironment.TestPlatformRootDirectory, "artifacts", IntegrationTestEnvironment.BuildConfiguration, "packages");
             var nugetPackage = Directory.EnumerateFiles(packageLocation, "Microsoft.TestPlatform.Portable.*.nupkg").ToList();
-            portablePackageFolder = Path.Combine(packageLocation, Path.GetFileNameWithoutExtension(nugetPackage[0]));
-            if (Directory.Exists(portablePackageFolder))
-            {
-                Directory.Delete(portablePackageFolder, recursive: true);
-            }
+            portablePackageFolder = GetResultsDirectory();
             ZipFile.ExtractToDirectory(nugetPackage[0], portablePackageFolder);
         }
 

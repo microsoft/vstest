@@ -1,11 +1,11 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TestPlatformRoot Condition="$(TestPlatformRoot) == ''">$(MSBuildThisFileDirectory)../../</TestPlatformRoot>
     <!-- This version is read by vsts-prebuild.ps1 and is a base for the current version, this should be updated
     at the start of new iteration to the goal number. This is also used to version the local packages. This version needs to be statically
     readable when we read the file as xml, don't move it to a .props file, unless you change the build server process -->
-    <TPVersionPrefix>16.11.0</TPVersionPrefix>
+    <TPVersionPrefix>16.11.1</TPVersionPrefix>
   </PropertyGroup>
   <PropertyGroup>
     <!-- Versioning is defined from the build script. Use a default dev build if it's not defined.
@@ -109,6 +109,11 @@
     <!-- Disable code analysis by default. Ignore SA0001 until we've xml documentation enabled for
          all projects -->
     <EnableCodeAnalysis>false</EnableCodeAnalysis>
+
+    <!-- StyleCop is not run on this servicing branch. Its rules encode a house style that the
+         backported files do not follow, and reformatting them would enlarge the source diff
+         without altering behaviour. Remove this to turn the analyzers back on. -->
+    <EnableStyleCopAnalyzers>false</EnableStyleCopAnalyzers>
     <NoWarn>$(NoWarn);SA0001</NoWarn>
 
     <CodeAnalysisRuleSet>$(TestPlatformRoot)scripts/stylecop.ruleset</CodeAnalysisRuleSet>

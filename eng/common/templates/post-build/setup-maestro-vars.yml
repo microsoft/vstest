@@ -1,18 +1,8 @@
-jobs:
-- job: setupMaestroVars
-  displayName: Setup Maestro Vars
-  pool:
-    vmImage: 'windows-2019'
-  steps:
-    - task: DownloadBuildArtifacts@0
-      displayName: Download Release Configs
-      inputs:
-        buildType: current
-        artifactName: ReleaseConfigs
+steps:
+- template: /eng/common/core-templates/post-build/setup-maestro-vars.yml
+  parameters:
+    # Specifies whether to use 1ES
+    is1ESPipeline: false
 
-    - task: PowerShell@2
-      name: setReleaseVars
-      displayName: Set Release Configs Vars
-      inputs:
-        filePath: $(Build.SourcesDirectory)/eng/common/post-build/setup-maestro-vars.ps1
-        arguments: -ReleaseConfigsPath '$(Build.StagingDirectory)/ReleaseConfigs/ReleaseConfigs.txt'
+    ${{ each parameter in parameters }}:
+      ${{ parameter.key }}: ${{ parameter.value }}
