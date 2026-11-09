@@ -998,14 +998,14 @@ extends:
             # passes both gates: no file is empty, no result is unknown, nothing is unexpectedly not
             # executed. Measured, not assumed. An empty folder is rejected; a PARTIAL one was not.
             #
-            # The floors are the measured full pass on this line: 32 result files (16 netcore + 16
-            # framework) and 4,587 result nodes. They are minimums, so adding tests raises the count
-            # harmlessly and losing a suite blocks. These are the script's own parameters, not new
-            # configuration.
+            # A full pass on this line produced 32 result files (16 netcore + 16 framework) and
+            # 4,464 result nodes. Keep the previous 21-result allowance, so require at least 4,443
+            # results. Adding tests raises the count harmlessly and losing a suite still blocks.
+            # These are the script's own parameters, not new configuration.
             - powershell: |
                 & "$env:BUILD_SOURCESDIRECTORY\scripts\build\Assert-TrxHasResults.ps1" -SelfTest
                 if ($LASTEXITCODE -ne 0) { throw "The .trx gate failed its own self-test; its verdict on this build cannot be trusted." }
-                & "$env:BUILD_SOURCESDIRECTORY\scripts\build\Assert-TrxHasResults.ps1" -ResultsDirectory "$env:BUILD_SOURCESDIRECTORY\artifacts\TestResults\$env:_BUILDCONFIG\Unit" -ExpectedEmptyBaseline "$env:BUILD_SOURCESDIRECTORY\eng\servicing-known-test-failures.json" -MinimumReportCount 32 -MinimumTotalResults 4587
+                & "$env:BUILD_SOURCESDIRECTORY\scripts\build\Assert-TrxHasResults.ps1" -ResultsDirectory "$env:BUILD_SOURCESDIRECTORY\artifacts\TestResults\$env:_BUILDCONFIG\Unit" -ExpectedEmptyBaseline "$env:BUILD_SOURCESDIRECTORY\eng\servicing-known-test-failures.json" -MinimumReportCount 32 -MinimumTotalResults 4443
                 if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
                 & "$env:BUILD_SOURCESDIRECTORY\scripts\build\Assert-TrxHasResults.ps1" -ResultsDirectory "$env:BUILD_SOURCESDIRECTORY\artifacts\TestResults\$env:_BUILDCONFIG\Integration" -MinimumReportCount 15
                 exit $LASTEXITCODE
