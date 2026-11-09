@@ -111,11 +111,7 @@ Set it up once (requires org admin to create/install the App):
    GitHub Apps). Grant the repository permissions the workflows need (Administration
    read-only; Checks read-only; Contents, Issues, and Pull requests read/write; and
    Security events read/write for code-scanning alerts), generate a **private key**
-   (`.pem`), and **install** the App on `microsoft/vstest`. `msbuild-quality-review.md`,
-   `malicious-code-scan.md`, and `daily-file-diet.md` request `permission-checks: read`;
-   an administrator must grant and approve Checks (read-only) for an existing
-   installation before recompiling with a gh-aw version that requires it, otherwise the
-   App's token-creation step fails and blocks those workflows' conclusion job.
+   (`.pem`), and **install** the App on `microsoft/vstest`.
 2. Store the App **Client ID** as a repository **variable** and the private key as a
    **secret**. The variable remains named `APP_ID` to match the workflow sources, but its
    value must be the Client ID, not the numeric App ID:
