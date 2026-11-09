@@ -402,7 +402,7 @@
       Other supported values are Framework40, Framework45, FrameworkCore10 and FrameworkUap10.</source>
         <target state="translated">--Framework|/Framework:&lt;Framework Version&gt;
       Version cible du .NET Framework à utiliser pour l’exécution de tests. 
-      Les valeurs valides sont des noms courts tels que net48 et net10.0, ou des noms longs tels que « .NETFramework,Version=v4.8 » et « .NETCoreApp,Version=v10.0 ».
+      Les valeurs valides sont des noms courts tels que net48 et net10.0, ou des noms longs tels que ".NETFramework,Version=v4.8" et ".NETCoreApp,Version=v10.0".
       Les autres valeurs prises en charge sont Framework40, Framework45, FrameworkCore10 et FrameworkUap10.</target>
         <note />
       </trans-unit>
