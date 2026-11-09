@@ -17,6 +17,8 @@ using System.Xml.Linq;
 using Microsoft.VisualStudio.TestPlatform.Common;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
+using NuGet.Versioning;
+
 using System.Text.Json;
 
 namespace Microsoft.TestPlatform.TestUtilities;
@@ -333,7 +335,11 @@ public class IntegrationTestBuild : IntegrationTestBase
             cacheId[sdkPropertyName] = netTestSdkVersion;
 
             var netTestSdkVersionDir = netTestSdkVersion.TrimStart('[').TrimEnd(']');
-            if (Directory.Exists(Path.Combine(nugetCache, "microsoft.testplatform", netTestSdkVersionDir)) && Directory.Exists(Path.Combine(nugetCache, "microsoft.testplatform.cli", netTestSdkVersionDir)))
+            // These CLI versions bundle vulnerable assemblies and are not used as runners by the compatibility matrix.
+            // Keep restoring Microsoft.NET.Test.Sdk at these versions when building the test projects below.
+            var restoreCli = !VersionRange.Parse("[15.8.0,15.9.2]").Satisfies(NuGetVersion.Parse(netTestSdkVersionDir));
+            if (Directory.Exists(Path.Combine(nugetCache, "microsoft.testplatform", netTestSdkVersionDir))
+                && (!restoreCli || Directory.Exists(Path.Combine(nugetCache, "microsoft.testplatform.cli", netTestSdkVersionDir))))
             {
                 continue;
             }
@@ -341,7 +347,7 @@ public class IntegrationTestBuild : IntegrationTestBase
             // We restore this project to download TestPlatform and TestPlatform.CLI nugets, into our package cache.
             // Using nuget.exe install errors out in various weird ways.
             var tools = Path.Combine(Root, "test", "TestAssets", "Tools", "Tools.csproj");
-            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{tools}" -p:PackageVersion={netTestSdkVersionDir} """);
+            ExecuteApplication2(Dotnet, $"""restore --packages {nugetCache} {nugetFeeds} --source "{IntegrationTestEnvironment.LocalPackageSource}" -nodereuse:false "{tools}" -p:PackageVersion={netTestSdkVersionDir} -p:RestoreTestPlatformCli={restoreCli} """);
         }
 
         foreach (var propertyName in msTestVersionProperties)
