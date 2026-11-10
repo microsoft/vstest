@@ -16,6 +16,15 @@ $desktop = Join-Path $output 'net451\win7-x64'
 $core = Join-Path $output 'netcoreapp2.0'
 $coreDesktopHost = Join-Path $core 'TestHost'
 
+function Get-TestPackageVersion([string] $ExpectedVersion, [string] $ProductVersion) {
+    $actualVersion = $ProductVersion.Split('+')[0]
+    if ($ExpectedVersion -and $ExpectedVersion -ne $actualVersion) {
+        throw "SETUP FAILURE: integration package version '$ExpectedVersion' does not match the built console '$actualVersion'."
+    }
+
+    return $actualVersion
+}
+
 function Publish-TestProduct([string] $Project, [string] $Framework, [string] $Destination) {
     Write-Host "Staging $Project ($Framework) -> $Destination"
     & $dotnet publish (Join-Path $repo $Project) --configuration $Configuration --framework $Framework --no-build --no-restore --output $Destination -v:quiet
@@ -96,6 +105,23 @@ function Copy-LegacyTestDependencies {
 }
 
 if ($SelfTest) {
+    foreach ($version in @('15.9.3', '15.9.3-hotfix-261109-01')) {
+        if ((Get-TestPackageVersion $version $version) -ne $version -or
+            (Get-TestPackageVersion '' "$version+commit") -ne $version) {
+            throw 'Test package version does not match the built console.'
+        }
+    }
+    $mismatchRejected = $false
+    try {
+        Get-TestPackageVersion '15.9.3' '15.9.3-hotfix-261109-01' | Out-Null
+    }
+    catch {
+        $mismatchRejected = $true
+    }
+    if (-not $mismatchRejected) {
+        throw 'A test package version different from the built console was accepted.'
+    }
+
     $root = Join-Path ([IO.Path]::GetTempPath()) ('vstest-legacy-' + [Guid]::NewGuid().ToString('N'))
     $previousPackages = $env:NUGET_PACKAGES
     try {
@@ -171,12 +197,7 @@ foreach ($console in @((Join-Path $desktop 'vstest.console.exe'), (Join-Path $co
         throw "SETUP FAILURE: staged console not found: $console"
     }
 }
-if (-not $Version) {
-    $Version = [Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $desktop 'vstest.console.exe')).ProductVersion.Split('+')[0]
-}
-if ($Version -notmatch '^15\.9\.3-hotfix-\d+-\d+$') {
-    throw "SETUP FAILURE: integration package version does not follow the servicing version rule: $Version"
-}
+$Version = Get-TestPackageVersion $Version ([Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path $desktop 'vstest.console.exe')).ProductVersion)
 $packageInputs = Join-Path $repo 'artifacts\obj\integration-packages'
 New-Item -ItemType Directory -Path $packageInputs -Force | Out-Null
 $nuspec = New-Object System.Xml.XmlDocument

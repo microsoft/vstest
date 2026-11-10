@@ -3,6 +3,10 @@
 # Internal feed publishing is a separate opt-in; BAR/Darc remains disabled.
 
 parameters:
+- name: isRTM
+  displayName: "Produce RTM version?"
+  type: boolean
+  default: false
 - name: runPackagingAndSigning
   type: boolean
   default: true
@@ -241,6 +245,12 @@ extends:
                 targetPath: $(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)
                 artifactName: ServicingTestResults_$(_BuildConfig)
                 condition: succeededOrFailed()
+              - output: pipelineArtifact
+                displayName: Publish ReleasePackages
+                targetPath: '$(Build.ArtifactStagingDirectory)\ReleasePackages'
+                artifactName: ReleasePackages
+                sbomEnabled: false
+                condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
             steps:
             # AN EXPLICIT CHECKOUT, BECAUSE THE DEFAULT ONE IS SHALLOW AND THAT BROKE TWO BUILDS.
             #
@@ -421,30 +431,7 @@ extends:
               displayName: Assert no undeclared product source change
               timeoutInMinutes: 10
 
-            # 📌 THE VERSION IS COMPUTED ONCE, HERE, BEFORE ANYTHING COMPILES.
-            # It used to be computed inside the Package step, which was correct while that step was
-            # the only consumer. It is HOISTED rather than COPIED because the Build step now needs
-            # the same value, and the comment further down already argued against letting the
-            # version live in "a fourth place".
-            #
-            # WHY THE BUILD STEP NEEDS IT - measured on 3066724's own artifacts, across all 1,419
-            # versioned binaries in the extracted packages:
-            #
-            #   ProductVersion 15.9.3-release-26904-16             1118
-            #   ProductVersion 15.9.3-preview.26454.16+<sha>         87
-            #
-            # The 87 are precisely the assemblies scripts\build.ps1 does NOT republish, so they are
-            # the BUILD step's output surviving untouched into the packages. That is not a new
-            # theory - the Package step's own comment below already named netstandard1.4
-            # PlatformAbstractions.dll as "the Build step's output surviving untouched", and that
-            # assembly is one of these 87. Two independent readings, same conclusion.
-            #
-            # Shipped 15.9.2 was MEASURED for comparison rather than assumed: every one of these
-            # same assemblies carries ONE uniform first-party ProductVersion, 15.9.2 - including
-            # netstandard1.4 PlatformAbstractions.dll and netstandard1.3 Microsoft.TestPlatform.
-            # Build.dll. So the 87 diverge from the shipped artifacts TWICE: on the +sha AND on the
-            # preview.<date> base label. Neither is the ONE approved divergence (FileVersion), so
-            # both are closed by giving the Build step the same two properties the Package step has.
+            # Build, packaging and test assets must consume the same version.
             - powershell: |
                 $bn = "$(Build.BuildNumber)"
                 if ($bn -notmatch '^(\d{4})(\d{2})(\d{2})\.(\d+)$') {
@@ -454,12 +441,10 @@ extends:
                 $mm  = [int]$Matches[2]
                 $dd  = [int]$Matches[3]
                 $rev = '{0:D2}' -f [int]$Matches[4]
-                $suffix = "hotfix-$yy$mm{0:D2}-$rev" -f $dd
+                $suffix = if ('${{ parameters.isRTM }}' -eq 'True') { '' } else { "hotfix-$yy$mm{0:D2}-$rev" -f $dd }
                 $prefix = ([xml](Get-Content scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | Where-Object { $_ }
-                # An empty prefix would silently produce a version of "-hotfix-<date>-<rev>", which
-                # packs and signs happily and is wrong everywhere downstream. Stop instead.
                 if (-not $prefix) { throw "TPVersionPrefix is empty in scripts\build\TestPlatform.Settings.targets." }
-                $full = "$prefix-$suffix"
+                $full = if ($suffix) { "$prefix-$suffix" } else { $prefix }
                 Write-Host "VERSION-SUFFIX build number : $bn"
                 Write-Host "VERSION-SUFFIX suffix       : $suffix"
                 Write-Host "VERSION-SUFFIX full version : $full"
@@ -715,35 +700,9 @@ extends:
                   if ($n -lt 232) { throw "Staged payload has $n files; the measured full set is 232. A short payload produces packages that are quietly missing files." }
                 displayName: Assert staged payload present
 
-              # VERSION SUFFIX: computed per build, never a constant.
-              #
-              # scripts\build.ps1:23 defaults $VersionSuffix to the literal "dev", and :141 builds
-              # $TPB_Version as "$Version-$VersionSuffix". A CONSTANT suffix means every build of
-              # this branch produces packages with identical file names, so the second delivering
-              # run pushes nothing: the feed keeps the FIRST run's bytes and the push still reports
-              # success because allowPackageConflicts is set. Measured across the three lines by an
-              # end-to-end comparison of feed bytes against build artifacts: this line came out 9 of
-              # 9 identical only because the 15.9.2 -> 15.9.3 prefix bump happened to force a fresh
-              # push, and a sibling line came out 0 of 11 with a feed frozen for a day.
-              #
-              # The shape is taken from what actually shipped, not chosen:
-              #   stable      15.9.2, 16.11.0, 17.10.0        bare, no suffix
-              #   prerelease  17.14.1-release-25428-01        -release-<yyMMdd>-<rev>
-              # 15.9 itself shipped bare as 15.9.1, so there is no 15.9-era prerelease shape to
-              # copy; the modern one is used.
-              #
-              # $(Build.BuildNumber) is the only per-build value available here and it already has
-              # the date and the revision in it, so the suffix is DERIVED from it rather than being
-              # a fourth place a version lives. The build.ps1 default stays "dev" on purpose: a
-              # developer's local build should not claim to be a release build.
               - powershell: |
-                  # The version is computed ONCE, before the Build step - see "THE VERSION IS
-                  # COMPUTED ONCE" there. This step consumes it instead of deriving its own copy,
-                  # so the Build step and the Package step cannot drift apart. Drift is not
-                  # hypothetical: it is exactly what put 87 assemblies on 15.9.3-preview.26454.16
-                  # while the other 1,118 were on 15.9.3-release-26904-16 in build 3066724.
                   $suffix = "$(ProducedVersionSuffix)"
-                  if (-not $suffix) { throw "ProducedVersionSuffix is empty. The 'Compute the produced version' step must run before this one - an empty suffix would package a different version than the Build step stamped, and would do it silently." }
+                  if (-not "$(ProducedVersion)") { throw "The produced version must be computed before packaging." }
                   Write-Host "VERSION-SUFFIX consumed suffix  : $suffix"
                   Write-Host "VERSION-SUFFIX consumed version : $(ProducedVersion)"
 
@@ -1838,43 +1797,14 @@ extends:
                     Write-Host "##vso[task.logissue type=error]ProducedVersion was not set by the Package step, so this report cannot know what this build produced."
                     exit 1
                   }
-                  # ASSERT THE VERSION CARRIES A PER-BUILD DISCRIMINATOR, BEFORE CONTACTING THE FEED.
-                  #
-                  # Everything below rests on a property of the version computation that nothing checked:
-                  # that this version identifies THIS build. If the suffix ever regresses to a fixed
-                  # string, an earlier build's packages are found at it, every clause passes, and this
-                  # step confirms another build's bytes while printing this build's conclusion.
-                  #
-                  # 16.11 found exactly that on their line - their read-back joins on package-name-at-a-
-                  # version, which cannot tell "the feed holds THIS build's packages" from "the feed
-                  # holds SOME build's packages at this version". This line's date comparison below is a
-                  # stronger discriminator and would still notice, but only as a WARNING - see the
-                  # escalation note at the summary.
-                  #
-                  # THE PATTERN MATCHES THE PRODUCER, NOT AN IDEALISED SHAPE. From the Package step:
-                  #     $suffix = "hotfix-$yy$mm{0:D2}-$rev" -f $dd     with $rev = '{0:D2}' -f ...
-                  # the month is NOT zero-padded while the day and rev are, so the date part is 5 OR 6
-                  # digits depending on the month:
-                  #     BuildNumber 20260902.41  ->  hotfix-26902-41    5 digits, September
-                  #     BuildNumber 20261112.31  ->  hotfix-261112-31   6 digits, November
-                  # A tidier '\d{6}' would reject the real produced version - and 16.11's lesson from
-                  # aligning their two patterns is that the historical value is the control in the other
-                  # direction: a check that rejects what it exists to protect is worse than no check.
-                  #
-                  # THE LABEL IS DELIBERATELY NOT PINNED, and that is the whole of what went wrong on
-                  # 3076400. This read pinned '-release-' while the producer above emits 'hotfix-',
-                  # so packaging and signing both succeeded and this report failed the build on a
-                  # version it should have accepted. The label is a policy decision - it was release,
-                  # it is hotfix now - while the thing this check exists to assert is the DATE AND REV,
-                  # because that is what makes the version identify THIS build rather than an earlier
-                  # one. Matching the label loosely and the discriminator strictly keeps the check
-                  # doing its job across a label change instead of breaking on one.
-                  if ($ourVersion -notmatch '-[a-z]+-\d{5,6}-\d{2,}$') {
-                    Write-Host "##vso[task.logissue type=error]ProducedVersion '$ourVersion' does not carry a per-build suffix of the form -<label>-<yyMdd>-<rev>. This report cannot distinguish this build's packages from an earlier build's, so it is failing closed rather than reporting a result it cannot support."
-                    Write-Host "FEED-REPORT RESULT      : VERSION NOT PER-BUILD - failing closed before any feed request"
-                    exit 1
+                  $prefix = ([xml](Get-Content scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | Where-Object { $_ }
+                  $pattern = '^' + [regex]::Escape($prefix)
+                  if ('${{ parameters.isRTM }}' -ne 'True') {
+                    $pattern += '-hotfix-\d{5,6}-\d{2,}'
                   }
-                  Write-Host "FEED-REPORT version shape: '$ourVersion' carries a per-build suffix"
+                  if ($ourVersion -notmatch ($pattern + '$')) {
+                    throw "ProducedVersion '$ourVersion' does not match the selected release mode."
+                  }
                   $packageDir = Join-Path $env:BUILD_SOURCESDIRECTORY "artifacts\$(_BuildConfig)\packages"
                   $produced = @(Get-ChildItem $packageDir -Filter "*.$ourVersion.nupkg" -File -ErrorAction SilentlyContinue)
                   # EMPTY SELECTION. Without this the loop below runs zero times and every counter
@@ -1938,26 +1868,9 @@ extends:
                   $onFeedOurs = @($all | Where-Object { $names -contains $_.name -and (@($_.versions | Where-Object { $_.version -eq $ourVersion }).Count -gt 0) }).Count
                   Write-Host "FEED-REPORT summary     : produced $($names.Count), on feed at $ourVersion $onFeedOurs, MISSING $missing - $thisBuild this build, $earlier earlier build"
                   if ($missing -gt 0) { Write-Host "##vso[task.logissue type=error]$missing of $($names.Count) produced packages are not on the feed at $ourVersion." ; exit 1 }
-                  # EARLIER BUILD IS NOW AN ERROR, AND IT USED TO BE CORRECT AS A WARNING.
-                  #
-                  # Under the FIXED version this line used to publish, an earlier build holding the
-                  # version was the EXPECTED steady state - the comment above the push step still
-                  # describes it: "expect this step to push zero packages on every repeat validation
-                  # run". Warning was right, because failing would have failed every re-run.
-                  #
-                  # The fixed version was replaced with release-<yyMdd>-<rev> derived from
-                  # Build.BuildNumber. Under a per-build version an earlier build CANNOT legitimately
-                  # hold this version: if one does, either the version computation regressed to a fixed
-                  # string or two builds share a build number. Both are faults, and neither should leave
-                  # a green step.
-                  #
-                  # THE THRESHOLD OUTLIVED THE REGIME IT WAS CORRECT FOR. Nothing announced that: the
-                  # ruling changed the version, and the clause that depended on the version staying
-                  # fixed was forty lines away and kept passing. Same shape as the perf budgets, the
-                  # empty .trx that only warns, and my own gate scoped to a directory while the
-                  # criterion was scoped to a population.
+                  # Stable versions are immutable too: a previous upload is not this build's delivery.
                   if ($earlier -gt 0) {
-                    Write-Host "##vso[task.logissue type=error]$earlier of $($names.Count) packages on the feed at $ourVersion were published BEFORE this build started. The version is supposed to be unique per build, so this means the version computation regressed to a fixed string or two builds share a build number - not that a push was skipped."
+                    Write-Host "##vso[task.logissue type=error]$earlier of $($names.Count) packages on the feed at $ourVersion were published BEFORE this build started. Existing package versions cannot be replaced by this build."
                     exit 1
                   }
                 displayName: Verify the feed holds THIS build's bytes, and report the split
@@ -1966,3 +1879,19 @@ extends:
                 condition: and(succeeded(), eq(variables['Agent.JobStatus'], 'Succeeded'), eq(variables['ArtifactsSigned'], 'true'))
 
               # Private publication is opt-in; PR validation never reaches this block.
+
+            - pwsh: |
+                $ErrorActionPreference = 'Stop'
+                $source = "$(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages"
+                $destination = "$(Build.ArtifactStagingDirectory)\ReleasePackages"
+                $packages = @(Get-ChildItem -LiteralPath $source -Filter '*.nupkg' -File |
+                  Where-Object { $_.Name -notlike '*.symbols.nupkg' })
+                if ($packages.Count -eq 0) {
+                  throw "No shipping NuGet packages were found in '$source'."
+                }
+                New-Item -ItemType Directory -Path $destination -Force | Out-Null
+                foreach ($package in $packages) {
+                  Copy-Item -LiteralPath $package.FullName -Destination $destination
+                }
+              displayName: Stage ReleasePackages
+              condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
