@@ -15,6 +15,12 @@ trigger:
     - internal/rel/*
 pr: none
 
+parameters:
+- name: isRTM
+  displayName: "Produce RTM version?"
+  type: boolean
+  default: false
+
 variables:
   # Defines DncEngInternalBuildPool. Without this import the pool name stays the literal text
   # "$(DncEngInternalBuildPool)" and the run fails before any job starts.
@@ -51,18 +57,13 @@ variables:
   - name: _SignArgs
     value: /p:DotNetSignType=$(_SignType) /p:TeamName=$(_TeamName) /p:Sign=$(_Sign)
 
-  # Passed ONLY to the signing step. Arcade sets OfficialBuild=true whenever OfficialBuildId is
-  # non-empty, and Sign.proj dry-runs unless OfficialBuild is true - so without this, signing
-  # reports success and signs nothing. It is kept off the build step because the build step
-  # determines assembly FileVersion, and off the packaging step because that determines package
-  # version; neither may change as a side effect of making signing real.
-  #
-  # 16.11 recorded a second-order consequence of this arrangement - the build never receives
-  # OfficialBuildId, so Arcade stamps its placeholder 42.42.42.42424 and two artifacts end up
-  # carrying two different version suffixes. THAT IS THEIR MEASUREMENT, NOT MINE. Whether 17.3
-  # splits the same way has to be measured on this line's own packages before it is claimed.
-  - name: _OfficialBuildIdArgs
-    value: /p:OfficialBuildId=$(Build.BuildNumber)
+  - name: _ReleaseVersionKind
+    value: ''
+  - ${{ if eq(parameters.isRTM, true) }}:
+    - name: _ReleaseVersionKind
+      value: release
+  - name: _OfficialBuildArgs
+    value: /p:OfficialBuildId=$(Build.BuildNumber) /p:DotNetFinalVersionKind=$(_ReleaseVersionKind)
 
   # The directory the signing gate reads AND the directory published as ServicingTestResults.
   # One value used twice cannot disagree with itself. 17.14 shipped the two-literal shape in a
@@ -76,9 +77,6 @@ variables:
   # land where consumers of that path look.
   - name: VisualStudioDropName
     value: Products/internal/microsoft-vstest/realsigned-DO-NOT-SHIP-$(Build.SourceBranchName)/$(Build.BuildNumber)
-
-  - name: _InternalBuildArgs
-    value: ' '
 
 resources:
   repositories:
@@ -141,7 +139,7 @@ extends:
               name: Managed
               container: mcr.microsoft.com/dotnet-buildtools/prereqs:centos-stream-10-amd64
               buildScript: bash ./eng/BuildSourceBuildIntermediate.sh
-              buildArguments: /p:OfficialBuildId=$(Build.BuildNumber) /p:DotNetBuildFromSource=true
+              buildArguments: --is-rtm ${{ parameters.isRTM }}
           publishBuildAssetsDependsOn:
           - job: Windows
           - job: Source_Build_Managed
@@ -223,6 +221,12 @@ extends:
                 dropRetentionDays: 30
                 accessToken: $(_DevDivDropAccessToken)
                 condition: and(and(eq(variables['_ServicingDeliveryReady'], 'true'), eq(variables['_HasVsix'], 'true')), ne(variables['Build.Reason'], 'PullRequest'))
+              - output: pipelineArtifact
+                displayName: Publish ReleasePackages
+                targetPath: '$(Build.ArtifactStagingDirectory)\ReleasePackages'
+                artifactName: ReleasePackages
+                sbomEnabled: false
+                condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
             strategy:
               matrix:
                 Release:
@@ -254,7 +258,7 @@ extends:
             # auto-load a MODULE named eng because the script path did not exist. The error names no
             # file, which is why it read as a toolchain fault for several builds.
             #
-            # $(_OfficialBuildIdArgs) is on the BUILD step here, unlike 17.3. On 17.3 packaging is
+            # $(_OfficialBuildArgs) is on the BUILD step here, unlike 17.3. On 17.3 packaging is
             # done by a separate Era A script, so the build step could be left without it. 17.8
             # packs through Arcade, and Arcade stamps its 42.42.42.42424 placeholder into
             # FileVersion whenever OfficialBuildId is empty. 15.9 fixed the identical defect the
@@ -267,42 +271,9 @@ extends:
                 -prepareMachine
                 -warnAsError 0
                 -projects $(Build.SourcesDirectory)\TestPlatform.sln
-                $(_OfficialBuildIdArgs)
-                $(_InternalBuildArgs)
+                $(_OfficialBuildArgs)
               name: Build
               displayName: Build
-
-            # The version suffix, computed and VALIDATED rather than assumed. Every serviced line
-            # now ships <target version>-hotfix-<yyyyMMdd>-<rev>, so a consumer looking for a fix
-            # finds it as a prerelease of the version it will become. 17.8 last shipped 17.8.0, so
-            # this line produces 17.8.1-hotfix-<date>-<rev>.
-            #
-            # This block and eng/Versions.props are TWO INDEPENDENT VERSION PRODUCERS and both have
-            # to agree. Build 3067281 on 17.3 measured what happens when they do not: its 12 signed
-            # packages carried two different version strings for one build, 1478 binaries on the
-            # suffix this block computes and 354 on Arcade's own, which comes from
-            # PreReleaseVersionLabel. Changing only one of them recreates that split.
-            # A malformed suffix would otherwise ship silently.
-            - pwsh: |
-                $buildNumber = "$(Build.BuildNumber)"
-                $parts = $buildNumber.Split('.')
-                if ($parts.Length -lt 2) {
-                  Write-Host "##vso[task.logissue type=error]Build.BuildNumber '$buildNumber' does not split into <date>.<revision>."
-                  exit 1
-                }
-                $date = $parts[0]
-                $rev = ([int]$parts[1]).ToString('00')
-                $suffix = "hotfix-$date-$rev"
-                if ($suffix -notmatch '^hotfix-\d{8}-\d{2,}$') {
-                  Write-Host "##vso[task.logissue type=error]Computed suffix '$suffix' does not match the shipped shape hotfix-<yyyyMMdd>-<rev>."
-                  exit 1
-                }
-                Write-Host "Build.BuildNumber : $buildNumber"
-                Write-Host "version suffix    : $suffix"
-                Write-Host "shipped 17.8 was  : 17.8.0, so this ships 17.8.1-hotfix-<date>-<rev>"
-                Write-Host "##vso[task.setvariable variable=_ServicingVersionSuffix]$suffix"
-              name: ComputeVersionSuffix
-              displayName: Compute the package version suffix
 
             # PACKAGE. ARCADE-NATIVE, because that is what THIS line is.
             #
@@ -322,7 +293,7 @@ extends:
             # -restore is included so this step is self-sufficient rather than depending on the
             # Build step's restore surviving; it is incremental and costs little.
             #
-            # $(_OfficialBuildIdArgs) is passed here AND on the Build step, deliberately: 15.9
+            # $(_OfficialBuildArgs) is passed here AND on the Build step, deliberately: 15.9
             # measured what happens when the two steps compute versions independently - they drift,
             # and two artifacts end up carrying two different suffixes. One value, read twice.
             #
@@ -338,7 +309,7 @@ extends:
                 -prepareMachine
                 -warnAsError 0
                 -projects $(Build.SourcesDirectory)\TestPlatform.sln
-                $(_OfficialBuildIdArgs)
+                $(_OfficialBuildArgs)
               name: Package
               displayName: Package
               continueOnError: true
@@ -468,7 +439,7 @@ extends:
                 -warnAsError 0
                 -projects $(Build.SourcesDirectory)\TestPlatform.sln
                 $(_SignArgs)
-                $(_OfficialBuildIdArgs)
+                $(_OfficialBuildArgs)
               name: Sign
               displayName: Sign
               condition: succeeded()
@@ -516,7 +487,7 @@ extends:
               continueOnError: true
 
             - ${{ if and(eq(variables['System.TeamProjectId'], '7ea9116e-9fac-403d-b258-b31fcf1bb293'), eq(variables['Build.Repository.ID'], 'ef257391-4d76-4240-8649-3f21ac49c392'), eq(variables['Build.SourceBranch'], 'refs/heads/internal/rel/17.8'), ne(variables['Build.Reason'], 'PullRequest')) }}:
-              - powershell: eng\common\sdk-task.ps1 -task Publish -configuration $(_BuildConfig) -restore -msbuildEngine dotnet $(_OfficialBuildIdArgs)
+              - powershell: eng\common\sdk-task.ps1 -task Publish -configuration $(_BuildConfig) -restore -msbuildEngine dotnet $(_OfficialBuildArgs)
                 displayName: Stage signed packages and manifests for BAR
                 condition: succeeded()
 
@@ -533,6 +504,22 @@ extends:
 
             # THE LAST STEP IN THE JOB, AND ITS POSITION IS THE POINT.
             #
+            - pwsh: |
+                $ErrorActionPreference = 'Stop'
+                $source = "$(Build.SourcesDirectory)\artifacts\packages\$(_BuildConfig)\Shipping"
+                $destination = "$(Build.ArtifactStagingDirectory)\ReleasePackages"
+                $packages = @(Get-ChildItem -LiteralPath $source -Filter '*.nupkg' -File |
+                  Where-Object { $_.Name -notlike '*.symbols.nupkg' })
+                if ($packages.Count -eq 0) {
+                  throw "No shipping NuGet packages were found in '$source'."
+                }
+                New-Item -ItemType Directory -Path $destination -Force | Out-Null
+                foreach ($package in $packages) {
+                  Copy-Item -LiteralPath $package.FullName -Destination $destination
+                }
+              displayName: Stage ReleasePackages
+              condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
+
             # 1ES appends templateContext.outputs to the job as ordinary steps that run in order,
             # so succeeded() evaluated inside an output folds in the results of the outputs BEFORE
             # it. That is how build 3067239 lost its delivery: the VSIX build-record output failed

@@ -107,11 +107,31 @@ fi
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$repo_root"
 
+is_rtm=false
+arguments=()
+while [[ $# -gt 0 ]]; do
+  if [[ "$1" == "--is-rtm" ]]; then
+    is_rtm="${2:-}"
+    is_rtm="${is_rtm,,}"
+    if [[ "$is_rtm" != "true" && "$is_rtm" != "false" ]]; then
+      echo "--is-rtm must be true or false." >&2
+      exit 1
+    fi
+    shift 2
+  else
+    arguments+=("$1")
+    shift
+  fi
+done
+set -- "${arguments[@]}"
+
 source_build_version() {
   local build_number="$1"
   local versions="$repo_root/eng/Versions.props"
+  local prefix
+  prefix="$(sed -n 's|.*<VersionPrefix>\([^<]*\)</VersionPrefix>.*|\1|p' "$versions")"
   if [[ ! "$build_number" =~ ^20[0-9]{6}\.[0-9]+$ ||
-        $(grep -Fc '<VersionPrefix>17.8.1</VersionPrefix>' "$versions" || true) -ne 1 ||
+        "$prefix" != "17.8.1" ||
         $(grep -Fc '<PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>' "$versions" || true) -ne 1 ||
         $(grep -Fc '<SemanticVersioningV1>true</SemanticVersioningV1>' "$versions" || true) -ne 1 ]]; then
     echo "The servicing build number or version settings do not match the pinned Arcade version formula." >&2
@@ -122,11 +142,15 @@ source_build_version() {
     echo "The servicing build number contains an invalid date." >&2
     return 1
   fi
+  if [[ "$is_rtm" == "true" ]]; then
+    printf '%s\n' "$prefix"
+    return 0
+  fi
   local year="${build_number:2:2}" month="${build_number:4:2}" day="${build_number:6:2}"
   local run="${build_number#*.}"
   # Arcade's SemVerV1 date stamp is YY * 1000 + MM * 50 + DD.
   local date_stamp=$((10#$year * 1000 + 10#$month * 50 + 10#$day))
-  printf '17.8.1-hotfix-%d-%02d\n' "$date_stamp" "$((10#$run))"
+  printf '%s-hotfix-%d-%02d\n' "$prefix" "$date_stamp" "$((10#$run))"
 }
 
 if [[ "${1:-}" == "--print-version" ]]; then

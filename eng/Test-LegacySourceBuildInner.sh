@@ -11,6 +11,14 @@ original_editorconfig_hash="$(sha256sum "$repo_root/.editorconfig" | cut -d' ' -
    "17.8.1-hotfix-26480-26" ]]
 [[ "$(bash "$repo_root/eng/BuildSourceBuildIntermediate.sh" --print-version 20260930.1)" == \
    "17.8.1-hotfix-26480-01" ]]
+[[ "$(bash "$repo_root/eng/BuildSourceBuildIntermediate.sh" --is-rtm false --print-version 20260930.1)" == \
+   "17.8.1-hotfix-26480-01" ]]
+[[ "$(bash "$repo_root/eng/BuildSourceBuildIntermediate.sh" --print-version 20260930.1 --is-rtm True)" == \
+   "17.8.1" ]]
+if bash "$repo_root/eng/BuildSourceBuildIntermediate.sh" --is-rtm invalid --print-version 20260930.1 >/dev/null 2>&1; then
+  echo "The source build accepted an invalid RTM flag." >&2
+  exit 1
+fi
 if bash "$repo_root/eng/BuildSourceBuildIntermediate.sh" --print-version 20261340.1 >/dev/null 2>&1; then
   echo "The source build accepted an invalid official build date." >&2
   exit 1
@@ -130,6 +138,21 @@ grep -Fq 'The isolated source-built product packages do not match' "$fixture/out
 grep -Fxq -- '-p:DotNetBuildFromSource=true' "$fixture/outer-args.txt"
 grep -Fxq -- '-p:Publish=false' "$fixture/outer-args.txt"
 grep -Fxq -- '-p:Version=17.8.1-hotfix-26480-99' "$fixture/outer-args.txt"
+
+if BUILD_REASON=PullRequest \
+    BUILD_REPOSITORY_ID=ef257391-4d76-4240-8649-3f21ac49c392 \
+    SYSTEM_TEAMPROJECTID=7ea9116e-9fac-403d-b258-b31fcf1bb293 \
+    BUILD_BUILDNUMBER=20260930.99 \
+    BUILD_SOURCEVERSION=0123456789abcdef0123456789abcdef01234567 \
+    PILOT_ARGS="$fixture/rtm-args.txt" PILOT_MSBUILD_SDKS="$fixture/rtm-sdk-path.txt" \
+    bash "$fixture/eng/BuildSourceBuildIntermediate.sh" --ci --configuration Release \
+      --restore --build --pack -bl --source-build --is-rtm True \
+      > "$fixture/rtm-build.log" 2>&1; then
+  echo "An RTM source build without real product packages must fail." >&2
+  exit 1
+fi
+grep -Fq 'The isolated source-built product packages do not match' "$fixture/rtm-build.log"
+grep -Fxq -- '-p:Version=17.8.1' "$fixture/rtm-args.txt"
 
 rmdir "$fixture/.dotnet/sdk/8.0.100/Sdks" "$fixture/.dotnet/sdk/8.0.100"
 cp "$repo_root/global.json" "$inner/global.json"
