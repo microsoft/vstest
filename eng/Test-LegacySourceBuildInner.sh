@@ -126,4 +126,56 @@ if BUILD_SOURCESDIRECTORY="$fixture" BUILD_REPOSITORY_ID=wrong-repository \
 fi
 cmp "$repo_root/global.json" "$inner/global.json"
 cmp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
+
+verify_package_version() {
+  local name="$1" build_version="$2" cli_version="$3" expected="$4"
+  shift 4
+  local root="$fixture/$name"
+  mkdir -p "$root/eng" "$root/.dotnet" "$root/artifacts/packages/Release/Shipping"
+  cp "$repo_root/eng/BuildSourceBuildIntermediate.sh" "$root/eng/BuildSourceBuildIntermediate.sh"
+  touch "$root/artifacts/packages/Release/Shipping/Microsoft.TestPlatform.Build.$build_version.nupkg" \
+        "$root/artifacts/packages/Release/Shipping/Microsoft.TestPlatform.CLI.$cli_version.nupkg"
+  cat > "$root/build.sh" <<'EOF'
+#!/usr/bin/env bash
+printf '%s\n' "$@" > "$PILOT_BUILD_ARGS"
+EOF
+  cat > "$root/.dotnet/dotnet" <<'EOF'
+#!/usr/bin/env bash
+if [[ "${1:-}" == "--version" ]]; then
+  echo 11.0.100-preview.6.26359.118
+  exit 0
+fi
+printf '%s\n' "$@" > "$PILOT_RESTORE_ARGS"
+exit 29
+EOF
+  chmod +x "$root/build.sh" "$root/.dotnet/dotnet"
+  local status=0
+  BUILD_REASON=PullRequest \
+  BUILD_BUILDNUMBER=20260930.99 \
+  BUILD_SOURCEVERSION=0123456789abcdef0123456789abcdef01234567 \
+  PILOT_BUILD_ARGS="$root/build-args.txt" \
+  PILOT_RESTORE_ARGS="$root/restore-args.txt" \
+    bash "$root/eng/BuildSourceBuildIntermediate.sh" "$@" > "$root/output.log" 2>&1 || status=$?
+  if [[ "$status" -ne "$expected" ]]; then
+    cat "$root/output.log" >&2
+    echo "Package version case '$name': expected exit $expected, got $status." >&2
+    return 1
+  fi
+  grep -Fxq -- "$1" "$root/build-args.txt"
+  if [[ "$expected" -eq 29 ]]; then
+    grep -Fxq -- restore "$root/restore-args.txt"
+  else
+    grep -Fq 'Source-built package versions do not match' "$root/output.log"
+    [[ ! -f "$root/restore-args.txt" ]]
+  fi
+}
+
+verify_package_version hotfix 17.12.1-hotfix-26480-99 17.12.1-hotfix-26480-99 29 \
+  /p:DotNetFinalVersionKind=
+verify_package_version rtm 17.12.1 17.12.1 29 \
+  /p:DotNetFinalVersionKind=release
+verify_package_version wrong-version 0.0.0 0.0.0 1 \
+  /p:DotNetFinalVersionKind=release
+verify_package_version mismatched-packages 17.12.1 17.12.1-hotfix-26480-99 1 \
+  /p:DotNetFinalVersionKind=release
 printf '%s\n' "Legacy source-build helper kept toolchain edits in the private inner copy."
