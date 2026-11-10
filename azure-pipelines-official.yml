@@ -74,8 +74,7 @@
 #     false, never set here.
 #
 # Localization runs here, unlike main, because satellites on this line are generated during the
-# build rather than checked in. There is no isRTM parameter, because there is nothing for it to
-# gate.
+# build rather than checked in.
 #
 # trigger: none is deliberate. This runs only when queued by hand. main's official pipeline
 # excludes rel/15.* and rel/16.* from its trigger, so 16.11 has never been built by it, and
@@ -133,6 +132,12 @@ trigger:
     include:
     - internal/rel/*
 pr: none
+
+parameters:
+- name: isRTM
+  displayName: "Produce RTM version?"
+  type: boolean
+  default: false
 
 variables:
   # Defines DncEngInternalBuildPool. Without this import the pool name stays the literal
@@ -622,6 +627,12 @@ extends:
                 publishVstsFeed: internal/general-testing-internal
                 publishPackageMetadata: true
                 condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+              - output: pipelineArtifact
+                displayName: Publish ReleasePackages
+                targetPath: '$(Build.ArtifactStagingDirectory)\ReleasePackages'
+                artifactName: ReleasePackages
+                sbomEnabled: false
+                condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
             strategy:
               matrix:
                 Release:
@@ -650,87 +661,24 @@ extends:
                 command: custom
                 custom: '--info'
 
-            # THE PACKAGE VERSION SUFFIX MUST VARY PER BUILD, and it is computed here rather than
-            # defaulted.
-            #
-            # scripts\build.ps1:23 defaults $VersionSuffix to the constant "dev", and a constant
-            # version is the mechanical cause of the feed being frozen: every run after the first
-            # offered 16.11.0-dev again, the feed kept the first upload and answered 409, and with
-            # allowPackageConflicts set the push reported success having transferred nothing.
-            # Eleven packages on the feed differ by SHA-256 from what the latest build produced.
-            #
-            # The SHAPE is taken from what this line actually shipped, not invented:
-            #
-            #   16.11.0-release-20210730-02      the shipped 16.11 packages and VSIX
-            #   16.11.0-release-<yyyyMMdd>-<rev> this, from Build.BuildNumber's <date>.<rev>
-            #
-            # DO NOT HARMONISE THIS WITH THE OTHER SERVICING LINES. They deliberately differ:
-            #
-            #   16.11   release-<yyyyMMdd>-<rev>   matches 16.11's shipped release-20210730-02
-            #   15.9    release-<yyMMdd>-<rev>     15.9 shipped bare, with no suffix at all
-            #   17.14   release-26452-26           Arcade's own date encoding, matching 17.14's shipped shape
-            #
-            # Three different encodings, each matched to ITS OWN baseline. The requirement is that a
-            # rebuilt artifact carries the same shape as what that line shipped - not that the three
-            # lines agree with each other. Anyone comparing the three side by side will want to
-            # unify them; unifying them would move at least two lines AWAY from their own shipped
-            # form, which is the thing being validated.
-            #
-            # Computed in PowerShell rather than as a YAML expression on purpose: the revision needs
-            # zero-padding to two digits to match the shipped form, which YAML expressions cannot do,
-            # and a malformed suffix would be silent. It ASSERTS its own output instead - a build
-            # number that does not split into date and revision fails the step rather than producing
-            # a version nobody notices is wrong.
-            #
-            # OfficialBuildId is NOT moved. It stays on the Sign invocation only, so the determinism
-            # measurement recorded in the variables block is unaffected: the package version is
-            # composed by scripts\build.ps1:149 from this suffix and never passes through Arcade's
-            # version generator, so no build-id component and no +commit metadata can appear.
-            #
-            # scripts\build.ps1:167 rewrites <NETTestSdkVersion> in
-            # scripts\build\TestPlatform.Dependencies.props from the computed version on every run,
-            # so the test assets follow this automatically. The value checked in there is the last
-            # one written, not a pin.
+            # Build, packaging and test assets must consume the same version.
             - pwsh: |
                 $buildNumber = "$(Build.BuildNumber)"
-                $parts = $buildNumber.Split('.')
-                if ($parts.Length -lt 2) {
-                  Write-Host "##vso[task.logissue type=error]Build.BuildNumber '$buildNumber' does not split into <date>.<revision>."
-                  Write-Host 'Blocking. A malformed version suffix would ship silently.'
-                  exit 1
+                if ($buildNumber -notmatch '^(\d{8})\.(\d+)$') {
+                  throw "Build.BuildNumber '$buildNumber' must be <yyyyMMdd>.<revision>."
                 }
-                $date = $parts[0]
-                $rev = ([int]$parts[1]).ToString('00')
-                $suffix = "hotfix-$date-$rev"
-                if ($suffix -notmatch '^hotfix-\d{8}-\d{2,}$') {
-                  Write-Host "##vso[task.logissue type=error]Computed suffix '$suffix' does not match the shipped shape hotfix-<yyyyMMdd>-<rev>."
-                  exit 1
-                }
+                $date = $Matches[1]
+                $rev = ([int]$Matches[2]).ToString('00')
+                $suffix = if ('${{ parameters.isRTM }}' -eq 'True') { '' } else { "hotfix-$date-$rev" }
                 Write-Host "Build.BuildNumber : $buildNumber"
                 Write-Host "version suffix    : $suffix"
-                Write-Host "shipped 16.11 was : release-20210730-02"
                 Write-Host "##vso[task.setvariable variable=_ServicingVersionSuffix]$suffix"
-                # THE FULL VERSION, for the Build step. The Package step composes its own version
-                # from the SUFFIX above, so the two steps would otherwise label the same product
-                # differently - and they measurably did:
-                #
-                #   1324 compiled by Package   ProductVersion 16.11.0-release-<yyyyMMdd>-<rev>
-                #    308 copied from Build     ProductVersion 16.11.0-ci
-                #
-                # Those 1,632 are EXACTLY the 1,632 that shipped 16.11.0 carries on ONE uniform
-                # ProductVersion, so the split is the divergence and uniformity is the target.
-                # Giving Build the same version the Package step will use is what closes it.
-                #
-                # The prefix is READ from the file that defines it rather than repeated here, so
-                # this cannot drift from TPVersionPrefix. An empty prefix would silently produce
-                # "-release-<date>-<rev>", which packs and signs happily and is wrong everywhere
-                # downstream, so it stops the build instead.
                 $prefix = ([xml](Get-Content scripts\build\TestPlatform.Settings.targets)).Project.PropertyGroup.TPVersionPrefix | Where-Object { $_ }
                 if (-not $prefix) {
                   Write-Host "##vso[task.logissue type=error]TPVersionPrefix is empty in scripts\build\TestPlatform.Settings.targets, so the full version cannot be composed."
                   exit 1
                 }
-                $full = "$prefix-$suffix"
+                $full = if ($suffix) { "$prefix-$suffix" } else { $prefix }
                 Write-Host "version prefix    : $prefix"
                 Write-Host "full version      : $full"
                 Write-Host "##vso[task.setvariable variable=_ServicingVersion]$full"
@@ -928,7 +876,7 @@ extends:
 
                 ./scripts/build.ps1 `
                   -Configuration $(_BuildConfig) `
-                  -VersionSuffix $(_ServicingVersionSuffix) `
+                  -VersionSuffix "$(_ServicingVersionSuffix)" `
                   -BuildNumber $bn `
                   -Steps Restore,Publish `
                   -Actions Restore-Package,Restore-FakesPayload,Publish-Package,Create-VsixPackage,Create-NugetPackages,Copy-PackageIntoStaticDirectory
@@ -2065,3 +2013,19 @@ extends:
                   $token = az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv
                   Write-Host "##vso[task.setvariable variable=_DevDivDropAccessToken;issecret=true]$token"
               condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest'))
+
+            - pwsh: |
+                $ErrorActionPreference = 'Stop'
+                $source = "$(Build.SourcesDirectory)\artifacts\$(_BuildConfig)\packages"
+                $destination = "$(Build.ArtifactStagingDirectory)\ReleasePackages"
+                $packages = @(Get-ChildItem -LiteralPath $source -Filter '*.nupkg' -File |
+                  Where-Object { $_.Name -notlike '*.symbols.nupkg' })
+                if ($packages.Count -eq 0) {
+                  throw "No shipping NuGet packages were found in '$source'."
+                }
+                New-Item -ItemType Directory -Path $destination -Force | Out-Null
+                foreach ($package in $packages) {
+                  Copy-Item -LiteralPath $package.FullName -Destination $destination
+                }
+              displayName: Stage ReleasePackages
+              condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
