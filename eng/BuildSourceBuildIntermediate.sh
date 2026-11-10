@@ -124,7 +124,7 @@ if [[ ${#source_built[@]} -ne 2 ]]; then
 fi
 version="${source_built[0]##*/Microsoft.TestPlatform.Build.}"
 version="${version%.nupkg}"
-if [[ ! "$version" =~ ^17\.11\.2-hotfix-[0-9]+-[0-9]+$ ||
+if [[ ! "$version" =~ ^17\.11\.2(-hotfix-[0-9]+-[0-9]+)?$ ||
       "${source_built[1]##*/}" != "Microsoft.TestPlatform.CLI.$version.nupkg" ]]; then
   echo "Source-built package versions do not match the servicing build." >&2
   exit 1
