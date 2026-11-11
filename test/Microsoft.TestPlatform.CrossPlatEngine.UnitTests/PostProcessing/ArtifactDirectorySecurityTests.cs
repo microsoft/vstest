@@ -48,6 +48,14 @@ public class ArtifactDirectorySecurityTests
         _originalArtifactsDirectory = Environment.GetEnvironmentVariable(ArtifactsDirectoryVariable);
         _root = Path.Combine(Path.GetTempPath(), $"vstest-artifact-security-{Guid.NewGuid():N}");
         Directory.CreateDirectory(_root);
+#if NET
+        // Every directory on the way to the artifacts directory is verified, so a umask that leaves this one
+        // group writable would reject every test below for a reason none of them is about.
+        if (!OperatingSystem.IsWindows())
+        {
+            File.SetUnixFileMode(_root, OwnerOnly);
+        }
+#endif
     }
 
     [TestCleanup]
@@ -138,17 +146,60 @@ public class ArtifactDirectorySecurityTests
 
     [TestMethod]
     [OSCondition(OperatingSystems.Linux)]
-    public void CollectArtifacts_ShouldNotWriteWhenTheProvidedArtifactsDirectoryIsASymbolicLink()
+    [DataRow("")]
+    [DataRow("/")]
+    public void CollectArtifacts_ShouldNotWriteWhenTheProvidedArtifactsDirectoryIsASymbolicLink(string suffix)
     {
-        // The artifacts would land wherever the link resolves to, which is not what the SDK handed over.
+        // The artifacts would land wherever the link resolves to, which is not what the SDK handed over. With a
+        // trailing separator the kernel resolves the link before AT_SYMLINK_NOFOLLOW applies, so the link has
+        // to be rejected in that form too.
         var target = CreateOwnerOnlyDirectory("target");
         var link = Path.Combine(_root, "link");
         Directory.CreateSymbolicLink(link, target);
-        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, link);
+        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, link + suffix);
 
         CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
 
         Assert.IsEmpty(Directory.GetFileSystemEntries(target));
+    }
+
+    [TestMethod]
+    [OSCondition(OperatingSystems.Linux)]
+    public void CollectArtifacts_ShouldNotWriteWhenAParentOfTheProvidedArtifactsDirectoryCanBeWrittenByOtherUsers()
+    {
+        // Anybody can rename entries in a parent that everybody can write to and that is not sticky, so the
+        // verified directory could be swapped for a symlink after the check.
+        var shared = Path.Combine(_root, "shared");
+        Directory.CreateDirectory(shared);
+        File.SetUnixFileMode(shared, AllPermissions);
+        var provided = Path.Combine(shared, "provided");
+        Directory.CreateDirectory(provided);
+        File.SetUnixFileMode(provided, OwnerOnly);
+        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, provided);
+
+        CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+
+        Assert.IsEmpty(Directory.GetFileSystemEntries(provided));
+    }
+
+    [TestMethod]
+    [OSCondition(OperatingSystems.Linux)]
+    public void CollectArtifacts_ShouldWriteThroughASymbolicLinkedParentThatOnlyTheOwnerCanReplace()
+    {
+        // A symlink on the way to the directory, rather than the directory itself, is fine as long as no other
+        // user can replace it or anything it leads through.
+        var real = CreateOwnerOnlyDirectory("real");
+        var provided = Path.Combine(real, "provided");
+        Directory.CreateDirectory(provided);
+        File.SetUnixFileMode(provided, OwnerOnly);
+        var alias = Path.Combine(_root, "alias");
+        Directory.CreateSymbolicLink(alias, real);
+        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, Path.Combine(alias, "provided"));
+
+        var sessionId = Guid.NewGuid().ToString();
+        CreateManager(sessionId).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+
+        Assert.IsNotEmpty(Directory.GetFiles(Path.Combine(provided, sessionId), "executionComplete.json", SearchOption.AllDirectories));
     }
 
     [TestMethod]

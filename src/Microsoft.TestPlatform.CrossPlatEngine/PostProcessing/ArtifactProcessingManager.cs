@@ -474,6 +474,13 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             return;
         }
 
+        // A trailing separator makes the kernel resolve a final symlink before O_NOFOLLOW is applied.
+        path = TrimTrailingSeparators(path);
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+        {
+            EnsurePathCannotBeReplacedByOtherUsers(path, $"'{path}'");
+        }
+
         int fd = NativeOpen(path, GetOpenNoFollowDirectoryFlags());
         if (fd < 0)
         {
@@ -533,11 +540,12 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     /// </summary>
     /// <remarks>
     /// A directory handed over by the SDK is verified rather than modified: it has to exist, and on Linux it
-    /// has to be a real directory owned by the current user that nobody else can reach. When vstest.console
-    /// picks the location itself the base is the current user's own private temporary directory (see
-    /// <see cref="GetUserPrivateTempPath"/>), which the platform already keeps private to the user, so only
-    /// its existence is checked and the session directory created inside it is what carries the restricted
-    /// permissions.
+    /// has to be a real directory owned by the current user that nobody else can reach, and that no other user
+    /// can replace through one of its parent directories. When vstest.console picks the location itself the
+    /// base is the current user's own private temporary directory (see <see cref="GetUserPrivateTempPath"/>),
+    /// which the platform already keeps private to the user, so only its existence is checked here, and the
+    /// session directory created inside it, verified together with every directory leading to it, is what
+    /// carries the restricted permissions.
     /// </remarks>
     private void ValidateArtifactsDirectory()
     {
@@ -562,7 +570,8 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     /// <summary>
     /// Verifies on Linux that a path is a real directory, owned by the current user, that no other user can
-    /// reach. Does nothing anywhere else, and never modifies the directory.
+    /// reach or replace through one of its parent directories. Does nothing anywhere else, never modifies the
+    /// directory, and fails rather than skipping a check the platform cannot answer.
     /// </summary>
     private void EnsureDirectoryIsPrivateToCurrentUser(string path, string description)
     {
@@ -578,20 +587,12 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             return;
         }
 
-        var status = GetUnixPathStatus(path);
-        if (status is null)
-        {
-            // The platform cannot answer, so verify what we can rather than refusing to run.
-            return;
-        }
+        EnsurePathCannotBeReplacedByOtherUsers(path, description);
 
-        (uint ownerId, ushort mode) = status.Value;
-
-        // Taken from the same statx call as the owner and the mode, so a symlink cannot be swapped in between
-        // the checks. 0170000 octal masks the file type, 0040000 is a directory.
-        const ushort fileTypeMask = 0xF000;
-        const ushort directory = 0x4000;
-        if ((mode & fileTypeMask) != directory)
+        // Taken from a single statx call, so a symlink cannot be swapped in between the type, owner and mode
+        // checks below.
+        (uint ownerId, ushort mode) = RequireUnixPathStatus(path, description);
+        if ((mode & FileTypeMask) != DirectoryFileType)
         {
             throw new ArtifactDirectoryVerificationException(
                 $"{description} is not a directory. A symbolic link is not accepted, because the artifacts would be written somewhere other than the directory that was checked. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
@@ -616,11 +617,179 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
 #if !NETFRAMEWORK
     /// <summary>
+    /// Verifies on Linux that no user other than the current one or root can make <paramref name="path"/>
+    /// resolve to something else after it has been checked.
+    /// </summary>
+    /// <remarks>
+    /// Checking only the final directory is not enough: a user who can rename entries in one of its parent
+    /// directories can move the checked directory away and put a symlink, or a directory of their own, in its
+    /// place, and every later by-path read or write then follows that instead. So every directory the kernel
+    /// walks through to reach <paramref name="path"/> has to be owned by the current user or by root, and every
+    /// entry on the way, <paramref name="path"/> included, has to sit in a directory that no other user can
+    /// write to, or in a sticky directory such as /tmp while being owned by the current user or by root.
+    /// Symbolic links on the way are followed: a link cannot be changed, only replaced through the directory
+    /// holding it, which is held to the same rule. The final entry is not followed, its own type, owner and
+    /// mode are for the caller to check.
+    /// </remarks>
+    private static void EnsurePathCannotBeReplacedByOtherUsers(string path, string description)
+    {
+        // The kernel's own limit (MAXSYMLINKS), past which it fails a lookup with ELOOP.
+        const int maxSymbolicLinks = 40;
+        // 0022 octal = write permission for the group or for everybody else.
+        const ushort groupOrOtherWrite = 0x12;
+        // 01000 octal = sticky bit, only the owner of an entry (or of the directory) can rename or delete it.
+        const ushort sticky = 0x200;
+
+        uint effectiveUserId = NativeGetEuid();
+
+        // The directories resolved so far, from "/" down, none of them a symbolic link.
+        var resolved = new List<(string Path, ushort Mode)>();
+        (uint rootOwnerId, ushort rootMode) = RequireUnixPathStatus("/", description);
+        if (!IsTrustedOwner(rootOwnerId))
+        {
+            throw new ArtifactDirectoryVerificationException(
+                $"{description} cannot be verified, '/' is owned by uid {rootOwnerId}. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+        }
+
+        resolved.Add(("/", rootMode));
+
+        // The components still to walk, the next one on top so that a symlink target can be pushed in front
+        // of the rest.
+        var pending = new Stack<string>();
+        PushComponents(pending, path);
+        int symbolicLinks = 0;
+        while (pending.Count > 0)
+        {
+            string name = pending.Pop();
+            if (name == ".")
+            {
+                continue;
+            }
+
+            if (name == "..")
+            {
+                // Every directory in the list was verified on the way down, so going back up needs no new check.
+                if (resolved.Count > 1)
+                {
+                    resolved.RemoveAt(resolved.Count - 1);
+                }
+
+                continue;
+            }
+
+            (string parentPath, ushort parentMode) = resolved[resolved.Count - 1];
+            string entry = parentPath == "/" ? "/" + name : parentPath + "/" + name;
+            (uint ownerId, ushort mode) = RequireUnixPathStatus(entry, description);
+
+            if ((parentMode & groupOrOtherWrite) != 0 && ((parentMode & sticky) == 0 || !IsTrustedOwner(ownerId)))
+            {
+                throw new ArtifactDirectoryVerificationException(
+                    $"{description} cannot be verified, because users other than its owner can replace '{entry}': '{parentPath}' can be written by its group or by everybody{((parentMode & sticky) == 0 ? " and is not sticky" : $", and '{entry}' is owned by uid {ownerId}")}. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+            }
+
+            if (pending.Count == 0)
+            {
+                return;
+            }
+
+            switch (mode & FileTypeMask)
+            {
+                case SymbolicLinkFileType:
+                    if (++symbolicLinks > maxSymbolicLinks)
+                    {
+                        throw new ArtifactDirectoryVerificationException(
+                            $"{description} cannot be verified, resolving it follows more than {maxSymbolicLinks} symbolic links. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+                    }
+
+                    string target = ReadSymbolicLink(entry, description);
+                    if (target.StartsWith("/", StringComparison.Ordinal))
+                    {
+                        resolved.RemoveRange(1, resolved.Count - 1);
+                    }
+
+                    PushComponents(pending, target);
+                    break;
+
+                case DirectoryFileType:
+                    if (!IsTrustedOwner(ownerId))
+                    {
+                        throw new ArtifactDirectoryVerificationException(
+                            $"{description} cannot be verified, because '{entry}' on the way to it is owned by uid {ownerId}, who can replace what it contains. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+                    }
+
+                    resolved.Add((entry, mode));
+                    break;
+
+                default:
+                    throw new ArtifactDirectoryVerificationException(
+                        $"{description} cannot be verified, '{entry}' on the way to it is not a directory. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+            }
+        }
+
+        bool IsTrustedOwner(uint ownerId) => ownerId == 0 || ownerId == effectiveUserId;
+
+        static void PushComponents(Stack<string> stack, string value)
+        {
+            string[] components = value.Split(new[] { '/' }, StringSplitOptions.RemoveEmptyEntries);
+            for (int i = components.Length - 1; i >= 0; i--)
+            {
+                stack.Push(components[i]);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Reads the target of a symbolic link, exactly as stored.
+    /// </summary>
+    private static string ReadSymbolicLink(string path, string description)
+    {
+        // PATH_MAX on Linux. readlink does not null terminate, and a result that fills the whole buffer may
+        // have been truncated.
+        var buffer = new byte[4096];
+        long length = (long)NativeReadLink(path, buffer, (UIntPtr)buffer.Length);
+        if (length < 0)
+        {
+            throw new ArtifactDirectoryVerificationException(
+                $"{description} cannot be verified, could not read the symbolic link '{path}', errno: {Marshal.GetLastWin32Error()}. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+        }
+
+        if (length >= buffer.Length)
+        {
+            throw new ArtifactDirectoryVerificationException(
+                $"{description} cannot be verified, the target of the symbolic link '{path}' is too long. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+        }
+
+        return Encoding.UTF8.GetString(buffer, 0, (int)length);
+    }
+
+    /// <summary>
+    /// Removes trailing '/' separators, keeping "/" itself.
+    /// </summary>
+    /// <remarks>
+    /// With a trailing separator the kernel resolves a final symlink before AT_SYMLINK_NOFOLLOW or O_NOFOLLOW
+    /// is applied, so "/tmp/link/" would be checked as the directory the link points to rather than as a link.
+    /// </remarks>
+    private static string TrimTrailingSeparators(string path)
+    {
+        string trimmed = path.TrimEnd('/');
+        return trimmed.Length == 0 && path.Length > 0 ? "/" : trimmed;
+    }
+
+    /// <summary>
+    /// Reads the owner and the mode of a path without following a final symlink, failing when that cannot be
+    /// done, so that a directory is never used unverified unless verification is explicitly disabled.
+    /// </summary>
+    private static (uint OwnerId, ushort Mode) RequireUnixPathStatus(string path, string description)
+        => GetUnixPathStatus(path)
+            ?? throw new ArtifactDirectoryVerificationException(
+                $"{description} cannot be verified, because statx is not available on this system. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+
+    /// <summary>
     /// Reads the owner and the mode of a path without following a final symlink, or <see langword="null"/>
     /// when the platform has no usable statx.
     /// </summary>
     private static (uint OwnerId, ushort Mode)? GetUnixPathStatus(string path)
-        => GetUnixStatus(AtFdCwd, path, AtSymlinkNoFollow, $"'{path}'");
+        => GetUnixStatus(AtFdCwd, TrimTrailingSeparators(path), AtSymlinkNoFollow, $"'{path}'");
 
     /// <summary>
     /// Reads the owner and the mode of a path, or of an already open file descriptor, through statx, or
@@ -696,15 +865,36 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     // 0700 octal = owner read/write/execute only.
     private const int OwnerFullAccess = 0x1C0;
 
+    // 0170000 octal masks the file type in a mode, 0040000 is a directory and 0120000 a symbolic link.
+    private const ushort FileTypeMask = 0xF000;
+    private const ushort DirectoryFileType = 0x4000;
+    private const ushort SymbolicLinkFileType = 0xA000;
+
     /// <summary>
     /// The O_NOFOLLOW | O_DIRECTORY | O_RDONLY flags used to open a directory while rejecting a final
-    /// symlink or anything that is not a directory at the kernel level. The bit values differ between Linux
-    /// and Darwin.
+    /// symlink or anything that is not a directory at the kernel level.
     /// </summary>
+    /// <remarks>
+    /// The bit values differ between Darwin and Linux, and on Linux between architectures: arm, arm64 and
+    /// powerpc define their own in &lt;asm/fcntl.h&gt;, where the generic values mean O_DIRECT and O_LARGEFILE
+    /// instead. Every other architecture uses &lt;asm-generic/fcntl.h&gt;.
+    /// </remarks>
     private static int GetOpenNoFollowDirectoryFlags()
-        => RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-            ? 0x000100 | 0x100000 // O_NOFOLLOW | O_DIRECTORY (Darwin <fcntl.h>)
-            : 0x020000 | 0x010000; // O_NOFOLLOW | O_DIRECTORY (Linux <bits/fcntl-linux.h>)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return 0x000100 | 0x100000; // O_NOFOLLOW | O_DIRECTORY (Darwin <fcntl.h>)
+        }
+
+        return RuntimeInformation.ProcessArchitecture switch
+        {
+            System.Runtime.InteropServices.Architecture.Arm or System.Runtime.InteropServices.Architecture.Arm64 => 0x8000 | 0x4000, // O_NOFOLLOW | O_DIRECTORY (arm, arm64)
+#if NET
+            System.Runtime.InteropServices.Architecture.Armv6 or System.Runtime.InteropServices.Architecture.Ppc64le => 0x8000 | 0x4000, // O_NOFOLLOW | O_DIRECTORY (arm, powerpc)
+#endif
+            _ => 0x020000 | 0x010000, // O_NOFOLLOW | O_DIRECTORY (asm-generic)
+        };
+    }
 
     /// <summary>
     /// Whether an errno from the open above means the path was a symlink (ELOOP) or not a directory
@@ -774,6 +964,9 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     [DllImport("libc", EntryPoint = "fchmod", SetLastError = true)]
     private static extern int NativeFchmod(int fd, int mode);
+
+    [DllImport("libc", EntryPoint = "readlink", SetLastError = true)]
+    private static extern IntPtr NativeReadLink(string pathname, byte[] buffer, UIntPtr size);
 
     [DllImport("libc", EntryPoint = "confstr", SetLastError = true)]
     private static extern UIntPtr NativeConfstr(int name, byte[]? buffer, UIntPtr length);
