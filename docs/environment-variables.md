@@ -153,7 +153,7 @@ This document lists environment variables that are currently handled by VSTest s
 - **Usage**: Useful when parsing console output and need to maintain compatibility
 
 ### VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION
-- **Description**: Disables the Unix checks around the directory holding the test session artifacts: narrowing a directory vstest creates to its owner, and verifying on Linux that a directory given by `VSTEST_ARTIFACTS_DIRECTORY` is a real directory, owned by the current user, that no other user can reach. On Linux every directory leading to it must also be owned by the current user or root, and must not let other users rename what it contains (a sticky directory such as `/tmp` is accepted). When the system cannot report owners and permissions (no `statx`), the artifacts are not used unless this variable is set.
+- **Description**: Disables the Unix checks around the directory holding the test session artifacts: narrowing a directory vstest creates to its owner, and verifying on Linux that a directory given by `VSTEST_ARTIFACTS_DIRECTORY` is a real directory, owned by the current user, that no other user can reach. On Linux every directory leading to it must also be owned by the current user or root, and must not let other users rename what it contains (a sticky directory such as `/tmp` is accepted). On Linux, when the system cannot report owners and permissions (no `statx`), the artifacts are not used unless this variable is set.
 - **Values**: Set to any non-zero value to disable
 - **Example**: `VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION=1`
 - **Usage**: Needed where the ownership or the permissions of that directory cannot be represented or changed, such as a mounted Windows or network volume. Has no effect on Windows.

@@ -206,11 +206,30 @@ public class ArtifactDirectorySecurityTests
         Assert.IsNotEmpty(Directory.GetFileSystemEntries(provided));
         File.SetUnixFileMode(shared, AllPermissions);
 
-        await Assert.ThrowsExactlyAsync<ArtifactDirectoryVerificationException>(() => CreateManager(sessionId).PostProcessArtifactsAsync());
+        var exception = await Assert.ThrowsExactlyAsync<ArtifactDirectoryVerificationException>(() => CreateManager(sessionId).PostProcessArtifactsAsync());
 
+        Assert.Contains("can be written by its group or by everybody", exception.Message);
         _attachmentsProcessingManager.Verify(x => x.ProcessTestRunAttachmentsAsync(It.IsAny<string>(),
             It.IsAny<IRequestData>(), It.IsAny<IEnumerable<AttachmentSet>>(), It.IsAny<IEnumerable<InvokedDataCollector>>(),
             It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [TestMethod]
+    [OSCondition(OperatingSystems.Linux)]
+    public async Task PostProcessArtifactsAsync_ShouldProcessArtifactsFromAVerifiedArtifactsDirectory()
+    {
+        var provided = CreateOwnerOnlyDirectory("provided");
+        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, provided);
+
+        var sessionId = Guid.NewGuid().ToString();
+        CreateManager(sessionId).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+
+        await CreateManager(sessionId).PostProcessArtifactsAsync();
+
+        _attachmentsProcessingManager.Verify(x => x.ProcessTestRunAttachmentsAsync(It.IsAny<string>(),
+            It.IsAny<IRequestData>(), It.IsAny<IEnumerable<AttachmentSet>>(), It.IsAny<IEnumerable<InvokedDataCollector>>(),
+            It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()), Times.Once);
+        Assert.IsFalse(Directory.Exists(Path.Combine(provided, sessionId)));
     }
 
     [TestMethod]
