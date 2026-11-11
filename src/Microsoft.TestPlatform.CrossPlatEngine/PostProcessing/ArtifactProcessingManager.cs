@@ -109,10 +109,12 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
     /// </summary>
     private static string ResolveArtifactsDirectory(out bool wasProvided)
     {
-        var providedDirectory = Environment.GetEnvironmentVariable(ArtifactsDirectoryEnvironmentVariableName)?.Trim();
+        // Not trimmed: on Unix leading and trailing whitespace is part of a valid directory name, and using a
+        // different spelling than the SDK would point at a different directory.
+        var providedDirectory = Environment.GetEnvironmentVariable(ArtifactsDirectoryEnvironmentVariableName);
         wasProvided = false;
 
-        if (!providedDirectory.IsNullOrEmpty())
+        if (!providedDirectory.IsNullOrWhiteSpace())
         {
             try
             {
@@ -243,8 +245,8 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
         {
             // Not provided covers both an absent variable and one whose value ResolveArtifactsDirectory
             // rejected, and the two need different advice.
-            var rawArtifactsDirectory = Environment.GetEnvironmentVariable(ArtifactsDirectoryEnvironmentVariableName)?.Trim();
-            artifactsDirectoryFallbackWarning = rawArtifactsDirectory.IsNullOrEmpty()
+            var rawArtifactsDirectory = Environment.GetEnvironmentVariable(ArtifactsDirectoryEnvironmentVariableName);
+            artifactsDirectoryFallbackWarning = rawArtifactsDirectory.IsNullOrWhiteSpace()
                 ? $"{ArtifactsDirectoryEnvironmentVariableName} environment variable was not found, falling back to a user-private temporary directory. This is most likely caused by an outdated Microsoft.NET.Test.Sdk package reference in the test project."
                 : $"{ArtifactsDirectoryEnvironmentVariableName} environment variable was set but ignored because its value '{rawArtifactsDirectory}' is not a usable absolute path, falling back to a user-private temporary directory.";
         }
@@ -759,8 +761,20 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
                 $"{description} cannot be verified, the target of the symbolic link '{path}' is too long. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
         }
 
-        return Encoding.UTF8.GetString(buffer, 0, (int)length);
+        // Decoded strictly: a lossy decode would turn invalid bytes into U+FFFD, so the walk would check a
+        // different path than the one the kernel follows.
+        try
+        {
+            return StrictUtf8.GetString(buffer, 0, (int)length);
+        }
+        catch (DecoderFallbackException)
+        {
+            throw new ArtifactDirectoryVerificationException(
+                $"{description} cannot be verified, the target of the symbolic link '{path}' is not valid UTF-8. Set {FeatureFlag.VSTEST_DISABLE_ARTIFACTS_DIRECTORY_VERIFICATION}=1 to skip this check.");
+        }
     }
+
+    private static readonly UTF8Encoding StrictUtf8 = new(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true);
 
     /// <summary>
     /// Removes trailing '/' separators, keeping "/" itself.

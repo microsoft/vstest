@@ -5,6 +5,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+#if NET
+using System.Runtime.InteropServices;
+#endif
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -323,6 +326,62 @@ public class ArtifactDirectorySecurityTests
             DeleteIfPresent(sessionDirectory);
         }
     }
+
+    [TestMethod]
+    [OSCondition(OperatingSystems.Linux)]
+    public void CollectArtifacts_ShouldUseTheProvidedArtifactsDirectoryExactlyAsSpelled()
+    {
+        // A trailing space is part of a valid Linux directory name, so trimming it would pick another directory.
+        var provided = CreateOwnerOnlyDirectory("provided ");
+        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, provided);
+
+        var sessionId = Guid.NewGuid().ToString();
+        var warning = CreateManager(sessionId).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+
+        Assert.IsNull(warning);
+        Assert.IsNotEmpty(Directory.GetFiles(Path.Combine(provided, sessionId), "executionComplete.json", SearchOption.AllDirectories));
+    }
+
+    [TestMethod]
+    [OSCondition(OperatingSystems.Linux)]
+    public void CollectArtifacts_ShouldNotWriteThroughASymbolicLinkWhoseTargetIsNotValidUtf8()
+    {
+        // A lossy decode would check the path spelled with U+FFFD instead of the one the kernel follows.
+        var linkHolder = CreateOwnerOnlyDirectory("links");
+        byte[] target = RawPath(linkHolder + "/r", 0xFF);
+        byte[] provided = RawPath(linkHolder + "/r", 0xFF, "/provided");
+        Assert.AreEqual(0, NativeMkdir(target, 0x1C0));
+        Assert.AreEqual(0, NativeMkdir(provided, 0x1C0));
+        try
+        {
+            var alias = Path.Combine(linkHolder, "alias");
+            Assert.AreEqual(0, NativeSymlink(new byte[] { (byte)'r', 0xFF, 0 }, alias));
+            Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, Path.Combine(alias, "provided"));
+
+            var warning = CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+
+            Assert.IsNotNull(warning);
+            Assert.Contains("is not valid UTF-8", warning);
+        }
+        finally
+        {
+            // .NET decodes the name lossily too, so Directory.Delete cannot reach these.
+            _ = NativeRmdir(provided);
+            _ = NativeRmdir(target);
+        }
+
+        static byte[] RawPath(string prefix, byte invalid, string suffix = "")
+            => [.. System.Text.Encoding.UTF8.GetBytes(prefix), invalid, .. System.Text.Encoding.UTF8.GetBytes(suffix), 0];
+    }
+
+    [DllImport("libc", EntryPoint = "symlink", SetLastError = true)]
+    private static extern int NativeSymlink(byte[] target, string linkPath);
+
+    [DllImport("libc", EntryPoint = "mkdir", SetLastError = true)]
+    private static extern int NativeMkdir(byte[] path, int mode);
+
+    [DllImport("libc", EntryPoint = "rmdir", SetLastError = true)]
+    private static extern int NativeRmdir(byte[] path);
 
     private const UnixFileMode OwnerOnly =
         UnixFileMode.UserRead | UnixFileMode.UserWrite | UnixFileMode.UserExecute;
