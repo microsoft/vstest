@@ -2,8 +2,11 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
 
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.ArtifactProcessing;
@@ -158,9 +161,11 @@ public class ArtifactDirectorySecurityTests
         Directory.CreateSymbolicLink(link, target);
         Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, link + suffix);
 
-        CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+        var warning = CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
 
         Assert.IsEmpty(Directory.GetFileSystemEntries(target));
+        Assert.IsNotNull(warning);
+        Assert.Contains("is not a directory", warning);
     }
 
     [TestMethod]
@@ -177,23 +182,53 @@ public class ArtifactDirectorySecurityTests
         File.SetUnixFileMode(provided, OwnerOnly);
         Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, provided);
 
-        CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+        var warning = CreateManager(Guid.NewGuid().ToString()).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
 
         Assert.IsEmpty(Directory.GetFileSystemEntries(provided));
+        Assert.IsNotNull(warning);
+        Assert.Contains("can be written by its group or by everybody", warning);
     }
 
     [TestMethod]
     [OSCondition(OperatingSystems.Linux)]
-    public void CollectArtifacts_ShouldWriteThroughASymbolicLinkedParentThatOnlyTheOwnerCanReplace()
+    public async Task PostProcessArtifactsAsync_ShouldNotReadWhenAParentOfTheProvidedArtifactsDirectoryCanBeWrittenByOtherUsers()
+    {
+        // The artifacts were collected while the parent was safe, and it was opened up before they are read
+        // back, which is when a swap would let another user's runsettings be read.
+        var shared = CreateOwnerOnlyDirectory("shared");
+        var provided = Path.Combine(shared, "provided");
+        Directory.CreateDirectory(provided);
+        File.SetUnixFileMode(provided, OwnerOnly);
+        Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, provided);
+
+        var sessionId = Guid.NewGuid().ToString();
+        CreateManager(sessionId).CollectArtifacts(CompletedRunWithAttachment(), string.Empty);
+        Assert.IsNotEmpty(Directory.GetFileSystemEntries(provided));
+        File.SetUnixFileMode(shared, AllPermissions);
+
+        await Assert.ThrowsExactlyAsync<ArtifactDirectoryVerificationException>(() => CreateManager(sessionId).PostProcessArtifactsAsync());
+
+        _attachmentsProcessingManager.Verify(x => x.ProcessTestRunAttachmentsAsync(It.IsAny<string>(),
+            It.IsAny<IRequestData>(), It.IsAny<IEnumerable<AttachmentSet>>(), It.IsAny<IEnumerable<InvokedDataCollector>>(),
+            It.IsAny<ITestRunAttachmentsProcessingEventsHandler>(), It.IsAny<CancellationToken>()), Times.Never);
+    }
+
+    [TestMethod]
+    [OSCondition(OperatingSystems.Linux)]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void CollectArtifacts_ShouldWriteThroughASymbolicLinkedParentThatOnlyTheOwnerCanReplace(bool relativeTarget)
     {
         // A symlink on the way to the directory, rather than the directory itself, is fine as long as no other
-        // user can replace it or anything it leads through.
+        // user can replace it or anything it leads through. A relative target goes back up with "..", which
+        // has to resolve the same way the kernel does.
         var real = CreateOwnerOnlyDirectory("real");
         var provided = Path.Combine(real, "provided");
         Directory.CreateDirectory(provided);
         File.SetUnixFileMode(provided, OwnerOnly);
-        var alias = Path.Combine(_root, "alias");
-        Directory.CreateSymbolicLink(alias, real);
+        var linkHolder = CreateOwnerOnlyDirectory("links");
+        var alias = Path.Combine(linkHolder, "alias");
+        Directory.CreateSymbolicLink(alias, relativeTarget ? "../real" : real);
         Environment.SetEnvironmentVariable(ArtifactsDirectoryVariable, Path.Combine(alias, "provided"));
 
         var sessionId = Guid.NewGuid().ToString();

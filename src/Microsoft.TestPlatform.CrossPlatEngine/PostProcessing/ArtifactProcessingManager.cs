@@ -886,12 +886,11 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
             return 0x000100 | 0x100000; // O_NOFOLLOW | O_DIRECTORY (Darwin <fcntl.h>)
         }
 
-        return RuntimeInformation.ProcessArchitecture switch
+        // Compared by value: the netstandard2.0 Architecture enum predates Armv6 and Ppc64le, but the runtime
+        // still reports them.
+        return (int)RuntimeInformation.ProcessArchitecture switch
         {
-            System.Runtime.InteropServices.Architecture.Arm or System.Runtime.InteropServices.Architecture.Arm64 => 0x8000 | 0x4000, // O_NOFOLLOW | O_DIRECTORY (arm, arm64)
-#if NET
-            System.Runtime.InteropServices.Architecture.Armv6 or System.Runtime.InteropServices.Architecture.Ppc64le => 0x8000 | 0x4000, // O_NOFOLLOW | O_DIRECTORY (arm, powerpc)
-#endif
+            2 /* Arm */ or 3 /* Arm64 */ or 7 /* Armv6 */ or 8 /* Ppc64le */ => 0x8000 | 0x4000, // O_NOFOLLOW | O_DIRECTORY (arm, arm64, powerpc)
             _ => 0x020000 | 0x010000, // O_NOFOLLOW | O_DIRECTORY (asm-generic)
         };
     }
