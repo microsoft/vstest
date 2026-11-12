@@ -1,0 +1,59 @@
+# Public pull request build for rel/16.11.
+# The branch-push trigger is off, so only pull requests build. An explicit `trigger: none`
+# avoids a second build for the push of a non-fork pull request.
+trigger: none
+
+pr:
+  branches:
+    include:
+    - rel/16.11
+  paths:
+    exclude:
+      - .github/*
+      - '**/*.md'
+      - azure-pipelines-official.yml
+
+jobs:
+- job: Windows
+  timeoutInMinutes: 120
+  pool:
+    name: NetCore-Public
+    demands: ImageOverride -equals windows.vs2022.amd64.open
+  variables:
+    _BuildConfig: Release
+  steps:
+  - powershell: eng\build.ps1
+      -configuration $(_BuildConfig)
+      -restore
+      -build
+      -ci
+      -prepareMachine
+      -warnAsError 0
+      -projects $(Build.SourcesDirectory)\TestPlatform.sln
+    displayName: Build
+
+  - powershell: eng\build.ps1
+      -configuration $(_BuildConfig)
+      -test
+      -ci
+      -prepareMachine
+      -warnAsError 0
+      -projects $(Build.SourcesDirectory)\TestPlatform.sln
+    displayName: Test
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '**\*.trx'
+      searchFolder: $(Build.SourcesDirectory)\artifacts\TestResults
+      mergeTestResults: true
+    condition: succeededOrFailed()
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish logs
+    inputs:
+      PathtoPublish: $(Build.SourcesDirectory)\artifacts\log
+      ArtifactName: Logs
+    condition: always()
+    continueOnError: true
