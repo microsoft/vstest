@@ -20,23 +20,8 @@ trigger:
     - rel/17.5
     - rel/17.6
 
-# Branch(es) that trigger(s) build(s) on PR
-pr:
-  branches:
-    include:
-    - main
-    - rel/*
-  paths:
-    exclude:
-      - .github/*
-      - .devcontainer/*
-      - docs/*
-      - .markdownlint.json
-      - .markdownlintignore
-      - CODE_OF_CONDUCT.md
-      - CONTRIBUTING.md
-      - README.md
-      - SECURITY.md
+# Pull requests are validated by azure-pipelines.yml. This official pipeline must not also run for them.
+pr: none
 
 parameters:
 - name: isRTM
