@@ -20,23 +20,8 @@ trigger:
     - rel/17.5
     - rel/17.6
 
-# Branch(es) that trigger(s) build(s) on PR
-pr:
-  branches:
-    include:
-    - main
-    - rel/*
-  paths:
-    exclude:
-      - .github/*
-      - .devcontainer/*
-      - docs/*
-      - .markdownlint.json
-      - .markdownlintignore
-      - CODE_OF_CONDUCT.md
-      - CONTRIBUTING.md
-      - README.md
-      - SECURITY.md
+# The public build in azure-pipelines.yml validates pull requests. This internal build runs on trigger only.
+pr: none
 
 parameters:
 - name: isRTM
