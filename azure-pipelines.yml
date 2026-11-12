@@ -51,13 +51,3 @@ jobs:
       PathtoPublish: $(Build.SourcesDirectory)/artifacts/log
       ArtifactName: Logs_Windows_$(_BuildConfig)
     condition: always()
-
-- job: Linux
-  timeoutInMinutes: 60
-  pool:
-    vmImage: ubuntu-22.04
-  steps:
-  - script: |
-      chmod +x eng/common/*.sh
-      ./build.sh --configuration $(_BuildConfig) --ci
-    displayName: Build
