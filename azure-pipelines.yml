@@ -32,6 +32,10 @@ jobs:
       -projects $(Build.SourcesDirectory)\TestPlatform.sln
     displayName: Build
 
+  # The test assets' NuGet.config names this local feed, and nothing else in this pipeline creates it.
+  - powershell: New-Item -ItemType Directory -Force -Path "$(Build.SourcesDirectory)\artifacts\testArtifacts\packages" | Out-Null
+    displayName: Create local test feed directory
+
   # Test assets are built best-effort, as in the official pipeline. Some net4x assets cannot
   # build on the agent image. Unit tests that need them are listed in the known failures file.
   - powershell: .dotnet\dotnet.exe build
