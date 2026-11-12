@@ -61,7 +61,7 @@
 <Project>
   <PropertyGroup>
     <VersionPrefix>15.9.3</VersionPrefix>
-    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
     <PreReleaseVersionIteration></PreReleaseVersionIteration>
     <!-- AssemblyVersion is pinned at 15.0.0 because the wire protocol serializes against it. -->
     <AssemblyVersion>15.0.0</AssemblyVersion>
