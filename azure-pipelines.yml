@@ -19,6 +19,8 @@ pr:
 variables:
   - name: _BuildConfig
     value: Release
+  - name: NUGET_PACKAGES
+    value: $(Build.SourcesDirectory)\.packages
 
 jobs:
 - job: Windows
