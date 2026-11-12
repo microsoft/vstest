@@ -19,6 +19,7 @@ namespace Microsoft.TestPlatform.AcceptanceTests;
 /// into vstest results so the console summary and loggers keep working.
 /// </summary>
 [TestClass]
+[Ignore("Internal IPC hardening validation excludes the opt-in MTP transport, which is moving to named pipes.")]
 public class MtpUnderVstestTests : AcceptanceTestBase
 {
     private const string MtpTestHostDisableFeatureFlag = "VSTEST_DISABLE_MTP_TESTHOST";

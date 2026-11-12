@@ -81,10 +81,7 @@ public class DotnetTestHostManager : ITestRuntimeProvider2
     private bool _captureOutput;
     private bool _createNoNewWindow;
 
-    // True when the target platform was inferred by the platform rather than pinned by the user. Read from
-    // the run settings in Initialize (RunConfiguration.IsTargetPlatformInferred), so this per-request fact
-    // travels with the run settings instead of the process-wide RunSettingsHelper singleton. Defaults to
-    // true (inferred), matching the historical RunSettingsHelper default when no marker is present.
+    // Keep architecture inference tied to this run's settings rather than process-wide state.
     private bool _isDefaultTargetArchitecture = true;
     private protected TestHostManagerCallbacks? _testHostManagerCallbacks;
 

@@ -105,6 +105,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
             }
         }
         
+        
         /// <summary>
         ///   Looks up a localized string similar to {0} process failed to connect to {1} process after {2} seconds. This may occur due to machine slowness, please set environment variable {3} to increase timeout..
         /// </summary>
@@ -185,5 +186,6 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities.Resources {
                 return ResourceManager.GetString("VersionCheckTimedout", resourceCulture);
             }
         }
+        
     }
 }

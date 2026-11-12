@@ -1,4 +1,4 @@
-﻿#nullable enable
+#nullable enable
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.StartTestSessionStart() -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.StartTestSessionStop() -> void
 *REMOVED*Microsoft.VisualStudio.TestPlatform.CoreUtilities.Tracing.Interfaces.ITestPlatformEventSource.StopTestSessionStart() -> void
