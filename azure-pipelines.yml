@@ -57,5 +57,7 @@ jobs:
   pool:
     vmImage: ubuntu-22.04
   steps:
-  - script: ./build.sh --configuration $(_BuildConfig) --ci
+  - script: |
+      chmod +x eng/common/*.sh
+      ./build.sh --configuration $(_BuildConfig) --ci
     displayName: Build
