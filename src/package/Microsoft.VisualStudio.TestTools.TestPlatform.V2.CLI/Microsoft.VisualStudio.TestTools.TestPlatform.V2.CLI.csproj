@@ -195,6 +195,45 @@
       <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\x64\dbghelp.dll">
         <VSIXSubPath>Extensions\Cpp\x64</VSIXSubPath>
       </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\cs\*.dll">
+        <VSIXSubPath>Extensions\Cpp\cs</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\de\*.dll">
+        <VSIXSubPath>Extensions\Cpp\de</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\es\*.dll">
+        <VSIXSubPath>Extensions\Cpp\es</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\fr\*.dll">
+        <VSIXSubPath>Extensions\Cpp\fr</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\it\*.dll">
+        <VSIXSubPath>Extensions\Cpp\it</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\ja\*.dll">
+        <VSIXSubPath>Extensions\Cpp\ja</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\ko\*.dll">
+        <VSIXSubPath>Extensions\Cpp\ko</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\pl\*.dll">
+        <VSIXSubPath>Extensions\Cpp\pl</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\pt-BR\*.dll">
+        <VSIXSubPath>Extensions\Cpp\pt-BR</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\ru\*.dll">
+        <VSIXSubPath>Extensions\Cpp\ru</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\tr\*.dll">
+        <VSIXSubPath>Extensions\Cpp\tr</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\zh-Hans\*.dll">
+        <VSIXSubPath>Extensions\Cpp\zh-Hans</VSIXSubPath>
+      </VsixSourceItem>
+      <VsixSourceItem Include="$(InternalTestPlatformExtensionsFolder)\Extensions\Cpp\zh-Hant\*.dll">
+        <VSIXSubPath>Extensions\Cpp\zh-Hant</VSIXSubPath>
+      </VsixSourceItem>
     </ItemGroup>
 
     <!-- msdia -->
