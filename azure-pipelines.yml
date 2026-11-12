@@ -42,10 +42,9 @@ jobs:
       $(Build.SourcesDirectory)\test\TestAssets\CILProject\CILProject.proj
       --configuration $(_BuildConfig)
       -v:minimal
+      /p:IlasmToolPath=C:\Windows\Microsoft.NET\Framework64\v4.0.30319\ilasm.exe
     displayName: Build test assets (CILProject)
     continueOnError: true
-    env:
-      NUGET_PACKAGES: $(Build.SourcesDirectory)\packages
 
   - powershell: .dotnet\dotnet.exe build
       $(Build.SourcesDirectory)\test\TestAssets\TestAssets.sln
