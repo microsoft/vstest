@@ -16,6 +16,11 @@ Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.Properties.get ->
 Microsoft.VisualStudio.TestPlatform.ObjectModel.TelemetryEvent.TelemetryEvent(string! name, System.Collections.Generic.IDictionary<string!, object!>! properties) -> void
 Microsoft.VisualStudio.TestPlatform.ObjectModel.RunConfiguration.CreateNoNewWindow.get -> bool
 static Microsoft.VisualStudio.TestPlatform.ObjectModel.Utilities.EqtHash.GuidFromStringXxHash128(string! data) -> System.Guid
+Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCaseIdAlgorithms
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCaseIdAlgorithms.SelfAssigned = "SelfAssigned" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCaseIdAlgorithms.Sha1 = "Sha1" -> string!
+const Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCaseIdAlgorithms.XxHash128 = "XxHash128" -> string!
+static readonly Microsoft.VisualStudio.TestPlatform.ObjectModel.TestCaseProperties.IdAlgorithm -> Microsoft.VisualStudio.TestPlatform.ObjectModel.TestProperty!
 *REMOVED*Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestPlatform.StartTestSession(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IRequestData! requestData, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCriteria! criteria, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler! eventsHandler, System.Collections.Generic.Dictionary<string!, Microsoft.VisualStudio.TestPlatform.ObjectModel.SourceDetail!>! sourceToSourceDetailMap, Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.IWarningLogger! warningLogger) -> bool
 *REMOVED*Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler
 *REMOVED*Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.ITestSessionEventsHandler.HandleStartTestSessionComplete(Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.StartTestSessionCompleteEventArgs? eventArgs) -> void
