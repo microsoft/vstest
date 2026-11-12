@@ -14,6 +14,7 @@ using Microsoft.VisualStudio.TestPlatform.ObjectModel;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client;
 using Microsoft.VisualStudio.TestPlatform.ObjectModel.Client.Interfaces;
 using Microsoft.VisualStudio.TestPlatform.PlatformAbstractions.Interfaces;
+using Microsoft.VisualStudio.TestPlatform.Utilities;
 using Microsoft.VisualStudio.TestPlatform.VsTestConsole.TranslationLayer;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -77,6 +78,20 @@ public class VsTestConsoleWrapperTests
         Assert.AreEqual(TraceLevel.Verbose, _consoleParameters.TraceLevel, "Default value of trace level should be verbose.");
 
         _mockProcessManager.Verify(pm => pm.StartProcess(_consoleParameters), Times.Once);
+    }
+
+    [TestMethod]
+    public async Task StartSessionAsyncShouldLaunchConsoleBeforeWaitingForConnection()
+    {
+        _mockRequestSender
+            .Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>()))
+            .Callback(() => _mockProcessManager.Verify(pm => pm.StartProcess(_consoleParameters), Times.Once))
+            .Returns(true);
+
+        await ((VsTestConsoleWrapper)_consoleWrapper).StartSessionAsync();
+
+        _mockRequestSender.Verify(rs => rs.InitializeCommunication(), Times.Once);
+        _mockRequestSender.Verify(rs => rs.InitializeCommunicationAsync(It.IsAny<int>()), Times.Never);
     }
 
     [TestMethod]

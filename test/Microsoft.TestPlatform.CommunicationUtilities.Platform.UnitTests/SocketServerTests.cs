@@ -83,6 +83,124 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     }
 
     [TestMethod]
+    public async Task SocketServerShouldCloseAcceptedClientDeliveredAfterStop()
+    {
+        var connectedClients = await CreateConnectedTcpClients();
+        using var tcpClient = connectedClients.Client;
+        using var acceptedClient = connectedClients.AcceptedClient;
+        var acceptCompletion = new TaskCompletionSource<TcpClient>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var channelFactory = new Mock<Func<Stream, ICommunicationChannel>>(MockBehavior.Strict);
+        var socketServer = new SocketServer(channelFactory.Object, _ => acceptCompletion.Task);
+        var connectedCount = 0;
+        socketServer.Connected += (_, _) => Interlocked.Increment(ref connectedCount);
+
+        try
+        {
+            var endpoint = socketServer.Start(_defaultConnection).GetIpEndPoint();
+            socketServer.Stop();
+            await AssertListenerStopped(endpoint);
+
+            acceptCompletion.SetResult(acceptedClient);
+
+            Assert.IsTrue(tcpClient.Client.Poll(Timeout * 1000, SelectMode.SelectRead));
+            Assert.AreEqual(0, tcpClient.Client.Available);
+            Assert.AreEqual(0, connectedCount);
+            channelFactory.Verify(factory => factory(It.IsAny<Stream>()), Times.Never);
+        }
+        finally
+        {
+            socketServer.Stop();
+            acceptCompletion.TrySetResult(acceptedClient);
+        }
+    }
+
+    [TestMethod]
+    [DataRow(true)]
+    [DataRow(false)]
+    public async Task SocketServerShouldNotPublishChannelWhenFactoryReturnsAfterStop(bool stopInsideFactory)
+    {
+        var connectedClients = await CreateConnectedTcpClients();
+        using var tcpClient = connectedClients.Client;
+        using var acceptedClient = connectedClients.AcceptedClient;
+        using var factoryEntered = new ManualResetEventSlim(false);
+        using var releaseFactory = new ManualResetEventSlim(false);
+        var channel = new Mock<ICommunicationChannel>();
+        IPEndPoint? endpoint = null;
+        var connectedCount = 0;
+        var disconnectedCount = 0;
+        var stopCompletedDuringDisposal = false;
+        SocketServer? socketServer = null;
+        socketServer = new SocketServer(
+            _ =>
+            {
+                factoryEntered.Set();
+                if (stopInsideFactory)
+                {
+                    socketServer!.Stop();
+                }
+                else
+                {
+                    releaseFactory.Wait(Timeout * 2, TestContext.CancellationToken);
+                }
+
+                return channel.Object;
+            },
+            listener =>
+            {
+                endpoint = (IPEndPoint)listener.LocalEndpoint;
+                return Task.FromResult(acceptedClient);
+            });
+        channel.Setup(communicationChannel => communicationChannel.Dispose()).Callback(() =>
+        {
+            var stopTask = Task.Run(socketServer.Stop, TestContext.CancellationToken);
+            stopCompletedDuringDisposal = stopTask.Wait(Timeout, TestContext.CancellationToken);
+        });
+        socketServer.Connected += (_, _) => Interlocked.Increment(ref connectedCount);
+        socketServer.Disconnected += (_, _) => Interlocked.Increment(ref disconnectedCount);
+        var startTask = Task.Run(() => socketServer.Start(_defaultConnection), TestContext.CancellationToken);
+
+        try
+        {
+            try
+            {
+                Assert.IsTrue(factoryEntered.Wait(Timeout, TestContext.CancellationToken));
+                if (!stopInsideFactory)
+                {
+                    var stopTask = Task.Run(socketServer.Stop, TestContext.CancellationToken);
+                    Assert.IsTrue(stopTask.Wait(Timeout, TestContext.CancellationToken));
+                    Assert.IsNotNull(endpoint);
+                    await AssertListenerStopped(endpoint);
+                }
+            }
+            finally
+            {
+                releaseFactory.Set();
+            }
+
+            Assert.IsTrue(startTask.Wait(Timeout, TestContext.CancellationToken));
+            await startTask;
+
+            Assert.IsNotNull(endpoint);
+            await AssertListenerStopped(endpoint);
+            Assert.AreEqual(0, connectedCount, "A channel returned after Stop must not be published.");
+            Assert.AreEqual(0, disconnectedCount, "An unpublished channel must not enter the message loop.");
+            channel.Verify(communicationChannel => communicationChannel.Dispose(), Times.Once);
+            Assert.IsTrue(stopCompletedDuringDisposal, "Channel disposal must run outside the state lock.");
+            channel.Verify(communicationChannel => communicationChannel.NotifyDataAvailable(It.IsAny<CancellationToken>()), Times.Never);
+            Assert.IsTrue(tcpClient.Client.Poll(Timeout * 1000, SelectMode.SelectRead));
+            Assert.AreEqual(0, tcpClient.Client.Available);
+            socketServer.Stop();
+            channel.Verify(communicationChannel => communicationChannel.Dispose(), Times.Once);
+        }
+        finally
+        {
+            releaseFactory.Set();
+            socketServer.Stop();
+            Assert.IsTrue(startTask.Wait(Timeout, TestContext.CancellationToken));
+        }
+    }
+
+    [TestMethod]
     public async Task SocketServerStopShouldNotWaitForConnectedHandlerWhenAcceptCompletesSynchronously()
     {
         var channel = new Mock<ICommunicationChannel>();
@@ -90,7 +208,14 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         using var tcpClient = connectedClients.Client;
         using var acceptedClient = connectedClients.AcceptedClient;
 
-        var socketServer = new SocketServer(_ => channel.Object, _ => Task.FromResult(acceptedClient));
+        IPEndPoint? endpoint = null;
+        var socketServer = new SocketServer(
+            _ => channel.Object,
+            listener =>
+            {
+                endpoint = (IPEndPoint)listener.LocalEndpoint;
+                return Task.FromResult(acceptedClient);
+            });
         using var handlerEntered = new ManualResetEventSlim(false);
         using var handlerExited = new ManualResetEventSlim(false);
         using var releaseHandler = new ManualResetEventSlim(false);
@@ -111,6 +236,8 @@ public class SocketServerTests : SocketTestsBase, IDisposable
 
                 var stopTask = Task.Run(socketServer.Stop, TestContext.CancellationToken);
                 Assert.IsTrue(stopTask.Wait(Timeout, TestContext.CancellationToken));
+                Assert.IsNotNull(endpoint);
+                await AssertListenerStopped(endpoint);
             }
             finally
             {
@@ -270,6 +397,14 @@ public class SocketServerTests : SocketTestsBase, IDisposable
     {
 #pragma warning disable MSTEST0049 // Use 'TestContext.CancellationToken' - ConnectAsync CancellationToken overload unavailable on .NET Framework
         await _tcpClient.ConnectAsync(IPAddress.Loopback, port);
+#pragma warning restore MSTEST0049
+    }
+
+    private static async Task AssertListenerStopped(IPEndPoint endpoint)
+    {
+        using var client = new TcpClient();
+#pragma warning disable MSTEST0049 // ConnectAsync CancellationToken overload is unavailable on .NET Framework.
+        await Assert.ThrowsExactlyAsync<SocketException>(() => client.ConnectAsync(endpoint.Address, endpoint.Port));
 #pragma warning restore MSTEST0049
     }
 

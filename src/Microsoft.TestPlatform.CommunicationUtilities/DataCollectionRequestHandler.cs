@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -361,6 +361,11 @@ internal class DataCollectionRequestHandler : IDataCollectionRequestHandler, IDi
                     catch (Exception e)
                     {
                         EqtTrace.Error("DataCollectionRequestHandler.HandleBeforeTestRunStart : Error occurred during test case events handling: {0}.", e);
+                        _messageSink.SendMessage(
+                            new DataCollectionMessageEventArgs(
+                                TestMessageLevel.Error,
+                                $"Test case event channel failed: {e.Message}"));
+                        throw;
                     }
                 },
                 _cancellationTokenSource.Token);

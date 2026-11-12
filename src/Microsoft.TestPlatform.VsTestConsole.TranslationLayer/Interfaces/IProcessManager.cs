@@ -42,6 +42,11 @@ internal interface IProcessManager
     int? ProcessId { get; }
 
     /// <summary>
+    /// Start time captured immediately from the process that was launched.
+    /// </summary>
+    DateTime? ProcessStartTimeUtc { get; }
+
+    /// <summary>
     /// Error output of the process. Cleared on new process start.
     /// </summary>
     string? ErrorOutput { get; }
@@ -50,4 +55,5 @@ internal interface IProcessManager
     /// Exit code of the process. Cleared on new process start.
     /// </summary>
     int? ExitCode { get; }
+
 }

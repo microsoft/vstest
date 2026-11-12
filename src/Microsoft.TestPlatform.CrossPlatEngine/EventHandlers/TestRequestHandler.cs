@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
+﻿// Copyright (c) Microsoft Corporation. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
@@ -359,6 +359,7 @@ public class TestRequestHandler : ITestRequestHandler, IDeploymentAwareTestReque
 
                     // Send the negotiated protocol to request sender
                     TPDebug.Assert(_channel is not null, "_channel is null");
+
                     _channel.Send(_dataSerializer.SerializePayload(MessageType.VersionCheck, _protocolVersion));
 
                     // Can only do this after InitializeCommunication because TestHost cannot "Send Log" unless communications are initialized
