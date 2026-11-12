@@ -32,6 +32,11 @@ jobs:
     env:
       DOTNET_ROOT: $(Build.SourcesDirectory)\.dotnet
 
+  - powershell: eng\Prepare-TestRunner.ps1 -Configuration $(_BuildConfig)
+    displayName: Prepare the test runner
+    env:
+      DOTNET_ROOT: $(Build.SourcesDirectory)\.dotnet
+
   - script: test.cmd -configuration $(_BuildConfig) -ci -nobl -projects $(Build.SourcesDirectory)\TestPlatform.sln /p:ArtifactsTestResultsDir=$(Build.SourcesDirectory)\artifacts\TestResults\$(_BuildConfig)\Unit\
     displayName: Unit Test
     env:
