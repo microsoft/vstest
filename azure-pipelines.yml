@@ -81,7 +81,7 @@ stages:
         timeoutInMinutes: 120
         pool:
           name: NetCore-Public
-          demands: ImageOverride -equals windows.vs2022.amd64.open
+          demands: ImageOverride -equals windows.vs2026preview.scout.amd64.open
         strategy:
           matrix:
             Release:
@@ -123,6 +123,14 @@ stages:
           env:
             VSTEST_CONSOLE_PATH: $(_LocalVSTestConsolePath)
 
+        # The test results folder is not produced when the job fails before any test runs,
+        # and publishing a missing path would report a second, misleading failure.
+        - pwsh: |
+            $dir = "$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)"
+            $hasFiles = (Test-Path -LiteralPath $dir) -and (@(Get-ChildItem -LiteralPath $dir -File -Recurse -ErrorAction SilentlyContinue).Count -gt 0)
+            Write-Host "##vso[task.setvariable variable=HasTestResults]$($hasFiles.ToString().ToLowerInvariant())"
+          displayName: 'Check for Test Results folders'
+          condition: failed()
         # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
         # through the console or trx
         - task: PublishBuildArtifacts@1
@@ -130,7 +138,7 @@ stages:
           inputs:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
-          condition: failed()
+          condition: and(failed(), eq(variables['HasTestResults'], 'true'))
 
         - task: PublishBuildArtifacts@1
           displayName: 'Publish Shipping Packages'
@@ -205,6 +213,14 @@ stages:
           env:
             VSTEST_CONSOLE_PATH: $(_LocalVSTestConsolePath)
 
+        # The test results folder is not produced when the job fails before any test runs,
+        # and publishing a missing path would report a second, misleading failure.
+        - pwsh: |
+            $dir = "$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)"
+            $hasFiles = (Test-Path -LiteralPath $dir) -and (@(Get-ChildItem -LiteralPath $dir -File -Recurse -ErrorAction SilentlyContinue).Count -gt 0)
+            Write-Host "##vso[task.setvariable variable=HasTestResults]$($hasFiles.ToString().ToLowerInvariant())"
+          displayName: 'Check for Test Results folders'
+          condition: failed()
         # This step is only helpful for diagnosing some issues with vstest/test host that would not appear
         # through the console or trx
         - task: PublishBuildArtifacts@1
@@ -212,5 +228,5 @@ stages:
           inputs:
             PathtoPublish: '$(Build.SourcesDirectory)/artifacts/TestResults/$(_BuildConfig)'
             ArtifactName: TestResults
-          condition: failed()
+          condition: and(failed(), eq(variables['HasTestResults'], 'true'))
 
