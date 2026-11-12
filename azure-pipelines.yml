@@ -44,6 +44,8 @@ jobs:
       -v:minimal
     displayName: Build test assets (CILProject)
     continueOnError: true
+    env:
+      NUGET_PACKAGES: $(Build.SourcesDirectory)\packages
 
   - powershell: .dotnet\dotnet.exe build
       $(Build.SourcesDirectory)\test\TestAssets\TestAssets.sln
