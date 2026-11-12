@@ -1,0 +1,61 @@
+# Public pipeline for pull requests to this release line.
+# It runs only on PRs. An explicit `trigger: none` avoids duplicate builds for non-fork PRs.
+# Signing, packaging and insertion belong to azure-pipelines-official.yml, which is not run here.
+trigger: none
+
+pr:
+  branches:
+    include:
+    - rel/*
+  paths:
+    exclude:
+      - .github/*
+      - docs/*
+      - .gitignore
+      - README.md
+      - azure-pipelines-official.yml
+      - azure-pipelines-insertion.yml
+
+variables:
+  - name: _BuildConfig
+    value: Release
+
+jobs:
+- job: Windows
+  timeoutInMinutes: 120
+  pool:
+    name: NetCore-Public
+    demands: ImageOverride -equals windows.vs2026preview.scout.amd64.open
+  steps:
+  - script: build.cmd -configuration $(_BuildConfig) -ci -projects $(Build.SourcesDirectory)\TestPlatform.sln
+    displayName: Build
+    env:
+      DOTNET_ROOT: $(Build.SourcesDirectory)\.dotnet
+
+  - script: test.cmd -configuration $(_BuildConfig) -ci -nobl -projects $(Build.SourcesDirectory)\TestPlatform.sln /p:ArtifactsTestResultsDir=$(Build.SourcesDirectory)\artifacts\TestResults\$(_BuildConfig)\Unit\
+    displayName: Unit Test
+    env:
+      DOTNET_ROOT: $(Build.SourcesDirectory)\.dotnet
+
+  - task: PublishTestResults@2
+    displayName: Publish test results
+    inputs:
+      testResultsFormat: VSTest
+      testResultsFiles: '**/*.trx'
+      searchFolder: $(Build.SourcesDirectory)/artifacts/TestResults
+    condition: succeededOrFailed()
+
+  - task: PublishBuildArtifacts@1
+    displayName: Publish logs
+    inputs:
+      PathtoPublish: $(Build.SourcesDirectory)/artifacts/log
+      ArtifactName: Logs_Windows_$(_BuildConfig)
+    condition: always()
+
+- job: Linux
+  timeoutInMinutes: 60
+  pool:
+    vmImage: ubuntu-22.04
+  steps:
+  - script: ./build.sh --configuration $(_BuildConfig) --ci
+    displayName: Build
