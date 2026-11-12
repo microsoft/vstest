@@ -1,4 +1,4 @@
-<Project>
+﻿<Project>
 
   <Import Project="Version.Details.props" />
 
@@ -14,8 +14,8 @@
       from appending +<commitId>, which breaks DTAAgent.
     -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
-    <VersionPrefix>18.10.1</VersionPrefix>
-    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
+    <VersionPrefix>18.10.2</VersionPrefix>
+    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
     <PreReleaseVersionIteration></PreReleaseVersionIteration>
     <!-- Allowed values: '', 'prerelease', 'release'. Set to 'release' when stabilizing. -->
     <DotNetFinalVersionKind></DotNetFinalVersionKind>
