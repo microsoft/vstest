@@ -11,7 +11,7 @@
     <TestPlatformEngVersionsImported>true</TestPlatformEngVersionsImported>
     <!-- This repo version -->
     <VersionPrefix>17.3.4</VersionPrefix>
-    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
     <!-- Opt-out repo features -->
     <UsingToolXliff>false</UsingToolXliff>
     <UsingToolNetFrameworkReferenceAssemblies Condition="'$(DotNetBuildFromSource)' != 'true'">true</UsingToolNetFrameworkReferenceAssemblies>
