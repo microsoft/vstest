@@ -9,7 +9,7 @@
     -->
     <SemanticVersioningV1>true</SemanticVersioningV1>
     <VersionPrefix>17.8.1</VersionPrefix>
-    <PreReleaseVersionLabel>hotfix</PreReleaseVersionLabel>
+    <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
   </PropertyGroup>
   <PropertyGroup Label="Arcade settings">
     <!-- Ensure we use xliff task tool - true is the default but we make it explicit here -->
