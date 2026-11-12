@@ -43,8 +43,8 @@ jobs:
   # of the test run is ignored here. The next step decides: it fails on any result that is not
   # a pass or a known failure.
   - powershell: |
-      eng\build.ps1 -configuration $(buildConfiguration) -test -ci -warnAsError 0 -projects $(Build.SourcesDirectory)\TestPlatform.sln
-      Write-Host "Test run exit code: $LASTEXITCODE (decided by the known failures gate)"
+      eng\build.ps1 -configuration $(buildConfiguration) -test -ci -warnAsError 0 -projects $(Build.SourcesDirectory)\TestPlatform.sln 2>&1 | ForEach-Object { "$_".Replace('##vso[', '#vso[').Replace('##[error]', 'error: ') }
+      Write-Host "Test run finished (the result is decided by the known failures gate)"
       exit 0
     displayName: 'Run Unit Tests'
     env:
