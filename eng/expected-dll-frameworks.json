@@ -307,6 +307,7 @@
     },
     "Microsoft.TestPlatform.Portable": {
       "tools/net10.0/datacollector.dll": "net",
+      "tools/net10.0/Extensions/Microsoft.Diagnostics.NETCore.Client.dll": "netstandard",
       "tools/net10.0/Extensions/Microsoft.TestPlatform.Extensions.BlameDataCollector.dll": "netstandard",
       "tools/net10.0/Extensions/Microsoft.TestPlatform.TestHostRuntimeProvider.dll": "netstandard",
       "tools/net10.0/Extensions/Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger.dll": "netstandard",
@@ -358,8 +359,7 @@
       "tools/net462/System.Numerics.Vectors.dll": "netframework",
       "tools/net462/System.Reflection.Metadata.dll": "netstandard",
       "tools/net462/System.Runtime.CompilerServices.Unsafe.dll": "none",
-      "tools/net462/System.Runtime.InteropServices.RuntimeInformation.dll": "none",
-      "tools/net8.0/Extensions/Microsoft.Diagnostics.NETCore.Client.dll": "netstandard"
+      "tools/net462/System.Runtime.InteropServices.RuntimeInformation.dll": "none"
     },
     "Microsoft.TestPlatform.TestHost": {
       "build/net10.0/x64/testhost.dll": "net",

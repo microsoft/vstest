@@ -323,7 +323,7 @@
         <PackagePath>tools\net10.0\Extensions\%(Filename)%(Extension)</PackagePath>
       </_PortableNetBlame>
       <_PortableNetNetCoreClient Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.BlameDataCollector\$(Configuration)\netstandard2.0\Microsoft.Diagnostics.NETCore.Client.dll">
-        <PackagePath>tools\net8.0\Extensions\%(Filename)%(Extension)</PackagePath>
+        <PackagePath>tools\net10.0\Extensions\%(Filename)%(Extension)</PackagePath>
       </_PortableNetNetCoreClient>
       <_PortableNetHtml Include="$(ArtifactsBinDir)Microsoft.TestPlatform.Extensions.HtmlLogger\$(Configuration)\netstandard2.0\**\Microsoft.VisualStudio.TestPlatform.Extensions.Html.TestLogger*.dll">
         <PackagePath>tools\net10.0\Extensions\%(RecursiveDir)%(Filename)%(Extension)</PackagePath>
