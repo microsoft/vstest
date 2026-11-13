@@ -40,6 +40,11 @@
       "version": "v0.92.1",
       "sha": "525e0a36af5c41d8321d5a80f460758c08d1196e"
     },
+    "github/gh-aw-actions/setup@v1.0.1": {
+      "repo": "github/gh-aw-actions/setup",
+      "version": "v1.0.1",
+      "sha": "221ba4f4319de6b8e809d1a15528b3ae6a818aa5"
+    },
     "super-linter/super-linter@v9.0.0": {
       "repo": "super-linter/super-linter",
       "version": "v9.0.0",
