@@ -12,6 +12,11 @@ on:
   schedule: daily
   workflow_dispatch:
 
+# Fork pull-request review events have a read-only token and cannot run Copilot.
+if: >
+  github.event_name != 'pull_request_review'
+  || github.event.pull_request.head.repo.full_name == github.repository
+
 permissions:
   contents: read
   models: read
@@ -36,7 +41,7 @@ safe-outputs:
   # Prefer an org-owned GitHub App: it mints a short-lived, auto-revoked token
   # scoped to this job and (unlike GITHUB_TOKEN) triggers CI on pushed commits.
   # ignore-if-missing lets the workflow fall back to GITHUB_TOKEN when the App
-  # secrets are absent, so it still runs without org-admin setup and on forks.
+  # secrets are absent, so it still runs without org-admin setup.
   github-app:
     client-id: ${{ vars.APP_ID }}
     private-key: ${{ secrets.APP_PRIVATE_KEY }}
