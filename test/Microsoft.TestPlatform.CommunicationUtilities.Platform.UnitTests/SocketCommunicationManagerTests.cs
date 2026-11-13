@@ -309,26 +309,38 @@ public class SocketCommunicationManagerTests : IDisposable
         var server = new SocketCommunicationManager();
         var client = new SocketCommunicationManager();
 
-        int port = server.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
-        client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait();
-        server.AcceptClientAsync().Wait();
-
-        server.WaitForClientConnection(1000);
-        client.WaitForServerConnection(1000);
-
-        var clientThread = new Thread(() => SendData(client));
-        clientThread.Start();
-
-        var dataReceived = 0;
-        while (dataReceived < 2048 * 5)
+        // Stop both endpoints explicitly. Once the sender thread completes, nothing else keeps the client alive;
+        // if it is garbage collected, finalizing its socket resets the connection before the server reads all data.
+        try
         {
-            dataReceived += server.ReceiveRawMessageAsync(CancellationToken.None).Result!.Length;
-            Task.Delay(1000).Wait();
+            int port = server.HostServer(new IPEndPoint(IPAddress.Loopback, 0)).Port;
+            client.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, port)).Wait();
+            server.AcceptClientAsync().Wait();
+
+            server.WaitForClientConnection(1000);
+            client.WaitForServerConnection(1000);
+
+            var clientThread = new Thread(() => SendData(client));
+            clientThread.Start();
+
+            var dataReceived = 0;
+            while (dataReceived < 2048 * 5)
+            {
+                var message = server.ReceiveRawMessageAsync(CancellationToken.None).Result;
+                Assert.IsNotNull(message, $"The connection was closed after receiving {dataReceived} bytes.");
+                dataReceived += message!.Length;
+                Task.Delay(1000).Wait();
+            }
+
+            clientThread.Join();
+
+            Assert.IsTrue(true);
         }
-
-        clientThread.Join();
-
-        Assert.IsTrue(true);
+        finally
+        {
+            client.StopClient();
+            server.StopServer();
+        }
     }
 
     [TestMethod]
