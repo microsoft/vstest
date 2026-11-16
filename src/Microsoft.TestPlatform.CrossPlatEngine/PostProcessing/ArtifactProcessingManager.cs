@@ -702,13 +702,28 @@ internal class ArtifactProcessingManager : IArtifactProcessingManager
 
     /// <summary>
     /// The O_NOFOLLOW | O_DIRECTORY | O_RDONLY flags used to open a directory while rejecting a final
-    /// symlink or anything that is not a directory at the kernel level. The bit values differ between Linux
-    /// and Darwin.
+    /// symlink or anything that is not a directory at the kernel level.
     /// </summary>
+    /// <remarks>
+    /// The bit values differ between Darwin and Linux, and on Linux between architectures: arm, arm64 and
+    /// powerpc define their own in &lt;asm/fcntl.h&gt;, where the generic values mean O_DIRECT and O_LARGEFILE
+    /// instead. Every other architecture uses &lt;asm-generic/fcntl.h&gt;.
+    /// </remarks>
     private static int GetOpenNoFollowDirectoryFlags()
-        => RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
-            ? 0x000100 | 0x100000 // O_NOFOLLOW | O_DIRECTORY (Darwin <fcntl.h>)
-            : 0x020000 | 0x010000; // O_NOFOLLOW | O_DIRECTORY (Linux <bits/fcntl-linux.h>)
+    {
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+        {
+            return 0x000100 | 0x100000; // O_NOFOLLOW | O_DIRECTORY (Darwin <fcntl.h>)
+        }
+
+        // Compared by value: the netstandard2.0 Architecture enum predates Armv6 and Ppc64le, but the runtime
+        // still reports them.
+        return (int)RuntimeInformation.ProcessArchitecture switch
+        {
+            2 /* Arm */ or 3 /* Arm64 */ or 7 /* Armv6 */ or 8 /* Ppc64le */ => 0x8000 | 0x4000, // O_NOFOLLOW | O_DIRECTORY (arm, arm64, powerpc)
+            _ => 0x020000 | 0x010000, // O_NOFOLLOW | O_DIRECTORY (asm-generic)
+        };
+    }
 
     /// <summary>
     /// Whether an errno from the open above means the path was a symlink (ELOOP) or not a directory
