@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Threading;
 
 namespace SampleUnitTestProject3
@@ -32,9 +33,13 @@ namespace SampleUnitTestProject3
         [TestMethod]
         public void ExitWithStackoverFlow()
         {
-            // a fast way to cause stack overflow, takes one method call instead of 9k that you need when calling a method recursively
-            Span<byte> s = stackalloc byte[int.MaxValue];
+            // Recurse instead of a single huge stackalloc. On .NET 10, a stackalloc of int.MaxValue bytes on a
+            // non-main thread can end in an access violation, and then the runtime does not print "Stack overflow.".
+            Recurse(0);
         }
+
+        [MethodImpl(MethodImplOptions.NoInlining)]
+        private static int Recurse(int depth) => Recurse(depth + 1) + depth;
 
 #if NETFRAMEWORK
         [TestMethod]
