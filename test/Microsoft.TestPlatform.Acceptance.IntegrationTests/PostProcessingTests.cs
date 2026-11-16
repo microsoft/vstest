@@ -78,7 +78,7 @@ public class PostProcessingTests : AcceptanceTestBase
             fileContent.Add(line);
         }
 
-        Assert.AreEqual(2, fileContent.Distinct().Count());
+        Assert.HasCount(2, fileContent.Distinct());
     }
 
     private static string GetRunsettingsFilePath(string resultsDir)
