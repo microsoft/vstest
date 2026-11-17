@@ -311,10 +311,9 @@ public class IntegrationTestBuild : IntegrationTestBase
 
         var nugetFeeds = GetNugetSourceParameters(Root);
 
-        var runnerVersionProperties = Enum.GetValues(typeof(CompatScenario)).Cast<CompatScenario>()
+        var runnerVersionProperties = new HashSet<string>(Enum.GetValues(typeof(CompatScenario)).Cast<CompatScenario>()
             .SelectMany(scenario => new CompatibilityMatrixAttribute(scenario).RunnerVersions.Split(';'))
-            .Select(version => $"VSTestConsole{version}Version")
-            .ToHashSet();
+            .Select(version => $"VSTestConsole{version}Version"));
 
         // We use the same version properties for NET.Test.Sdk as for VSTestConsole, for now.
         foreach (var sdkPropertyName in vstestConsoleVersionProperties)
