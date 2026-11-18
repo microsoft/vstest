@@ -126,9 +126,13 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
         var coverage = new XmlDocument();
         coverage.Load(report);
         // The root element does not always carry lines-covered, so look for a line that was hit instead.
-        Assert.IsNotNull(coverage.SelectSingleNode("//line[number(@hits) > 0]"), report);
-
         var diagnostics = string.Join(Environment.NewLine, Directory.GetFiles(DiagLogsDirectory, "*.log").Select(File.ReadAllText));
+        var reportText = File.ReadAllText(report);
+        var diagnosticsTail = diagnostics.Length > 6000 ? diagnostics.Substring(diagnostics.Length - 6000) : diagnostics;
+        Assert.IsNotNull(
+            coverage.SelectSingleNode("//line[number(@hits) > 0]"),
+            $"{report}{Environment.NewLine}--- report ({reportText.Length} chars) ---{Environment.NewLine}{(reportText.Length > 4000 ? reportText.Substring(0, 4000) : reportText)}{Environment.NewLine}--- diagnostics tail ---{Environment.NewLine}{diagnosticsTail}");
+
         Assert.Contains(collectorPath, diagnostics);
         Assert.Contains(Path.Combine(deployment.Path, "Microsoft.CodeCoverage", "Microsoft.CodeCoverage.Core.dll"), diagnostics);
     }
