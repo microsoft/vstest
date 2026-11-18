@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Runtime.InteropServices;
 using System.Xml;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -126,13 +125,8 @@ public sealed class CodeCoveragePublishTests : AcceptanceTestBase
         var report = Directory.GetFiles(deployment.Path, "*.cobertura.xml", SearchOption.AllDirectories).Single();
         var coverage = new XmlDocument();
         coverage.Load(report);
-        Assert.AreEqual("coverage", coverage.DocumentElement!.Name, report);
-
-        // On macOS the report is produced but has no line with hits (observed in CI), so only check hits elsewhere.
-        if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-        {
-            Assert.IsNotNull(coverage.SelectSingleNode("//line[number(@hits) > 0]"), report);
-        }
+        // The root element does not always carry lines-covered, so look for a line that was hit instead.
+        Assert.IsNotNull(coverage.SelectSingleNode("//line[number(@hits) > 0]"), report);
 
         var diagnostics = string.Join(Environment.NewLine, Directory.GetFiles(DiagLogsDirectory, "*.log").Select(File.ReadAllText));
         Assert.Contains(collectorPath, diagnostics);
