@@ -128,7 +128,7 @@ public class NativeAotCompatibilityTests
             "TestAssets",
             "NativeAotTranslationLayerConsumer",
             "Release",
-            "net8.0",
+            "net10.0",
             rid,
             "publish",
             executableName));
