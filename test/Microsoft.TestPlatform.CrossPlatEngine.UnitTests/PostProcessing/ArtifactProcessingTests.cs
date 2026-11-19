@@ -428,11 +428,9 @@ public class ArtifactProcessingTests
     }
 
     [TestMethod]
-    public void CollectArtifacts_ShouldWarnWhenTheArtifactsDirectoryVariableIsMissing()
+    public void CollectArtifacts_ShouldNotWarnWhenTheArtifactsDirectoryVariableIsMissingAndThereAreNoAttachments()
     {
-        // A correlation id with no attachments still has nothing to persist, but the .NET SDK asked for
-        // artifacts handling by passing the id at all, so the warning must not depend on there being
-        // something to write this particular run.
+        // With no attachments the artifacts directory is never used, so falling back from it is not worth a warning.
         var testRunCompleteEventArgs = new TestRunCompleteEventArgs(_testRunStatistics.Object,
             false,
             false,
@@ -442,9 +440,7 @@ public class ArtifactProcessingTests
 
         var result = _artifactProcessingManager.CollectArtifacts(testRunCompleteEventArgs, string.Empty);
 
-        Assert.IsNotNull(result);
-        StringAssert.Contains(result, ArtifactProcessingManager.ArtifactsDirectoryEnvironmentVariableName);
-        StringAssert.Contains(result, "Microsoft.NET.Test.Sdk");
+        Assert.IsNull(result);
     }
 
     [TestMethod]
