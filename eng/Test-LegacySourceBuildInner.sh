@@ -23,7 +23,7 @@ cp "$repo_root/eng/BuildSourceBuildIntermediate.sh" "$inner/eng/BuildSourceBuild
 cat > "$fixture/.dotnet/dotnet" <<'EOF'
 #!/usr/bin/env bash
 if [[ "${1:-}" == "--version" ]]; then
-  echo 9.0.104
+  echo 10.0.404
   exit 0
 fi
 printf '%s\n' "$@" > "$PILOT_ARGS"
@@ -33,7 +33,7 @@ chmod +x "$fixture/.dotnet/dotnet"
 cat > "$inner/eng/common/dotnet-install.sh" <<'EOF'
 #!/usr/bin/env bash
 printf '%s\n' "$@" > "$PILOT_INSTALL_ARGS"
-mkdir -p "$BUILD_SOURCESDIRECTORY/.dotnet/sdk/9.0.104/Sdks"
+mkdir -p "$BUILD_SOURCESDIRECTORY/.dotnet/sdk/10.0.404/Sdks"
 EOF
 
 BUILD_SOURCESDIRECTORY="$fixture" \
@@ -48,10 +48,10 @@ MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100/Sdks" \
     "$fixture/tool-packages/microsoft.dotnet.arcade.sdk/9.0.0-beta.25164.2/tools" \
     17.11.2-hotfix-26480-99
 
-[[ $(grep -Fc '9.0.104' "$inner/global.json") -eq 2 ]]
+[[ $(grep -Fc '10.0.404' "$inner/global.json") -eq 2 ]]
 [[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/global.json") -eq 1 ]]
-[[ $(grep -Fc '9.0.104' "$fixture/artifacts/sourcebuild-intermediate/global.json") -eq 1 ]]
-cmp <(sed -e 's/11\.0\.100/9.0.104/g' \
+[[ $(grep -Fc '10.0.404' "$fixture/artifacts/sourcebuild-intermediate/global.json") -eq 1 ]]
+cmp <(sed -e 's/11\.0\.100/10.0.404/g' \
           -e 's/11\.0\.0-beta\.26421\.2/9.0.0-beta.25164.2/g' "$repo_root/global.json") \
   "$inner/global.json"
 cmp <(sed -e 's/9\.0\.0-beta\.24429\.5/9.0.0-beta.25164.2/g' \
@@ -66,14 +66,14 @@ grep -Fxq -- '-p:Version=17.11.2-hotfix-26480-99' "$fixture/args.txt"
 grep -Fxq -- '-p:Configuration=Release' "$fixture/args.txt"
 grep -Fxq -- '-p:ArcadeSdkVersion=9.0.0-beta.25164.2' "$fixture/args.txt"
 grep -Fxq -- 'private-copy=verified' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
-grep -Fxq -- 'sdk9-install=started' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
-grep -Fxq -- 'sdk9-install=finished' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
-grep -Fxq -- 'compat-sdk=9.0.104' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
-grep -Fxq -- 'sdk-selected=9.0.104' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
-grep -Fxq -- "$fixture/.dotnet/sdk/9.0.104/Sdks" "$fixture/sdk-path.txt"
+grep -Fxq -- 'compat-sdk-install=started' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
+grep -Fxq -- 'compat-sdk-install=finished' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
+grep -Fxq -- 'compat-sdk=10.0.404' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
+grep -Fxq -- 'sdk-selected=10.0.404' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
+grep -Fxq -- "$fixture/.dotnet/sdk/10.0.404/Sdks" "$fixture/sdk-path.txt"
 grep -Fxq -- 'inner-build=starting' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
 grep -Fxq -- '-version' "$fixture/install-args.txt"
-grep -Fxq -- '9.0.104' "$fixture/install-args.txt"
+grep -Fxq -- '10.0.404' "$fixture/install-args.txt"
 grep -Fxq -- '-dotnetpath' "$fixture/install-args.txt"
 grep -Fxq -- "$fixture/.dotnet" "$fixture/install-args.txt"
 grep -Fxq -- '-runtime' "$fixture/install-args.txt"
@@ -85,7 +85,7 @@ fi
 [[ "$(sha256sum "$repo_root/global.json" | cut -d' ' -f1)" == "$original_global_hash" ]]
 [[ "$(sha256sum "$repo_root/eng/Version.Details.xml" | cut -d' ' -f1)" == "$original_details_hash" ]]
 
-rmdir "$fixture/.dotnet/sdk/9.0.104/Sdks" "$fixture/.dotnet/sdk/9.0.104"
+rmdir "$fixture/.dotnet/sdk/10.0.404/Sdks" "$fixture/.dotnet/sdk/10.0.404"
 cp "$repo_root/global.json" "$inner/global.json"
 cp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
 cp "$fixture/compat-global-before.json" "$fixture/artifacts/sourcebuild-intermediate/global.json"
@@ -107,7 +107,7 @@ else
   [[ "$?" -eq 23 ]]
 fi
 grep -Fq 'Simulated SDK installation failure' "$fixture/install-failure.log"
-grep -Fxq 'sdk9-install=failed' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
+grep -Fxq 'compat-sdk-install=failed' "$fixture/artifacts/log/Release/SourceBuildIntermediate/inner-toolchain-check.txt"
 
 cp "$repo_root/global.json" "$inner/global.json"
 cp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
