@@ -13,8 +13,8 @@ fi
 trap 'rm -rf -- "$fixture"' EXIT
 
 inner="$fixture/artifacts/sourcebuild-intermediate/artifacts/sb/src"
-mkdir -p "$inner/eng/common" "$fixture/.dotnet/sdk/11.0.100-preview.6.26359.118/Sdks"
-printf '%s\n' '{"sdk":{"version":"11.0.100-preview.6.26359.118"},"msbuild-sdks":{"Microsoft.DotNet.Arcade.Sdk":"9.0.0-beta.25164.2"}}' \
+mkdir -p "$inner/eng/common" "$fixture/.dotnet/sdk/11.0.100/Sdks"
+printf '%s\n' '{"sdk":{"version":"11.0.100"},"msbuild-sdks":{"Microsoft.DotNet.Arcade.Sdk":"9.0.0-beta.25164.2"}}' \
   > "$fixture/compat-global-before.json"
 cp "$fixture/compat-global-before.json" "$fixture/artifacts/sourcebuild-intermediate/global.json"
 cp "$repo_root/global.json" "$inner/global.json"
@@ -42,7 +42,7 @@ BUILD_BUILDNUMBER=20260930.99 \
 PILOT_ARGS="$fixture/args.txt" \
 PILOT_INSTALL_ARGS="$fixture/install-args.txt" \
 PILOT_MSBUILD_SDKS="$fixture/sdk-path.txt" \
-MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100-preview.6.26359.118/Sdks" \
+MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100/Sdks" \
   bash "$inner/eng/BuildSourceBuildIntermediate.sh" --inner-legacy \
     "$fixture/.dotnet/dotnet" \
     "$fixture/tool-packages/microsoft.dotnet.arcade.sdk/9.0.0-beta.25164.2/tools" \
@@ -51,7 +51,7 @@ MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100-preview.6.26359.118/Sdks" \
 [[ $(grep -Fc '9.0.104' "$inner/global.json") -eq 2 ]]
 [[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/global.json") -eq 1 ]]
 [[ $(grep -Fc '9.0.104' "$fixture/artifacts/sourcebuild-intermediate/global.json") -eq 1 ]]
-cmp <(sed -e 's/11\.0\.100-preview\.6\.26359\.118/9.0.104/g' \
+cmp <(sed -e 's/11\.0\.100/9.0.104/g' \
           -e 's/11\.0\.0-beta\.26421\.2/9.0.0-beta.25164.2/g' "$repo_root/global.json") \
   "$inner/global.json"
 cmp <(sed -e 's/9\.0\.0-beta\.24429\.5/9.0.0-beta.25164.2/g' \
@@ -138,7 +138,7 @@ EOF
   cat > "$root/.dotnet/dotnet" <<'EOF'
 #!/usr/bin/env bash
 if [[ "${1:-}" == "--version" ]]; then
-  echo 11.0.100-preview.6.26359.118
+  echo 11.0.100
   exit 0
 fi
 printf '%s\n' "$@" > "$PILOT_RESTORE_ARGS"
