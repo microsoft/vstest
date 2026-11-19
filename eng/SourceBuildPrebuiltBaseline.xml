@@ -24,6 +24,11 @@
     <UsagePattern IdentityGlob="Microsoft.AspNetCore.App.Ref/8.0.*" />
     <UsagePattern IdentityGlob="Microsoft.NetCore.App.Ref/8.0.*" />
     <UsagePattern IdentityGlob="Microsoft.NETCore.App.Host.linux-x64/8.0.*" />
+    <!-- The private source-build copy targets net9.0 (Arcade 9) but runs on SDK 10, which does not
+         bundle the 9.0 packs. Full source-build supplies them from the source-built runtime. -->
+    <UsagePattern IdentityGlob="Microsoft.AspNetCore.App.Ref/9.0.*" />
+    <UsagePattern IdentityGlob="Microsoft.NetCore.App.Ref/9.0.*" />
+    <UsagePattern IdentityGlob="Microsoft.NETCore.App.Host.linux-x64/9.0.*" />
     <UsagePattern IdentityGlob="Microsoft.Extensions.FileSystemGlobbing/*" />
     <UsagePattern IdentityGlob="System.Text.Encodings.Web/*" />
     <UsagePattern IdentityGlob="System.Text.Json/*" />
