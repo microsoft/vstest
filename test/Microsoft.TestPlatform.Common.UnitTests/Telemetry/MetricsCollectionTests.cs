@@ -83,6 +83,6 @@ public class MetricsCollectionTests
             task.GetAwaiter().GetResult();
         }
 
-        Assert.IsGreaterThan(0, _metricsCollection.Metrics.Count);
+        Assert.AreEqual(10000, _metricsCollection.Metrics.Count);
     }
 }
