@@ -64,7 +64,7 @@ parameters:
     image: 1es-ubuntu-2204
     os: linux
   - name: Azure Pipelines
-    image: macos-14
+    image: macos-15
     os: macOS
 
 variables:
@@ -328,6 +328,11 @@ extends:
               dependsOn: Windows
               workspace:
                 clean: all
+              variables:
+                # Without this, Arcade uses the agent's dotnet when it already has the pinned SDK and
+                # never creates the repo-local .dotnet that the integration tests run from.
+                - name: DOTNET_INSTALL_DIR
+                  value: $(Build.SourcesDirectory)/.dotnet
               pool:
                 name: ${{ pool.name }}
                 demands: ImageOverride -equals ${{ pool.image }}
