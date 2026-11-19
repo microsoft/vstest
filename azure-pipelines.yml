@@ -182,6 +182,11 @@ stages:
           fetchDepth: 1
           clean: true
 
+        # The integration tests fill the hosted Ubuntu agent's disk. Remove preinstalled toolsets this job never uses.
+        - script: sudo rm -rf /usr/local/lib/android /usr/share/dotnet /opt/ghc /usr/local/.ghcup /usr/share/swift && df -h /
+          displayName: Free disk space
+          condition: and(succeeded(), eq(variables['Agent.OS'], 'Linux'))
+
         # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
         # anyway. Because that is what we will publish.
         - script: ./build.sh
