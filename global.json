@@ -1,6 +1,6 @@
 {
   "sdk": {
-    "version": "10.0.202",
+    "version": "10.0.404",
     "paths": [
       ".dotnet",
       "$host$"
@@ -34,7 +34,7 @@
     "vs": {
       "version": "17.8.0"
     },
-    "dotnet": "10.0.202"
+    "dotnet": "10.0.404"
   },
   "msbuild-sdks": {
     "Microsoft.DotNet.Arcade.Sdk": "10.0.0-beta.26177.7"
