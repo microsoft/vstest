@@ -173,6 +173,10 @@ stages:
           # even when we don't use matrix.
           - name: _BuildConfig
             value: Release
+          # Without this, Arcade uses the agent's dotnet when it already has the pinned SDK and
+          # never creates the repo-local .dotnet that the integration tests run from.
+          - name: DOTNET_INSTALL_DIR
+            value: $(Build.SourcesDirectory)/.dotnet
         strategy:
           matrix:
             ubuntu:
