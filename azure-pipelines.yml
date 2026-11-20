@@ -157,7 +157,7 @@ stages:
               vmImage: ubuntu-22.04
               pwsh: true
             macOS_12:
-              vmImage: macos-14
+              vmImage: macos-15
               pwsh: true
         pool:
           vmImage: $[ variables['vmImage'] ]
