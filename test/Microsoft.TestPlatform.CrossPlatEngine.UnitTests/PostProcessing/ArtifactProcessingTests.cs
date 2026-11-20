@@ -425,19 +425,23 @@ public class ArtifactProcessingTests
     }
 
     [TestMethod]
-    public void CollectArtifacts_ShouldNotWarnWhenTheArtifactsDirectoryVariableIsMissingAndThereAreNoAttachments()
+    [DataRow(true)]
+    [DataRow(false)]
+    public void CollectArtifacts_ShouldNotWarnWhenTheArtifactsDirectoryVariableIsMissingAndThereAreNoAttachments(bool attachmentSetsIsNull)
     {
         // With no attachments the artifacts directory is never used, so falling back from it is not worth a warning.
         var testRunCompleteEventArgs = new TestRunCompleteEventArgs(_testRunStatistics.Object,
             false,
             false,
             null,
-            new Collection<AttachmentSet>(),
+            attachmentSetsIsNull ? null : new Collection<AttachmentSet>(),
             TimeSpan.Zero);
 
         var result = _artifactProcessingManager.CollectArtifacts(testRunCompleteEventArgs, string.Empty);
 
         Assert.IsNull(result);
+        _fileHelperMock.Verify(x => x.CreateDirectory(It.IsAny<string>()), Times.Never);
+        _fileHelperMock.Verify(x => x.WriteAllTextToFile(It.IsAny<string>(), It.IsAny<string>()), Times.Never);
     }
 
     [TestMethod]
