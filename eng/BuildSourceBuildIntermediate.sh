@@ -37,7 +37,7 @@ if [[ "${1:-}" == "--inner-legacy" ]]; then
     echo "The copied source-build toolchain differs from its pinned input." >&2
     exit 1
   fi
-  sed -i 's/11\.0\.100/9.0.104/g' "$global"
+  sed -i 's/11\.0\.100/10.0.404/g' "$global"
   sed -i 's/11\.0\.0-beta\.26421\.2/9.0.0-beta.25164.2/g' "$global"
   sed -i 's/9\.0\.0-beta\.24429\.5/9.0.0-beta.25164.2/g' "$details"
   sed -i 's/d21db44e84b9038ea7b2add139adee2303d46800/5ba9ca776c1d0bb72b2791591e54cf51fc52dfee/g' "$details"
@@ -49,27 +49,27 @@ if [[ "${1:-}" == "--inner-legacy" ]]; then
     echo "The temporary Arcade 9 tool project has an unexpected SDK pin." >&2
     exit 1
   fi
-  sed -i 's/11\.0\.100/9.0.104/g' "$compat_global"
-  printf 'compat-sdk=9.0.104\n' >> "$diagnostic"
-  if [[ ! -d "$outer_root/.dotnet/sdk/9.0.104" ]]; then
-    printf 'sdk9-install=started\n' >> "$diagnostic"
+  sed -i 's/11\.0\.100/10.0.404/g' "$compat_global"
+  printf 'compat-sdk=10.0.404\n' >> "$diagnostic"
+  if [[ ! -d "$outer_root/.dotnet/sdk/10.0.404" ]]; then
+    printf 'compat-sdk-install=started\n' >> "$diagnostic"
     installer="$inner_root/eng/common/dotnet-install.sh"
     [[ -f "$installer" ]] || { echo "The checked-in .NET installer is missing." >&2; exit 1; }
-    install_log="$(dirname "$diagnostic")/sdk9-install.log"
-    if bash "$installer" -version 9.0.104 -dotnetpath "$outer_root/.dotnet" -runtime sdk > "$install_log" 2>&1; then
-      printf 'sdk9-install=finished\n' >> "$diagnostic"
+    install_log="$(dirname "$diagnostic")/compat-sdk-install.log"
+    if bash "$installer" -version 10.0.404 -dotnetpath "$outer_root/.dotnet" -runtime sdk > "$install_log" 2>&1; then
+      printf 'compat-sdk-install=finished\n' >> "$diagnostic"
     else
       status=$?
-      printf 'sdk9-install=failed\n' >> "$diagnostic"
+      printf 'compat-sdk-install=failed\n' >> "$diagnostic"
       tail -n 20 "$install_log" >&2
       exit "$status"
     fi
   else
-    printf 'sdk9-install=already-present\n' >> "$diagnostic"
+    printf 'compat-sdk-install=already-present\n' >> "$diagnostic"
   fi
   printf 'sdk-selected=%s\n' "$("$dotnet" --version)" >> "$diagnostic"
   previous_sdks="$outer_root/.dotnet/sdk/11.0.100/Sdks"
-  historical_sdks="$outer_root/.dotnet/sdk/9.0.104/Sdks"
+  historical_sdks="$outer_root/.dotnet/sdk/10.0.404/Sdks"
   if [[ ( -n "${MSBuildSDKsPath:-}" && "$MSBuildSDKsPath" != "$previous_sdks" ) ||
         ! -d "$historical_sdks" ]]; then
     echo "The inner MSBuild SDK resolver is not at the expected toolchain path." >&2
