@@ -2161,7 +2161,7 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
 
         _mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
-            It.Is<Dictionary<string, object?>>(m =>
+            It.Is<IDictionary<string, object?>>(m =>
                 m.Count == 2
                 && m.ContainsKey(TelemetryDataConstants.NumberOfAttachmentsSentForProcessing)
                 && (int)m[TelemetryDataConstants.NumberOfAttachmentsSentForProcessing]! == 5
@@ -2230,7 +2230,7 @@ public class TestRequestManagerTests
         _mockTestPlatformEventSource.Verify(es => es.TestRunAttachmentsProcessingRequestStop());
 
         _mockMetricsPublisher.Verify(p => p.PublishMetrics(TelemetryDataConstants.TestAttachmentsProcessingCompleteEvent,
-            It.Is<Dictionary<string, object?>>(m =>
+            It.Is<IDictionary<string, object?>>(m =>
                 m.Count == 1
                 && m.ContainsKey(TelemetryDataConstants.AttachmentsProcessingState)
                 && (string?)m[TelemetryDataConstants.AttachmentsProcessingState] == "Canceled")));
