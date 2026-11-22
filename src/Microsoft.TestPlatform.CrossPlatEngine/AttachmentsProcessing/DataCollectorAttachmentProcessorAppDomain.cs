@@ -92,7 +92,7 @@ internal class DataCollectorAttachmentProcessorAppDomain : IDataCollectorAttachm
     {
         try
         {
-            using StreamReader sr = new(_pipeClientStream, Encoding.Default, false, 1024, true);
+            using StreamReader sr = new(_pipeClientStream, new UTF8Encoding(false), false, 1024, true);
             while (_pipeClientStream?.IsConnected == true)
             {
                 try
