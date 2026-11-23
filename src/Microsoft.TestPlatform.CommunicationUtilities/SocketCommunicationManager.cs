@@ -173,7 +173,8 @@ public class SocketCommunicationManager : ICommunicationManager
         // for now added a check for validation of this.tcpclient
         _clientConnectionAcceptedEvent.Reset();
         EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
-        _tcpClient = new TcpClient { NoDelay = true };
+        // Match the address family to the endpoint to avoid a dual-mode socket (rejected by loopback-only macOS sandboxes).
+        _tcpClient = new TcpClient(endpoint.AddressFamily) { NoDelay = true };
         _socket = _tcpClient.Client;
 
         Stopwatch watch = new();

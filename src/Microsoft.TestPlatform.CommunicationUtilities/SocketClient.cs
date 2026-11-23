@@ -21,7 +21,7 @@ namespace Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 public class SocketClient : ICommunicationEndPoint
 {
     private readonly CancellationTokenSource _cancellation;
-    private readonly TcpClient _tcpClient;
+    private TcpClient _tcpClient;
     private readonly Func<Stream, ICommunicationChannel> _channelFactory;
 
     private ICommunicationChannel? _channel;
@@ -39,6 +39,7 @@ public class SocketClient : ICommunicationEndPoint
         _cancellation = new CancellationTokenSource();
         _stopped = false;
 
+        // Replaced in Start, once the endpoint address family is known.
         _tcpClient = new TcpClient { NoDelay = true };
         _channelFactory = channelFactory;
     }
@@ -56,6 +57,11 @@ public class SocketClient : ICommunicationEndPoint
         var ipEndPoint = endPoint.GetIpEndPoint();
 
         EqtTrace.Info("SocketClient.Start: connecting to server endpoint: {0}", endPoint);
+
+        // Match the socket address family to the endpoint. A default TcpClient is a dual-mode IPv6 socket, which
+        // reaches 127.0.0.1 as ::ffff:127.0.0.1 and is rejected by loopback-only macOS sandboxes.
+        _tcpClient.Dispose();
+        _tcpClient = new TcpClient(ipEndPoint.AddressFamily) { NoDelay = true };
 
         // Don't start if the endPoint port is zero
         _tcpClient.ConnectAsync(ipEndPoint.Address, ipEndPoint.Port).ContinueWith(OnServerConnected);
