@@ -667,8 +667,13 @@ function Get-ChangedSourceFiles {
     #
     # So: a window that found no adequate pause REFUSES. There is no other base to fall back to, and
     # "I could not find the base" must never produce the same outcome as a clean verdict.
+    # COMMITTER DATES, NOT AUTHOR DATES. Rebase, cherry-pick and --amend keep the author date, and
+    # `git commit --date` sets it freely, so a port of an old fix can carry a 2019 author date inside
+    # the servicing work. With author dates that commit would create the largest gap and silently
+    # become the base, hiding every change made before it. The committer date is set when the commit
+    # lands on the branch, so it follows first-parent order.
     $walkLimit = 400
-    $walk = @(& git log --first-parent --format='%H %at' $Head -n $walkLimit 2>$null)
+    $walk = @(& git log --first-parent --format='%H %ct' $Head -n $walkLimit 2>$null)
     $isShallow = ((& git rev-parse --is-shallow-repository 2>$null | Out-String).Trim() -eq 'true')
 
     if ($walk.Count -lt 2) {
