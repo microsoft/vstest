@@ -25,8 +25,8 @@
       1  an UNDECLARED changed file under src/                      exit 1
       2  the proxy is no longer valid: a src/ project, or a shared
          import, compiles a file from outside src/                  exit 1
-      3  the supplied baseline ref disagrees with the base derived
-         from the branch's own commit timestamps                    throws
+      3  no servicing baseline can be derived from the branch's
+         own commit timestamps (no pause of 180+ days found)        throws
       4  the diff produced nothing at all, so the command failed     throws
       5  -SelfTest cannot detect a planted probe, or does not
          restore the tree afterwards                                exit 1
@@ -117,16 +117,18 @@
     - an immutable property of a committed object), one is prose about evidence, one is history
     explaining why a line exists. Exactly one aged, and it is the paragraph above.
 
-    MUTATION RESULTS, DATED AT 84b4b8768 - re-run them and append your own hash rather than trust these:
+    MUTATION RESULTS, DATED AT 24ea213bd - re-run them and append your own hash rather than trust these:
 
         clean tree                                      exit 0
         -SelfTest                                       exit 0
         UNDECLARED src/*.cs edited, uncommitted         exit 1   SCOPE: 1 UNDECLARED
         OUT-OF-SCOPE file edited, uncommitted           exit 0   <- discriminates
-        REFUSAL (-BaselineRef at an all-zero SHA)       exit 1   refusal text asserted, not just exit 1
+        REFUSAL (-HeadRef at an all-zero SHA)           exit 1   refusal text asserted, not just exit 1
 
-    This table was previously dated 334090d8e / 76dc86f5f, and THIS FILE CHANGED THREE TIMES after
-    that run (540e0534b, 479da5eae, 84b4b8768) - so the table had stopped describing the script,
+    Re-run on the change that removed -BaselineRef and made the history-derived base the only base.
+    This table was previously dated 84b4b8768, and before that 334090d8e / 76dc86f5f. THIS FILE
+    CHANGED THREE TIMES after that first run (540e0534b, 479da5eae, 84b4b8768) - so the table had
+    stopped describing the script,
     which is the aging the dating exists to make visible. Dating is not protection against aging.
     An UNDATED table would have aged identically and still been quoted.
 
@@ -172,9 +174,10 @@
         'UNDECLARED COMPILED'   clean FALSE  undeclared TRUE   proxy FALSE  refusal FALSE  binding FALSE
         'NO LONGER VALID'       clean FALSE  undeclared FALSE  proxy TRUE   refusal FALSE  binding FALSE
 
-    THE BINDING ERROR IS NOT DISTINGUISHABLE FROM A REFUSAL BY EXIT CODE. Both exit 1. -Base and
-    -ComparedSet and -Declarations and -Path are parameters of INNER FUNCTIONS in this file; passing
-    any of them to the SCRIPT is a binding error that produces exit 1 and NO gate output at all. A
+    THE BINDING ERROR IS NOT DISTINGUISHABLE FROM A REFUSAL BY EXIT CODE. Both exit 1.
+    -ComparedSet and -Declarations and -Path are parameters of INNER FUNCTIONS in this file, and
+    -BaselineRef was removed from the script; passing any of them to the SCRIPT is a binding error
+    that produces exit 1 and NO gate output at all. A
     caller that treats "exit 1" as "the gate ran and found something" is wrong on that row.
 
     Discriminate by OUTPUT, not by code:
@@ -197,9 +200,10 @@
     that was true for a reason never established until the fifth row was measured, and being right for
     an unestablished reason is not the same as being right.
 
-    The refusal row was produced with -BaselineRef pointing at an all-zero SHA, verified to be the
-    real refusal (the merge-base throw at line ~525) and not something else: the first attempt used
-    -Base, which is an INNER function's parameter, so it raised a parameter-binding exception. That
+    The refusal row is produced with -HeadRef pointing at an all-zero SHA, verified to be the real
+    refusal (the "Cannot derive the base" throw in Get-ChangedSourceFiles) and not something else.
+    It was originally produced with -BaselineRef, which no longer exists; an earlier attempt used
+    -Base, which was an INNER function's parameter, so it raised a parameter-binding exception. That
     also exits 1 with the token FALSE, and would have looked like a passing test of a path never
     reached. Distinguished by asserting the refusal TEXT is present, not merely that the exit was 1.
 
@@ -232,17 +236,17 @@
       state         did the tree return to a known state?   before and after, one instrument
       cross-check   is the answer RIGHT?                    needs a side from OUTSIDE the input
 
-    The base check further down is a real cross-check by that test - it derives the base from the
-    branch's own commit timestamps and never touches the supplied ref.
+    The base check further down passes that test by construction - it derives the base from the
+    branch's own commit timestamps and takes no ref at all, so there is no supplied input to agree
+    with by accident.
 
     A stale label is worse than none, because "positive control passed" is exactly the phrase a
     future reader would quote as evidence the result was verified.
 #>
 [CmdletBinding()]
 param(
-    # The servicing baseline this branch departs from.
-    [string] $BaselineRef = 'origin/rel/15.9',
-
+    # The commit whose first-parent history is walked to find the servicing baseline: the older
+    # commit of the longest pause between neighbouring commits.
     [string] $HeadRef = 'HEAD',
 
     # Print the declared set and exit 0 without gating.
@@ -626,37 +630,9 @@ declaration must state what changed, not that something did, because it is all a
 }
 
 function Get-ChangedSourceFiles {
-    param([string] $Base, [string] $Head)
+    param([string] $Head)
 
-    # TEST THE CAPABILITY, NOT THE PROXY.
-    #
-    # An earlier version refused whenever `git rev-parse --is-shallow-repository` said true. That is
-    # a PROXY for "a merge base cannot be computed", and build 3065098 proved the two come apart:
-    # `git fetch --unshallow origin` pulled all ~140 branches in 9 seconds, and the repository still
-    # reported shallow afterwards - because the checked-out commit's own graft boundary survives even
-    # when every ref has been completed. Refusing there rejects a tree that may be perfectly able to
-    # answer the question.
-    #
-    # So: ask for the merge base first. If it computes, the depth is sufficient BY DEMONSTRATION and
-    # shallowness is irrelevant. Only when it fails does shallowness become the explanation, and then
-    # it is reported as the cause rather than as "fetch the baseline ref", which was the misleading
-    # advice on 3065092 - the ref had just been fetched and asserted present.
-    $mergeBase = (& git merge-base $Head $Base 2>$null | Out-String).Trim()
-    if (-not $mergeBase) {
-        $isShallow = ((& git rev-parse --is-shallow-repository 2>$null | Out-String).Trim() -eq 'true')
-        if ($isShallow) {
-            throw ("REFUSING: no merge base between '$Head' and '$Base', and this repository is " +
-                "SHALLOW - the two share no locally present ancestor. Deepen the checkout before this " +
-                "gate runs. Do NOT read this as 'the baseline ref is missing': that is a different " +
-                "failure, and on build 3065092 the ref had already been fetched and asserted present " +
-                "one step earlier, so that advice sent the reader to re-check the one proven thing.")
-        }
-        throw ("REFUSING: no merge base between '$Head' and '$Base', and this repository is NOT " +
-            "shallow, so depth is not the explanation and the baseline ref itself is. Fetch it; do " +
-            "not treat this as 'nothing changed'.")
-    }
-
-    # CROSS-CHECK THE BASE BY A METHOD THAT DOES NOT DEPEND ON THE SUPPLIED REF.
+    # THE BASE COMES FROM THE BRANCH'S OWN HISTORY, AND FROM NOTHING ELSE.
     #
     # The base is the whole answer, and the natural thing to reach for is the wrong thing. 16.11 ran
     # this audit against merge-base with origin/MAIN and got 245 changed src/ files including
@@ -664,42 +640,47 @@ function Get-ChangedSourceFiles {
     # was BRANCH DIVERGENCE, not work: a servicing branch parted from main years ago, so almost
     # everything differs and none of it was done here.
     #
-    # THE FIRST VERSION OF THIS CHECK WAS VACUOUS AND A TEST CAUGHT IT. It compared the merge base
-    # against the parent of the first commit "not in $Base". Both of those compute where the branch
-    # left the ref you handed in, so they agree for ANY ref, including a wrong one. Run against
-    # origin/main it happily reported 149 src/ files and never mentioned the base. A cross-check
-    # whose two methods share the input they are supposed to be checking is not a cross-check.
+    # This gate used to take the merge base with origin/rel/15.9 as the base and cross-check it
+    # against the history-derived point below. That only held while the servicing work lived on
+    # internal/rel/15.9 and rel/15.9 still pointed at the shipped 2019 commit. Once the servicing
+    # commits were published to rel/15.9, the merge base became HEAD itself and the gate refused every
+    # clean tree with "Base disagreement". A branch name moves; the point the servicing effort
+    # departs from does not. So the ref-based base was removed and the history-derived one is the
+    # only base.
     #
-    # This derives the resumption point from the branch's own shape instead. A servicing branch sits
-    # untouched for years and then restarts, so the largest gap between consecutive commits IS the
-    # start of the effort. That needs no ref at all and cannot be fooled by passing a wrong one.
+    # A servicing branch sits untouched for years and then restarts, so the largest gap between
+    # consecutive first-parent commits IS the start of the effort, and the older commit of that pair
+    # is the shipped state the effort departs from. That needs no ref at all and cannot be fooled by
+    # a ref that has moved.
+    #
     # THE WINDOW MUST BE PROVEN TO HAVE ARRIVED BEFORE ANYTHING IS DERIVED FROM IT.
     #
     # This walk is bounded twice: by -n below, and by the CLONE, because a CI checkout is shallow
     # unless something deepened it. Both truncations look identical from here - a short list - and
     # the original code drew a conclusion from whatever it got. If the walk came back with one entry
     # the loop never ran, $gapBase stayed $null, and the `if ($gapBase -and ...)` guard was false, so
-    # the cross-check SILENTLY DID NOTHING while still reading as protection.
+    # the base check SILENTLY DID NOTHING while still reading as protection.
     #
     # 16.11 measured the same shape on their line and it is worse than a hang: at depth 20 and depth
     # 100 their base derivation reported a 0-day gap and NO ERROR, where the true gap is 1,855 days.
     # A bounded window that undershoots swaps a visible failure for a silently wrong scope audit.
     #
-    # So: a truncated window REFUSES. It does not fall through to the merge base, because "I could
-    # not check" and "I checked and it agreed" must never produce the same outcome.
+    # So: a window that found no adequate pause REFUSES. There is no other base to fall back to, and
+    # "I could not find the base" must never produce the same outcome as a clean verdict.
     $walkLimit = 400
     $walk = @(& git log --first-parent --format='%H %at' $Head -n $walkLimit 2>$null)
     $isShallow = ((& git rev-parse --is-shallow-repository 2>$null | Out-String).Trim() -eq 'true')
 
     if ($walk.Count -lt 2) {
-        throw ("Cannot cross-check the base: the history walk returned $($walk.Count) commit(s)" +
+        throw ("Cannot derive the base: the history walk from '$Head' returned $($walk.Count) commit(s)" +
             "$(if ($isShallow) { ' and this is a SHALLOW repository' }). The gap derivation needs at " +
             "least two commits. Deepen the checkout (git fetch --unshallow) before this gate runs. " +
-            "Refusing rather than trusting '$Base' unchecked - a cross-check that cannot run must not " +
-            "look like one that ran and agreed.")
+            "Refusing - a gate that cannot find its base must not look like one that found it.")
     }
     if ($isShallow) {
-        # DEFERRED, NOT IMMEDIATE - the same proxy error as the merge-base check above.
+        # DEFERRED, NOT IMMEDIATE. Testing the shallow flag is a PROXY for "the base cannot be
+        # found", and build 3065098 proved the two come apart: the repository still reported shallow
+        # after `git fetch --unshallow` had completed every ref.
         # Shallowness truncates the walk, but a truncated walk that ALREADY CONTAINS a multi-year
         # pause has found the resumption point, and a longer pause hidden beyond the boundary cannot
         # move it earlier. Refusing here unconditionally rejects a tree that has demonstrably
@@ -734,28 +715,28 @@ function Get-ChangedSourceFiles {
         $why = @()
         if ($hitLimit) { $why += "hit its own limit of $walkLimit commits" }
         if ($isShallow) { $why += 'was truncated by a SHALLOW clone' }
-        throw ("Cannot cross-check the base: the history walk " + ($why -join ' and ') +
+        throw ("Cannot derive the base: the history walk " + ($why -join ' and ') +
             ", and found no pause longer than $gapDays day(s) inside that window. A longer pause may " +
             "lie beyond the boundary, so this is a TRUNCATED SEARCH and NOT a report that the branch " +
-            "has no resumption point. Deepen the checkout or raise the limit. Refusing rather than " +
-            "trusting '$Base' unchecked - a cross-check that could not run must not look like one " +
-            "that ran and agreed.")
+            "has no resumption point. Deepen the checkout or raise the limit. Refusing - a gate that " +
+            "cannot find its base must not look like one that found it.")
+    }
+    if ($gapDays -lt 180) {
+        throw ("Cannot derive the base: the complete first-parent history of '$Head' has no pause " +
+            "longer than $gapDays day(s), so it shows no point where a servicing effort restarted. " +
+            "Refusing rather than guessing a base - a diff against the wrong base reports branch " +
+            "divergence as work.")
     }
 
-    if ($gapBase -and $gapDays -ge 180 -and $gapBase -ne $mergeBase) {
-        throw ("Base disagreement. merge-base with '$Base' is $mergeBase, but this branch's history " +
-               "shows a $gapDays-day pause ending at $gapBase, which is where the servicing effort " +
-               "restarted. A diff against the wrong base reports branch divergence as work - that is " +
-               "how a sibling line got 245 changed files and nearly reported a catastrophe.")
-    }
+    $base = $gapBase
 
-    # Compare the merge base to the WORKING TREE, not to $Head.
+    # Compare the base to the WORKING TREE, not to $Head.
     #
     # This originally used `git diff --name-only <base> <head>`, which compares two COMMITS and is
     # blind to uncommitted edits. The mutation test caught it: a comment appended to a src/ file was
     # not detected, and the gate exited 0 while the tree carried exactly the change it exists to
     # stop. An edit is dangerous when it is BUILT, which happens before it is committed.
-    $tracked = @(& git diff --name-only $mergeBase --)
+    $tracked = @(& git diff --name-only $base --)
     $untracked = @(& git ls-files --others --exclude-standard --)
     $all = @($tracked + $untracked | Sort-Object -Unique)
 
@@ -775,11 +756,12 @@ function Get-ChangedSourceFiles {
     # A liveness check labelled as a control is its own instance of tonight's family: a plausible
     # reassurance about a question it cannot answer.
     if ($all.Count -eq 0) {
-        throw "The diff against '$mergeBase' reported NO changed files at all. This branch has changes, so the command failed. A zero from a broken command is not a measurement."
+        throw "The diff against '$base' reported NO changed files at all. This branch has changes, so the command failed. A zero from a broken command is not a measurement."
     }
 
     return [pscustomobject]@{
-        MergeBase = $mergeBase
+        Base = $base
+        PauseDays = $gapDays
         TotalChanged = $all.Count
         AllChanged = $all
         SourceFiles = @($all | Where-Object { $_ -like 'src/*' -or $_ -like 'shared/*' })
@@ -819,9 +801,9 @@ if ($List) {
     exit 0
 }
 
-$result = Get-ChangedSourceFiles -Base $BaselineRef -Head $HeadRef
+$result = Get-ChangedSourceFiles -Head $HeadRef
 
-Write-Host "Baseline      : $BaselineRef  ($($result.MergeBase.Substring(0,9)))"
+Write-Host "Baseline      : $($result.Base.Substring(0,9))  (older end of a $($result.PauseDays)-day pause in the first-parent history of $HeadRef)"
 Write-Host "Total changed : $($result.TotalChanged) files   [liveness check - the diff ran; this does NOT validate the base]"
 Write-Host "Under src/    : $($result.SourceFiles.Count)"
 
@@ -887,7 +869,7 @@ if ($SelfTest) {
     # Uses the SAME $probeMarker the healer above matches on, so the two cannot drift apart.
     $probeMarker | Set-Content -LiteralPath $full -Encoding utf8
     try {
-        $after = Get-ChangedSourceFiles -Base $BaselineRef -Head $HeadRef
+        $after = Get-ChangedSourceFiles -Head $HeadRef
         $detected = @($after.SourceFiles | Where-Object { -not $declared.Contains($_) }) -contains $probe
         Write-Host "SELF-TEST planted $probe -> seen by the gate as UNDECLARED: $detected"
         if (-not $detected) {
@@ -904,7 +886,7 @@ if ($SelfTest) {
     # checking cleanup with git status by eye, which is a person verifying a machine - the same
     # defect as running a gate by hand. An experiment that leaves its subject dirty has contaminated
     # every measurement taken after it, and the failure would surface somewhere unrelated.
-    $restored = Get-ChangedSourceFiles -Base $BaselineRef -Head $HeadRef
+    $restored = Get-ChangedSourceFiles -Head $HeadRef
     $leftover = @($restored.SourceFiles | Where-Object { -not $declared.Contains($_) })
     Write-Host "SELF-TEST after cleanup -> undeclared src/ changes remaining: $($leftover.Count) (must be 0)"
     if ($leftover.Count -gt 0) {
