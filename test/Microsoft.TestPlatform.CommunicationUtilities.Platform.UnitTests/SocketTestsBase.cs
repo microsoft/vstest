@@ -11,7 +11,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace Microsoft.TestPlatform.CommunicationUtilities.PlatformTests;
 
-[TestClass]
 public abstract class SocketTestsBase
 {
     protected const string Dummydata = "Dummy Data";

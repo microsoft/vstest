@@ -445,7 +445,7 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.DiscoverTests(localDiscoveryCriteria, mockTestDiscoveryEventsHandler.Object);
 
         // Assert
-        CollectionAssert.AreEquivalent(inputSource, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+        Assert.AreSequenceEqual(inputSource, _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered), SequenceOrder.InAnyOrder);
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
     }
@@ -602,12 +602,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
 
         // Assert
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new List<string> { "d" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        CollectionAssert.AreEquivalent(
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(
             new List<string> { "a", "b", "c" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            SequenceOrder.InAnyOrder);
     }
 
     [TestMethod]
@@ -628,9 +630,10 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
 
         // Assert
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[] { "a", "b" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+            SequenceOrder.InAnyOrder);
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
     }
@@ -658,12 +661,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
 
         // Assert
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[] { "a" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        CollectionAssert.AreEquivalent(
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(
             new[] { "b" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            SequenceOrder.InAnyOrder);
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
     }
 
@@ -684,15 +689,18 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
 
         // Assert
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[] { "c" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        CollectionAssert.AreEquivalent(
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(
             new[] { "d" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
-        CollectionAssert.AreEquivalent(
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(
             new[] { "a", "b" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered),
+            SequenceOrder.InAnyOrder);
     }
 
     [TestMethod]
@@ -718,12 +726,14 @@ public class ProxyDiscoveryManagerTests : ProxyBaseManagerTests
         _discoveryManager.HandleDiscoveryComplete(new(-1, true), lastChunk);
 
         // Assert
-        CollectionAssert.AreEquivalent(
+        Assert.AreSequenceEqual(
             new[] { "a", "b", "c" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered));
-        CollectionAssert.AreEquivalent(
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.FullyDiscovered),
+            SequenceOrder.InAnyOrder);
+        Assert.AreSequenceEqual(
             new[] { "d" },
-            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered));
+            _discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.PartiallyDiscovered),
+            SequenceOrder.InAnyOrder);
         Assert.IsEmpty(_discoveryDataAggregator.GetSourcesWithStatus(DiscoveryStatus.NotDiscovered));
     }
 

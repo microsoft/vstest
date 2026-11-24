@@ -314,7 +314,6 @@ public class RunsettingsTests : AcceptanceTestBase
     /// <param name="runnerInfo"></param>
     [TestMethod]
     // patched dotnet is not published on non-windows systems
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     [NetCoreTargetFrameworkDataSourceAttribute(useDesktopRunner: false)]
     public void RunSettingsAreLoadedFromProject(RunnerInfo runnerInfo)

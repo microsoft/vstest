@@ -19,7 +19,7 @@ using Moq;
 namespace Microsoft.VisualStudio.TestPlatform.DataCollector.PlatformTests;
 
 [TestClass]
-[Ignore]    // Tests are flaky
+[Ignore("Tests are flaky.")]
 public class CommunicationLayerIntegrationTests
 {
     private readonly string _defaultRunSettings = "<?xml version=\"1.0\" encoding=\"utf-16\"?>\r\n<RunSettings>\r\n  <DataCollectionRunSettings>\r\n    <DataCollectors >{0}</DataCollectors>\r\n  </DataCollectionRunSettings>\r\n</RunSettings>";

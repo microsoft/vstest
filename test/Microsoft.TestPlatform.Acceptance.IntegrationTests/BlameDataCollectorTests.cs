@@ -39,7 +39,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource]
     public void BlameDataCollectorShouldGiveCorrectTestCaseName(RunnerInfo runnerInfo)
     {
@@ -55,7 +54,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource(useCoreRunner: false)]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void BlameDataCollectorShouldOutputDumpFile(RunnerInfo runnerInfo)
@@ -79,7 +77,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetCoreTargetFrameworkDataSource(useDesktopRunner: false)]
     public void BlameDataCollectorShouldNotOutputDumpFileWhenNoCrashOccurs(RunnerInfo runnerInfo)
     {
@@ -102,7 +99,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     // This tests .net runner and .net framework runner, together with .net framework testhost.
     [NetFullTargetFrameworkDataSource]
     public void BlameDataCollectorShouldOutputDumpFileWhenNoCrashOccursButCollectAlwaysIsEnabled(RunnerInfo runnerInfo)
@@ -240,7 +236,6 @@ public class BlameDataCollectorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [DoNotParallelize] // Installs/uninstalls procdump as machine-wide postmortem debugger via HKLM registry.
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]

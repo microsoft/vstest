@@ -12,7 +12,6 @@ public class ArgumentProcessorTests : AcceptanceTestBase
 {
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void PassingNoArgumentsToVsTestConsoleShouldPrintHelpMessage(RunnerInfo runnerInfo)
     {
@@ -34,7 +33,6 @@ public class ArgumentProcessorTests : AcceptanceTestBase
     }
 
     [TestMethod]
-    [TestCategory("Windows-Review")]
     [NetFullTargetFrameworkDataSource]
     public void PassingInvalidArgumentsToVsTestConsoleShouldNotPrintHelpMessage(RunnerInfo runnerInfo)
     {
