@@ -97,7 +97,7 @@ public class VsTestConsoleWrapperTests
         await _consoleWrapper.StartSessionAsync();
 #pragma warning restore CS0618
 
-        CollectionAssert.AreEqual(new[] { "initialize", "launch", "wait" }, calls);
+        Assert.AreSequenceEqual(new[] { "initialize", "launch", "wait" }, calls);
     }
 
     [TestMethod]
