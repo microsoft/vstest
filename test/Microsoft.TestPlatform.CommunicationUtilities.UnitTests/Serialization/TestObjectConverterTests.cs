@@ -28,7 +28,7 @@ public class TestObjectConverterTests
         var test = Deserialize<TestableTestObject>("{\"Properties\":[]}");
 
         Assert.IsNotNull(test);
-        Assert.AreEqual(0, test.Properties.Count());
+        Assert.IsEmpty(test.Properties);
     }
 
     [TestMethod]
@@ -117,7 +117,7 @@ public class TestObjectConverterTests
 
         var properties = test.Properties.ToArray();
         Assert.HasCount(1, properties);
-        CollectionAssert.AreEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(properties[0])!);
+        Assert.AreSequenceEqual(new[] { "val1", "val2" }, (string[])test.GetPropertyValue(properties[0])!);
     }
 
     [TestMethod]

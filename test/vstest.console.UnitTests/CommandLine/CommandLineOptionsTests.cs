@@ -85,7 +85,7 @@ public class CommandLineOptionsTests
 
         // Pass relative path
         CommandLineOptions.Instance.AddSource(relativeTestFilePath);
-        Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(absolutePath));
+        Assert.Contains(absolutePath, CommandLineOptions.Instance.Sources);
     }
 
     [TestMethod]
@@ -102,6 +102,6 @@ public class CommandLineOptionsTests
 
         CommandLineOptions.Instance.AddSource(testFilePath);
 
-        Assert.IsTrue(CommandLineOptions.Instance.Sources.Contains(testFilePath));
+        Assert.Contains(testFilePath, CommandLineOptions.Instance.Sources);
     }
 }

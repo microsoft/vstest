@@ -51,6 +51,6 @@ public class DiscoveryCriteriaTests
         Assert.AreEqual("<RunConfiguration></RunConfiguration>", criteria.RunSettings);
         Assert.AreEqual("TestFilter", criteria.TestCaseFilter);
         Assert.AreEqual("sampleTest.dll", criteria.AdapterSourceMap["_none_"].Single());
-        CollectionAssert.AreEqual(new[] { "sampleTest.dll" }, criteria.Sources.ToArray());
+        Assert.AreSequenceEqual(new[] { "sampleTest.dll" }, criteria.Sources.ToArray());
     }
 }

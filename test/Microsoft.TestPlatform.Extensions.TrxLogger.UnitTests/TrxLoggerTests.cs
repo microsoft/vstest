@@ -789,7 +789,7 @@ public class TrxLoggerTests
             "AsmLevel"
         ];
 
-        CollectionAssert.AreEqual(listCategoriesExpected, listCategoriesActual);
+        Assert.AreSequenceEqual(listCategoriesExpected, listCategoriesActual);
     }
 
     [TestMethod]
@@ -808,7 +808,7 @@ public class TrxLoggerTests
             "0"
         ];
 
-        CollectionAssert.AreEqual(listWorkItemsExpected, listWorkItemsActual);
+        Assert.AreSequenceEqual(listWorkItemsExpected, listWorkItemsActual);
     }
 
     [TestMethod]

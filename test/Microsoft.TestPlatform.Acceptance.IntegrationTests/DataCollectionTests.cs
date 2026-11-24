@@ -145,10 +145,10 @@ public class DataCollectionTests : AcceptanceTestBase
             }
         }
 
-        Assert.AreEqual(2, fileContent.Distinct().Count());
+        Assert.HasCount(2, fileContent.Distinct());
 
         var dataCollectorsLogs = Directory.GetFiles(TempDirectory.Path, "*.datacollector.*", SearchOption.TopDirectoryOnly);
-        Assert.AreEqual(2, dataCollectorsLogs.Distinct().Count());
+        Assert.HasCount(2, dataCollectorsLogs.Distinct());
         foreach (var dataCollectorLogFile in dataCollectorsLogs)
         {
             string dataCollectorLog = File.ReadAllText(dataCollectorLogFile);

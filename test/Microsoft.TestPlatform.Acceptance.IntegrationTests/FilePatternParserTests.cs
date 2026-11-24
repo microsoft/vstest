@@ -60,6 +60,7 @@ public class FilePatternParserTests : AcceptanceTestBase
     [TestMethod]
     [NetFullTargetFrameworkDataSource]
     [NetCoreTargetFrameworkDataSource]
+    [ResourceLock(WellKnownResources.CurrentDirectory)]
     public void WildCardPatternShouldCorrectlyWorkForRelativeAssemblyPath(RunnerInfo runnerInfo)
     {
         SetTestEnvironment(_testEnvironment, runnerInfo);
