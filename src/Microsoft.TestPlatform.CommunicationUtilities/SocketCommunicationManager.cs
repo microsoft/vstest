@@ -173,7 +173,9 @@ public class SocketCommunicationManager : ICommunicationManager
         // for now added a check for validation of this.tcpclient
         _clientConnectionAcceptedEvent.Reset();
         EqtTrace.Info("Trying to connect to server on socket : {0} ", endpoint);
-        _tcpClient = new TcpClient { NoDelay = true };
+        // Match the endpoint's address family so an IPv4 endpoint is not connected through
+        // a dual-mode IPv6 socket, see SocketClient.Start.
+        _tcpClient = new TcpClient(endpoint.AddressFamily) { NoDelay = true };
         _socket = _tcpClient.Client;
 
         Stopwatch watch = new();
