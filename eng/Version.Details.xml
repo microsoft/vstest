@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!-- 16.11 takes no darc-managed product dependencies; package versions are pinned in
      scripts/build/TestPlatform.Dependencies.props. The Arcade SDK entry lets darc keep
-     global.json and eng/common up to date. -->
+     global.json (the Arcade SDK and the .NET SDK version) and eng/common up to date. -->
 <Dependencies>
   <ProductDependencies>
   </ProductDependencies>
