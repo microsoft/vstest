@@ -125,11 +125,14 @@ name: $(Date:yyyyMMdd)$(Rev:.r)
 
 # A merge into this line's servicing branch must build, and until now nothing made it.
 # The branch policy covers the pull request; this covers what lands after it. Azure DevOps
-# reads this file from the branch that was pushed, so internal/rel/* can only ever select
-# this branch's own servicing line.
+# reads this file from the branch that was pushed, so rel/* and internal/rel/* can only ever
+# select this branch's own servicing line. rel/* builds what lands from GitHub (mirrored verbatim
+# to the AzDO rel/* branch), including the weekly Arcade update. internal/rel/* is for
+# internal-only changes and is not synced from rel/* automatically.
 trigger:
   branches:
     include:
+    - rel/*
     - internal/rel/*
 pr: none
 
