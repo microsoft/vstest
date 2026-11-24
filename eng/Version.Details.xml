@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Minimal. 15.9 takes no darc-managed dependencies; package versions are pinned in
-     scripts/build/TestPlatform.Dependencies.props. -->
+<!-- 15.9 takes no darc-managed product dependencies; package versions are pinned in
+     scripts/build/TestPlatform.Dependencies.props. The Arcade SDK entry lets darc keep
+     global.json and eng/common up to date. -->
 <Dependencies>
   <ProductDependencies>
   </ProductDependencies>
   <ToolsetDependencies>
+    <Dependency Name="Microsoft.DotNet.Arcade.Sdk" Version="11.0.0-beta.26421.2">
+      <Uri>https://github.com/dotnet/arcade</Uri>
+      <Sha>51abc19095ae366ecb773826993966dc8a1063eb</Sha>
+    </Dependency>
   </ToolsetDependencies>
 </Dependencies>

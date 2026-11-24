@@ -19,11 +19,13 @@ parameters:
 
 # A merge into this line's servicing branch must build, and until now nothing made it.
 # The branch policy covers the pull request; this covers what lands after it. Azure DevOps
-# reads this file from the branch that was pushed, so internal/rel/* can only ever select
-# this branch's own servicing line.
+# reads this file from the branch that was pushed, so rel/* and internal/rel/* can only ever
+# select this branch's own servicing line. rel/* builds what lands from GitHub, including the
+# weekly Arcade update, before it is mirrored into internal/rel/*.
 trigger:
   branches:
     include:
+    - rel/*
     - internal/rel/*
 pr: none
 
@@ -257,8 +259,8 @@ extends:
             # There was no `checkout:` step in this file, so the injected default applied: a shallow,
             # credential-stripped clone. Both properties cost a build.
             #
-            #   3065068  the scope gate's `git fetch` had no credentials, prompted, and hung 31
-            #            minutes with ZERO output. persistCredentials: true removes that class.
+            #   3065068  the scope gate's old `git fetch` of rel/15.9 had no credentials, prompted, and
+            #            hung 31 minutes with ZERO output. persistCredentials: true removes that class.
             #   3065098  `git fetch --unshallow` pulled all ~140 branches in 9 seconds and the
             #            repository STILL reported shallow, because the checked-out commit's own
             #            graft boundary survives. fetchDepth: 0 means there is no boundary to begin
@@ -306,115 +308,29 @@ extends:
             # cheapest moment to refuse an undeclared change is before an agent spends forty minutes
             # compiling and signing it.
             #
-            # IF THIS FAILS ON A TREE NOBODY EDITED, SUSPECT THE BASELINE REF AND NOT THE TREE. The
-            # gate diffs against origin/rel/15.9 and throws if it cannot resolve a merge base, which
-            # is fail-closed on purpose: a gate that cannot find its base cannot do its job, and
-            # passing anyway is the exact defect family this whole line has spent the evening
-            # removing. The fetch below exists so that a shallow or single-branch checkout does not
-            # produce that failure for an infrastructure reason. The gate also cross-checks the base
-            # against the branch's own shape and will say so explicitly if they disagree.
-            # SPLIT INTO THREE STEPS, DELIBERATELY. Build 3065068 sat in the single combined step for
+            # IF THIS FAILS ON A TREE NOBODY EDITED, SUSPECT THE HISTORY AND NOT THE TREE. The gate
+            # derives its baseline from the first-parent history of HEAD: the older commit of the
+            # longest pause between neighbouring commits, which on this line is the shipped 2019 state
+            # the servicing effort departs from. It throws if no pause of 180+ days is found, which is
+            # fail-closed on purpose: a gate that cannot find its base cannot do its job. The checkout
+            # above uses fetchDepth: 0 so the history is complete.
+            #
+            # It used to diff against origin/rel/15.9 and fetched that ref in a separate step. That
+            # stopped working once the servicing commits were published to rel/15.9: the merge base
+            # became HEAD itself and the gate refused every clean tree. The ref and its fetch step were
+            # removed.
+            #
+            # SPLIT INTO TWO STEPS, DELIBERATELY. Build 3065068 sat in a single combined step for
             # 21 minutes with no log - a step publishes nothing until it ends, so a hang buys zero
             # diagnostic information. The timeline names the STEP, not the command, so one record
-            # covering fetch + self-test + run could not say which of the three was slow. Locally all
-            # three together take about 5 seconds. Three records cost nothing and answer the question
-            # in one run instead of one bisect per run.
+            # covering fetch + self-test + run could not say which of the three was slow. The fetch
+            # step has since been removed; the other two stay separate for the same reason. Locally
+            # both together take about 5 seconds.
             #
             # timeoutInMinutes on each: a fail-closed gate that HANGS does not fail closed, it does
             # not fail at all. It holds the agent to the job timeout and blocks nothing, because it
             # never reaches a verdict. A generous ceiling that still fails is worth more than an
             # unbounded wait that cannot.
-            - powershell: |
-                $ErrorActionPreference = 'Stop'
-
-                # A HANG IS THE ONE FAILURE THIS STEP COULD NOT EXPRESS, AND IT HAPPENED.
-                #
-                # Build 3065068 sat here for 31m40s and produced ZERO output lines before it was
-                # cancelled - not one line between "Starting Command Output" and the cancel. git fetch
-                # always writes to stderr, so it blocked at or before its first write.
-                #
-                # Mechanism: at the time, there was no `checkout:` step in this file, so the injected
-                # default applied and persistCredentials was FALSE - the auth header is removed after
-                # checkout. This fetch was the ONLY ad-hoc git command in the whole pipeline, and it
-                # was therefore unauthenticated. An unauthenticated git against an internal remote
-                # asks for credentials, and on a non-interactive agent that prompt blocks forever
-                # with nothing on stdout.
-                #
-                # THAT IS NOW FIXED AT THE SOURCE: an explicit `checkout: self` above sets
-                # persistCredentials: true and fetchDepth: 0. Everything below is therefore
-                # DEFENSIVE rather than load-bearing, and it is kept for two reasons: the token path
-                # still works if the checkout settings are ever reverted, and
-                # GIT_TERMINAL_PROMPT=0 is worth having regardless.
-                #
-                #   1. GIT_TERMINAL_PROMPT=0 turns an unbounded wait into an immediate error. This
-                #      matters even if the diagnosis above is wrong: a gate that cannot fail cannot
-                #      gate, and every other refusal in this file is worthless behind a hang.
-                #   2. Do not deepen or fetch when it is unnecessary - the cheapest call is the one
-                #      not made, and with fetchDepth: 0 the deepen should now be a no-op.
-                #   3. When a fetch IS needed, authenticate it explicitly with the job access token
-                #      rather than relying on a credential helper that may not be configured.
-                $env:GIT_TERMINAL_PROMPT = '0'
-                $env:GCM_INTERACTIVE = 'never'
-
-                # SHALLOWNESS SHOULD NO LONGER OCCUR, AND THIS STAYS AS A BACKSTOP.
-                #
-                # Build 3065092 proved the fetch fix works - this step succeeded in 2 seconds where
-                # 3065068 hung for 31 minutes. It then failed one step later, computing a merge base,
-                # because the checkout was shallow and the branch and rel/15.9 shared no ancestor
-                # that was PRESENT. Build 3065098 then showed that `--unshallow` does not reliably
-                # clear the condition: it fetched all ~140 branches in 9 seconds and the repository
-                # still reported shallow, because the checked-out commit's own graft boundary
-                # survives.
-                #
-                # fetchDepth: 0 on the checkout removes the boundary rather than trying to undo it,
-                # which is why the deepen below should now find nothing to do. It is retained because
-                # a no-op costs nothing and a missing backstop costs a build.
-                $token = $env:SYSTEM_ACCESSTOKEN
-                if (-not $token) {
-                    throw "SYSTEM_ACCESSTOKEN is not available, so an authenticated fetch is impossible. Refusing rather than attempting an unauthenticated fetch, which is what hung build 3065068 for 31 minutes with no output."
-                }
-                $authArg = "http.extraheader=Authorization: Basic " + [Convert]::ToBase64String([Text.Encoding]::ASCII.GetBytes(":$token"))
-
-                if ((& git rev-parse --is-shallow-repository 2>$null | Out-String).Trim() -eq 'true') {
-                    Write-Host 'Checkout is shallow; deepening so a merge base can be computed.'
-                    & git -c $authArg fetch --no-tags --unshallow origin
-                    if ($LASTEXITCODE -ne 0) { throw "Could not unshallow the checkout. The scope gate cannot compute a merge base against rel/15.9 without it, and it must not pass without running." }
-                }
-                else {
-                    Write-Host 'Checkout is already complete; no deepening needed.'
-                }
-
-                & git -c $authArg fetch --no-tags origin +refs/heads/rel/15.9:refs/remotes/origin/rel/15.9
-                if ($LASTEXITCODE -ne 0) { throw "Could not fetch the baseline ref rel/15.9. The scope gate cannot run without it, and it must not pass without running." }
-
-                # POST-CONDITIONS. TEST THE CAPABILITY, NOT THE PROXY.
-                #
-                # Build 3065098 refused here because `git rev-parse --is-shallow-repository` still
-                # said true AFTER --unshallow fetched all ~140 branches in 9 seconds. The checked-out
-                # commit's own graft boundary survives even when every ref has been completed, so the
-                # shallow flag and the ability to compute a merge base come apart. Refusing on the
-                # flag rejected a tree that might have been perfectly able to answer the question -
-                # and the gate never got to find out.
-                #
-                # So the merge base is the post-condition. Shallowness is reported only as the likely
-                # explanation when the merge base actually fails.
-                if (-not (& git rev-parse --verify -q refs/remotes/origin/rel/15.9 2>$null)) {
-                    throw "The baseline ref rel/15.9 is still not resolvable after the fetch. Refusing - a scope gate without its baseline cannot report a finding."
-                }
-                $mb = (& git merge-base HEAD refs/remotes/origin/rel/15.9 2>$null | Out-String).Trim()
-                if (-not $mb) {
-                    $stillShallow = ((& git rev-parse --is-shallow-repository 2>$null | Out-String).Trim() -eq 'true')
-                    throw ("No merge base between HEAD and rel/15.9 after fetching. Repository still shallow: $stillShallow. " +
-                        "If true, the deepen did not reach a common ancestor; if false, this is a real history problem rather than a depth problem.")
-                }
-                $shallowNote = if (((& git rev-parse --is-shallow-repository 2>$null | Out-String).Trim() -eq 'true')) { ' (repository still reports shallow, which does not matter because the merge base computed)' } else { '' }
-                Write-Host "Baseline ready: merge-base $($mb.Substring(0,9))$shallowNote"
-              name: FetchScopeBaseline
-              displayName: Fetch rel/15.9 baseline for the scope gate
-              timeoutInMinutes: 10
-              env:
-                SYSTEM_ACCESSTOKEN: $(System.AccessToken)
-
             - powershell: |
                 $ErrorActionPreference = 'Stop'
                 & "$env:BUILD_SOURCESDIRECTORY\scripts\build\Assert-ProductSourceScope.ps1" -SelfTest
