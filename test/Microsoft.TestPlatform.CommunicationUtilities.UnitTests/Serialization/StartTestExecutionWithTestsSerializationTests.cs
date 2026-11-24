@@ -148,6 +148,17 @@ public class StartTestExecutionWithTestsSerializationTests
                       "ValueType": "System.Int32"
                     },
                     "Value": 42
+                  },
+                  {
+                    "Key": {
+                      "Id": "TestCase.IdAlgorithm",
+                      "Label": "Id Algorithm",
+                      "Category": "",
+                      "Description": "",
+                      "Attributes": 1,
+                      "ValueType": "System.String"
+                    },
+                    "Value": "SelfAssigned"
                   }
                 ]
               }
@@ -185,7 +196,19 @@ public class StartTestExecutionWithTestsSerializationTests
                 "Source": "Contoso.Math.Tests.dll",
                 "CodeFilePath": "C:\\src\\Contoso.Math.Tests\\CalculatorTests.cs",
                 "LineNumber": 42,
-                "Properties": []
+                "Properties": [
+                  {
+                    "Key": {
+                      "Id": "TestCase.IdAlgorithm",
+                      "Label": "Id Algorithm",
+                      "Category": "",
+                      "Description": "",
+                      "Attributes": 1,
+                      "ValueType": "System.String"
+                    },
+                    "Value": "SelfAssigned"
+                  }
+                ]
               }
             ],
             "RunSettings": "\u003CRunSettings\u003E\u003CRunConfiguration\u003E\u003CResultsDirectory\u003E.\\TestResults\u003C/ResultsDirectory\u003E\u003C/RunConfiguration\u003E\u003C/RunSettings\u003E",

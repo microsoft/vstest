@@ -143,6 +143,13 @@ computed it. In practice adapters either let the platform compute the id or assi
 so this is a caveat rather than a live hazard, but it is why the column is named for where the id
 matches rather than asserting where it came from.
 
+> [!NOTE]
+> A tool reading test cases from the platform rather than reading this report does not have to infer
+> anything. Every test case carries a `TestCase.IdAlgorithm` property, whose value is `Sha1`,
+> `XxHash128` or `SelfAssigned` - the same vocabulary as `IdSource`, but stated by the code that
+> produced the id instead of worked out afterwards. The property is absent on test cases reported by
+> a vstest that predates it.
+
 ## Worked example
 
 Running a suite that mixes an adapter using platform computed ids with an MSTest project:

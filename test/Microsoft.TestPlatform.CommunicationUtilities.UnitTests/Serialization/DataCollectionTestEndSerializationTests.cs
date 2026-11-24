@@ -118,6 +118,17 @@ public class DataCollectionTestEndSerializationTests
                     "ValueType": "System.Int32"
                   },
                   "Value": -1
+                },
+                {
+                  "Key": {
+                    "Id": "TestCase.IdAlgorithm",
+                    "Label": "Id Algorithm",
+                    "Category": "",
+                    "Description": "",
+                    "Attributes": 1,
+                    "ValueType": "System.String"
+                  },
+                  "Value": "SelfAssigned"
                 }
               ]
             },
@@ -152,7 +163,19 @@ public class DataCollectionTestEndSerializationTests
               "Source": "Tests.dll",
               "CodeFilePath": null,
               "LineNumber": -1,
-              "Properties": []
+              "Properties": [
+                {
+                  "Key": {
+                    "Id": "TestCase.IdAlgorithm",
+                    "Label": "Id Algorithm",
+                    "Category": "",
+                    "Description": "",
+                    "Attributes": 1,
+                    "ValueType": "System.String"
+                  },
+                  "Value": "SelfAssigned"
+                }
+              ]
             },
             "Context": {
               "TestCase": null,
