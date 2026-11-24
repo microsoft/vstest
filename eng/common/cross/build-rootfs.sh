@@ -5,7 +5,7 @@ set -e
 usage()
 {
     echo "Usage: $0 [BuildArch] [CodeName] [lldbx.y] [llvmx[.y]] [--skipunmount] --rootfsdir <directory>]"
-    echo "BuildArch can be: arm(default), arm64, loongarch64, ppc64le, riscv64, s390x, x64, x86"
+    echo "BuildArch can be: arm(default), arm64, loongarch64, ppc64le, riscv64, s390x, x64"
     echo "CodeName - optional, Code name for Linux, can be: xenial(default), zesty, bionic, alpine"
     echo "                               for alpine can be specified with version: alpineX.YY or alpineedge"
     echo "                               for FreeBSD can be: freebsd14, freebsd15"
@@ -230,12 +230,6 @@ while :; do
             __HaikuArch=x86_64
             __UbuntuRepo="https://archive.ubuntu.com/ubuntu/"
             ;;
-        x86)
-            __BuildArch=x86
-            __UbuntuArch=i386
-            __AlpineArch=x86
-            __UbuntuRepo="https://archive.ubuntu.com/ubuntu/"
-            ;;
         lldb*)
             version="$(echo "$lowerI" | tr -d '[:alpha:]-=')"
             majorVersion="${version%%.*}"
@@ -457,16 +451,18 @@ case "$__AlpineVersion" in
     3.17) __AlpinePackages+=" llvm15-libs" ;;
     edge) __AlpineLlvmLibsLookup=1 ;;
     *)
+        __AlpineVersionNumber=0
+        if [[ -n "$__AlpineMajorVersion" ]]; then
+            __AlpineVersionNumber=$((10#$__AlpineMajorVersion * 100 + 10#$__AlpineMinorVersion))
+        fi
+
         if [[ "$__AlpineArch" =~ s390x|ppc64le ]]; then
             __AlpineVersion=3.15 # minimum version that supports lldb-dev
             __AlpinePackages+=" llvm12-libs"
-        elif [[ "$__AlpineArch" == "x86" ]]; then
-            __AlpineVersion=3.17 # minimum version that supports lldb-dev
-            __AlpinePackages+=" llvm15-libs"
-        elif [[ "$__AlpineArch" == "loongarch64" ]]; then
+        elif [[ "$__AlpineArch" == "loongarch64" ]] && (( __AlpineVersionNumber <= 321 )); then
             __AlpineVersion=3.21 # minimum version that supports lldb-dev
             __AlpinePackages+=" llvm19-libs"
-        elif [[ "$__AlpineArch" == "riscv64" ]]; then
+        elif [[ "$__AlpineArch" == "riscv64" ]] && (( __AlpineVersionNumber <= 322 )); then
             __AlpineVersion=3.22 # lldb-dev requires 3.21+, but 3.22+ provides the newer linux-headers needed for RISC-V extension probes
             __AlpinePackages+=" llvm20-libs"
         elif [[ -n "$__AlpineMajorVersion" ]]; then
@@ -532,7 +528,7 @@ ensureDownloadTool()
 }
 
 if [[ "$__CodeName" == "alpine" ]]; then
-    __ApkToolsVersion=2.14.4-r1
+    __ApkToolsVersion=3.0.9-r0
     __ApkToolsDir="$(mktemp -d)"
     __ApkKeysDir="$(mktemp -d)"
     arch="$(uname -m)"
@@ -540,7 +536,7 @@ if [[ "$__CodeName" == "alpine" ]]; then
 
     ensureDownloadTool
     __ApkToolsPackage="$__ApkToolsDir/apk-tools-static.apk"
-    __ApkToolsUrl="$__AlpineRepo/v3.20/main/$arch/apk-tools-static-$__ApkToolsVersion.apk"
+    __ApkToolsUrl="$__AlpineRepo/v3.24/main/$arch/apk-tools-static-$__ApkToolsVersion.apk"
 
     if [[ "$__hasWget" == 1 ]]; then
         wget -O "$__ApkToolsPackage" "$__ApkToolsUrl"
@@ -549,9 +545,9 @@ if [[ "$__CodeName" == "alpine" ]]; then
     fi
 
     if [[ "$arch" == "x86_64" ]]; then
-        __ApkToolsSHA512SUM="b1b3cc382aa0ec26a2c24b742701a1f9885d0678365f9aea15d3d005926b06ecc802659cec8a7deba2717af99c19c708a17c23e1f0f07742268ee5be5400eb9e"
+        __ApkToolsSHA512SUM="c97f27bef2940bb6c23323bf9fe0f3c60932a3c676f1cea23d5f5664ee8be27f349bb0c905f5f3e1fe0b04cfd79d6e422829c49b12cacbce21b02d9b2d1fa083"
     elif [[ "$arch" == "aarch64" ]]; then
-        __ApkToolsSHA512SUM="61f9a636c5ac4e96e7a3f69fd65e60fc57b3ec8b23619c4df86f59b89e71d1309b3e406388945bdf0dd9168dac22df376943a70ff3efa179e5687e586f825fb0"
+        __ApkToolsSHA512SUM="121b77c2e1ac3c856e168c335d57887ab9716bf6b704e30309c37cf8d0935f72a1775aa6628ec1f73eeec0ca7282f4b40836887e62dac94063485b496ad460c9"
     else
         >&2 echo "ERROR: Unsupported apk-tools-static host architecture '$arch'."
         exit 1
