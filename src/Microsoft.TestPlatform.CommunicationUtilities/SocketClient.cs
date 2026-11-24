@@ -47,6 +47,8 @@ public class SocketClient : ICommunicationEndPoint
     /// <inheritdoc />
     public event EventHandler<DisconnectedEventArgs>? Disconnected;
 
+    internal TcpClient? TcpClient => _tcpClient;
+
     /// <inheritdoc />
     public string Start(string endPoint)
     {

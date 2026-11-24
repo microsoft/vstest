@@ -89,6 +89,8 @@ public class SocketCommunicationManager : ICommunicationManager
         _dataSerializer = dataSerializer;
     }
 
+    internal Socket? Socket => _socket;
+
     #region ServerMethods
 
     /// <summary>
