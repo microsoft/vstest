@@ -45,7 +45,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
             ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path)
         };
 
-        ExecuteApplication(dotnetPath, "new mstest", out _, out _, out _, environmentVariables, TempDirectory.Path);
+        ExecuteApplication(dotnetPath, $"new mstest --framework {AcceptanceTestBase.Core12TargetFramework}", out _, out _, out _, environmentVariables, TempDirectory.Path);
         UseLocallyBuiltTestSdk(TempDirectory.Path);
 
         // Patch test file
