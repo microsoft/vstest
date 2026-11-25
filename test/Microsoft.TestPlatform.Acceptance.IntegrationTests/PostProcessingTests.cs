@@ -39,20 +39,15 @@ public class PostProcessingTests : AcceptanceTestBase
             .Add(new XElement("Configuration", new XElement("MergeFile", "MergedFile.txt")));
         runSettingsXml.Save(runSettings);
 
-        // Build and run tests like msbuild
-        Parallel.For(0, 5, i =>
+        // Use a checked-in asset rather than `dotnet new mstest`: the SDK template's MSTest
+        // version moves with every SDK update and can outgrow the locally built Test.Sdk.
+        string testContainer = GetTestDllForFramework("SimpleTestProject.dll", Core80TargetFramework);
+
+        // Run vstest 2 times in parallel to collect artifacts (minimum needed to verify merging)
+        Parallel.For(0, 2, i =>
         {
-            string projectFolder = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
-            // Give this test its own template cache; the shared one races with other scaffolds.
-            ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
-            Assert.AreEqual(0, exitCode);
-            UseLocallyBuiltTestSdk(projectFolder);
-            ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);
-            Assert.AreEqual(0, exitCode);
-
-            string testContainer = Directory.GetFiles(Path.Combine(projectFolder, "bin"), $"{i}.dll", SearchOption.AllDirectories).Single();
-
-            ExecuteVsTestConsole($"{testContainer} --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{Path.GetDirectoryName(testContainer)}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out stdOut, out stdError, out exitCode);
+            string resultsDirectory = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
+            ExecuteVsTestConsole($"{testContainer} /TestCaseFilter:\"Name=PassingTest\" --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{resultsDirectory}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out string stdOut, out string stdError, out int exitCode);
             Assert.AreEqual(0, exitCode);
         });
 
@@ -76,7 +71,7 @@ public class PostProcessingTests : AcceptanceTestBase
             fileContent.Add(line);
         }
 
-        Assert.AreEqual(5, fileContent.Distinct().Count());
+        Assert.AreEqual(2, fileContent.Distinct().Count());
     }
 
     private static string GetRunsettingsFilePath(string resultsDir)

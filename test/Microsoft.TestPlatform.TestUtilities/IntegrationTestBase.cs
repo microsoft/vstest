@@ -599,8 +599,14 @@ public class IntegrationTestBase
             var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
             if (version.StartsWith("4"))
             {
-                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net9.0";
-                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
+                if (_testEnvironment.TargetFramework.StartsWith("net4"))
+                {
+                    // The MSTest 4 adapter needs System.Memory 4.0.5.0 on .NET Framework. This branch's testhost ships an older
+                    // System.Memory, and the adapter package folder has none, so point at a test asset output folder, which has both.
+                    return Path.GetDirectoryName(_testEnvironment.GetTestAsset("SimpleTestProject.dll"))!;
+                }
+
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, "net9.0");
             }
             else if (version.StartsWith("3"))
             {
@@ -1080,5 +1086,28 @@ public class IntegrationTestBase
         var nugetConfig = File.ReadAllText(Path.Combine(IntegrationTestEnvironment.RepoRootDirectory, "NuGet.config"))
             .Replace("</packageSources>", $@"<add key=""localy-built-packages"" value=""{IntegrationTestEnvironment.LocalPackageSource}"" /></packageSources>");
         File.WriteAllText(Path.Combine(projectDirectory, "NuGet.config"), nugetConfig);
+    }
+
+    /// <summary>
+    /// Pins the MSTest metapackage in a project scaffolded by <c>dotnet new mstest</c> to MSTest 3.
+    /// </summary>
+    /// <remarks>
+    /// The template's MSTest 4 requires a newer Microsoft.NET.Test.Sdk than this branch builds, so restoring it
+    /// together with <see cref="UseLocallyBuiltTestSdk"/> fails with NU1605. MSTest 3.9.3 accepts the locally built one.
+    /// </remarks>
+    protected static void UseMSTest3(string projectDirectory)
+    {
+        var projectFile = Directory.GetFiles(projectDirectory, "*.csproj").Single();
+        var project = File.ReadAllText(projectFile);
+        var pinned = Regex.Replace(
+            project,
+            @"(<PackageReference\s+Include=""MSTest""\s+Version="")[^""]+("")",
+            "${1}3.9.3${2}");
+        if (pinned == project)
+        {
+            throw new InvalidOperationException($"Cannot pin MSTest in {projectFile}: no MSTest package reference.");
+        }
+
+        File.WriteAllText(projectFile, pinned);
     }
 }
