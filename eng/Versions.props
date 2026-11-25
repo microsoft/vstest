@@ -57,12 +57,12 @@
      28/172 split is unchanged and still unfixed: it is decided by which components
      scripts/build.ps1 -s Publish regenerates, which is upstream of both the VSIX and the
      packages. -->
-
 <Project>
   <PropertyGroup>
     <VersionPrefix>15.9.3</VersionPrefix>
     <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <PreReleaseVersionIteration>
+    </PreReleaseVersionIteration>
     <!-- AssemblyVersion is pinned at 15.0.0 because the wire protocol serializes against it. -->
     <AssemblyVersion>15.0.0</AssemblyVersion>
     <UsingToolNetFrameworkReferenceAssemblies>true</UsingToolNetFrameworkReferenceAssemblies>
@@ -87,4 +87,3 @@
     <TestRunnerName>MSTest</TestRunnerName>
   </PropertyGroup>
 </Project>
-
