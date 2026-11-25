@@ -5,6 +5,8 @@
     <IsTestProject>true</IsTestProject>
     <UseBannedApiAnalyzers>true</UseBannedApiAnalyzers>
     <TestRunnerAdditionalArguments>$(TestRunnerAdditionalArguments) --settings "$(MSBuildThisFileDirectory)\.runsettings"</TestRunnerAdditionalArguments>
+    <!-- Both target frameworks build the same test assets and share machine-wide state, so run them one after another. -->
+    <TestTargetFrameworksInParallel>false</TestTargetFrameworksInParallel>
   </PropertyGroup>
 
   <PropertyGroup>

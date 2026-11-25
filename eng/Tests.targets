@@ -1,0 +1,23 @@
+<Project>
+  <!--
+    Arcade's _OuterRunTests runs the target frameworks of a test project in parallel. Projects that share
+    machine-wide state between target frameworks can set TestTargetFrameworksInParallel to false to run
+    them one after another, as older Arcade versions did.
+  -->
+  <PropertyGroup>
+    <TestTargetFrameworksInParallel Condition="'$(TestTargetFrameworksInParallel)' == ''">true</TestTargetFrameworksInParallel>
+  </PropertyGroup>
+
+  <Target Name="_OuterRunTests" Returns="@(FileWrites)">
+    <ItemGroup>
+      <_TargetFramework Include="$(TargetFrameworks)" />
+      <_InnerTestBuild Include="$(MSBuildProjectFile)"
+                       AdditionalProperties="TargetFramework=%(_TargetFramework.Identity)" />
+    </ItemGroup>
+    <MSBuild Projects="@(_InnerTestBuild)"
+             Targets="_InnerRunTests"
+             BuildInParallel="$(TestTargetFrameworksInParallel)">
+      <Output ItemName="FileWrites" TaskParameter="TargetOutputs" />
+    </MSBuild>
+  </Target>
+</Project>
