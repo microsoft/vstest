@@ -12,9 +12,16 @@ if [[ "$fixture" != "$repo_root/artifacts/tmp/legacy-inner-"* ]]; then
 fi
 trap 'rm -rf -- "$fixture"' EXIT
 
+sdk_version="$(sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' "$repo_root/global.json" | head -n 1)"
+arcade_version="$(sed -n 's/.*"Microsoft\.DotNet\.Arcade\.Sdk":[[:space:]]*"\([^"]*\)".*/\1/p' "$repo_root/global.json")"
+arcade_dependencies="$(grep -Fc '<Uri>https://github.com/dotnet/arcade</Uri>' "$repo_root/eng/Version.Details.xml")"
+escape() { printf '%s' "$1" | sed 's/[][\.*^$/]/\\&/g'; }
+
 inner="$fixture/artifacts/sourcebuild-intermediate/artifacts/sb/src"
-mkdir -p "$inner/eng/common" "$fixture/.dotnet/sdk/11.0.100/Sdks"
-printf '%s\n' '{"sdk":{"version":"11.0.100"},"msbuild-sdks":{"Microsoft.DotNet.Arcade.Sdk":"9.0.0-beta.25164.2"}}' \
+mkdir -p "$inner/eng/common" "$fixture/eng" "$fixture/.dotnet/sdk/$sdk_version/Sdks"
+cp "$repo_root/global.json" "$fixture/global.json"
+cp "$repo_root/eng/Version.Details.xml" "$fixture/eng/Version.Details.xml"
+printf '%s\n' "{\"sdk\":{\"version\":\"$sdk_version\"},\"msbuild-sdks\":{\"Microsoft.DotNet.Arcade.Sdk\":\"9.0.0-beta.25164.2\"}}" \
   > "$fixture/compat-global-before.json"
 cp "$fixture/compat-global-before.json" "$fixture/artifacts/sourcebuild-intermediate/global.json"
 cp "$repo_root/global.json" "$inner/global.json"
@@ -42,7 +49,7 @@ BUILD_BUILDNUMBER=20260930.99 \
 PILOT_ARGS="$fixture/args.txt" \
 PILOT_INSTALL_ARGS="$fixture/install-args.txt" \
 PILOT_MSBUILD_SDKS="$fixture/sdk-path.txt" \
-MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100/Sdks" \
+MSBuildSDKsPath="$fixture/.dotnet/sdk/$sdk_version/Sdks" \
   bash "$inner/eng/BuildSourceBuildIntermediate.sh" --inner-legacy \
     "$fixture/.dotnet/dotnet" \
     "$fixture/tool-packages/microsoft.dotnet.arcade.sdk/9.0.0-beta.25164.2/tools" \
@@ -51,11 +58,12 @@ MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100/Sdks" \
 [[ $(grep -Fc '10.0.404' "$inner/global.json") -eq 2 ]]
 [[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/global.json") -eq 1 ]]
 [[ $(grep -Fc '10.0.404' "$fixture/artifacts/sourcebuild-intermediate/global.json") -eq 1 ]]
-cmp <(sed -e 's/11\.0\.100/10.0.404/g' \
-          -e 's/11\.0\.0-beta\.26421\.2/9.0.0-beta.25164.2/g' "$repo_root/global.json") \
+cmp <(sed -e "s/\"$(escape "$sdk_version")\"/\"10.0.404\"/g" \
+          -e "s/\"$(escape "$arcade_version")\"/\"9.0.0-beta.25164.2\"/g" "$repo_root/global.json") \
   "$inner/global.json"
-[[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/eng/Version.Details.xml") -eq 3 ]]
-[[ $(grep -Fc '5ba9ca776c1d0bb72b2791591e54cf51fc52dfee' "$inner/eng/Version.Details.xml") -eq 3 ]]
+[[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/eng/Version.Details.xml") -eq "$arcade_dependencies" ]]
+[[ $(grep -Fc '5ba9ca776c1d0bb72b2791591e54cf51fc52dfee' "$inner/eng/Version.Details.xml") -eq "$arcade_dependencies" ]]
+[[ $(grep -Fc '<Dependency ' "$inner/eng/Version.Details.xml") -eq $(grep -Fc '<Dependency ' "$repo_root/eng/Version.Details.xml") ]]
 grep -Fxq -- '-p:Publish=false' "$fixture/args.txt"
 grep -Fxq -- '-p:ArcadeBuildFromSource=true' "$fixture/args.txt"
 grep -Fxq -- '-p:DotNetBuildRepo=true' "$fixture/args.txt"
@@ -119,6 +127,20 @@ if BUILD_SOURCESDIRECTORY="$fixture" BUILD_REPOSITORY_ID=wrong-repository \
 fi
 cmp "$repo_root/global.json" "$inner/global.json"
 cmp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
+
+printf '\n' >> "$inner/global.json"
+if BUILD_SOURCESDIRECTORY="$fixture" \
+    BUILD_REPOSITORY_ID=ef257391-4d76-4240-8649-3f21ac49c392 \
+    BUILD_BUILDNUMBER=20260930.99 \
+    bash "$inner/eng/BuildSourceBuildIntermediate.sh" --inner-legacy \
+      "$fixture/.dotnet/dotnet" \
+      "$fixture/tool-packages/microsoft.dotnet.arcade.sdk/9.0.0-beta.25164.2/tools" \
+      17.14.2-hotfix-26480-99 > "$fixture/mismatch.log" 2>&1; then
+  echo "The inner helper accepted a copy that differs from the outer checkout." >&2
+  exit 1
+fi
+grep -Fq 'differs from its pinned input' "$fixture/mismatch.log"
+cp "$repo_root/global.json" "$inner/global.json"
 
 verify_package_version() {
   local name="$1" build_version="$2" cli_version="$3" expected="$4"
