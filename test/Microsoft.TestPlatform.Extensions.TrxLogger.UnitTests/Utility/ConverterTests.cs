@@ -17,6 +17,7 @@ using Moq;
 
 using TestOutcome = Microsoft.VisualStudio.TestPlatform.ObjectModel.TestOutcome;
 using TestPlatformObjectModel = Microsoft.VisualStudio.TestPlatform.ObjectModel;
+using TestRun = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel.TestRun;
 using TrxLoggerConstants = Microsoft.TestPlatform.Extensions.TrxLogger.Utility.Constants;
 using TrxLoggerOutcome = Microsoft.TestPlatform.Extensions.TrxLogger.ObjectModel.TestOutcome;
 using UriDataAttachment = Microsoft.VisualStudio.TestPlatform.ObjectModel.UriDataAttachment;

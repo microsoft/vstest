@@ -345,11 +345,7 @@ public class IntegrationTestBase
             StringAssert.DoesNotMatch(
                 _standardTestOutput,
                 new Regex(summaryStatus),
-                "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
-                _standardTestOutput,
-                _standardTestError,
-                Environment.NewLine,
-                _arguments);
+                $"Excepted: There should not be test summary{Environment.NewLine}Actual: {_standardTestOutput}{Environment.NewLine}Standard Error: {_standardTestError}{Environment.NewLine}Arguments: {_arguments}{Environment.NewLine}");
         }
         else
         {
@@ -371,12 +367,7 @@ public class IntegrationTestBase
 
             Assert.IsTrue(
                 _standardTestOutput.Contains(summaryStatus),
-                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
-                _standardTestOutput,
-                summaryStatus,
-                _standardTestError,
-                Environment.NewLine,
-                _arguments);
+                $"The Test summary does not match.{Environment.NewLine}Expected summary: {summaryStatus}{Environment.NewLine}Test Output: {_standardTestOutput}{Environment.NewLine}Standard Error: {_standardTestError}{Environment.NewLine}Arguments: {_arguments}{Environment.NewLine}");
         }
     }
 
@@ -396,11 +387,7 @@ public class IntegrationTestBase
             StringAssert.DoesNotMatch(
                 _standardTestOutput,
                 new Regex("Total tests\\:"),
-                "Excepted: There should not be test summary{2}Actual: {0}{2}Standard Error: {1}{2}Arguments: {3}{2}",
-                _standardTestOutput,
-                _standardTestError,
-                Environment.NewLine,
-                _arguments);
+                $"Excepted: There should not be test summary{Environment.NewLine}Actual: {_standardTestOutput}{Environment.NewLine}Standard Error: {_standardTestError}{Environment.NewLine}Arguments: {_arguments}{Environment.NewLine}");
         }
         else
         {
@@ -422,28 +409,23 @@ public class IntegrationTestBase
 
             Assert.IsTrue(
                 _standardTestOutput.Contains(summaryStatus),
-                "The Test summary does not match.{3}Expected summary: {1}{3}Test Output: {0}{3}Standard Error: {2}{3}Arguments: {4}{3}",
-                _standardTestOutput,
-                summaryStatus,
-                _standardTestError,
-                Environment.NewLine,
-                _arguments);
+                $"The Test summary does not match.{Environment.NewLine}Expected summary: {summaryStatus}{Environment.NewLine}Test Output: {_standardTestOutput}{Environment.NewLine}Standard Error: {_standardTestError}{Environment.NewLine}Arguments: {_arguments}{Environment.NewLine}");
         }
     }
 
     public void StdErrorContains(string substring)
     {
-        Assert.IsTrue(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+        Assert.IsTrue(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdErrorRegexIsMatch(string pattern)
     {
-        Assert.IsTrue(Regex.IsMatch(_standardTestError, pattern), "StdErrorOutput - [{0}] did not contain expected pattern '{1}'", _standardTestError, pattern);
+        Assert.IsTrue(Regex.IsMatch(_standardTestError, pattern), $"StdErrorOutput - [{_standardTestError}] did not contain expected pattern '{pattern}'");
     }
 
     public void StdErrorDoesNotContains(string substring)
     {
-        Assert.IsFalse(_standardTestError.Contains(substring), "StdErrorOutput - [{0}] did not contain expected string '{1}'", _standardTestError, substring);
+        Assert.IsFalse(_standardTestError.Contains(substring), $"StdErrorOutput - [{_standardTestError}] did not contain expected string '{substring}'");
     }
 
     public void StdOutputContains(string substring)
@@ -478,7 +460,7 @@ public class IntegrationTestBase
                        || _standardTestOutput.Contains("Passed " + GetTestMethodName(test))
                        || _standardTestOutput.Contains("\\ufffd " + test)
                        || _standardTestOutput.Contains("\\ufffd " + GetTestMethodName(test));
-            Assert.IsTrue(flag, "Test {0} does not appear in passed tests list.", test);
+            Assert.IsTrue(flag, $"Test {test} does not appear in passed tests list.");
         }
     }
 
@@ -496,10 +478,10 @@ public class IntegrationTestBase
         {
             var flag = _standardTestOutput.Contains("Failed " + test)
                        || _standardTestOutput.Contains("Failed " + GetTestMethodName(test));
-            Assert.IsTrue(flag, "Test {0} does not appear in failed tests list.", test);
+            Assert.IsTrue(flag, $"Test {test} does not appear in failed tests list.");
 
             // Verify stack information as well.
-            Assert.IsTrue(_standardTestOutput.Contains(GetTestMethodName(test)), "No stack trace for failed test: {0}", test);
+            Assert.IsTrue(_standardTestOutput.Contains(GetTestMethodName(test)), $"No stack trace for failed test: {test}");
         }
     }
 
@@ -514,7 +496,7 @@ public class IntegrationTestBase
         {
             var flag = _standardTestOutput.Contains("Skipped " + test)
                        || _standardTestOutput.Contains("Skipped " + GetTestMethodName(test));
-            Assert.IsTrue(flag, "Test {0} does not appear in skipped tests list.", test);
+            Assert.IsTrue(flag, $"Test {test} does not appear in skipped tests list.");
         }
     }
 
@@ -615,7 +597,12 @@ public class IntegrationTestBase
         if (testFramework == UnitTestFramework.MSTest)
         {
             var version = IntegrationTestEnvironment.DependencyVersions["MSTestTestAdapterVersion"];
-            if (version.StartsWith("3"))
+            if (version.StartsWith("4"))
+            {
+                var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "net9.0";
+                adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
+            }
+            else if (version.StartsWith("3"))
             {
                 var tfm = _testEnvironment.TargetFramework.StartsWith("net4") ? "net462" : "netcoreapp3.1";
                 adapterRelativePath = string.Format(CultureInfo.InvariantCulture, _msTestAdapterRelativePath, version, tfm);
@@ -671,10 +658,10 @@ public class IntegrationTestBase
         }
         else
         {
-            Assert.Fail("Unknown Runner framework - [{0}]", _testEnvironment.RunnerFramework);
+            Assert.Fail($"Unknown Runner framework - [{_testEnvironment.RunnerFramework}]");
         }
 
-        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);
+        Assert.IsTrue(File.Exists(consoleRunnerPath), $"GetConsoleRunnerPath: Path not found: \"{consoleRunnerPath}\"");
         return consoleRunnerPath;
     }
 

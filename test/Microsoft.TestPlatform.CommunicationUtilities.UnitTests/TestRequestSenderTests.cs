@@ -206,7 +206,7 @@ public class TestRequestSenderTests
         _mockChannel.Verify(mockChannel => mockChannel.Send(MessageType.CancelTestRun), Times.Never);
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow("")]
     [DataRow(" ")]
     [DataRow(null)]
@@ -301,7 +301,7 @@ public class TestRequestSenderTests
         SetupRaiseMessageReceivedOnCheckVersion();
         SetupFakeCommunicationChannel();
 
-        Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
+        Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
     }
 
     [TestMethod]
@@ -318,7 +318,7 @@ public class TestRequestSenderTests
                 nameof(CheckVersionWithTestHostShouldReportProtocolErrorFromCommunicationThread))));
         SetupFakeCommunicationChannel();
 
-        var error = Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
+        var error = Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
 
         StringAssert.Contains(error.Message, "Protocol version check failed");
     }
@@ -330,7 +330,7 @@ public class TestRequestSenderTests
         SetupRaiseMessageReceivedOnCheckVersion();
         SetupFakeCommunicationChannel();
 
-        Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
+        Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost());
     }
 
     [TestMethod]
@@ -340,7 +340,7 @@ public class TestRequestSenderTests
 
         SetupFakeCommunicationChannel();
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost()).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => _testRequestSender.CheckVersionWithTestHost()).Message;
 
         Assert.AreEqual(message, TimoutErrorMessage);
     }

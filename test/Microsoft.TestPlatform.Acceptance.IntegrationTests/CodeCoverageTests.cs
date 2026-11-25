@@ -222,7 +222,7 @@ public class CodeCoverageTests : CodeCoverageAcceptanceTestBase
 
         var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, TempDirectory.Path);
         Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {TempDirectory.Path} trxfile: {trxFilePath}");
-        Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
+        Assert.IsTrue(File.Exists(actualCoverageFile), $"Coverage file not found: {actualCoverageFile}");
 
         if (testParameters.RunSettingsType == TestParameters.SettingsType.XmlOutput)
         {

@@ -113,7 +113,7 @@ public class SocketClientTests : SocketTestsBase, IDisposable
 
         // Validate that write on server side fails
         waitEvent.WaitOne(Timeout);
-        Assert.ThrowsException<IOException>(() => WriteData(Client!));
+        Assert.ThrowsExactly<IOException>(() => WriteData(Client!));
     }
 
     [TestMethod]
@@ -124,7 +124,7 @@ public class SocketClientTests : SocketTestsBase, IDisposable
         _socketClient.Stop();
 
         waitEvent.WaitOne(Timeout);
-        Assert.ThrowsException<CommunicationException>(() => channel!.Send(Dummydata));
+        Assert.ThrowsExactly<CommunicationException>(() => channel!.Send(Dummydata));
     }
 
     protected override ICommunicationChannel? SetupChannel(out ConnectedEventArgs? connectedEvent)

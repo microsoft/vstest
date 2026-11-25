@@ -83,7 +83,7 @@ public class VsTestConsoleWrapperTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
 
-        Assert.ThrowsException<TransationLayerException>(() => _consoleWrapper.StartSession());
+        Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.StartSession());
     }
 
     [TestMethod]
@@ -113,7 +113,7 @@ public class VsTestConsoleWrapperTests
     {
         _mockRequestSender.Setup(rs => rs.InitializeCommunication()).Returns(-1);
 
-        await Assert.ThrowsExceptionAsync<TransationLayerException>(() => ((VsTestConsoleWrapper)_consoleWrapper).StartSessionAsync());
+        await Assert.ThrowsExactlyAsync<TransationLayerException>(() => ((VsTestConsoleWrapper)_consoleWrapper).StartSessionAsync());
 
         _mockRequestSender.Verify(rs => rs.Close(), Times.Once);
         _mockProcessManager.Verify(pm => pm.StartProcess(It.IsAny<ConsoleParameters>()), Times.Never);
@@ -304,7 +304,7 @@ public class VsTestConsoleWrapperTests
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-        var exception = Assert.ThrowsException<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
+        var exception = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.InitializeExtensions(new List<string> { "Hello", "World" }));
         Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", exception.Message);
         _mockRequestSender.Verify(rs => rs.InitializeExtensions(It.IsAny<IEnumerable<string>>()), Times.Never);
     }
@@ -362,7 +362,7 @@ public class VsTestConsoleWrapperTests
         _mockProcessHelper.Setup(x => x.GetCurrentProcessFileName()).Returns("DummyProcess");
         _mockRequestSender.Setup(rs => rs.WaitForRequestHandlerConnection(It.IsAny<int>())).Returns(false);
 
-        var exception = Assert.ThrowsException<TransationLayerException>(() => _consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
+        var exception = Assert.ThrowsExactly<TransationLayerException>(() => _consoleWrapper.DiscoverTests(new List<string> { "Hello", "World" }, null, null, new Mock<ITestDiscoveryEventsHandler2>().Object));
         Assert.AreEqual("DummyProcess process failed to connect to vstest.console process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", exception.Message);
         _mockRequestSender.Verify(rs => rs.DiscoverTests(It.IsAny<IEnumerable<string>>(), It.IsAny<string>(), null, null, It.IsAny<ITestDiscoveryEventsHandler2>()), Times.Never);
     }

@@ -108,7 +108,7 @@ public class DesignModeClientTests
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
         _mockCommunicationManager.SetupSequence(cm => cm.ReceiveMessage()).Returns(verCheck).Returns(sessionEnd);
 
-        Assert.ThrowsException<TimeoutException>(() => _designModeClient.ConnectToClientAndProcessRequests(PortNumber, _mockTestRequestManager.Object));
+        Assert.ThrowsExactly<TimeoutException>(() => _designModeClient.ConnectToClientAndProcessRequests(PortNumber, _mockTestRequestManager.Object));
 
         _mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
         _mockCommunicationManager.Verify(cm => cm.WaitForServerConnection(It.IsAny<int>()), Times.Once);
@@ -272,7 +272,7 @@ public class DesignModeClientTests
     {
         _mockCommunicationManager.Setup(cm => cm.WaitForServerConnection(It.IsAny<int>())).Returns(false);
 
-        var ex = Assert.ThrowsException<TimeoutException>(() => _designModeClient.ConnectToClientAndProcessRequests(PortNumber, _mockTestRequestManager.Object));
+        var ex = Assert.ThrowsExactly<TimeoutException>(() => _designModeClient.ConnectToClientAndProcessRequests(PortNumber, _mockTestRequestManager.Object));
         Assert.AreEqual("vstest.console process failed to connect to translation layer process after 90 seconds. This may occur due to machine slowness, please set environment variable VSTEST_CONNECTION_TIMEOUT to increase timeout.", ex.Message);
 
         _mockCommunicationManager.Verify(cm => cm.SetupClientAsync(new IPEndPoint(IPAddress.Loopback, PortNumber)), Times.Once);
@@ -309,7 +309,6 @@ public class DesignModeClientTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(TestPlatformException))]
     public void DesignModeClientLaunchCustomHostMustThrowIfInvalidAckComes()
     {
         var testableDesignModeClient = new TestableDesignModeClient(_mockCommunicationManager.Object, JsonDataSerializer.Instance, _mockPlatformEnvironment.Object);
@@ -324,11 +323,10 @@ public class DesignModeClientTests
             .Callback(() => Task.Run(sendMessageAction));
 
         var info = new TestProcessStartInfo();
-        testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None);
+        Assert.ThrowsExactly<TestPlatformException>(() => testableDesignModeClient.LaunchCustomHost(info, CancellationToken.None));
     }
 
     [TestMethod]
-    [ExpectedException(typeof(TestPlatformException))]
     public void DesignModeClientLaunchCustomHostMustThrowIfCancellationOccursBeforeHostLaunch()
     {
         var testableDesignModeClient = new TestableDesignModeClient(_mockCommunicationManager.Object, JsonDataSerializer.Instance, _mockPlatformEnvironment.Object);
@@ -337,7 +335,7 @@ public class DesignModeClientTests
         var cancellationTokenSource = new CancellationTokenSource();
         cancellationTokenSource.Cancel();
 
-        testableDesignModeClient.LaunchCustomHost(info, cancellationTokenSource.Token);
+        Assert.ThrowsExactly<TestPlatformException>(() => testableDesignModeClient.LaunchCustomHost(info, cancellationTokenSource.Token));
     }
 
     [TestMethod]

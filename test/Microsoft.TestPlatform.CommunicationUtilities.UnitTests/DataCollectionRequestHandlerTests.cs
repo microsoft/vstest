@@ -77,13 +77,13 @@ public class DataCollectionRequestHandlerTests
     [TestMethod]
     public void CreateInstanceShouldThrowExceptionIfInstanceCommunicationManagerIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null!, _mockMessageSink.Object));
+        Assert.ThrowsExactly<ArgumentNullException>(() => DataCollectionRequestHandler.Create(null!, _mockMessageSink.Object));
     }
 
     [TestMethod]
     public void CreateInstanceShouldThrowExceptinIfInstanceMessageSinkIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => DataCollectionRequestHandler.Create(_mockCommunicationManager.Object, null!));
     }
 
     [TestMethod]
@@ -107,7 +107,7 @@ public class DataCollectionRequestHandlerTests
     {
         _mockCommunicationManager.Setup(x => x.SetupClientAsync(It.IsAny<IPEndPoint>())).Throws<Exception>();
 
-        Assert.ThrowsException<Exception>(() => _requestHandler.InitializeCommunication(123));
+        Assert.ThrowsExactly<Exception>(() => _requestHandler.InitializeCommunication(123));
     }
 
     [TestMethod]
@@ -123,7 +123,7 @@ public class DataCollectionRequestHandlerTests
     {
         _mockCommunicationManager.Setup(x => x.WaitForServerConnection(It.IsAny<int>())).Throws<Exception>();
 
-        Assert.ThrowsException<Exception>(() => _requestHandler.WaitForRequestSenderConnection(0));
+        Assert.ThrowsExactly<Exception>(() => _requestHandler.WaitForRequestSenderConnection(0));
     }
 
     [TestMethod]
@@ -142,7 +142,7 @@ public class DataCollectionRequestHandlerTests
         _mockCommunicationManager.Setup(x => x.SendMessage(MessageType.DataCollectionMessage, It.IsAny<DataCollectionMessageEventArgs>())).Throws<Exception>();
         var message = new DataCollectionMessageEventArgs(TestMessageLevel.Error, "message");
 
-        Assert.ThrowsException<Exception>(() => _requestHandler.SendDataCollectionMessage(message));
+        Assert.ThrowsExactly<Exception>(() => _requestHandler.SendDataCollectionMessage(message));
     }
 
     [TestMethod]
@@ -158,7 +158,7 @@ public class DataCollectionRequestHandlerTests
     {
         _mockCommunicationManager.Setup(x => x.StopClient()).Throws<Exception>();
 
-        Assert.ThrowsException<Exception>(() => _requestHandler.Close());
+        Assert.ThrowsExactly<Exception>(() => _requestHandler.Close());
     }
 
     [TestMethod]
@@ -258,7 +258,7 @@ public class DataCollectionRequestHandlerTests
     {
         _mockCommunicationManager.Setup(x => x.ReceiveMessage()).Throws<Exception>();
 
-        Assert.ThrowsException<Exception>(() => _requestHandler.ProcessRequests());
+        Assert.ThrowsExactly<Exception>(() => _requestHandler.ProcessRequests());
     }
 
     [TestMethod]

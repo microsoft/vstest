@@ -85,7 +85,7 @@ public class TelemetryTests : AcceptanceTestBase
     {
         if (!Directory.Exists(tempDirectory.Path))
         {
-            Assert.Fail("Could not find the telemetry logs folder at {0}", tempDirectory.Path);
+            Assert.Fail($"Could not find the telemetry logs folder at {tempDirectory.Path}");
         }
 
         bool isValid = false;

@@ -105,7 +105,6 @@ public class MigratorTests
     }
 
     [TestMethod]
-    [ExpectedException(typeof(XmlException))]
     public void InvalidSettingsThrowsException()
     {
         _oldTestsettingsPath = Path.Combine(Path.GetTempPath(), "oldTestsettings.testsettings");
@@ -113,20 +112,19 @@ public class MigratorTests
         File.WriteAllText(_oldTestsettingsPath, InvalidSettings);
         File.WriteAllText(_newRunsettingsPath, string.Empty);
 
-        _migrator.Migrate(_oldTestsettingsPath, _newRunsettingsPath);
+        Assert.ThrowsExactly<XmlException>(() => _migrator.Migrate(_oldTestsettingsPath, _newRunsettingsPath));
 
         File.Delete(_oldTestsettingsPath);
     }
 
     [TestMethod]
-    // On some systems this throws file not found, on some it throws directory not found,
-    // I don't know why and it does not matter for the test. As long as it throws.
-    [ExpectedException(typeof(IOException), AllowDerivedTypes = true)]
     public void InvalidPathThrowsException()
     {
         string oldTestsettingsPath = @"X:\generatedRun,settings.runsettings";
 
-        _migrator.Migrate(oldTestsettingsPath, _newRunsettingsPath);
+        // On some systems this throws file not found, on some it throws directory not found,
+        // I don't know why and it does not matter for the test. As long as it throws.
+        Assert.Throws<IOException>(() => _migrator.Migrate(oldTestsettingsPath, _newRunsettingsPath));
     }
 
     private static void Validate(string newRunsettingsPath)

@@ -44,7 +44,7 @@ public class FrameworkHandleTests
         var frameworkHandle = new FrameworkHandle(null, new TestRunCache(100, TimeSpan.MaxValue, (s, r, ip) => { }), tec, null!);
         frameworkHandle.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => frameworkHandle.LaunchProcessWithDebuggerAttached(null!, null!, null!, null!));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => frameworkHandle.LaunchProcessWithDebuggerAttached(null!, null!, null!, null!));
     }
 
     [TestMethod]

@@ -45,20 +45,20 @@ public class PostProcessingTests : AcceptanceTestBase
             string projectFolder = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
             // Give this test its own template cache; the shared one races with other scaffolds.
             ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
-            Assert.AreEqual(exitCode, 0);
+            Assert.AreEqual(0, exitCode);
             UseLocallyBuiltTestSdk(projectFolder);
             ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);
-            Assert.AreEqual(exitCode, 0);
+            Assert.AreEqual(0, exitCode);
 
             string testContainer = Directory.GetFiles(Path.Combine(projectFolder, "bin"), $"{i}.dll", SearchOption.AllDirectories).Single();
 
             ExecuteVsTestConsole($"{testContainer} --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{Path.GetDirectoryName(testContainer)}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out stdOut, out stdError, out exitCode);
-            Assert.AreEqual(exitCode, 0);
+            Assert.AreEqual(0, exitCode);
         });
 
         // Post process artifacts
         ExecuteVsTestConsole($"--ArtifactsProcessingMode-PostProcess --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + "/mergeLog/"}\"", out string stdOut, out string stdError, out int exitCode);
-        Assert.AreEqual(exitCode, 0);
+        Assert.AreEqual(0, exitCode);
 
         using StringReader reader = new(stdOut);
         Assert.AreEqual(string.Empty, reader.ReadLine().Trim());

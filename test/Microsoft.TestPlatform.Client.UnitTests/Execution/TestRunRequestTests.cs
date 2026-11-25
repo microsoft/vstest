@@ -58,14 +58,14 @@ public class TestRunRequestTests
     {
         _testRunRequest.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => _testRunRequest.ExecuteAsync());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _testRunRequest.ExecuteAsync());
     }
 
     [TestMethod]
     public void ExecuteAsycIfStateIsNotPendingThrowsInvalidOperationException()
     {
         _testRunRequest.ExecuteAsync();
-        Assert.ThrowsException<InvalidOperationException>(() => _testRunRequest.ExecuteAsync());
+        Assert.ThrowsExactly<InvalidOperationException>(() => _testRunRequest.ExecuteAsync());
     }
 
     [TestMethod]
@@ -122,13 +122,13 @@ public class TestRunRequestTests
     public void WaitForCompletionIfTestRunRequestDisposedShouldThrowObjectDisposedException()
     {
         _testRunRequest.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => _testRunRequest.WaitForCompletion());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _testRunRequest.WaitForCompletion());
     }
 
     [TestMethod]
     public void WaitForCompletionIfTestRunStatePendingShouldThrowInvalidOperationException()
     {
-        Assert.ThrowsException<InvalidOperationException>(() => _testRunRequest.WaitForCompletion());
+        Assert.ThrowsExactly<InvalidOperationException>(() => _testRunRequest.WaitForCompletion());
     }
 
     [TestMethod]

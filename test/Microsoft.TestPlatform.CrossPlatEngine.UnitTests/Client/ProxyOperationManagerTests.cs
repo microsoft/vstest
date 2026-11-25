@@ -278,7 +278,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
         Assert.AreEqual(message, TimoutErrorMessage);
     }
 
@@ -292,7 +292,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, cancellationTokenSource);
 
         cancellationTokenSource.Cancel();
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
         Equals("Canceling the operation as requested.", message);
     }
 
@@ -307,7 +307,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         var cancellationTokenSource = new CancellationTokenSource();
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, cancellationTokenSource);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
         Equals("Canceling the operation as requested.", message);
     }
 
@@ -321,7 +321,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
         _mockTestHostManager.Setup(rs => rs.LaunchTestHostAsync(It.IsAny<TestProcessStartInfo>(), It.IsAny<CancellationToken>())).Callback(() => cancellationTokenSource.Cancel());
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object, cancellationTokenSource);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
         Equals("Canceling the operation as requested.", message);
     }
 
@@ -333,7 +333,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
 
         var operationManager = new TestableProxyOperationManager(_mockRequestData.Object, _mockRequestSender.Object, _mockTestHostManager.Object);
 
-        var message = Assert.ThrowsException<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
+        var message = Assert.ThrowsExactly<TestPlatformException>(() => operationManager.SetupChannel([], DefaultRunSettings)).Message;
         Assert.AreEqual(message, Microsoft.VisualStudio.TestPlatform.CrossPlatEngine.Resources.Resources.InitializationFailed);
     }
 
@@ -349,7 +349,7 @@ public class ProxyOperationManagerTests : ProxyBaseManagerTests
     {
         // Make the version check fail
         _mockRequestSender.Setup(rs => rs.CheckVersionWithTestHost()).Throws(new TestPlatformException("Version check failed"));
-        Assert.ThrowsException<TestPlatformException>(() => _testOperationManager.SetupChannel([], DefaultRunSettings));
+        Assert.ThrowsExactly<TestPlatformException>(() => _testOperationManager.SetupChannel([], DefaultRunSettings));
     }
 
     [TestMethod]

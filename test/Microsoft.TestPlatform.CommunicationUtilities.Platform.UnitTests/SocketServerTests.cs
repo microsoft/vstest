@@ -305,7 +305,7 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         _socketServer.Stop();
 
         waitEvent.WaitOne();
-        Assert.ThrowsException<IOException>(() => WriteData(_tcpClient));
+        Assert.ThrowsExactly<IOException>(() => WriteData(_tcpClient));
     }
 
     [TestMethod]
@@ -337,7 +337,7 @@ public class SocketServerTests : SocketTestsBase, IDisposable
         _socketServer.Stop();
 
         waitEvent.Wait();
-        Assert.ThrowsException<CommunicationException>(() => channel!.Send(Dummydata));
+        Assert.ThrowsExactly<CommunicationException>(() => channel!.Send(Dummydata));
     }
 
     [TestMethod]

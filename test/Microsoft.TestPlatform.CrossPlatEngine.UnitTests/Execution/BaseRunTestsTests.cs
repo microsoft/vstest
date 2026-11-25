@@ -526,7 +526,7 @@ public class BaseRunTestsTests
 
         _runTestsInstance.RunTests();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => _runTestsInstance.GetFrameworkHandle.LaunchProcessWithDebuggerAttached(null!, null, null, null));
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _runTestsInstance.GetFrameworkHandle.LaunchProcessWithDebuggerAttached(null!, null, null, null));
     }
 
     [TestMethod]
@@ -556,7 +556,7 @@ public class BaseRunTestsTests
         // verify TC.Source is updated with package
         foreach (var tr in _receivedRunStatusArgs.NewTestResults)
         {
-            Assert.AreEqual(tr.TestCase.Source, package);
+            Assert.AreEqual(package, tr.TestCase.Source);
         }
     }
 
@@ -576,7 +576,7 @@ public class BaseRunTestsTests
 
         foreach (var tc in _receivedRunStatusArgs.ActiveTests)
         {
-            Assert.AreEqual(tc.Source, package);
+            Assert.AreEqual(package, tc.Source);
         }
     }
 

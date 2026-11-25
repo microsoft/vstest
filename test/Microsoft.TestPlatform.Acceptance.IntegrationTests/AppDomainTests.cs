@@ -54,20 +54,18 @@ public class AppDomainTests : AcceptanceTestBase
 
         Assert.IsTrue(
             IsFilesContentEqual(testAppDomainDetailFileName, dataCollectorAppDomainDetailFileName),
-            "Different AppDomains, test: {0} datacollector: {1}",
-            File.ReadAllText(testAppDomainDetailFileName),
-            File.ReadAllText(dataCollectorAppDomainDetailFileName));
+            $"Different AppDomains, test: {File.ReadAllText(testAppDomainDetailFileName)} datacollector: {File.ReadAllText(dataCollectorAppDomainDetailFileName)}");
         ValidateSummaryStatus(1, 1, 1);
         File.Delete(runsettingsFilePath);
     }
 
     private static bool IsFilesContentEqual(string filePath1, string filePath2)
     {
-        Assert.IsTrue(File.Exists(filePath1), "File doesn't exist: {0}.", filePath1);
-        Assert.IsTrue(File.Exists(filePath2), "File doesn't exist: {0}.", filePath2);
+        Assert.IsTrue(File.Exists(filePath1), $"File doesn't exist: {filePath1}.");
+        Assert.IsTrue(File.Exists(filePath2), $"File doesn't exist: {filePath2}.");
         var content1 = File.ReadAllText(filePath1);
         var content2 = File.ReadAllText(filePath2);
-        Assert.IsTrue(string.Equals(content1, content2, StringComparison.Ordinal), "Content mismatch{2}- file1 content:{2}{0}{2}- file2 content:{2}{1}{2}", content1, content2, Environment.NewLine);
+        Assert.IsTrue(string.Equals(content1, content2, StringComparison.Ordinal), $"Content mismatch{Environment.NewLine}- file1 content:{Environment.NewLine}{content1}{Environment.NewLine}- file2 content:{Environment.NewLine}{content2}{Environment.NewLine}");
         return string.Equals(content1, content2, StringComparison.Ordinal);
     }
 

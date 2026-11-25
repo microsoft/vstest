@@ -237,7 +237,7 @@ public class IntegrationTestEnvironment
             assetPath = Path.Combine(RepoRootDirectory, "artifacts", "bin", "TestAssets", $"{simpleAssetName}--{versionsHash}", BuildConfiguration, targetFramework, $"{simpleAssetName}--{versionsHash}.dll");
         }
 
-        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.", assetPath);
+        Assert.IsTrue(File.Exists(assetPath), $"GetTestAsset: Path not found: \"{assetPath}\". Most likely you need to build using build.cmd -s PrepareAcceptanceTests.");
 
         // If you are thinking about wrapping the path in double quotes here,
         // then don't. File.Exist cannot handle quoted paths, and we use it in a lot of places.
@@ -268,7 +268,7 @@ public class IntegrationTestEnvironment
     {
         var packagePath = Path.Combine(PackageDirectory, packageSuffix);
 
-        Assert.IsTrue(Directory.Exists(packagePath), "GetNugetPackage: Directory not found: {0}.", packagePath);
+        Assert.IsTrue(Directory.Exists(packagePath), $"GetNugetPackage: Directory not found: {packagePath}.");
 
         return packagePath;
     }
@@ -336,7 +336,7 @@ public class IntegrationTestEnvironment
             simpleAssetName,
             assetName);
 
-        Assert.IsTrue(File.Exists(assetPath), "GetTestAsset: Path not found: \"{0}\".", assetPath);
+        Assert.IsTrue(File.Exists(assetPath), $"GetTestAsset: Path not found: \"{assetPath}\".");
 
         return assetPath;
     }
