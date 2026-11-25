@@ -52,7 +52,7 @@ public class DotnetArchitectureSwitchTestsWindowsOnly : AcceptanceTestBase
         {
             environmentVariables.Add("DOTNET_ROOT(x86)", Path.GetDirectoryName(dotnetPathTo)!);
         }
-        ExecuteApplication(dotnetPath, "new mstest", out _, out string _, out _, environmentVariables, TempDirectory.Path);
+        ExecuteApplication(dotnetPath, $"new mstest --framework {Core90TargetFramework}", out _, out string _, out _, environmentVariables, TempDirectory.Path);
         UseLocallyBuiltTestSdk(TempDirectory.Path);
 
         // Patch test file
