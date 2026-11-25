@@ -50,9 +50,41 @@
   {
     "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShouldAddLogs",
     "outcome": "NotExecuted",
-    "signature": "",
-    "cause": "Carries [Ignore] at EventLogContainerTests.cs:62. It becomes visible for the first time now that this project's tests are discovered at all - before the csproj fix the whole assembly produced zero results, so this [Ignore] had nothing to report against. Declared here because an undeclared NotExecuted blocks signing, which is the designed behaviour.",
-    "classifiedOnRun": "local",
-    "classifiedOn": "2026-09-02"
+    "signature": "Gets stuck when running with other tests.",
+    "cause": "Carries the class-level [Ignore(\"Gets stuck when running with other tests.\")] on EventLogContainerTests, taken from main. The tests read the machine's live Application event log, most also write to it, and EventLogContainer.OnEventLogEntryWritten retries in a while loop that swallows every exception, so on a busy agent it can spin forever. PR build 1699060 hung in this class until the 120-minute job timeout. Not a regression in the product.",
+    "classifiedOnRun": "1699060",
+    "classifiedOn": "2026-11-25"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShouldNotAddLogsIfNoNewEntryIsPresent",
+    "outcome": "NotExecuted",
+    "signature": "Gets stuck when running with other tests.",
+    "cause": "Carries the class-level [Ignore(\"Gets stuck when running with other tests.\")] on EventLogContainerTests, taken from main. The tests read the machine's live Application event log, most also write to it, and EventLogContainer.OnEventLogEntryWritten retries in a while loop that swallows every exception, so on a busy agent it can spin forever. PR build 1699060 hung in this class until the 120-minute job timeout. Not a regression in the product.",
+    "classifiedOnRun": "1699060",
+    "classifiedOn": "2026-11-25"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShoulFilterLogsBasedOnEventTypeAndEventSource",
+    "outcome": "NotExecuted",
+    "signature": "Gets stuck when running with other tests.",
+    "cause": "Carries the class-level [Ignore(\"Gets stuck when running with other tests.\")] on EventLogContainerTests, taken from main. The tests read the machine's live Application event log, most also write to it, and EventLogContainer.OnEventLogEntryWritten retries in a while loop that swallows every exception, so on a busy agent it can spin forever. PR build 1699060 hung in this class until the 120-minute job timeout. Not a regression in the product.",
+    "classifiedOnRun": "1699060",
+    "classifiedOn": "2026-11-25"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShoulNotAddLogsIfEventSourceIsDifferent",
+    "outcome": "NotExecuted",
+    "signature": "Gets stuck when running with other tests.",
+    "cause": "Carries the class-level [Ignore(\"Gets stuck when running with other tests.\")] on EventLogContainerTests, taken from main. The tests read the machine's live Application event log, most also write to it, and EventLogContainer.OnEventLogEntryWritten retries in a while loop that swallows every exception, so on a busy agent it can spin forever. PR build 1699060 hung in this class until the 120-minute job timeout. Not a regression in the product.",
+    "classifiedOnRun": "1699060",
+    "classifiedOn": "2026-11-25"
+  },
+  {
+    "test": "Microsoft.TestPlatform.Extensions.EventLogCollector.UnitTests.EventLogContainerTests.OnEventLogEntryWrittenShoulNotAddLogsIfEventTypeIsDifferent",
+    "outcome": "NotExecuted",
+    "signature": "Gets stuck when running with other tests.",
+    "cause": "Carries the class-level [Ignore(\"Gets stuck when running with other tests.\")] on EventLogContainerTests, taken from main. The tests read the machine's live Application event log, most also write to it, and EventLogContainer.OnEventLogEntryWritten retries in a while loop that swallows every exception, so on a busy agent it can spin forever. PR build 1699060 hung in this class until the 120-minute job timeout. Not a regression in the product.",
+    "classifiedOnRun": "1699060",
+    "classifiedOn": "2026-11-25"
   }
 ]
