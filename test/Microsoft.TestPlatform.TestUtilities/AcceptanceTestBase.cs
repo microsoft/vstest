@@ -19,7 +19,7 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string Core80TargetFramework = "net8.0";
     public const string Core90TargetFramework = "net9.0";
     public const string Core10TargetFramework = "net10.0";
-    public const string Core11TargetFramework = "net11.0";
+    public const string Core12TargetFramework = "net12.0";
 
     public const string DesktopFrameworkArgValue = Net462FrameworkArgValue;
     public const string Net462FrameworkArgValue = ".NETFramework,Version=v4.6.2";
@@ -31,14 +31,14 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string Core80FrameworkArgValue = ".NETCoreApp,Version=v8.0";
     public const string Core90FrameworkArgValue = ".NETCoreApp,Version=v9.0";
     public const string Core10FrameworkArgValue = ".NETCoreApp,Version=v10.0";
-    public const string Core11FrameworkArgValue = ".NETCoreApp,Version=v11.0";
+    public const string Core12FrameworkArgValue = ".NETCoreApp,Version=v12.0";
 
     public const string DesktopRunnerTargetRuntime = "win7-x64";
     public const string CoreRunnerTargetRuntime = "";
     public const string InIsolation = "/InIsolation";
 
     public const string NETFX462_48 = "net462;net472;net48";
-    public const string NETFX462_NET11 = "net462;net472;net48;net8.0;net9.0;net10.0;net11.0";
+    public const string NETFX462_NET12 = "net462;net472;net48;net8.0;net9.0;net10.0;net12.0";
     public const string DEFAULT_RUNNER_NETFX = Net48TargetFramework;
     public const string DEFAULT_HOST_NETFX = Net462TargetFramework;
     public const string DEFAULT_RUNNER_NETCORE = Core80TargetFramework;
@@ -84,7 +84,7 @@ public class AcceptanceTestBase : IntegrationTestBase
             Core80TargetFramework => Core80FrameworkArgValue,
             Core90TargetFramework => Core90FrameworkArgValue,
             Core10TargetFramework => Core10FrameworkArgValue,
-            Core11TargetFramework => Core11FrameworkArgValue,
+            Core12TargetFramework => Core12FrameworkArgValue,
             Net462TargetFramework => Net462FrameworkArgValue,
             Net47TargetFramework => Net47FrameworkArgValue,
             Net471TargetFramework => Net471FrameworkArgValue,

@@ -39,22 +39,15 @@ public class PostProcessingTests : AcceptanceTestBase
             .Add(new XElement("Configuration", new XElement("MergeFile", "MergedFile.txt")));
         runSettingsXml.Save(runSettings);
 
-        // Create and build a single test project once, then reuse it for all parallel vstest runs.
-        string projectFolder = Path.Combine(TempDirectory.Path, "testproject");
-            // Give this test its own template cache; the shared one races with other scaffolds.
-        ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string setupStdOut, out string setupStdError, out int setupExitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
-        Assert.AreEqual(0, setupExitCode);
-        UseLocallyBuiltTestSdk(projectFolder);
-        ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out setupStdOut, out setupStdError, out setupExitCode);
-        Assert.AreEqual(0, setupExitCode);
-
-        string testContainer = Directory.GetFiles(Path.Combine(projectFolder, "bin"), "testproject.dll", SearchOption.AllDirectories).Single();
+        // Use a checked-in asset rather than `dotnet new mstest`: the SDK template's MSTest
+        // version moves with every SDK update and can outgrow the locally built Test.Sdk.
+        string testContainer = GetTestDllForFramework("SimpleTestProject.dll", Core80TargetFramework);
 
         // Run vstest 2 times in parallel to collect artifacts (minimum needed to verify merging)
         Parallel.For(0, 2, i =>
         {
             string resultsDirectory = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
-            ExecuteVsTestConsole($"{testContainer} --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{resultsDirectory}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out string stdOut, out string stdError, out int exitCode);
+            ExecuteVsTestConsole($"{testContainer} /TestCaseFilter:\"Name=PassingTest\" --Collect:\"SampleDataCollector\" --TestAdapterPath:\"{extensionsPath}\" --ResultsDirectory:\"{resultsDirectory}\" --Settings:\"{runSettings}\" --ArtifactsProcessingMode-Collect --TestSessionCorrelationId:\"{correlationSessionId}\" --Diag:\"{TempDirectory.Path + '/'}\"", out string stdOut, out string stdError, out int exitCode);
             Assert.AreEqual(0, exitCode);
         });
 
