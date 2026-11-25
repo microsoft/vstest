@@ -49,7 +49,7 @@ public class PostProcessingTests : AcceptanceTestBase
         {
             string projectFolder = Path.Combine(TempDirectory.Path, i.ToString(CultureInfo.InvariantCulture));
             // Give this test its own template cache; the shared one races with other scaffolds.
-            ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string stdOut, out string stdError, out int exitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
+            ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder} --framework {SdkTemplateTargetFramework}", out string stdOut, out string stdError, out int exitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
             Assert.AreEqual(exitCode, 0);
             UseLocallyBuiltTestSdk(projectFolder);
             ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out stdOut, out stdError, out exitCode);

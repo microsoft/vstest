@@ -49,7 +49,7 @@ public class DotnetHostArchitectureVerifierTests : IntegrationTestBase
         // on a network isolated agent.
         WriteNuGetConfigToTempDirectory();
 
-        ExecuteApplication(dotnetPath, "new mstest", out _, out _, out _, environmentVariables, TempDirectory.Path);
+        ExecuteApplication(dotnetPath, $"new mstest --framework {AcceptanceTestBase.SdkTemplateTargetFramework}", out _, out _, out _, environmentVariables, TempDirectory.Path);
         UseLocallyBuiltTestSdk(TempDirectory.Path);
 
         // Patch test file
