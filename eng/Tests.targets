@@ -1,0 +1,33 @@
+<!-- Licensed to the .NET Foundation under one or more agreements. The .NET Foundation licenses this file to you under the MIT license. -->
+<Project>
+
+  <!--
+    OVERRIDES Arcade's _OuterRunTests so a project can run its target frameworks one at a time.
+
+    Arcade 12 runs each target framework of a multi-targeted test project as its own inner build
+    with BuildInParallel="true". Arcade 11 ran them one after another. The acceptance tests use
+    state shared by the whole machine (the vstest.console process count, the postmortem debugger
+    registry key, fixed %TEMP% paths) and build the same test assets into the same folders, so
+    their net48 and net9.0 runs must not overlap. Such projects set
+    TestTargetFrameworksInParallel to false.
+
+    This is Arcade's target with only BuildInParallel changed.
+  -->
+  <PropertyGroup>
+    <TestTargetFrameworksInParallel Condition="'$(TestTargetFrameworksInParallel)' == ''">true</TestTargetFrameworksInParallel>
+  </PropertyGroup>
+
+  <Target Name="_OuterRunTests" Returns="@(FileWrites)">
+    <ItemGroup>
+      <_TargetFramework Include="$(TargetFrameworks)" />
+      <_InnerTestBuild Include="$(MSBuildProjectFile)"
+                       AdditionalProperties="TargetFramework=%(_TargetFramework.Identity)" />
+    </ItemGroup>
+    <MSBuild Projects="@(_InnerTestBuild)"
+             Targets="_InnerRunTests"
+             BuildInParallel="$(TestTargetFrameworksInParallel)">
+      <Output ItemName="FileWrites" TaskParameter="TargetOutputs" />
+    </MSBuild>
+  </Target>
+
+</Project>

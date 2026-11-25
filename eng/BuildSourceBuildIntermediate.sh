@@ -26,29 +26,59 @@ if [[ "${1:-}" == "--inner-legacy" ]]; then
     echo "The private copy is missing its pinned toolchain metadata." >&2
     exit 1
   fi
-  sdk_count="$(grep -Fc '11.0.100' "$global" || true)"
-  global_arcade_count="$(grep -Fc '11.0.0-beta.26421.2' "$global" || true)"
-  details_arcade_count="$(grep -Fc '11.0.0-beta.26421.2' "$details" || true)"
-  details_sha_count="$(grep -Fc '51abc19095ae366ecb773826993966dc8a1063eb' "$details" || true)"
-  printf 'sdk=%s global-arcade=%s details-arcade=%s details-sha=%s\n' \
-    "$sdk_count" "$global_arcade_count" "$details_arcade_count" "$details_sha_count" >> "$diagnostic"
-  if [[ "$sdk_count" -ne 2 || "$global_arcade_count" -ne 1 ||
-        "$details_arcade_count" -ne 3 || "$details_sha_count" -ne 3 ]]; then
+  # The pins come from the outer checkout, so weekly Arcade and SDK updates need no edits here.
+  if ! cmp -s "$outer_root/global.json" "$global" ||
+     ! cmp -s "$outer_root/eng/Version.Details.xml" "$details"; then
     echo "The copied source-build toolchain differs from its pinned input." >&2
     exit 1
   fi
-  sed -i 's/11\.0\.100/10.0.404/g' "$global"
-  sed -i 's/11\.0\.0-beta\.26421\.2/9.0.0-beta.25164.2/g' "$global" "$details"
-  sed -i 's/51abc19095ae366ecb773826993966dc8a1063eb/5ba9ca776c1d0bb72b2791591e54cf51fc52dfee/g' "$details"
+  escape() { printf '%s' "$1" | sed 's/[][\.*^$/]/\\&/g'; }
+  sdk_version="$(sed -n 's/^[[:space:]]*"version":[[:space:]]*"\([^"]*\)".*/\1/p' "$global" | head -n 1)"
+  tools_sdk_version="$(sed -n 's/^[[:space:]]*"dotnet":[[:space:]]*"\([^"]*\)".*/\1/p' "$global")"
+  arcade_version="$(sed -n 's/.*"Microsoft\.DotNet\.Arcade\.Sdk":[[:space:]]*"\([^"]*\)".*/\1/p' "$global")"
+  sdk_count="$(grep -Fc "\"$sdk_version\"" "$global" || true)"
+  global_arcade_count="$(grep -Fc "\"$arcade_version\"" "$global" || true)"
+  arcade_dependencies="$(grep -Fc '<Uri>https://github.com/dotnet/arcade</Uri>' "$details" || true)"
+  printf 'sdk=%s arcade=%s sdk-count=%s global-arcade=%s arcade-dependencies=%s\n' \
+    "$sdk_version" "$arcade_version" "$sdk_count" "$global_arcade_count" "$arcade_dependencies" >> "$diagnostic"
+  if [[ -z "$sdk_version" || "$sdk_version" != "$tools_sdk_version" || -z "$arcade_version" ||
+        "$sdk_count" -ne 2 || "$global_arcade_count" -ne 1 || "$arcade_dependencies" -lt 1 ]] ||
+     ! grep -Fq "<Dependency Name=\"Microsoft.DotNet.Arcade.Sdk\" Version=\"$arcade_version\">" "$details"; then
+    echo "The copied source-build toolchain has unexpected pins." >&2
+    exit 1
+  fi
+  sed -i "s/\"$(escape "$sdk_version")\"/\"10.0.404\"/g" "$global"
+  sed -i "s/\"$(escape "$arcade_version")\"/\"9.0.0-beta.25164.2\"/g" "$global"
+  # Point every dotnet/arcade dependency, including the source-build intermediate, at Arcade 9.
+  awk -v version=9.0.0-beta.25164.2 -v sha=5ba9ca776c1d0bb72b2791591e54cf51fc52dfee '
+    function flush() {
+      if (block ~ /<Uri>https:\/\/github\.com\/dotnet\/arcade<\/Uri>/) {
+        sub(/Version="[^"]*"/, "Version=\"" version "\"", block)
+        sub(/<Sha>[^<]*<\/Sha>/, "<Sha>" sha "</Sha>", block)
+      }
+      printf "%s", block
+      block = ""
+      inside = 0
+    }
+    inside { block = block $0 ORS; if ($0 ~ /<\/Dependency>/) flush(); next }
+    /<Dependency[[:space:]]/ { inside = 1; block = $0 ORS; if ($0 ~ /<\/Dependency>/) flush(); next }
+    { print }
+    END { if (inside) exit 1 }' "$details" > "$details.tmp"
+  mv "$details.tmp" "$details"
+  if [[ $(grep -Fc '9.0.0-beta.25164.2' "$details" || true) -ne "$arcade_dependencies" ||
+        $(grep -Fc '5ba9ca776c1d0bb72b2791591e54cf51fc52dfee' "$details" || true) -ne "$arcade_dependencies" ]]; then
+    echo "Could not pin the copied Arcade dependencies to Arcade 9." >&2
+    exit 1
+  fi
   printf 'toolchain=historical-pins-applied\n' >> "$diagnostic"
   compat_global="$outer_root/artifacts/sourcebuild-intermediate/global.json"
   if [[ ! -f "$compat_global" ||
-        $(grep -Fc '11.0.100' "$compat_global" || true) -ne 1 ||
+        $(grep -Fc "\"$sdk_version\"" "$compat_global" || true) -ne 1 ||
         $(grep -Fc '9.0.0-beta.25164.2' "$compat_global" || true) -ne 1 ]]; then
     echo "The temporary Arcade 9 tool project has an unexpected SDK pin." >&2
     exit 1
   fi
-  sed -i 's/11\.0\.100/10.0.404/g' "$compat_global"
+  sed -i "s/\"$(escape "$sdk_version")\"/\"10.0.404\"/g" "$compat_global"
   printf 'compat-sdk=10.0.404\n' >> "$diagnostic"
   if [[ ! -d "$outer_root/.dotnet/sdk/10.0.404" ]]; then
     printf 'compat-sdk-install=started\n' >> "$diagnostic"
@@ -67,7 +97,7 @@ if [[ "${1:-}" == "--inner-legacy" ]]; then
     printf 'compat-sdk-install=already-present\n' >> "$diagnostic"
   fi
   printf 'sdk-selected=%s\n' "$("$dotnet" --version)" >> "$diagnostic"
-  previous_sdks="$outer_root/.dotnet/sdk/11.0.100/Sdks"
+  previous_sdks="$outer_root/.dotnet/sdk/$sdk_version/Sdks"
   historical_sdks="$outer_root/.dotnet/sdk/10.0.404/Sdks"
   if [[ ( -n "${MSBuildSDKsPath:-}" && "$MSBuildSDKsPath" != "$previous_sdks" ) ||
         ! -d "$historical_sdks" ]]; then

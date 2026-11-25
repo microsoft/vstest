@@ -9,6 +9,8 @@
   <PropertyGroup>
     <OutputType Condition=" $([MSBuild]::IsTargetFrameworkCompatible('$(TargetFramework)', '$(NetCoreAppMinimum)')) ">Exe</OutputType>
     <TargetFrameworks>net9.0;net48</TargetFrameworks>
+    <!-- The tests share machine-wide state, so the target frameworks must not run at the same time. See eng/Tests.targets. -->
+    <TestTargetFrameworksInParallel>false</TestTargetFrameworksInParallel>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="TestAssets\**" />
