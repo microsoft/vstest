@@ -9,10 +9,10 @@
   <PropertyGroup>
     <VersionPrefix>16.11.1</VersionPrefix>
     <PreReleaseVersionLabel>release</PreReleaseVersionLabel>
-    <PreReleaseVersionIteration></PreReleaseVersionIteration>
+    <PreReleaseVersionIteration>
+    </PreReleaseVersionIteration>
     <!-- AssemblyVersion is pinned at 15.0.0 because the wire protocol serializes against it. -->
     <AssemblyVersion>15.0.0</AssemblyVersion>
-
     <!-- Arcade would otherwise add implicit test-package references. 16.11 pins its own MSTest,
          xunit and NUnit versions in scripts/build/TestPlatform.Dependencies.props, and a second
          implicit reference is NETSDK1023 on every test project. -->

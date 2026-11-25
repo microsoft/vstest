@@ -26,9 +26,8 @@
     So: netcore goes through the console this build produced, .NET Framework stays on Arcade's
     `dotnet test` path, untouched. The change is reversible per framework rather than per branch.
 
-    Every scheduled netcore suite must write a nonempty TRX. A failing netcore target prevents
-    Arcade from running the remaining target frameworks of that project, so the .NET Framework
-    result count must also remain intact.
+    Every scheduled netcore suite must write a nonempty TRX, and the .NET Framework result count
+    must also remain intact.
   -->
 
   <Target Name="RunTests"
@@ -158,6 +157,34 @@
     <ItemGroup>
       <FileWrites Include="@(_OutputFiles)"/>
     </ItemGroup>
+  </Target>
+
+  <!--
+    OVERRIDES Arcade's _OuterRunTests to run a project's target frameworks ONE AT A TIME.
+
+    Arcade 12 dispatches each target framework of a multi-targeted test project as its own inner
+    build with BuildInParallel="true". Arcade 11 collected the tests of every target framework
+    first and ran them one after another. This line's unit tests write fixed file names under
+    %TEMP% (for example %TEMP%\Test in BlameCollectorTests and
+    %TEMP%\InitializeShouldPreserveActualJapaneseString.runsettings in RunSettingsArgumentProcessorTests),
+    so the net4x and netcoreapp2.1 runs of the same project now collide with
+    "The process cannot access the file ... because it is being used by another process".
+
+    This is Arcade's target with only BuildInParallel changed. Different projects still run in
+    parallel. The MSBuild task keeps its default StopOnFirstFailure=false, so a failing target
+    framework does not stop the next one.
+  -->
+  <Target Name="_OuterRunTests" Returns="@(FileWrites)">
+    <ItemGroup>
+      <_TargetFramework Include="$(TargetFrameworks)" />
+      <_InnerTestBuild Include="$(MSBuildProjectFile)"
+                       AdditionalProperties="TargetFramework=%(_TargetFramework.Identity)" />
+    </ItemGroup>
+    <MSBuild Projects="@(_InnerTestBuild)"
+             Targets="_InnerRunTests"
+             BuildInParallel="false">
+      <Output ItemName="FileWrites" TaskParameter="TargetOutputs" />
+    </MSBuild>
   </Target>
 
 </Project>

@@ -1,20 +1,34 @@
 {
   "sdk": {
-    "version": "11.0.100",
-    "paths": [ ".dotnet", "$host$" ],
+    "version": "12.0.100-alpha.1.26555.106",
+    "paths": [
+      ".dotnet",
+      "$host$"
+    ],
     "errorMessage": "The .NET SDK could not be found, please run ./build.cmd on Windows or ./build.sh on Linux and macOS.",
     "rollForward": "minor",
     "allowPrerelease": false,
     "architecture": "x64"
   },
   "tools": {
-    "dotnet": "11.0.100",
+    "dotnet": "12.0.100-alpha.1.26555.106",
     "runtimes": {
-      "dotnet/x64": [ "1.0.16", "1.1.13", "2.1.30", "3.1.32", "5.0.0" ],
-      "dotnet/x86": [ "1.0.16", "1.1.13", "2.1.30", "3.1.32" ]
+      "dotnet/x64": [
+        "1.0.16",
+        "1.1.13",
+        "2.1.30",
+        "3.1.32",
+        "5.0.0"
+      ],
+      "dotnet/x86": [
+        "1.0.16",
+        "1.1.13",
+        "2.1.30",
+        "3.1.32"
+      ]
     }
   },
   "msbuild-sdks": {
-    "Microsoft.DotNet.Arcade.Sdk": "11.0.0-beta.26421.2"
+    "Microsoft.DotNet.Arcade.Sdk": "12.0.0-beta.26569.6"
   }
 }
