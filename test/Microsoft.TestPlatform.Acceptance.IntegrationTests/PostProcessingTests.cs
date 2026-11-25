@@ -42,7 +42,7 @@ public class PostProcessingTests : AcceptanceTestBase
         // Create and build a single test project once, then reuse it for all parallel vstest runs.
         string projectFolder = Path.Combine(TempDirectory.Path, "testproject");
             // Give this test its own template cache; the shared one races with other scaffolds.
-        ExecuteApplication(GetConsoleRunnerPath(), $"new mstest -o {projectFolder}", out string setupStdOut, out string setupStdError, out int setupExitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
+        ExecuteApplication(GetConsoleRunnerPath(), $"new mstest --framework {Core12TargetFramework} -o {projectFolder}", out string setupStdOut, out string setupStdError, out int setupExitCode, new Dictionary<string, string> { ["DOTNET_CLI_HOME"] = CreateIsolatedTemplateEngineHome(TempDirectory.Path) });
         Assert.AreEqual(0, setupExitCode);
         UseLocallyBuiltTestSdk(projectFolder);
         ExecuteApplication(GetConsoleRunnerPath(), $"build {projectFolder} -c release", out setupStdOut, out setupStdError, out setupExitCode);
