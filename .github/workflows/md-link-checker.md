@@ -28,7 +28,7 @@ network:
     - github
 steps:
   - name: Checkout repository
-    uses: actions/checkout@v4
+    uses: actions/checkout@v7.0.1
     with:
       fetch-depth: 0
       persist-credentials: false
@@ -48,10 +48,15 @@ tools:
   edit:
 
 safe-outputs:
+  github-app:
+    client-id: ${{ vars.APP_ID }}
+    private-key: ${{ secrets.APP_PRIVATE_KEY }}
+    ignore-if-missing: true
   create-pull-request:
     title-prefix: "[md-link-checker] "
     labels: ["Area: Documentation", "agentic-workflows"]
     draft: false
+    github-token-for-extra-empty-commit: app
     protected-files: fallback-to-issue
     if-no-changes: "warn"
   create-issue:

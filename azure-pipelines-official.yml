@@ -156,6 +156,15 @@ extends:
               name: $(DncEngInternalBuildPool)
               image: windows.vs2026preview.scout.amd64
               os: windows
+            templateContext:
+              outputs:
+              - ${{ if eq(parameters.isRTM, True) }}:
+                - output: pipelineArtifact
+                  displayName: Publish ReleasePackages
+                  targetPath: '$(Build.ArtifactStagingDirectory)\ReleasePackages'
+                  artifactName: ReleasePackages
+                  sbomEnabled: false
+                  condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
             steps:
             # This steps help to understand versions of .NET runtime installed on the machine,
             # which is useful to diagnose some governance issues.
@@ -235,6 +244,23 @@ extends:
                 PathtoPublish: '$(Build.SourcesDirectory)/artifacts/VSSetup/Release'
                 ArtifactName: VSSetupArtifacts
 
+            - ${{ if eq(parameters.isRTM, True) }}:
+              - pwsh: |
+                  $ErrorActionPreference = 'Stop'
+                  $source = "$(Build.SourcesDirectory)\artifacts\packages\Release\Shipping"
+                  $destination = "$(Build.ArtifactStagingDirectory)\ReleasePackages"
+                  $packages = @(Get-ChildItem -LiteralPath $source -Filter '*.nupkg' -File |
+                    Where-Object { $_.Name -notlike '*.symbols.nupkg' })
+                  if ($packages.Count -eq 0) {
+                    throw "No shipping NuGet packages were found in '$source'."
+                  }
+                  New-Item -ItemType Directory -Path $destination -Force | Out-Null
+                  foreach ($package in $packages) {
+                    Copy-Item -LiteralPath $package.FullName -Destination $destination
+                  }
+                displayName: Stage ReleasePackages
+                condition: and(succeeded(), eq(variables['System.TeamProject'], 'internal'), ne(variables['Build.Reason'], 'PullRequest'))
+
           - ${{ each pool in parameters.otherOsPools }}:
             - job: ${{ pool.os }}
               dependsOn: Windows
@@ -249,6 +275,21 @@ extends:
               - checkout: self
                 fetchDepth: 1
                 clean: true
+
+              - ${{ if eq(pool.os, 'linux') }}:
+                # A regular interactive login creates /run/user/<uid> (the XDG_RUNTIME_DIR convention) via
+                # pam_systemd, which the artifacts-directory fallback (GetUserPrivateTempPath) relies on as
+                # the current user's private temporary directory. The hosted agent never logs in that way, so
+                # the directory is missing and that fallback path goes untested. Create it here the same way a
+                # login session would, rather than loosening the product code or the tests to tolerate it
+                # being absent.
+                - script: |
+                    set -e
+                    uid=$(id -u)
+                    sudo mkdir -p "/run/user/$uid"
+                    sudo chown "$uid" "/run/user/$uid"
+                    sudo chmod 700 "/run/user/$uid"
+                  displayName: Ensure the XDG runtime directory exists
 
               # Build but don't pack, packing does not work on non-windows and we want to test what we built on Windows
               # anyway. Because that is what we will publish.
