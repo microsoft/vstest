@@ -4,7 +4,6 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -381,23 +380,12 @@ public class Build : IntegrationTestBase
         {
             var packagePath = Path.Combine(IntegrationTestEnvironment.LocalPackageSource, packageName);
             var unzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName);
-
-            // The other target framework's test process may already run tests from this folder,
-            // so leave an up-to-date extraction alone instead of deleting it.
-            var cacheMarkerPath = Path.Combine(unzipPath, packageName + ".cache");
-            var packageStamp = File.GetLastWriteTimeUtc(packagePath).ToString("o", CultureInfo.InvariantCulture);
-            if (File.Exists(cacheMarkerPath) && File.ReadAllText(cacheMarkerPath) == packageStamp)
-            {
-                continue;
-            }
-
             if (Directory.Exists(unzipPath))
             {
                 Directory.Delete(unzipPath, recursive: true);
             }
 
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
-            File.WriteAllText(cacheMarkerPath, packageStamp);
         }
     }
 }
