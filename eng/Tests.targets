@@ -1,0 +1,23 @@
+<Project>
+  <!--
+    Arcade 12 runs the target frameworks of a test project in parallel. Redefine its _OuterRunTests
+    so a project can opt out with TestTargetFrameworksInParallel=false. Arcade imports this file
+    after its own Tests.targets, so this definition wins.
+  -->
+  <PropertyGroup>
+    <TestTargetFrameworksInParallel Condition="'$(TestTargetFrameworksInParallel)' == ''">true</TestTargetFrameworksInParallel>
+  </PropertyGroup>
+
+  <Target Name="_OuterRunTests" Returns="@(FileWrites)">
+    <ItemGroup>
+      <_TargetFramework Include="$(TargetFrameworks)" />
+      <_InnerTestBuild Include="$(MSBuildProjectFile)"
+                       AdditionalProperties="TargetFramework=%(_TargetFramework.Identity)" />
+    </ItemGroup>
+    <MSBuild Projects="@(_InnerTestBuild)"
+             Targets="_InnerRunTests"
+             BuildInParallel="$(TestTargetFrameworksInParallel)">
+      <Output ItemName="FileWrites" TaskParameter="TargetOutputs" />
+    </MSBuild>
+  </Target>
+</Project>

@@ -9,6 +9,8 @@
   <PropertyGroup>
     <OutputType Condition=" $(TargetFramework.StartsWith('net6')) ">Exe</OutputType>
     <TargetFrameworks>net6.0;net48</TargetFrameworks>
+    <!-- Each target framework builds the same test assets and uses machine-wide state, so run them one after another. -->
+    <TestTargetFrameworksInParallel>false</TestTargetFrameworksInParallel>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="TestAssets\**" />
