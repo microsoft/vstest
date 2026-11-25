@@ -4,15 +4,11 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
-using System.Globalization;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -34,36 +30,9 @@ public class Build : IntegrationTestBase
     public static void AssemblyInitialize(TestContext _)
     {
         SetDotnetEnvironment();
-
-        // Arcade runs each target framework of this project in parallel, and every test process
-        // builds the same test assets into the same folders. Take turns, per repo checkout.
-        using var mutex = new Mutex(initiallyOwned: false, GetBuildMutexName());
-        try
-        {
-            mutex.WaitOne();
-        }
-        catch (AbandonedMutexException)
-        {
-            // The previous owner exited without releasing the mutex; we own it now.
-        }
-
-        try
-        {
-            BuildTestAssetsAndUnzipPackages();
-            BuildTestAssetsCompatibility();
-            CopyAndPatchDotnet();
-        }
-        finally
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
-    private static string GetBuildMutexName()
-    {
-        using var sha256 = SHA256.Create();
-        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(Root.ToUpperInvariant()));
-        return @"Global\vstest-acceptance-build-" + BitConverter.ToString(hash).Replace("-", string.Empty);
+        BuildTestAssetsAndUnzipPackages();
+        BuildTestAssetsCompatibility();
+        CopyAndPatchDotnet();
     }
 
     private static void SetDotnetEnvironment()
@@ -81,30 +50,9 @@ public class Build : IntegrationTestBase
     private static void CopyAndPatchDotnet()
     {
         var patchedDotnetDir = IntegrationTestEnvironment.PatchedDotnetDirectory;
-        var dotnetExe = Path.GetFileName(Dotnet);
-        var originalDotnetExePath = Path.Combine(DotnetDir, dotnetExe);
-        var patchedDotnetExePath = Path.Combine(patchedDotnetDir, dotnetExe);
-        var copyCompletePath = Path.Combine(patchedDotnetDir, ".vstest-sdk-copy-complete");
 
-        // Match main's SDK cache: a later test invocation must not overwrite hostfxr.dll
-        // while a process from the previous invocation is still using the copied SDK.
-        bool skipCopy = File.Exists(copyCompletePath)
-            && File.Exists(originalDotnetExePath)
-            && File.Exists(patchedDotnetExePath)
-            && File.GetLastWriteTime(originalDotnetExePath) == File.GetLastWriteTime(patchedDotnetExePath);
-
-        if (!skipCopy)
-        {
-            // dotnet.exe is copied before hostfxr.dll, so its timestamp alone cannot prove a completed copy.
-            if (File.Exists(copyCompletePath))
-            {
-                File.Delete(copyCompletePath);
-            }
-
-            // Copy dotnet.
-            DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
-            File.WriteAllText(copyCompletePath, string.Empty);
-        }
+        // Copy dotnet.
+        DirectoryUtils.CopyDirectory(new DirectoryInfo(DotnetDir), new DirectoryInfo(patchedDotnetDir));
 
         // Copy target file and build task dll into it.
         var netTestSdkVersion = IntegrationTestEnvironment.LatestLocallyBuiltNugetVersion;
@@ -413,23 +361,12 @@ public class Build : IntegrationTestBase
         {
             var packagePath = Path.Combine(IntegrationTestEnvironment.LocalPackageSource, packageName);
             var unzipPath = Path.Combine(IntegrationTestEnvironment.PublishDirectory, packageName);
-
-            // The other target framework's test process may already run tests from this folder,
-            // so leave an up-to-date extraction alone instead of deleting it.
-            var cacheMarkerPath = Path.Combine(unzipPath, packageName + ".cache");
-            var packageStamp = File.GetLastWriteTimeUtc(packagePath).ToString("o", CultureInfo.InvariantCulture);
-            if (File.Exists(cacheMarkerPath) && File.ReadAllText(cacheMarkerPath) == packageStamp)
-            {
-                continue;
-            }
-
             if (Directory.Exists(unzipPath))
             {
                 Directory.Delete(unzipPath, recursive: true);
             }
 
             ZipFile.ExtractToDirectory(packagePath, unzipPath);
-            File.WriteAllText(cacheMarkerPath, packageStamp);
         }
     }
 }
