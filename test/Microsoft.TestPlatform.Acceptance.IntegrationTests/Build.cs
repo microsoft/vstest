@@ -8,10 +8,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading;
 using System.Xml.Linq;
 
 using Microsoft.TestPlatform.TestUtilities;
@@ -33,36 +30,9 @@ public class Build : IntegrationTestBase
     public static void AssemblyInitialize(TestContext _)
     {
         SetDotnetEnvironment();
-
-        // Arcade runs each target framework of this project in parallel, and every test process
-        // builds the same test assets into the same folders. Take turns, per repo checkout.
-        using var mutex = new Mutex(initiallyOwned: false, GetBuildMutexName());
-        try
-        {
-            mutex.WaitOne();
-        }
-        catch (AbandonedMutexException)
-        {
-            // The previous owner exited without releasing the mutex; we own it now.
-        }
-
-        try
-        {
-            BuildTestAssetsAndUnzipPackages();
-            BuildTestAssetsCompatibility();
-            CopyAndPatchDotnet();
-        }
-        finally
-        {
-            mutex.ReleaseMutex();
-        }
-    }
-
-    private static string GetBuildMutexName()
-    {
-        using var sha256 = SHA256.Create();
-        var hash = sha256.ComputeHash(Encoding.UTF8.GetBytes(Root.ToUpperInvariant()));
-        return @"Global\vstest-acceptance-build-" + BitConverter.ToString(hash).Replace("-", string.Empty);
+        BuildTestAssetsAndUnzipPackages();
+        BuildTestAssetsCompatibility();
+        CopyAndPatchDotnet();
     }
 
     private static void SetDotnetEnvironment()
