@@ -1290,52 +1290,52 @@ public class TestRequestManagerTests
     [TestMethod]
     public void RunTestsIfThrowsTestPlatformExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<TestPlatformException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new TestPlatformException("HelloWorld")));
+        Assert.ThrowsExactly<TestPlatformException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new TestPlatformException("HelloWorld")));
     }
 
     [TestMethod]
     public void RunTestsIfThrowsSettingsExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<SettingsException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new SettingsException("HelloWorld")));
+        Assert.ThrowsExactly<SettingsException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new SettingsException("HelloWorld")));
     }
 
     [TestMethod]
     public void RunTestsIfThrowsInvalidOperationExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<InvalidOperationException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new InvalidOperationException("HelloWorld")));
+        Assert.ThrowsExactly<InvalidOperationException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new InvalidOperationException("HelloWorld")));
     }
 
     [TestMethod]
     public void RunTestsIfThrowsExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<NotImplementedException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new NotImplementedException("HelloWorld")));
+        Assert.ThrowsExactly<NotImplementedException>(() => RunTestsIfThrowsExceptionShouldThrowOut(new NotImplementedException("HelloWorld")));
     }
 
     [TestMethod]
     public void DiscoverTestsIfThrowsTestPlatformExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<TestPlatformException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new TestPlatformException("HelloWorld")));
+        Assert.ThrowsExactly<TestPlatformException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new TestPlatformException("HelloWorld")));
     }
 
     [TestMethod]
     public void DiscoverTestsIfThrowsSettingsExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<SettingsException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new SettingsException("HelloWorld")));
+        Assert.ThrowsExactly<SettingsException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new SettingsException("HelloWorld")));
     }
 
     [TestMethod]
     public void DiscoverTestsIfThrowsInvalidOperationExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<InvalidOperationException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new InvalidOperationException("HelloWorld")));
+        Assert.ThrowsExactly<InvalidOperationException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new InvalidOperationException("HelloWorld")));
     }
 
     [TestMethod]
     public void DiscoverTestsIfThrowsExceptionShouldThrowOut()
     {
-        Assert.ThrowsException<NotImplementedException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new NotImplementedException("HelloWorld")));
+        Assert.ThrowsExactly<NotImplementedException>(() => DiscoverTestsIfThrowsExceptionShouldThrowOut(new NotImplementedException("HelloWorld")));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void DiscoverTestsShouldUpdateDesignModeAndCollectSourceInformation(bool designModeValue)
@@ -1369,7 +1369,7 @@ public class TestRequestManagerTests
             tp => tp.CreateDiscoveryRequest(It.IsAny<IRequestData>(), It.Is<DiscoveryCriteria>(dc => dc.RunSettings!.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void RunTestsShouldUpdateDesignModeIfRunnerIsInDesignMode(bool designModeValue)
@@ -1389,7 +1389,7 @@ public class TestRequestManagerTests
         _mockTestPlatform.Verify(tp => tp.CreateTestRunRequest(It.IsAny<IRequestData>(), It.Is<TestRunCriteria>(rc => rc.TestRunSettings!.Contains(designmode)), It.IsAny<TestPlatformOptions>(), It.IsAny<Dictionary<string, SourceDetail>>(), It.IsAny<IWarningLogger>()));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void DiscoverTestsShouldNotUpdateCollectSourceInformationIfUserHasSetItInRunSettings(bool val)
@@ -2561,10 +2561,10 @@ public class TestRequestManagerTests
                 Assert.IsNotNull(eventArgs.TestSessionInfo);
                 Assert.IsNotNull(eventArgs.Metrics);
                 Assert.AreEqual(eventArgs.TestSessionInfo, testSessionInfo);
-                Assert.AreEqual(eventArgs.IsStopped, false);
+                Assert.AreEqual(false, eventArgs.IsStopped);
             });
 
-        Assert.ThrowsException<Exception>(() =>
+        Assert.ThrowsExactly<Exception>(() =>
             _testRequestManager.StopTestSession(
                 new()
                 {

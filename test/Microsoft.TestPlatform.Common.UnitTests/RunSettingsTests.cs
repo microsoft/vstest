@@ -30,14 +30,14 @@ public class RunSettingsTests
     public void LoadSettingsXmlShouldThrowOnNullSettings()
     {
         var runSettings = new RunSettings();
-        Assert.ThrowsException<ArgumentException>(() => runSettings.LoadSettingsXml(null!));
+        Assert.ThrowsExactly<ArgumentException>(() => runSettings.LoadSettingsXml(null!));
     }
 
     [TestMethod]
     public void LoadSettingsXmlShouldThrowOnEmptySettings()
     {
         var runSettings = new RunSettings();
-        Assert.ThrowsException<ArgumentException>(() => runSettings.LoadSettingsXml("  "));
+        Assert.ThrowsExactly<ArgumentException>(() => runSettings.LoadSettingsXml("  "));
     }
 
     [TestMethod]
@@ -63,7 +63,7 @@ public class RunSettingsTests
         var runSettings = new RunSettings();
         var invalidSettings = GetInvalidRunSettings();
 
-        Assert.ThrowsException<SettingsException>(
+        Assert.ThrowsExactly<SettingsException>(
             () => runSettings.LoadSettingsXml(invalidSettings),
             "An error occurred while loading the run settings.");
     }
@@ -76,7 +76,7 @@ public class RunSettingsTests
     public void InitializeSettingsProvidersShouldThrowOnNullSettings()
     {
         var runSettings = new RunSettings();
-        Assert.ThrowsException<ArgumentNullException>(() => runSettings.InitializeSettingsProviders(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => runSettings.InitializeSettingsProviders(null!));
     }
 
     [TestMethod]
@@ -100,10 +100,9 @@ public class RunSettingsTests
         Action action =
             () => runSettings.GetSettings("OrphanNode");
 
-        Assert.ThrowsException<SettingsException>(
+        Assert.ThrowsExactly<SettingsException>(
             action,
-            "Settings Provider named '{0}' was not found.  The settings can not be loaded.",
-            "OrphanNode");
+            "Settings Provider named 'OrphanNode' was not found.  The settings can not be loaded.");
     }
 
     [TestMethod]
@@ -117,17 +116,16 @@ public class RunSettingsTests
         Action action =
             () => runSettings.GetSettings("BadSettings");
 
-        Assert.ThrowsException<SettingsException>(
+        Assert.ThrowsExactly<SettingsException>(
             action,
-            "An error occurred while initializing the settings provider named '{0}'",
-            "BadSettings");
+            "An error occurred while initializing the settings provider named 'BadSettings'");
     }
 
     [TestMethod]
     public void InitializeSettingsProvidersShouldThrowIfInvalidRunSettingsIsPassed()
     {
         var runSettings = new RunSettings();
-        Assert.ThrowsException<SettingsException>(
+        Assert.ThrowsExactly<SettingsException>(
             () => runSettings.InitializeSettingsProviders(GetInvalidRunSettings()),
             "An error occurred while loading the run settings.");
     }
@@ -137,7 +135,7 @@ public class RunSettingsTests
     {
         var runSettings = new RunSettings();
         runSettings.InitializeSettingsProviders(GetEmptyRunSettings());
-        Assert.ThrowsException<InvalidOperationException>(
+        Assert.ThrowsExactly<InvalidOperationException>(
             () => runSettings.InitializeSettingsProviders(GetEmptyRunSettings()),
             "The Run Settings have already been loaded.");
     }
@@ -211,7 +209,7 @@ public class RunSettingsTests
     {
         var runSettings = new RunSettings();
 
-        Assert.ThrowsException<ArgumentException>(() => runSettings.GetSettings(null!));
+        Assert.ThrowsExactly<ArgumentException>(() => runSettings.GetSettings(null!));
     }
 
     [TestMethod]
@@ -219,7 +217,7 @@ public class RunSettingsTests
     {
         var runSettings = new RunSettings();
 
-        Assert.ThrowsException<ArgumentException>(() => runSettings.GetSettings("  "));
+        Assert.ThrowsExactly<ArgumentException>(() => runSettings.GetSettings("  "));
     }
 
     // The remaining GetSettings tests are covered in the InitializeSettingsProviders tests above.

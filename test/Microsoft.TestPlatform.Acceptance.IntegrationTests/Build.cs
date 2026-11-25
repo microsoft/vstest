@@ -30,7 +30,7 @@ public class Build : IntegrationTestBase
     public static void AssemblyInitialize(TestContext context)
     {
         SetDotnetEnvironment();
-        if (bool.TryParse(context.Properties["SkipIntegrationTestBuild"]?.ToString(), out var skipBuild) && skipBuild)
+        if (context.Properties.TryGetValue("SkipIntegrationTestBuild", out var skipValue) && bool.TryParse(skipValue?.ToString(), out var skipBuild) && skipBuild)
         {
             return;
         }

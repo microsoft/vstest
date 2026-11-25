@@ -58,7 +58,7 @@ public class DiscoveryRequestTests
     {
         _discoveryRequest.Dispose();
 
-        Assert.ThrowsException<ObjectDisposedException>(() => _discoveryRequest.DiscoverAsync());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _discoveryRequest.DiscoverAsync());
     }
 
     [TestMethod]
@@ -90,10 +90,10 @@ public class DiscoveryRequestTests
     public void AbortIfDiscoveryRequestDisposedShouldThrowObjectDisposedException()
     {
         _discoveryRequest.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => _discoveryRequest.Abort());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _discoveryRequest.Abort());
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DynamicData(nameof(ProtocolConfigVersionProvider))]
     public void AbortIfDiscoveryIsinProgressShouldCallDiscoveryManagerAbort(int version)
     {
@@ -128,7 +128,7 @@ public class DiscoveryRequestTests
     public void WaitForCompletionIfDiscoveryRequestDisposedShouldThrowObjectDisposedException()
     {
         _discoveryRequest.Dispose();
-        Assert.ThrowsException<ObjectDisposedException>(() => _discoveryRequest.WaitForCompletion());
+        Assert.ThrowsExactly<ObjectDisposedException>(() => _discoveryRequest.WaitForCompletion());
     }
 
     [TestMethod]

@@ -164,7 +164,7 @@ public class PortArgumentProcessorTests
 
         int port = 2345;
         _executor.Initialize(port.ToString(CultureInfo.InvariantCulture));
-        Assert.ThrowsException<CommandLineException>(() => _executor.Execute());
+        Assert.ThrowsExactly<CommandLineException>(() => _executor.Execute());
 
         _testDesignModeClient.Verify(td => td.ConnectToClientAndProcessRequests(port, _testRequestManager.Object), Times.Once);
     }

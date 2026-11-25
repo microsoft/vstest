@@ -58,16 +58,16 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
 
     protected static string GetCoverageFileNameFromTrx(string trxFilePath, string resultsDirectory)
     {
-        Assert.IsTrue(File.Exists(trxFilePath), "Trx file not found: {0}", trxFilePath);
+        Assert.IsTrue(File.Exists(trxFilePath), $"Trx file not found: {trxFilePath}");
         XmlDocument doc = new();
         using var trxStream = new FileStream(trxFilePath, FileMode.Open, FileAccess.Read);
         doc.Load(trxStream);
         var deploymentElements = doc.GetElementsByTagName("Deployment");
         Assert.IsTrue(deploymentElements.Count == 1,
-            "None or more than one Deployment tags found in trx file:{0}", trxFilePath);
+            $"None or more than one Deployment tags found in trx file:{trxFilePath}");
         var deploymentDir = deploymentElements[0]!.Attributes!.GetNamedItem("runDeploymentRoot")?.Value;
         Assert.IsTrue(string.IsNullOrEmpty(deploymentDir) == false,
-            "runDeploymentRoot attribute not found in trx file:{0}", trxFilePath);
+            $"runDeploymentRoot attribute not found in trx file:{trxFilePath}");
         var collectors = doc.GetElementsByTagName("Collector");
 
         string? fileName = string.Empty;
@@ -81,8 +81,7 @@ public class CodeCoverageAcceptanceTestBase : AcceptanceTestBase
             }
         }
 
-        Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, "Coverage file name not found in trx file: {0}",
-            trxFilePath);
+        Assert.IsTrue(string.IsNullOrEmpty(fileName) == false, $"Coverage file name not found in trx file: {trxFilePath}");
         return Path.Combine(resultsDirectory, deploymentDir, "In", fileName);
     }
 

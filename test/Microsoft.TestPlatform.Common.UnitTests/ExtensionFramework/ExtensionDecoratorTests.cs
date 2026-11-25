@@ -126,9 +126,9 @@ public class ExtensionDecoratorTests
         _settingsMock.Setup(x => x.SettingsXml).Returns(nullRunSettings ? null : runsettings);
         _contextMock.Setup(x => x.RunSettings).Returns(_settingsMock.Object);
         _testExecutorMock.Setup(x => x.RunTests(It.IsAny<IEnumerable<TestCase>?>(), It.IsAny<IRunContext?>(), It.IsAny<IFrameworkHandle?>()))
-        .Callback((IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle) => Assert.AreEqual(testCases, tests));
+        .Callback((IEnumerable<TestCase>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle) => Assert.AreSame(testCases, tests));
         _testExecutorMock.Setup(x => x.RunTests(It.IsAny<IEnumerable<string>?>(), It.IsAny<IRunContext?>(), It.IsAny<IFrameworkHandle?>()))
-        .Callback((IEnumerable<string>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle) => Assert.AreEqual(sourcesName, tests));
+        .Callback((IEnumerable<string>? tests, IRunContext? runContext, IFrameworkHandle? frameworkHandle) => Assert.AreSame(sourcesName, tests));
 
         // Run test
         SerialTestRunDecorator serialTestRunDecorator = new(_testExecutorMock.Object);

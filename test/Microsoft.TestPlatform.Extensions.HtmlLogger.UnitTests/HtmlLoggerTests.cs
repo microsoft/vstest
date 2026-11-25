@@ -55,7 +55,7 @@ public class HtmlLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfEventsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () => _htmlLogger.Initialize(null!, _parameters));
     }
 
@@ -67,7 +67,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.Initialize(events.Object, testResultDir);
 
-        Assert.AreEqual(_htmlLogger.TestResultsDirPath, testResultDir);
+        Assert.AreEqual(testResultDir, _htmlLogger.TestResultsDirPath);
         Assert.IsNotNull(_htmlLogger.TestRunDetails);
         Assert.IsNotNull(_htmlLogger.Results);
     }
@@ -75,7 +75,7 @@ public class HtmlLoggerTests
     [TestMethod]
     public void InitializeShouldThrowExceptionIfTestRunDirectoryIsEmptyOrNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(
+        Assert.ThrowsExactly<ArgumentNullException>(
             () =>
             {
                 _events = new Mock<TestLoggerEvents>();
@@ -88,13 +88,13 @@ public class HtmlLoggerTests
     public void InitializeShouldThrowExceptionIfParametersAreEmpty()
     {
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentException>(() => _htmlLogger.Initialize(events.Object, new Dictionary<string, string?>()));
+        Assert.ThrowsExactly<ArgumentException>(() => _htmlLogger.Initialize(events.Object, new Dictionary<string, string?>()));
     }
 
     [TestMethod]
     public void TestMessageHandlerShouldThrowExceptionIfEventArgsIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.TestMessageHandler(new object(), default!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _htmlLogger.TestMessageHandler(new object(), default!));
     }
 
     #endregion
@@ -123,7 +123,7 @@ public class HtmlLoggerTests
     {
         Dictionary<string, string?>? parameters = null;
         var events = new Mock<TestLoggerEvents>();
-        Assert.ThrowsException<ArgumentNullException>(() => _htmlLogger.Initialize(events.Object, parameters!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => _htmlLogger.Initialize(events.Object, parameters!));
     }
 
     [TestMethod]
@@ -495,7 +495,7 @@ public class HtmlLoggerTests
 
         _htmlLogger.Initialize(new Mock<TestLoggerEvents>().Object, parameters);
 
-        Assert.ThrowsException<KeyNotFoundException>(() => _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero)));
+        Assert.ThrowsExactly<KeyNotFoundException>(() => _htmlLogger.TestRunCompleteHandler(new object(), new TestRunCompleteEventArgs(null, false, true, null, null, null, TimeSpan.Zero)));
     }
 
     [TestMethod]
@@ -506,7 +506,7 @@ public class HtmlLoggerTests
         _parameters[HtmlLoggerConstants.LogFilePrefixKey] = "HtmlPrefix";
         _parameters[DefaultLoggerParameterNames.TargetFramework] = ".NETFramework,Version=4.5.1";
 
-        Assert.ThrowsException<ArgumentException>(() => _htmlLogger.Initialize(_events.Object, _parameters));
+        Assert.ThrowsExactly<ArgumentException>(() => _htmlLogger.Initialize(_events.Object, _parameters));
     }
 
     [TestMethod]

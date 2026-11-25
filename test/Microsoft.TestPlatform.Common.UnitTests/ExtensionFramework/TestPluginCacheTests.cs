@@ -259,7 +259,7 @@ public class TestPluginCacheTests
     [TestMethod]
     public void GetResolutionPathsShouldThrowIfExtensionAssemblyIsNull()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => TestPluginCache.GetResolutionPaths(null!));
+        Assert.ThrowsExactly<ArgumentNullException>(() => TestPluginCache.GetResolutionPaths(null!));
     }
 
     [TestMethod]
@@ -335,7 +335,7 @@ public class TestPluginCacheTests
         //TODO : make ITestDiscoverer interface and then mock it in order to make this test case pass.
 
         var extensionAssembly = typeof(TestPluginCacheTests).Assembly.Location;
-        Assert.ThrowsException<Exception>(() => _testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly));
+        Assert.ThrowsExactly<Exception>(() => _testablePluginCache.GetTestExtensions<TestDiscovererPluginInformation, ITestDiscoverer>(extensionAssembly));
     }
 
     #endregion

@@ -38,7 +38,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
 
         var actualCoverageFile = GetCoverageFileNameFromTrx(trxFilePath, TempDirectory.Path);
         Console.WriteLine($@"Coverage file: {actualCoverageFile}  Results directory: {TempDirectory} trxfile: {trxFilePath}");
-        Assert.IsTrue(File.Exists(actualCoverageFile), "Coverage file not found: {0}", actualCoverageFile);
+        Assert.IsTrue(File.Exists(actualCoverageFile), $"Coverage file not found: {actualCoverageFile}");
     }
 
     public override string GetConsoleRunnerPath()
@@ -50,7 +50,7 @@ public class TestPlatformNugetPackageTests : CodeCoverageAcceptanceTestBase
             consoleRunnerPath = Path.Combine(s_nugetPackageFolder, "tools", Net462TargetFramework, "Common7", "IDE", "Extensions", "TestPlatform", "vstest.console.exe");
         }
 
-        Assert.IsTrue(File.Exists(consoleRunnerPath), "GetConsoleRunnerPath: Path not found: \"{0}\"", consoleRunnerPath);
+        Assert.IsTrue(File.Exists(consoleRunnerPath), $"GetConsoleRunnerPath: Path not found: \"{consoleRunnerPath}\"");
         return consoleRunnerPath;
     }
 

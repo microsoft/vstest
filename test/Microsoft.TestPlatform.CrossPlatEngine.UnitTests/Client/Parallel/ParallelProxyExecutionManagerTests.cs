@@ -471,14 +471,14 @@ public class ParallelProxyExecutionManagerTests
                 {
                     if (matchFound)
                     {
-                        Assert.Fail("Concurrreny issue detected: Source['{0}'] got processed twice", processedSrc);
+                        Assert.Fail($"Concurrreny issue detected: Source['{processedSrc}'] got processed twice");
                     }
 
                     matchFound = true;
                 }
             }
 
-            Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
+            Assert.IsTrue(matchFound, $"Concurrency issue detected: Source['{source}'] did NOT get processed at all");
         }
     }
 
@@ -505,13 +505,12 @@ public class ParallelProxyExecutionManagerTests
                 if (processedTest.FullyQualifiedName.Equals(test.FullyQualifiedName))
                 {
                     if (matchFound)
-                        Assert.Fail("Concurrency issue detected: Test['{0}'] got processed twice", test.FullyQualifiedName);
+                        Assert.Fail($"Concurrency issue detected: Test['{test.FullyQualifiedName}'] got processed twice");
                     matchFound = true;
                 }
             }
 
-            Assert.IsTrue(matchFound, "Concurrency issue detected: Test['{0}'] did NOT get processed at all",
-                test.FullyQualifiedName);
+            Assert.IsTrue(matchFound, $"Concurrency issue detected: Test['{test.FullyQualifiedName}'] did NOT get processed at all");
         }
     }
 

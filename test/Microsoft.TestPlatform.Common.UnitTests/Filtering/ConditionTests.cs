@@ -17,21 +17,21 @@ public class ConditionTests
     public void ParseShouldThrownFormatExceptionOnNullConditionString()
     {
         string? conditionString = null;
-        Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        Assert.ThrowsExactly<FormatException>(() => Condition.Parse(conditionString));
     }
 
     [TestMethod]
     public void ParseShouldThrownFormatExceptionOnEmptyConditionString()
     {
         var conditionString = "";
-        Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        Assert.ThrowsExactly<FormatException>(() => Condition.Parse(conditionString));
     }
 
     [TestMethod]
     public void ParseShouldThrownFormatExceptionOnIncompleteConditionString()
     {
         var conditionString = "PropertyName=";
-        Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        Assert.ThrowsExactly<FormatException>(() => Condition.Parse(conditionString));
     }
 
     [TestMethod]
@@ -114,7 +114,7 @@ public class ConditionTests
     {
         var conditionString = @"FullyQualifiedName=Test1(""!"")";
 
-        Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        Assert.ThrowsExactly<FormatException>(() => Condition.Parse(conditionString));
     }
 
     [TestMethod]
@@ -122,13 +122,13 @@ public class ConditionTests
     {
         var conditionString = @"FullyQualifiedName!Test1()";
 
-        Assert.ThrowsException<FormatException>(() => Condition.Parse(conditionString));
+        Assert.ThrowsExactly<FormatException>(() => Condition.Parse(conditionString));
     }
 
     [TestMethod]
     public void TokenizeNullThrowsArgumentNullException()
     {
-        Assert.ThrowsException<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null!), "str");
+        Assert.ThrowsExactly<ArgumentNullException>(() => Condition.TokenizeFilterConditionString(null!), "str");
     }
 
     [TestMethod]

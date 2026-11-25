@@ -148,7 +148,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         var testRequestManager = new TestRequestManager(CommandLineOptions.Instance, TestPlatformFactory.GetTestPlatform(), TestRunResultAggregator.Instance, _mockTestPlatformEventSource.Object, _inferHelper, _mockMetricsPublisherTask, _mockProcessHelper.Object, _mockAttachmentsProcessingManager.Object, _mockEnvironment.Object, _mockEnvironmentVariableHelper.Object);
         var executor = GetExecutor(testRequestManager, null);
 
-        Assert.ThrowsException<CommandLineException>(() => executor.Execute());
+        Assert.ThrowsExactly<CommandLineException>(() => executor.Execute());
     }
 
     [TestMethod]
@@ -166,7 +166,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
 
         var executor = GetExecutor(testRequestManager, null);
 
-        Assert.ThrowsException<TestPlatformException>(() => executor.Execute());
+        Assert.ThrowsExactly<TestPlatformException>(() => executor.Execute());
     }
 
     [TestMethod]
@@ -183,7 +183,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
 
         var listTestsArgumentExecutor = GetExecutor(testRequestManager, null);
 
-        Assert.ThrowsException<SettingsException>(() => listTestsArgumentExecutor.Execute());
+        Assert.ThrowsExactly<SettingsException>(() => listTestsArgumentExecutor.Execute());
     }
 
     [TestMethod]
@@ -202,7 +202,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
 
         var listTestsArgumentExecutor = GetExecutor(testRequestManager, null);
 
-        Assert.ThrowsException<InvalidOperationException>(() => listTestsArgumentExecutor.Execute());
+        Assert.ThrowsExactly<InvalidOperationException>(() => listTestsArgumentExecutor.Execute());
     }
 
     [TestMethod]
@@ -220,7 +220,7 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
 
         var executor = GetExecutor(testRequestManager, null);
 
-        Assert.ThrowsException<Exception>(() => executor.Execute());
+        Assert.ThrowsExactly<Exception>(() => executor.Execute());
     }
 
     [TestMethod]
@@ -255,14 +255,13 @@ public class ListFullyQualifiedTestsArgumentProcessorTests
         Assert.IsFalse(fileOutput.Contains("Test2"));
     }
 
-    [ExpectedException(typeof(CommandLineException))]
     [TestMethod]
     public void ExecutorExecuteShouldThrowWhenListFullyQualifiedTestsTargetPathIsEmpty()
     {
         var mockDiscoveryRequest = new Mock<IDiscoveryRequest>();
         var mockConsoleOutput = new Mock<IOutput>();
 
-        RunListFullyQualifiedTestArgumentProcessorExecuteWithMockSetup(mockDiscoveryRequest, mockConsoleOutput, false);
+        Assert.ThrowsExactly<CommandLineException>(() => RunListFullyQualifiedTestArgumentProcessorExecuteWithMockSetup(mockDiscoveryRequest, mockConsoleOutput, false));
     }
 
     [TestMethod]

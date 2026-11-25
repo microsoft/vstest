@@ -382,14 +382,14 @@ public class ParallelProxyDiscoveryManagerTests
                 {
                     if (matchFound)
                     {
-                        Assert.Fail("Concurrency issue detected: Source['{0}'] got processed twice", processedSrc);
+                        Assert.Fail($"Concurrency issue detected: Source['{processedSrc}'] got processed twice");
                     }
 
                     matchFound = true;
                 }
             }
 
-            Assert.IsTrue(matchFound, "Concurrency issue detected: Source['{0}'] did NOT get processed at all", source);
+            Assert.IsTrue(matchFound, $"Concurrency issue detected: Source['{source}'] did NOT get processed at all");
         }
     }
 

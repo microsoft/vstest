@@ -157,7 +157,7 @@ public class CliRunSettingsArgumentProcessorTests
         var args = new string[] { arg };
         var str = CommandLineResources.MalformedRunSettingsKey;
 
-        CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
+        CommandLineException ex = Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize(args));
 
         Assert.AreEqual(str, ex.Message);
     }
@@ -315,8 +315,8 @@ public class CliRunSettingsArgumentProcessorTests
         Assert.IsFalse(_commandLineOptions.FrameworkVersionSpecified);
     }
 
-    [DynamicData(nameof(TestRunParameterArgValidTestCases), DynamicDataSourceType.Method)]
-    [DataTestMethod]
+    [DynamicData(nameof(TestRunParameterArgValidTestCases))]
+    [TestMethod]
     public void InitializeShouldValidateTestRunParameter(string arg, string runSettingsWithTestRunParameters)
     {
         var args = new string[] { arg };
@@ -327,14 +327,14 @@ public class CliRunSettingsArgumentProcessorTests
         Assert.AreEqual(runSettingsWithTestRunParameters, _settingsProvider.ActiveRunSettings.SettingsXml);
     }
 
-    [DynamicData(nameof(TestRunParameterArgInvalidTestCases), DynamicDataSourceType.Method)]
-    [DataTestMethod]
+    [DynamicData(nameof(TestRunParameterArgInvalidTestCases))]
+    [TestMethod]
     public void InitializeShouldThrowErrorIfTestRunParameterNodeIsInValid(string arg)
     {
         var args = new string[] { arg };
         var str = string.Format(CultureInfo.CurrentCulture, CommandLineResources.InvalidTestRunParameterArgument, arg);
 
-        CommandLineException ex = Assert.ThrowsException<CommandLineException>(() => _executor.Initialize(args));
+        CommandLineException ex = Assert.ThrowsExactly<CommandLineException>(() => _executor.Initialize(args));
 
         Assert.AreEqual(str, ex.Message);
     }

@@ -218,7 +218,7 @@ public class InferRunSettingsHelperTests
         Assert.AreEqual("False", GetValueOf(xmlDocument, "/RunSettings/RunConfiguration/CollectSourceInformation"));
     }
 
-    [DataTestMethod]
+    [TestMethod]
     [DataRow(true)]
     [DataRow(false)]
     public void UpdateDesignModeOrCsiShouldModifyXmlToValueProvided(bool val)
