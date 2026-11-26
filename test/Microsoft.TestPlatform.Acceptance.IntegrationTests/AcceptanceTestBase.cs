@@ -21,6 +21,10 @@ public class AcceptanceTestBase : IntegrationTestBase
     public const string Core50TargetFramework = "net5.0";
     public const string Core60TargetFramework = "net6.0";
 
+    // `dotnet new mstest` defaults to the template's TFM, which can lag behind the SDK in global.json.
+    // The repo-local .dotnet only has that SDK's runtime, so scaffolded projects must target it.
+    public const string SdkTemplateTargetFramework = "net12.0";
+
     public const string DesktopFrameworkArgValue = Net462FrameworkArgValue;
     public const string Net462FrameworkArgValue = ".NETFramework,Version=v4.6.2";
     public const string Net47FrameworkArgValue = ".NETFramework,Version=v4.7";

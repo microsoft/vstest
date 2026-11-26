@@ -13,10 +13,16 @@ fi
 trap 'rm -rf -- "$fixture"' EXIT
 
 inner="$fixture/artifacts/sourcebuild-intermediate/artifacts/sb/src"
-mkdir -p "$inner/eng/common" "$fixture/.dotnet/sdk/11.0.100/Sdks"
-printf '%s\n' '{"sdk":{"version":"11.0.100"},"msbuild-sdks":{"Microsoft.DotNet.Arcade.Sdk":"9.0.0-beta.25164.2"}}' \
+sdk_version="$(sed -n 's/.*"sdk"[^}]*"version": *"\([^"]*\)".*/\1/p' <(tr -d '\r\n' < "$repo_root/global.json"))"
+arcade_version="$(sed -n 's/.*"Microsoft\.DotNet\.Arcade\.Sdk": *"\([^"]*\)".*/\1/p' <(tr -d '\r\n' < "$repo_root/global.json"))"
+arcade_dependency_count="$(grep -Fc '<Uri>https://github.com/dotnet/arcade</Uri>' "$repo_root/eng/Version.Details.xml")"
+[[ -n "$sdk_version" && -n "$arcade_version" && "$arcade_dependency_count" -ge 1 ]]
+mkdir -p "$inner/eng/common" "$fixture/eng" "$fixture/.dotnet/sdk/$sdk_version/Sdks"
+printf '{"sdk":{"version":"%s"},"msbuild-sdks":{"Microsoft.DotNet.Arcade.Sdk":"9.0.0-beta.25164.2"}}\n' "$sdk_version" \
   > "$fixture/compat-global-before.json"
 cp "$fixture/compat-global-before.json" "$fixture/artifacts/sourcebuild-intermediate/global.json"
+cp "$repo_root/global.json" "$fixture/global.json"
+cp "$repo_root/eng/Version.Details.xml" "$fixture/eng/Version.Details.xml"
 cp "$repo_root/global.json" "$inner/global.json"
 cp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
 cp "$repo_root/eng/BuildSourceBuildIntermediate.sh" "$inner/eng/BuildSourceBuildIntermediate.sh"
@@ -42,7 +48,7 @@ BUILD_BUILDNUMBER=20260930.99 \
 PILOT_ARGS="$fixture/args.txt" \
 PILOT_INSTALL_ARGS="$fixture/install-args.txt" \
 PILOT_MSBUILD_SDKS="$fixture/sdk-path.txt" \
-MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100/Sdks" \
+MSBuildSDKsPath="$fixture/.dotnet/sdk/$sdk_version/Sdks" \
   bash "$inner/eng/BuildSourceBuildIntermediate.sh" --inner-legacy \
     "$fixture/.dotnet/dotnet" \
     "$fixture/tool-packages/microsoft.dotnet.arcade.sdk/9.0.0-beta.25164.2/tools" \
@@ -51,14 +57,18 @@ MSBuildSDKsPath="$fixture/.dotnet/sdk/11.0.100/Sdks" \
 [[ $(grep -Fc '10.0.404' "$inner/global.json") -eq 2 ]]
 [[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/global.json") -eq 1 ]]
 [[ $(grep -Fc '10.0.404' "$fixture/artifacts/sourcebuild-intermediate/global.json") -eq 1 ]]
-cmp <(sed -e 's/11\.0\.100/10.0.404/g' \
-          -e 's/11\.0\.0-beta\.26421\.2/9.0.0-beta.25164.2/g' "$repo_root/global.json") \
+sed_escape() { printf '%s' "$1" | sed 's/[.[\*^$/]/\\&/g'; }
+cmp <(sed -e "s/\"$(sed_escape "$sdk_version")\"/\"10.0.404\"/g" \
+          -e "s/\"$(sed_escape "$arcade_version")\"/\"9.0.0-beta.25164.2\"/g" "$repo_root/global.json") \
   "$inner/global.json"
-cmp <(sed -e 's/9\.0\.0-beta\.24429\.5/9.0.0-beta.25164.2/g' \
-          -e 's/d21db44e84b9038ea7b2add139adee2303d46800/5ba9ca776c1d0bb72b2791591e54cf51fc52dfee/g' \
-          "$repo_root/eng/Version.Details.xml") "$inner/eng/Version.Details.xml"
-[[ $(grep -Fc '9.0.0-beta.25164.2' "$inner/eng/Version.Details.xml") -eq 3 ]]
-[[ $(grep -Fc '5ba9ca776c1d0bb72b2791591e54cf51fc52dfee' "$inner/eng/Version.Details.xml") -eq 3 ]]
+# Only the Version and Sha lines of the dotnet/arcade dependencies may change.
+diff <(grep -v -e 'Version="' -e '<Sha>' "$repo_root/eng/Version.Details.xml") \
+     <(grep -v -e 'Version="' -e '<Sha>' "$inner/eng/Version.Details.xml")
+[[ $(grep -Fc 'Version="9.0.0-beta.25164.2"' "$inner/eng/Version.Details.xml") -eq "$arcade_dependency_count" ]]
+[[ $(grep -Fc '<Sha>5ba9ca776c1d0bb72b2791591e54cf51fc52dfee</Sha>' "$inner/eng/Version.Details.xml") -eq "$arcade_dependency_count" ]]
+[[ $(diff <(grep -e 'Version="' -e '<Sha>' "$repo_root/eng/Version.Details.xml") \
+          <(grep -e 'Version="' -e '<Sha>' "$inner/eng/Version.Details.xml") | grep -c '^>' || true) \
+   -eq $((arcade_dependency_count * 2)) ]]
 grep -Fxq -- '-p:Publish=false' "$fixture/args.txt"
 grep -Fxq -- '-p:ArcadeBuildFromSource=true' "$fixture/args.txt"
 grep -Fxq -- '-p:DotNetBuildRepo=true' "$fixture/args.txt"
@@ -122,6 +132,23 @@ if BUILD_SOURCESDIRECTORY="$fixture" BUILD_REPOSITORY_ID=wrong-repository \
 fi
 cmp "$repo_root/global.json" "$inner/global.json"
 cmp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
+
+printf ' ' >> "$inner/eng/Version.Details.xml"
+cp "$fixture/compat-global-before.json" "$fixture/artifacts/sourcebuild-intermediate/global.json"
+if BUILD_SOURCESDIRECTORY="$fixture" \
+    BUILD_REPOSITORY_ID=ef257391-4d76-4240-8649-3f21ac49c392 \
+    BUILD_BUILDNUMBER=20260930.99 \
+    bash "$inner/eng/BuildSourceBuildIntermediate.sh" --inner-legacy \
+      "$fixture/.dotnet/dotnet" \
+      "$fixture/tool-packages/microsoft.dotnet.arcade.sdk/9.0.0-beta.25164.2/tools" \
+      17.11.2-hotfix-26480-99 > "$fixture/copy-mismatch.log" 2>&1; then
+  echo "The inner helper accepted a private copy that differs from the outer checkout." >&2
+  exit 1
+fi
+grep -Fq 'The copied source-build toolchain differs from its pinned input.' "$fixture/copy-mismatch.log"
+cmp "$repo_root/global.json" "$inner/global.json"
+cmp "$fixture/compat-global-before.json" "$fixture/artifacts/sourcebuild-intermediate/global.json"
+cp "$repo_root/eng/Version.Details.xml" "$inner/eng/Version.Details.xml"
 
 verify_package_version() {
   local name="$1" build_version="$2" cli_version="$3" expected="$4"
