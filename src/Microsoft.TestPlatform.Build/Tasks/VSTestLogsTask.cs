@@ -8,6 +8,7 @@ using Microsoft.Build.Utilities;
 
 namespace Microsoft.TestPlatform.Build.Tasks;
 
+[MSBuildMultiThreadableTask]
 public class VSTestLogsTask : Task
 {
     public string? LogType { get; set; }
