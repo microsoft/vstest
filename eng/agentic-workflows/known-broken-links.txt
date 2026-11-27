@@ -23,8 +23,13 @@ https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.Transl
 https://dotnet.myget.org/feed/vstest/package/nuget/Microsoft.TestPlatform.TranslationLayer/15.0.0-preview-20170125-04
 https://github.com/Microsoft/vstest/compare/RC.3...15.0-rtm
 https://github.com/Microsoft/vstest/compare/v15.3.0-preview-20170618-03...rel/15.3-rtm
+https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/dotnet-test-protocol.md
+https://github.com/dotnet/cli/blob/rel/1.0.0/Documentation/dotnet-test-protocol.md#test-execution
 https://github.com/dotnet/cli/blob/rel/1.0.0/src/Microsoft.Extensions.Testing.Abstractions/Test.cs
 https://github.com/dotnet/cli/blob/rel/1.0.0/src/Microsoft.Extensions.Testing.Abstractions/TestResult.cs
+https://github.com/microsoft/codecoverage/blob/main/docs/supported-os.md
+https://github.com/microsoft/vstest/blob/main/docs/RFCs/0020-Improving-Logic-To-Pass-Sources-To-Adapters.md
+https://github.com/spekt/xunit.testlogger/blob/49d2416f24acb30225adc6e65753cc829010bec9/src/Xunit.Xml.TestLogger/XunitXmlTestLogger.cs#L19
 https://stackoverflow.com/a/49780224/3065397
 https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.3-rtm/20170618-03;/TestPlatform.vsix
 https://vsdrop.corp.microsoft.com/file/v1/Products/DevDiv/Microsoft/vstest/15.3-rtm/20170807-05;/TestPlatform.vsix
